@@ -429,6 +429,30 @@
             opacity: 0.6;
         }
         
+        /* Limbo page styles */
+        .limbo-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #0d1117;
+            padding: 40px 20px;
+        }
+        
+        /* Panic menu page styles */
+        .panicmenu-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: #0d1117;
+            padding: 40px 20px;
+        }
+        
         /* Achievements page styles */
         .achievements-page {
             text-align: center;
@@ -797,6 +821,8 @@
         
         <p class="subtitle">Built with code, powered by Finley</p>
         <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
+        <!-- Canvas for wooperbird goose on main page -->
+        <canvas id="wooperbirdCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;"></canvas>
                 </div>
     
     <!-- Home page -->
@@ -833,7 +859,7 @@
         <div style="position: fixed; top: 20px; left: 20px; color: black; font-size: 16px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); z-index: 1000; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 8px;">
             <div>Brush Size: <span id="paint-brush-size">5</span></div>
             <div>Color: <span id="paint-color-display">#000000</span></div>
-        </div>
+            </div>
         <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
             </div>
         
@@ -909,6 +935,36 @@
             Press E to spawn stones
         </div>
         <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
+    </div>
+    
+    <!-- Limbo page (blocked) -->
+    <div class="page limbo-page hidden" id="limboPage">
+        <h1 style="color: #f85149; font-size: 48px; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">⚠️ BLOCKED ⚠️</h1>
+        <p style="color: #c9d1d9; font-size: 24px; margin-bottom: 40px; text-align: center;">Your blocked from this website</p>
+        <p style="color: #8b949e; font-size: 18px; margin-bottom: 30px;">Enter the password to be unblocked:</p>
+        <input type="text" id="limboPasswordInput" placeholder="Password" style="padding: 15px 20px; font-size: 20px; background: #161b22; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; margin-bottom: 20px; text-align: center; min-width: 250px;">
+        <button id="limboSubmitBtn" onclick="checkLimboPassword()" style="padding: 15px 40px; font-size: 20px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Submit</button>
+        <p id="limboError" style="color: #f85149; font-size: 16px; margin-top: 20px; min-height: 24px;"></p>
+    </div>
+    
+    <!-- Panic Menu page -->
+    <div class="page panicmenu-page hidden" id="panicmenuPage">
+        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Panic Menu</h1>
+        <p style="color: #8b949e; font-size: 16px; margin-bottom: 30px;">Set a hotkey and URL to quickly swap tabs</p>
+        <div style="max-width: 500px; margin: 0 auto;">
+            <div style="margin-bottom: 20px;">
+                <label style="color: #c9d1d9; font-size: 18px; display: block; margin-bottom: 10px;">Hotkey:</label>
+                <input type="text" id="panicHotkeyInput" placeholder="Press a key..." style="width: 100%; padding: 12px; font-size: 16px; background: #161b22; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; text-align: center;" readonly>
+                <p style="color: #8b949e; font-size: 14px; margin-top: 5px;">Click the input and press a key to set</p>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="color: #c9d1d9; font-size: 18px; display: block; margin-bottom: 10px;">Website URL:</label>
+                <input type="text" id="panicUrlInput" placeholder="https://example.com" style="width: 100%; padding: 12px; font-size: 16px; background: #161b22; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9;">
+            </div>
+            <button onclick="savePanicSettings()" style="width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px;">Save Settings</button>
+            <div id="panicStatus" style="color: #58a6ff; font-size: 16px; text-align: center; min-height: 24px; margin-bottom: 20px;"></div>
+            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer;">Back</button>
+        </div>
     </div>
     
     <!-- Background Selection page -->
@@ -1170,6 +1226,7 @@
                     { name: 'stones', desc: 'Throw stones!' },
                     { name: 'wooper', desc: 'Wooper colors!' },
                     { name: 'wooperbird', desc: 'WooperBird command', isWooper: true },
+                    { name: 'panicmenu', desc: 'Panic menu settings' },
                 ],
                 'Colors': [
                     { name: 'rainbow', desc: 'Rainbow colors' },
@@ -1952,8 +2009,9 @@
                 } else if (command === 'wooperbird') {
                     resetConfirm = false;
                     if (unlockedCommands.has('wooperbird')) {
+                        spawnWooperbirdGoose();
                         commandInput.value = '';
-                        commandInput.placeholder = 'WooperBird! 🐦';
+                        commandInput.placeholder = 'WooperBird dropped! 🐦';
                         setTimeout(() => {
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
@@ -1964,6 +2022,12 @@
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
                     }
+                } else if (command === 'panicmenu' || command === 'panic') {
+                    resetConfirm = false;
+                    showPage('panicmenuPage');
+                    initPanicMenu();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'jumpscare') {
                     resetConfirm = false;
                     triggerJumpscare();
@@ -1972,6 +2036,26 @@
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
+                } else if (command === '67') {
+                    resetConfirm = false;
+                    // Get current count
+                    let count67 = parseInt(localStorage.getItem('count67') || '0');
+                    count67++;
+                    localStorage.setItem('count67', count67.toString());
+                    
+                    commandInput.value = '';
+                    commandInput.placeholder = 'DONT SAY THAT';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                    
+                    // Block after 3 uses
+                    if (count67 >= 3) {
+                        localStorage.setItem('isBlocked', 'true');
+                        showPage('limboPage');
+                        const commandBar = document.querySelector('.command-bar');
+                        if (commandBar) commandBar.style.display = 'none';
+                    }
                 } else if (command === 'cmds') {
                     resetConfirm = false;
                     toggleCommandsMenu();
@@ -2447,6 +2531,289 @@
         
         // Load background on page load
         loadBackgroundPreferences();
+        
+        // Wooperbird goose on main page
+        let wooperbirdCanvas, wooperbirdCtx;
+        let wooperbirdGoose = null;
+        let wooperbirdDragged = false;
+        let wooperbirdMousePos = { x: 0, y: 0 };
+        let wooperbirdLastMousePos = { x: 0, y: 0 };
+        let wooperbirdAnimationId = null;
+        
+        function initWooperbirdCanvas() {
+            wooperbirdCanvas = document.getElementById('wooperbirdCanvas');
+            if (!wooperbirdCanvas) return;
+            
+            wooperbirdCanvas.width = window.innerWidth;
+            wooperbirdCanvas.height = window.innerHeight;
+            wooperbirdCtx = wooperbirdCanvas.getContext('2d');
+            wooperbirdCanvas.style.pointerEvents = wooperbirdGoose ? 'auto' : 'none';
+            
+            // Mouse/touch events for dragging
+            wooperbirdCanvas.addEventListener('mousedown', handleWooperbirdMouseDown);
+            wooperbirdCanvas.addEventListener('mousemove', handleWooperbirdMouseMove);
+            wooperbirdCanvas.addEventListener('mouseup', handleWooperbirdMouseUp);
+            wooperbirdCanvas.addEventListener('touchstart', handleWooperbirdTouchStart, { passive: false });
+            wooperbirdCanvas.addEventListener('touchmove', handleWooperbirdTouchMove, { passive: false });
+            wooperbirdCanvas.addEventListener('touchend', handleWooperbirdTouchEnd);
+            
+            if (wooperbirdGoose) {
+                animateWooperbird();
+            }
+        }
+        
+        function spawnWooperbirdGoose() {
+            if (!wooperbirdCanvas) {
+                initWooperbirdCanvas();
+            }
+            
+            wooperbirdGoose = {
+                x: window.innerWidth / 2,
+                y: window.innerHeight / 2,
+                size: 30,
+                rotation: 0,
+                rotationSpeed: 0.02
+            };
+            
+            wooperbirdCanvas.style.pointerEvents = 'auto';
+            
+            if (!wooperbirdAnimationId) {
+                animateWooperbird();
+            }
+        }
+        
+        function drawWooperbirdGoose(goose) {
+            if (!wooperbirdCtx || !goose) return;
+            
+            wooperbirdCtx.save();
+            wooperbirdCtx.translate(goose.x, goose.y);
+            wooperbirdCtx.rotate(goose.rotation);
+            
+            // Draw goose body (simple oval)
+            wooperbirdCtx.fillStyle = '#FFFFFF';
+            wooperbirdCtx.beginPath();
+            wooperbirdCtx.ellipse(0, 0, goose.size * 0.6, goose.size * 0.4, 0, 0, Math.PI * 2);
+            wooperbirdCtx.fill();
+            wooperbirdCtx.strokeStyle = '#000000';
+            wooperbirdCtx.lineWidth = 2;
+            wooperbirdCtx.stroke();
+            
+            // Draw goose head
+            wooperbirdCtx.fillStyle = '#FFFFFF';
+            wooperbirdCtx.beginPath();
+            wooperbirdCtx.arc(goose.size * 0.5, -goose.size * 0.2, goose.size * 0.3, 0, Math.PI * 2);
+            wooperbirdCtx.fill();
+            wooperbirdCtx.stroke();
+            
+            // Draw beak
+            wooperbirdCtx.fillStyle = '#FFA500';
+            wooperbirdCtx.beginPath();
+            wooperbirdCtx.moveTo(goose.size * 0.7, -goose.size * 0.2);
+            wooperbirdCtx.lineTo(goose.size * 0.9, -goose.size * 0.15);
+            wooperbirdCtx.lineTo(goose.size * 0.7, -goose.size * 0.1);
+            wooperbirdCtx.closePath();
+            wooperbirdCtx.fill();
+            wooperbirdCtx.strokeStyle = '#000000';
+            wooperbirdCtx.stroke();
+            
+            // Draw eye
+            wooperbirdCtx.fillStyle = '#000000';
+            wooperbirdCtx.beginPath();
+            wooperbirdCtx.arc(goose.size * 0.55, -goose.size * 0.25, 3, 0, Math.PI * 2);
+            wooperbirdCtx.fill();
+            
+            wooperbirdCtx.restore();
+        }
+        
+        function handleWooperbirdMouseDown(e) {
+            if (!wooperbirdGoose) return;
+            const rect = wooperbirdCanvas.getBoundingClientRect();
+            wooperbirdMousePos.x = e.clientX - rect.left;
+            wooperbirdMousePos.y = e.clientY - rect.top;
+            wooperbirdLastMousePos.x = wooperbirdMousePos.x;
+            wooperbirdLastMousePos.y = wooperbirdMousePos.y;
+            
+            const dist = Math.sqrt(Math.pow(wooperbirdMousePos.x - wooperbirdGoose.x, 2) + Math.pow(wooperbirdMousePos.y - wooperbirdGoose.y, 2));
+            if (dist < wooperbirdGoose.size) {
+                wooperbirdDragged = true;
+            }
+        }
+        
+        function handleWooperbirdMouseMove(e) {
+            if (!wooperbirdGoose || !wooperbirdDragged) return;
+            const rect = wooperbirdCanvas.getBoundingClientRect();
+            wooperbirdLastMousePos.x = wooperbirdMousePos.x;
+            wooperbirdLastMousePos.y = wooperbirdMousePos.y;
+            wooperbirdMousePos.x = e.clientX - rect.left;
+            wooperbirdMousePos.y = e.clientY - rect.top;
+            
+            wooperbirdGoose.x = wooperbirdMousePos.x;
+            wooperbirdGoose.y = wooperbirdMousePos.y;
+        }
+        
+        function handleWooperbirdMouseUp() {
+            wooperbirdDragged = false;
+        }
+        
+        function handleWooperbirdTouchStart(e) {
+            if (!wooperbirdGoose) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = wooperbirdCanvas.getBoundingClientRect();
+            wooperbirdMousePos.x = touch.clientX - rect.left;
+            wooperbirdMousePos.y = touch.clientY - rect.top;
+            wooperbirdLastMousePos.x = wooperbirdMousePos.x;
+            wooperbirdLastMousePos.y = wooperbirdMousePos.y;
+            
+            const dist = Math.sqrt(Math.pow(wooperbirdMousePos.x - wooperbirdGoose.x, 2) + Math.pow(wooperbirdMousePos.y - wooperbirdGoose.y, 2));
+            if (dist < wooperbirdGoose.size) {
+                wooperbirdDragged = true;
+            }
+        }
+        
+        function handleWooperbirdTouchMove(e) {
+            if (!wooperbirdGoose || !wooperbirdDragged) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = wooperbirdCanvas.getBoundingClientRect();
+            wooperbirdLastMousePos.x = wooperbirdMousePos.x;
+            wooperbirdLastMousePos.y = wooperbirdMousePos.y;
+            wooperbirdMousePos.x = touch.clientX - rect.left;
+            wooperbirdMousePos.y = touch.clientY - rect.top;
+            
+            wooperbirdGoose.x = wooperbirdMousePos.x;
+            wooperbirdGoose.y = wooperbirdMousePos.y;
+        }
+        
+        function handleWooperbirdTouchEnd() {
+            wooperbirdDragged = false;
+        }
+        
+        function animateWooperbird() {
+            if (!wooperbirdCtx || !wooperbirdGoose) {
+                wooperbirdAnimationId = null;
+                return;
+            }
+            
+            wooperbirdCtx.clearRect(0, 0, wooperbirdCanvas.width, wooperbirdCanvas.height);
+            
+            if (!wooperbirdDragged) {
+                wooperbirdGoose.rotation += wooperbirdGoose.rotationSpeed;
+            }
+            
+            drawWooperbirdGoose(wooperbirdGoose);
+            
+            wooperbirdAnimationId = requestAnimationFrame(animateWooperbird);
+        }
+        
+        // Initialize wooperbird canvas on page load
+        initWooperbirdCanvas();
+        
+        // Handle window resize for wooperbird canvas
+        window.addEventListener('resize', () => {
+            if (wooperbirdCanvas) {
+                wooperbirdCanvas.width = window.innerWidth;
+                wooperbirdCanvas.height = window.innerHeight;
+            }
+        });
+        
+        // Panic Menu system
+        let panicHotkey = null;
+        let panicUrl = '';
+        
+        function loadPanicSettings() {
+            const saved = localStorage.getItem('panicSettings');
+            if (saved) {
+                const data = JSON.parse(saved);
+                panicHotkey = data.hotkey || null;
+                panicUrl = data.url || '';
+            }
+            setupPanicHotkey();
+        }
+        
+        function savePanicSettings() {
+            const hotkeyInput = document.getElementById('panicHotkeyInput');
+            const urlInput = document.getElementById('panicUrlInput');
+            const statusEl = document.getElementById('panicStatus');
+            
+            if (!hotkeyInput || !urlInput) return;
+            
+            const url = urlInput.value.trim();
+            
+            if (!panicHotkey || !url) {
+                if (statusEl) statusEl.textContent = 'Please set both hotkey and URL!';
+                return;
+            }
+            
+            localStorage.setItem('panicSettings', JSON.stringify({
+                hotkey: panicHotkey,
+                url: url
+            }));
+            panicUrl = url;
+            setupPanicHotkey();
+            
+            if (statusEl) statusEl.textContent = 'Settings saved! Press your hotkey to swap tabs.';
+            setTimeout(() => {
+                if (statusEl) statusEl.textContent = '';
+            }, 3000);
+        }
+        
+        function setupPanicHotkey() {
+            // Remove existing listener if any
+            document.removeEventListener('keydown', handlePanicHotkey);
+            
+            if (panicHotkey && panicUrl) {
+                document.addEventListener('keydown', handlePanicHotkey);
+            }
+        }
+        
+        function handlePanicHotkey(e) {
+            // Check if the pressed key matches the panic hotkey
+            if (e.key.toLowerCase() === panicHotkey.toLowerCase() || e.code.toLowerCase() === panicHotkey.toLowerCase()) {
+                // Swap to the panic URL
+                window.location.href = panicUrl;
+            }
+        }
+        
+        function initPanicMenu() {
+            const hotkeyInput = document.getElementById('panicHotkeyInput');
+            const urlInput = document.getElementById('panicUrlInput');
+            const statusEl = document.getElementById('panicStatus');
+            
+            loadPanicSettings();
+            
+            if (hotkeyInput) {
+                hotkeyInput.value = panicHotkey || '';
+                
+                hotkeyInput.addEventListener('focus', () => {
+                    hotkeyInput.value = '';
+                    hotkeyInput.placeholder = 'Press a key...';
+                });
+                
+                hotkeyInput.addEventListener('keydown', (e) => {
+                    e.preventDefault();
+                    // Get the key code or key name
+                    const key = e.key.length === 1 ? e.key.toLowerCase() : e.code;
+                    panicHotkey = key;
+                    hotkeyInput.value = e.key.length === 1 ? e.key.toUpperCase() : e.code;
+                    hotkeyInput.placeholder = 'Hotkey';
+                });
+            }
+            
+            if (urlInput) {
+                urlInput.value = panicUrl;
+            }
+            
+            if (statusEl) {
+                statusEl.textContent = '';
+            }
+        }
+        
+        // Make savePanicSettings globally accessible
+        window.savePanicSettings = savePanicSettings;
+        
+        // Load panic settings on page load
+        loadPanicSettings();
         
         // Goose Rain game with physics
         let geese = [];
@@ -2983,7 +3350,7 @@
                     const y = Math.sin(angle) * radius;
                     if (i === 0) {
                         stonesCtx.moveTo(x, y);
-                            } else {
+                                    } else {
                         stonesCtx.lineTo(x, y);
                     }
                 }
@@ -3471,9 +3838,69 @@
             container.innerHTML = html;
         }
         
+        // Blocking system
+        function checkBlocked() {
+            if (localStorage.getItem('isBlocked') === 'true') {
+                showPage('limboPage');
+                const commandBar = document.querySelector('.command-bar');
+                if (commandBar) commandBar.style.display = 'none';
+                return true;
+            }
+            return false;
+        }
+        
+        function unblock() {
+            localStorage.removeItem('isBlocked');
+            localStorage.removeItem('count67');
+            showPage('mainPage');
+            const commandBar = document.querySelector('.command-bar');
+            if (commandBar) commandBar.style.display = 'flex';
+        }
+        
+        // Password check function for limbo page
+        function checkLimboPassword() {
+            const passwordInput = document.getElementById('limboPasswordInput');
+            const errorEl = document.getElementById('limboError');
+            
+            if (!passwordInput) return;
+            
+            const password = passwordInput.value.trim();
+            
+            if (password === 'OG') {
+                // Correct password - unblock
+                unblock();
+                if (passwordInput) passwordInput.value = '';
+                if (errorEl) errorEl.textContent = '';
+                } else {
+                // Wrong password
+                if (errorEl) errorEl.textContent = 'Incorrect password!';
+                if (passwordInput) passwordInput.value = '';
+                setTimeout(() => {
+                    if (errorEl) errorEl.textContent = '';
+                }, 2000);
+            }
+        }
+        
+        // Allow Enter key to submit password
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('limboPasswordInput');
+            if (passwordInput) {
+                passwordInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        checkLimboPassword();
+                    }
+                });
+            }
+        });
+        
         // Initialize global data on page load
         loadGlobalData();
         loadCoinflipData();
+        
+        // Check if blocked on page load
+        if (checkBlocked()) {
+            // Already showing limbo page
+        }
         
         // Update clicker display
         const clickerAmount = document.getElementById('clicker-amount');
