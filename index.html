@@ -654,6 +654,58 @@
             font-style: italic;
         }
         
+        /* Clock display in top left */
+        .clock-display {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .clock-display.hidden {
+            display: none;
+        }
+        
+        /* Command feedback display */
+        .command-feedback {
+            position: fixed;
+            bottom: 70px;
+            left: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-width: 400px;
+            z-index: 998;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .command-feedback.hidden {
+            display: none;
+        }
+        
+        .command-feedback .command-text {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        
+        .command-feedback .feedback-text {
+            color: #8b949e;
+            margin-left: 8px;
+        }
+        
         /* Command bar in bottom left */
         .command-bar {
             position: fixed;
@@ -858,7 +910,11 @@
         <canvas id="paintCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; cursor: crosshair;"></canvas>
         <div style="position: fixed; top: 20px; left: 20px; color: black; font-size: 16px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); z-index: 1000; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 8px;">
             <div>Brush Size: <span id="paint-brush-size">5</span></div>
-            <div>Color: <span id="paint-color-display">#000000</span></div>
+            <div style="margin-top: 10px;">
+                <label for="paint-color-picker" style="display: block; margin-bottom: 5px;">Color:</label>
+                <input type="color" id="paint-color-picker" value="#000000" style="width: 60px; height: 30px; cursor: pointer; border: 2px solid #333; border-radius: 4px;">
+                <span id="paint-color-display" style="margin-left: 10px;">#000000</span>
+            </div>
             </div>
         <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
             </div>
@@ -915,7 +971,7 @@
             <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
         </div>
     </div>
-    
+
     <!-- Goose Rain page -->
     <div class="page gooserain-page hidden" id="gooserainPage">
         <canvas id="gooseCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #87CEEB 0%, #98D8C8 100%); cursor: crosshair;"></canvas>
@@ -994,6 +1050,14 @@
         <div style="margin-top: 30px;">
             <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
         </div>
+    </div>
+    
+    <!-- Clock display (top left) -->
+    <div class="clock-display hidden" id="clockDisplay"></div>
+    
+    <!-- Command feedback display -->
+    <div class="command-feedback hidden" id="commandFeedback">
+        <span class="command-text"></span><span class="feedback-text"></span>
     </div>
     
     <!-- Command bar in bottom left -->
@@ -1245,6 +1309,8 @@
                 ],
                 'Actions': [
                     { name: 'honk', desc: 'Play honk sound', isGoose: true },
+                    { name: 'clock', desc: 'Toggle clock (true/false)' },
+                    { name: 'whoami', desc: 'Display user profile' },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
@@ -1611,9 +1677,9 @@
                     // Randomly pick a shade from the palette
                     const randomShade = palette[Math.floor(Math.random() * palette.length)];
                     letter.style.color = randomShade;
-                            }
-                        });
-                    }
+                }
+            });
+        }
 
         // Function to apply rainbow colors
         function applyRainbowColors() {
@@ -1709,6 +1775,93 @@
                 commandsMenu.style.transition = 'right 0.3s ease';
             }
         }
+        
+        // Clock system
+        let clockEnabled = false;
+        let clockInterval = null;
+        const clockDisplay = document.getElementById('clockDisplay');
+        
+        function loadClockSetting() {
+            const saved = localStorage.getItem('clockEnabled');
+            clockEnabled = saved === 'true';
+            if (clockEnabled) {
+                showClock();
+            } else {
+                hideClock();
+            }
+        }
+        
+        function saveClockSetting() {
+            localStorage.setItem('clockEnabled', clockEnabled.toString());
+        }
+        
+        function updateClock() {
+            if (!clockDisplay) return;
+            const now = new Date();
+            // Florida timezone (America/New_York - EST/EDT)
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false, // Military time
+                timeZone: 'America/New_York'
+            };
+            const timeString = new Intl.DateTimeFormat('en-US', options).format(now);
+            clockDisplay.textContent = timeString;
+        }
+        
+        function showClock() {
+            if (!clockDisplay) return;
+            clockEnabled = true;
+            clockDisplay.classList.remove('hidden');
+            updateClock();
+            if (clockInterval) clearInterval(clockInterval);
+            clockInterval = setInterval(updateClock, 1000);
+            saveClockSetting();
+        }
+        
+        function hideClock() {
+            if (!clockDisplay) return;
+            clockEnabled = false;
+            clockDisplay.classList.add('hidden');
+            if (clockInterval) {
+                clearInterval(clockInterval);
+                clockInterval = null;
+            }
+            saveClockSetting();
+        }
+        
+        // Command feedback helper
+        function showCommandFeedback(command, feedback) {
+            const feedbackEl = document.getElementById('commandFeedback');
+            const commandTextEl = feedbackEl?.querySelector('.command-text');
+            const feedbackTextEl = feedbackEl?.querySelector('.feedback-text');
+            
+            if (feedbackEl && commandTextEl && feedbackTextEl) {
+                commandTextEl.textContent = command;
+                feedbackTextEl.textContent = feedback ? ` - ${feedback}` : '';
+                feedbackEl.classList.remove('hidden');
+                
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    feedbackEl.classList.add('hidden');
+                }, 3000);
+            }
+        }
+        
+        // Whoami profile
+        function showWhoami() {
+            const profile = `User: Finley Chang | Location: Florida | Status: Building cool stuff | Favorite Command: goose 🦢`;
+            showCommandFeedback('whoami', profile);
+            commandInput.value = '';
+            commandInput.placeholder = 'Profile displayed!';
+            setTimeout(() => {
+                commandInput.placeholder = 'Type a color or "home"...';
+            }, 2000);
+        }
+        
+        // Load clock setting on page load
+        loadClockSetting();
         
         // Command input handler
         const commandInput = document.getElementById('commandInput');
@@ -2420,7 +2573,7 @@
                 if (gradientSection) gradientSection.style.display = 'none';
                 if (solidBtn) solidBtn.style.background = '#238636';
                 if (gradientBtn) gradientBtn.style.background = '#30363d';
-            } else {
+                } else {
                 if (solidSection) solidSection.style.display = 'none';
                 if (gradientSection) gradientSection.style.display = 'block';
                 if (solidBtn) solidBtn.style.background = '#30363d';
@@ -2489,7 +2642,7 @@
                     applyBtn.style.cursor = 'pointer';
                     applyBtn.style.background = '#238636';
                 }
-            } else {
+                        } else {
                 // Reset and select first color again
                 selectedGradientColor1 = color;
                 selectedGradientColor2 = null;
@@ -3152,6 +3305,16 @@
             paintCtx.fillStyle = '#ffffff';
             paintCtx.fillRect(0, 0, paintCanvas.width, paintCanvas.height);
             
+            // Color picker event listener
+            const colorPicker = document.getElementById('paint-color-picker');
+            const colorDisplay = document.getElementById('paint-color-display');
+            if (colorPicker) {
+                colorPicker.addEventListener('input', (e) => {
+                    paintColor = e.target.value;
+                    if (colorDisplay) colorDisplay.textContent = paintColor;
+                });
+            }
+            
             // Mouse/touch events for drawing
             paintCanvas.addEventListener('mousedown', handlePaintMouseDown);
             paintCanvas.addEventListener('mousemove', handlePaintMouseMove);
@@ -3350,7 +3513,7 @@
                     const y = Math.sin(angle) * radius;
                     if (i === 0) {
                         stonesCtx.moveTo(x, y);
-                                    } else {
+                } else {
                         stonesCtx.lineTo(x, y);
                     }
                 }
