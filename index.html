@@ -17,11 +17,34 @@
             color: #333;
             background: #0d1117;
             min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .page {
+            min-height: calc(100vh - 40px);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+        }
+        
+        .page.hidden {
+            display: none;
+        }
+        
+        .home-page {
+            text-align: center;
+        }
+        
+        .home-page h1 {
+            color: #c9d1d9;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .home-page p {
+            color: #8b949e;
+            font-size: 18px;
         }
         
         .finhub-title {
@@ -157,28 +180,36 @@
     </style>
 </head>
 <body>
-    <!-- FinHub title - big letters made of small "finley" letters -->
-    <div class="finhub-title">
-        <!-- Big F made of small letters -->
-        <div class="big-letter letter-f" id="letter-f"></div>
-        <!-- Big i made of small letters -->
-        <div class="big-letter letter-i" id="letter-i"></div>
-        <!-- Big n made of small letters -->
-        <div class="big-letter letter-n" id="letter-n"></div>
-        <!-- Big H made of small letters -->
-        <div class="big-letter letter-h" id="letter-h"></div>
-        <!-- Big u made of small letters -->
-        <div class="big-letter letter-u" id="letter-u"></div>
-        <!-- Big b made of small letters -->
-        <div class="big-letter letter-b" id="letter-b"></div>
+    <!-- Main page with FinHub title -->
+    <div class="page" id="mainPage">
+        <div class="finhub-title">
+            <!-- Big F made of small letters -->
+            <div class="big-letter letter-f" id="letter-f"></div>
+            <!-- Big i made of small letters -->
+            <div class="big-letter letter-i" id="letter-i"></div>
+            <!-- Big n made of small letters -->
+            <div class="big-letter letter-n" id="letter-n"></div>
+            <!-- Big H made of small letters -->
+            <div class="big-letter letter-h" id="letter-h"></div>
+            <!-- Big u made of small letters -->
+            <div class="big-letter letter-u" id="letter-u"></div>
+            <!-- Big b made of small letters -->
+            <div class="big-letter letter-b" id="letter-b"></div>
+        </div>
+        
+        <p class="subtitle">Built with code, powered by Finley</p>
+        <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
     </div>
     
-    <p class="subtitle">Built with code, powered by Finley</p>
-    <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
+    <!-- Home page -->
+    <div class="page home-page hidden" id="homePage">
+        <h1>Welcome to the home</h1>
+        <p>Type "back" in the command bar to return</p>
+    </div>
     
     <!-- Command bar in bottom left -->
     <div class="command-bar">
-        <input type="text" class="command-input" id="commandInput" placeholder="Type a color (black, red, blue, green, yellow, purple, orange, white, pink, cyan)..." autocomplete="off">
+        <input type="text" class="command-input" id="commandInput" placeholder="Type a color or 'home'..." autocomplete="off">
     </div>
 
     <script>
@@ -350,6 +381,14 @@
             });
         }
         
+        // Navigation system
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+        
         // Command input handler
         const commandInput = document.getElementById('commandInput');
         commandInput.addEventListener('keydown', (e) => {
@@ -357,7 +396,16 @@
                 const command = commandInput.value.toLowerCase().trim();
                 const color = colorMap[command];
                 
-                if (color) {
+                // Handle navigation commands
+                if (command === 'home') {
+                    showPage('homePage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'back') {
+                    showPage('mainPage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type a color or "home"...';
+                } else if (color) {
                     changeAllColors(color);
                     commandInput.value = '';
                     commandInput.placeholder = `Changed to ${command}!`;
@@ -366,9 +414,9 @@
                     }, 2000);
                 } else {
                     commandInput.value = '';
-                    commandInput.placeholder = 'Color not found. Try: black, red, blue, green, yellow...';
+                    commandInput.placeholder = 'Command not found. Try: home, back, or a color name...';
                     setTimeout(() => {
-                        commandInput.placeholder = 'Type a color (black, red, blue, green, yellow, purple, orange, white, pink, cyan)...';
+                        commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 }
             }
