@@ -740,14 +740,14 @@
         
         <p class="subtitle">Built with code, powered by Finley</p>
         <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
-    </div>
+                </div>
     
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
         <h1>Welcome to the home</h1>
         <p>Type "back" in the command bar to return</p>
         <a href="https://sso.browardschools.com/" target="_blank">Broward Schools Login</a>
-    </div>
+            </div>
     
     <!-- Minesweeper page -->
     <div class="page minesweeper-page hidden" id="minesweeperPage" oncontextmenu="return false;">
@@ -757,61 +757,25 @@
             <div class="minesweeper-grid" id="minesweeper-grid"></div>
         </div>
     </div>
-    
+
     <!-- Pong page -->
-    <div class="page pong-page hidden" id="pongPage">
-        <div class="pong-info">
-            Control: Use <strong>Mouse</strong> (move up/down) or <strong>Arrow Keys</strong>
-        </div>
-        <canvas id="pongCanvas" width="600" height="400"></canvas>
-        <div style="margin-top: 16px;">
-            <button id="settingsButton" onclick="window.toggleSettingsModal()" class="pong-button-style bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
-                Game Settings
-            </button>
-        </div>
-        <!-- Settings Modal (Hidden by default) -->
-        <div id="settingsModal" class="pong-settings-modal hidden">
-            <div class="pong-settings-content">
-                <h3>Game Settings</h3>
-                <!-- Bot Level Selector -->
-                <div style="margin-bottom: 16px;">
-                    <label for="botLevelSelect">Bot Difficulty:</label>
-                    <select id="botLevelSelect" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-1 focus:ring-white">
-                        <option value="easy">Easy (Slow)</option>
-                        <option value="hard" selected>Hard (Standard)</option>
-                        <option value="impossible">Impossible (Perfect)</option>
-                    </select>
-                </div>
-                <!-- Number of Balls Input -->
-                <div style="margin-bottom: 24px;">
-                    <label for="numBallsInput">Number of Balls (1-5):</label>
-                    <input type="number" id="numBallsInput" value="1" min="1" max="5" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-1 focus:ring-white">
-                </div>
-                <button id="saveSettingsButton" onclick="window.saveSettingsAndRestart()" class="pong-button-style bg-white hover:bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded-lg w-full">
-                    Apply & Restart
-                </button>
-            </div>
-        </div>
-    </div>
+    <div class="page sandboxels-page hidden" id="pongPage">
+        <iframe id="pong-iframe" class="sandboxels-iframe" src="https://web-pong.com/" name="pong_frame"></iframe>
+        <button class="sandboxels-close-btn" onclick="closePong()">X CLOSE VIEW (Return to original site)</button>
+                    </div>
     
     <!-- Sandboxels page -->
     <div class="page sandboxels-page hidden" id="sandboxelsPage">
         <iframe id="sandboxels-iframe" class="sandboxels-iframe" src="https://shalbito.vercel.app/" name="sandboxels_frame"></iframe>
         <button class="sandboxels-close-btn" onclick="closeSandboxels()">X CLOSE VIEW (Return to original site)</button>
-    </div>
-    
-    <!-- Snake page -->
-    <div class="page sandboxels-page hidden" id="snakePage">
-        <iframe id="snake-iframe" class="sandboxels-iframe" src="https://www.google.com/fbx?fbx=snake_arcade" name="snake_frame"></iframe>
-        <button class="sandboxels-close-btn" onclick="closeSnake()">X CLOSE VIEW (Return to original site)</button>
-    </div>
-    
+        </div>
+        
     <!-- Coinflip page -->
     <div class="page coinflip-page hidden" id="coinflipPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Coin Flip</h1>
         <div id="money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 15px; font-weight: bold;">
             Money: $<span id="money-count">0</span>
-        </div>
+            </div>
         <div id="win-chance-display" style="color: #58a6ff; font-size: 18px; margin-bottom: 20px;">
             Win Chance: <span id="win-chance-percent">50</span>%
         </div>
@@ -864,8 +828,49 @@
         <canvas id="gooseCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #87CEEB 0%, #98D8C8 100%); cursor: crosshair;"></canvas>
         <div style="position: fixed; top: 20px; left: 20px; color: white; font-size: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 1000;">
             Geese: <span id="goose-count">0</span>
+                </div>
+        <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
+            </div>
+    
+    <!-- Stones page -->
+    <div class="page stones-page hidden" id="stonesPage">
+        <canvas id="stonesCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #4682B4 0%, #5F9EA0 60%, #D2B48C 60%, #CD853F 100%); cursor: crosshair;"></canvas>
+        <div style="position: fixed; top: 20px; left: 20px; color: white; font-size: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 1000;">
+            Stones: <span id="stones-count">0</span>
+        </div>
+        <div style="position: fixed; top: 50px; left: 20px; color: white; font-size: 16px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 1000;">
+            Press E to spawn stones
         </div>
         <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
+    </div>
+    
+    <!-- Background Selection page -->
+    <div class="page background-page hidden" id="backgroundPage">
+        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Background Selection</h1>
+        <div style="margin-bottom: 30px;">
+            <button id="bg-solid-btn" onclick="setBgMode('solid')" style="padding: 10px 20px; margin: 5px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer;">Solid Color</button>
+            <button id="bg-gradient-btn" onclick="setBgMode('gradient')" style="padding: 10px 20px; margin: 5px; font-size: 16px; font-weight: bold; background: #30363d; color: white; border: none; border-radius: 6px; cursor: pointer;">Gradient (2 Colors)</button>
+        </div>
+        <div id="bg-solid-section" style="display: none;">
+            <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 15px;">Select Color</h2>
+            <div id="bg-solid-colors" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; max-width: 800px; margin-bottom: 20px;">
+                <!-- Colors will be generated here -->
+            </div>
+        </div>
+        <div id="bg-gradient-section" style="display: none;">
+            <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 15px;">Select 2 Colors</h2>
+            <div style="margin-bottom: 15px;">
+                <p style="color: #8b949e; font-size: 16px;">Color 1: <span id="bg-gradient-color1-name" style="color: #c9d1d9; font-weight: bold;">Not selected</span></p>
+                <p style="color: #8b949e; font-size: 16px;">Color 2: <span id="bg-gradient-color2-name" style="color: #c9d1d9; font-weight: bold;">Not selected</span></p>
+            </div>
+            <div id="bg-gradient-colors" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; max-width: 800px; margin-bottom: 20px;">
+                <!-- Colors will be generated here -->
+            </div>
+            <button id="bg-apply-gradient-btn" onclick="applyGradientBackground()" disabled style="padding: 12px 24px; font-size: 18px; font-weight: bold; background: #30363d; color: white; border: none; border-radius: 8px; cursor: not-allowed; margin-top: 20px;">Apply Gradient</button>
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
+        </div>
     </div>
     
     <!-- Command bar in bottom left -->
@@ -1090,8 +1095,13 @@
                     { name: 'clicker', desc: 'Play clicker game' },
                     { name: 'finley', desc: 'Transform back to FinHub' },
                     { name: 'achievements', desc: 'View achievements' },
+                    { name: 'background', desc: 'Change background' },
+                    { name: 'bg', desc: 'Change background' },
                     { name: 'goose', desc: 'Transform to GooseHub' },
                     { name: 'gooserain', desc: 'Make it rain geese!', isGoose: true },
+                    { name: 'stones', desc: 'Throw stones!' },
+                    { name: 'wooper', desc: 'Wooper colors!' },
+                    { name: 'wooperbird', desc: 'WooperBird command', isWooper: true },
                 ],
                 'Colors': [
                     { name: 'rainbow', desc: 'Rainbow colors' },
@@ -1122,6 +1132,10 @@
                 const visibleCommands = commands.filter(cmd => {
                     // Hide goose commands if not unlocked
                     if (cmd.isGoose && !unlockedCommands.has(cmd.name)) {
+                        return false;
+                    }
+                    // Hide wooper commands if not unlocked
+                    if (cmd.isWooper && !unlockedCommands.has(cmd.name)) {
                         return false;
                     }
                     return true;
@@ -1271,6 +1285,7 @@
         let unlockedCommands = new Set(); // Only goose commands need to be unlocked
         let isGooseMode = false; // Track if in goose mode
         let resetConfirm = false; // Track if reset command was just used (needs confirmation)
+        let resetUsed = false; // Track if reset has been used (can only use once)
         
         // Load global data
         function loadGlobalData() {
@@ -1282,6 +1297,10 @@
                 clickerPerClick = data.clickerPerClick || 1;
                 unlockedCommands = new Set(data.unlockedCommands || []); // Only goose commands stored
                 isGooseMode = data.isGooseMode || false;
+            }
+            // Check if reset was used in this session
+            if (sessionStorage.getItem('resetUsed') === 'true') {
+                resetUsed = true;
             }
             updateAllMoneyDisplays();
             renderCommandsMenu();
@@ -1303,6 +1322,10 @@
         
         // Reset everything - clears all progress
         function resetEverything() {
+            // Mark reset as used - can only use once
+            resetUsed = true;
+            sessionStorage.setItem('resetUsed', 'true');
+            
             // Clear all localStorage
             localStorage.removeItem('globalData');
             localStorage.removeItem('coinflipData');
@@ -1480,6 +1503,19 @@
             });
         }
         
+        // Function to apply wooper colors (blue and pink)
+        function applyWooperColors() {
+            const wooperColors = ['#1a1aff', '#ff69b4']; // Blue and pink
+            const allSmallLetters = document.querySelectorAll('.small-letter');
+            let colorIndex = 0;
+            allSmallLetters.forEach(letter => {
+                if (letter.textContent.trim() !== '') {
+                    letter.style.color = wooperColors[colorIndex % wooperColors.length];
+                    colorIndex++;
+                }
+            });
+        }
+        
         // Navigation system
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
@@ -1558,12 +1594,19 @@
                 
                 // Handle navigation commands
                 if (command === 'reset') {
-                    if (resetConfirm) {
+                    // Check if reset has already been used
+                    if (sessionStorage.getItem('resetUsed') === 'true') {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Reset can only be used once per session!';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    } else if (resetConfirm) {
                         // Second time - actually reset
                         resetEverything();
                         commandInput.value = '';
                         resetConfirm = false;
-                                    } else {
+                            } else {
                         // First time - ask for confirmation
                         resetConfirm = true;
                         commandInput.value = '';
@@ -1594,7 +1637,6 @@
                 } else if (command === 'pong') {
                     resetConfirm = false;
                     showPage('pongPage');
-                    initPong();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'sandboxles') {
@@ -1604,9 +1646,150 @@
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'snake') {
                     resetConfirm = false;
-                    showPage('snakePage');
+                    // Execute snake game JavaScript
+                    (function() {
+                        if(window.snakeGameActive) return;
+                        window.snakeGameActive = true;
+
+                        const snakeColor = '#00FF00';
+                        const headColor = '#FFFF00';
+                        const snakeSpeed = 80; // faster for smoother movement
+                        const snakeSize = 20;
+                        const maxLength = 50;
+
+                        let snake = [{x: 100, y: 100}];
+                        let direction = 'right';
+                        let grow = 0;
+
+                        const canvas = document.createElement('canvas');
+                        canvas.style.position = 'fixed';
+                        canvas.style.top = '0';
+                        canvas.style.left = '0';
+                        canvas.style.zIndex = '9999';
+                        canvas.width = window.innerWidth;
+                        canvas.height = window.innerHeight;
+                        document.body.appendChild(canvas);
+                        const ctx = canvas.getContext('2d');
+
+                        // Polyfill for roundRect if not available
+                        if (!ctx.roundRect) {
+                            ctx.roundRect = function(x, y, width, height, radius) {
+                                this.beginPath();
+                                this.moveTo(x + radius, y);
+                                this.lineTo(x + width - radius, y);
+                                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                                this.lineTo(x + width, y + height - radius);
+                                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                                this.lineTo(x + radius, y + height);
+                                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                                this.lineTo(x, y + radius);
+                                this.quadraticCurveTo(x, y, x + radius, y);
+                                this.closePath();
+                            };
+                        }
+
+                        window.addEventListener('keydown', e => {
+                            if(e.key === 'ArrowUp' && direction !== 'down') direction = 'up';
+                            if(e.key === 'ArrowDown' && direction !== 'up') direction = 'down';
+                            if(e.key === 'ArrowLeft' && direction !== 'right') direction = 'left';
+                            if(e.key === 'ArrowRight' && direction !== 'left') direction = 'right';
+                            // Allow escape to close
+                            if(e.key === 'Escape') {
+                                canvas.remove();
+                                window.snakeGameActive = false;
+                            }
+                        });
+
+                        function wrapWords() {
+                            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+                            const textNodes = [];
+                            while(walker.nextNode()) textNodes.push(walker.currentNode);
+
+                            textNodes.forEach(node => {
+                                if(node.nodeValue.trim() === '') return;
+                                const words = node.nodeValue.split(/(\s+)/);
+                                const fragment = document.createDocumentFragment();
+                                words.forEach(word => {
+                                    if(word.trim() === '') {
+                                        fragment.appendChild(document.createTextNode(word));
+                                    } else {
+                                        const span = document.createElement('span');
+                                        span.textContent = word;
+                                        span.style.display = 'inline-block';
+                                        fragment.appendChild(span);
+                                    }
+                                });
+                                node.parentNode.replaceChild(fragment, node);
+                            });
+                        }
+
+                        wrapWords();
+
+                        function moveSnake() {
+                            const head = {...snake[0]};
+                            const step = 10; // smaller step for better collision
+                            if(direction === 'up') head.y -= step;
+                            if(direction === 'down') head.y += step;
+                            if(direction === 'left') head.x -= step;
+                            if(direction === 'right') head.x += step;
+
+                            snake.unshift(head);
+
+                            if(grow > 0) grow--;
+                            else snake.pop();
+
+                            if(snake.length > maxLength) snake.pop();
+
+                            // Eat one word at a time
+                            const elements = Array.from(document.body.querySelectorAll('span')).filter(el => el !== canvas);
+                            for(let el of elements) {
+                                const rect = el.getBoundingClientRect();
+                                const padding = 4; // smaller hitbox
+                                if(head.x + padding < rect.right && head.x + snakeSize - padding > rect.left &&
+                                   head.y + padding < rect.bottom && head.y + snakeSize - padding > rect.top) {
+                                    el.style.visibility = 'hidden';
+                                    grow += 1;
+                                    break;
+                                }
+                            }
+                        }
+
+                        function drawSnake() {
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                            // Draw tail with gradient effect
+                            for(let i = 0; i < snake.length; i++) {
+                                const seg = snake[i];
+                                const t = i / snake.length;
+                                ctx.fillStyle = `rgba(${Math.floor(0 + t*255)}, ${Math.floor(255 - t*100)}, 0, 1)`;
+                                ctx.beginPath();
+                                ctx.roundRect(seg.x, seg.y, snakeSize, snakeSize, 6); // rounded corners
+                                ctx.fill();
+                            }
+
+                            // Draw head
+                            const head = snake[0];
+                            ctx.fillStyle = headColor;
+                            ctx.beginPath();
+                            ctx.roundRect(head.x, head.y, snakeSize, snakeSize, 8);
+                            ctx.fill();
+                        }
+
+                        function gameLoop() {
+                            moveSnake();
+                            drawSnake();
+                        }
+
+                        setInterval(gameLoop, snakeSpeed);
+
+                        console.log("Snake game started! Arrow keys move. Snake eats one word at a time, hitbox improved. Press ESC to exit.");
+                    })();
+                    commandsUsed.add('snake');
                     commandInput.value = '';
-                    commandInput.placeholder = 'Type "back" to return';
+                    commandInput.placeholder = 'Snake game started! Press ESC to exit.';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 3000);
                 } else if (command === 'finley') {
                     resetConfirm = false;
                     transformToFinHubMode();
@@ -1633,6 +1816,12 @@
                     renderAchievements();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'background' || command === 'bg') {
+                    resetConfirm = false;
+                    showPage('backgroundPage');
+                    initBackground();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'goose') {
                     resetConfirm = false; // Clear reset confirmation if other command is used
                     transformToGooseMode();
@@ -1650,7 +1839,7 @@
                         setTimeout(() => {
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
-                    } else {
+                                    } else {
                         commandInput.value = '';
                         commandInput.placeholder = 'Honk command not unlocked yet! Use "goose" first.';
                         setTimeout(() => {
@@ -1667,6 +1856,36 @@
                     } else {
                         commandInput.value = '';
                         commandInput.placeholder = 'Goose rain not unlocked yet! Use "goose" first.';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
+                } else if (command === 'stones') {
+                    resetConfirm = false;
+                    showPage('stonesPage');
+                    initStones();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'wooper') {
+                    resetConfirm = false;
+                    applyWooperColors();
+                    unlockCommand('wooperbird');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Wooper colors applied! 🐟';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'wooperbird') {
+                    resetConfirm = false;
+                    if (unlockedCommands.has('wooperbird')) {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'WooperBird! 🐦';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'WooperBird not unlocked yet! Use "wooper" first.';
                         setTimeout(() => {
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
@@ -1910,10 +2129,204 @@
             showPage('mainPage');
         }
         
-        // Snake close function
-        function closeSnake() {
+        // Pong close function
+        function closePong() {
             showPage('mainPage');
         }
+        
+        // Background selection system
+        let bgMode = 'solid'; // 'solid' or 'gradient'
+        let selectedGradientColor1 = null;
+        let selectedGradientColor2 = null;
+        let selectedSolidColor = null;
+        
+        // Map color names to hex values (use first color from each palette)
+        const bgColorMap = {
+            'black': '#000000',
+            'red': '#ff0000',
+            'blue': '#0000ff',
+            'green': '#00ff00',
+            'yellow': '#ffff00',
+            'purple': '#800080',
+            'orange': '#ffa500',
+            'white': '#ffffff',
+            'pink': '#ff69b4',
+            'cyan': '#00ffff',
+            'lime': '#00ff00',
+            'magenta': '#ff00ff',
+            'brown': '#a52a2a',
+            'gray': '#808080',
+            'grey': '#808080',
+            'gold': '#ffd700',
+            'silver': '#c0c0c0'
+        };
+        
+        // Load background preferences
+        function loadBackgroundPreferences() {
+            const saved = localStorage.getItem('backgroundPrefs');
+            if (saved) {
+                const prefs = JSON.parse(saved);
+                bgMode = prefs.mode || 'solid';
+                if (prefs.mode === 'solid' && prefs.color) {
+                    document.body.style.background = prefs.color;
+                    selectedSolidColor = prefs.color;
+                } else if (prefs.mode === 'gradient' && prefs.color1 && prefs.color2) {
+                    document.body.style.background = `linear-gradient(to bottom, ${prefs.color1}, ${prefs.color2})`;
+                    selectedGradientColor1 = prefs.color1;
+                    selectedGradientColor2 = prefs.color2;
+                }
+            }
+        }
+        
+        // Save background preferences
+        function saveBackgroundPreferences() {
+            const prefs = {
+                mode: bgMode,
+                color: bgMode === 'solid' ? selectedSolidColor : null,
+                color1: bgMode === 'gradient' ? selectedGradientColor1 : null,
+                color2: bgMode === 'gradient' ? selectedGradientColor2 : null
+            };
+            localStorage.setItem('backgroundPrefs', JSON.stringify(prefs));
+        }
+        
+        // Initialize background page
+        function initBackground() {
+            // Load saved preferences
+            const saved = localStorage.getItem('backgroundPrefs');
+            if (saved) {
+                const prefs = JSON.parse(saved);
+                bgMode = prefs.mode || 'solid';
+            }
+            
+            setBgMode(bgMode);
+            renderColorButtons();
+        }
+        
+        // Set background mode (solid or gradient)
+        function setBgMode(mode) {
+            bgMode = mode;
+            
+            const solidSection = document.getElementById('bg-solid-section');
+            const gradientSection = document.getElementById('bg-gradient-section');
+            const solidBtn = document.getElementById('bg-solid-btn');
+            const gradientBtn = document.getElementById('bg-gradient-btn');
+            
+            if (mode === 'solid') {
+                if (solidSection) solidSection.style.display = 'block';
+                if (gradientSection) gradientSection.style.display = 'none';
+                if (solidBtn) solidBtn.style.background = '#238636';
+                if (gradientBtn) gradientBtn.style.background = '#30363d';
+            } else {
+                if (solidSection) solidSection.style.display = 'none';
+                if (gradientSection) gradientSection.style.display = 'block';
+                if (solidBtn) solidBtn.style.background = '#30363d';
+                if (gradientBtn) gradientBtn.style.background = '#238636';
+                selectedGradientColor1 = null;
+                selectedGradientColor2 = null;
+                updateGradientSelection();
+            }
+        }
+        
+        // Render color buttons
+        function renderColorButtons() {
+            const solidColors = document.getElementById('bg-solid-colors');
+            const gradientColors = document.getElementById('bg-gradient-colors');
+            
+            if (solidColors) {
+                solidColors.innerHTML = '';
+                Object.keys(bgColorMap).forEach(colorName => {
+                    const btn = document.createElement('button');
+                    btn.style.cssText = `width: 100px; height: 60px; background: ${bgColorMap[colorName]}; border: 2px solid #30363d; border-radius: 8px; cursor: pointer; margin: 5px;`;
+                    btn.onclick = () => applySolidBackground(colorName);
+                    btn.title = colorName;
+                    solidColors.appendChild(btn);
+                });
+            }
+            
+            if (gradientColors) {
+                gradientColors.innerHTML = '';
+                Object.keys(bgColorMap).forEach(colorName => {
+                    const btn = document.createElement('button');
+                    btn.style.cssText = `width: 100px; height: 60px; background: ${bgColorMap[colorName]}; border: 2px solid #30363d; border-radius: 8px; cursor: pointer; margin: 5px;`;
+                    btn.onclick = () => selectGradientColor(colorName);
+                    btn.title = colorName;
+                    gradientColors.appendChild(btn);
+                });
+            }
+        }
+        
+        // Apply solid background
+        function applySolidBackground(colorName) {
+            const color = bgColorMap[colorName];
+            if (color) {
+                document.body.style.background = color;
+                selectedSolidColor = color;
+                saveBackgroundPreferences();
+            }
+        }
+        
+        // Select gradient color
+        function selectGradientColor(colorName) {
+            const color = bgColorMap[colorName];
+            if (!color) return;
+            
+            if (!selectedGradientColor1) {
+                selectedGradientColor1 = color;
+                const color1NameEl = document.getElementById('bg-gradient-color1-name');
+                if (color1NameEl) color1NameEl.textContent = colorName;
+            } else if (!selectedGradientColor2) {
+                selectedGradientColor2 = color;
+                const color2NameEl = document.getElementById('bg-gradient-color2-name');
+                if (color2NameEl) color2NameEl.textContent = colorName;
+                
+                const applyBtn = document.getElementById('bg-apply-gradient-btn');
+                if (applyBtn) {
+                    applyBtn.disabled = false;
+                    applyBtn.style.cursor = 'pointer';
+                    applyBtn.style.background = '#238636';
+                }
+            } else {
+                // Reset and select first color again
+                selectedGradientColor1 = color;
+                selectedGradientColor2 = null;
+                const color1NameEl = document.getElementById('bg-gradient-color1-name');
+                const color2NameEl = document.getElementById('bg-gradient-color2-name');
+                if (color1NameEl) color1NameEl.textContent = colorName;
+                if (color2NameEl) color2NameEl.textContent = 'Not selected';
+                const applyBtn = document.getElementById('bg-apply-gradient-btn');
+                if (applyBtn) {
+                    applyBtn.disabled = true;
+                    applyBtn.style.cursor = 'not-allowed';
+                    applyBtn.style.background = '#30363d';
+                }
+            }
+        }
+        
+        // Update gradient selection display
+        function updateGradientSelection() {
+            const color1NameEl = document.getElementById('bg-gradient-color1-name');
+            const color2NameEl = document.getElementById('bg-gradient-color2-name');
+            const applyBtn = document.getElementById('bg-apply-gradient-btn');
+            
+            if (color1NameEl) color1NameEl.textContent = 'Not selected';
+            if (color2NameEl) color2NameEl.textContent = 'Not selected';
+            if (applyBtn) {
+                applyBtn.disabled = true;
+                applyBtn.style.cursor = 'not-allowed';
+                applyBtn.style.background = '#30363d';
+            }
+        }
+        
+        // Apply gradient background
+        function applyGradientBackground() {
+            if (selectedGradientColor1 && selectedGradientColor2) {
+                document.body.style.background = `linear-gradient(to bottom, ${selectedGradientColor1}, ${selectedGradientColor2})`;
+                saveBackgroundPreferences();
+            }
+        }
+        
+        // Load background on page load
+        loadBackgroundPreferences();
         
         // Goose Rain game with physics
         let geese = [];
@@ -1921,6 +2334,15 @@
         let canvas, ctx;
         let draggedGoose = null;
         let mousePos = { x: 0, y: 0 };
+        
+        // Stones game with physics
+        let stones = [];
+        let stonesAnimationId = null;
+        let stonesCanvas, stonesCtx;
+        let draggedStone = null;
+        let stonesMousePos = { x: 0, y: 0 };
+        let lastMousePos = { x: 0, y: 0 };
+        let dragStartPos = { x: 0, y: 0 };
         
         function initGooseRain() {
             canvas = document.getElementById('gooseCanvas');
@@ -2176,7 +2598,7 @@
                             if (!other.dragged) {
                                 other.x -= Math.cos(angle) * otherPush;
                                 other.y -= Math.sin(angle) * otherPush;
-                    } else {
+                        } else {
                                 // If other is dragged, push the dragged goose back a bit
                                 goose.x += Math.cos(angle) * goosePush * 0.3;
                                 goose.y += Math.sin(angle) * goosePush * 0.3;
@@ -2209,7 +2631,330 @@
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             }
+            if (stonesCanvas && !document.getElementById('stonesPage').classList.contains('hidden')) {
+                stonesCanvas.width = window.innerWidth;
+                stonesCanvas.height = window.innerHeight;
+            }
         });
+        
+        // Stones game initialization
+        function initStones() {
+            stonesCanvas = document.getElementById('stonesCanvas');
+            if (!stonesCanvas) return;
+            
+            stonesCanvas.width = window.innerWidth;
+            stonesCanvas.height = window.innerHeight;
+            stonesCtx = stonesCanvas.getContext('2d');
+            
+            stones = [];
+            const stonesCount = document.getElementById('stones-count');
+            if (stonesCount) stonesCount.textContent = 0;
+            
+            // Stop previous animation
+            if (stonesAnimationId) {
+                cancelAnimationFrame(stonesAnimationId);
+            }
+            
+            // Mouse/touch events for dragging and throwing
+            stonesCanvas.addEventListener('mousedown', handleStonesMouseDown);
+            stonesCanvas.addEventListener('mousemove', handleStonesMouseMove);
+            stonesCanvas.addEventListener('mouseup', handleStonesMouseUp);
+            stonesCanvas.addEventListener('touchstart', handleStonesTouchStart, { passive: false });
+            stonesCanvas.addEventListener('touchmove', handleStonesTouchMove, { passive: false });
+            stonesCanvas.addEventListener('touchend', handleStonesTouchEnd);
+            
+            // Key event for spawning stones with 'e'
+            stonesKeyHandler = handleStonesKeyDown;
+            document.addEventListener('keydown', stonesKeyHandler);
+            
+            // Start animation loop
+            animateStones();
+        }
+        
+        // Handle 'e' key to spawn stones (only when on stones page)
+        let stonesKeyHandler = null;
+        
+        function handleStonesKeyDown(e) {
+            if (document.getElementById('stonesPage').classList.contains('hidden')) return;
+            
+            if (e.key === 'e' || e.key === 'E') {
+                spawnStone();
+            }
+        }
+        
+        // Stone shape types
+        const STONE_SHAPES = ['circle', 'square', 'triangle', 'irregular'];
+        
+        function spawnStone() {
+            const size = Math.random() * 25 + 15;
+            const shape = STONE_SHAPES[Math.floor(Math.random() * STONE_SHAPES.length)];
+            const stoneColor = `rgb(${Math.floor(Math.random() * 60 + 80)}, ${Math.floor(Math.random() * 40 + 60)}, ${Math.floor(Math.random() * 40 + 60)})`;
+            
+            stones.push({
+                x: Math.random() * stonesCanvas.width,
+                y: -50,
+                vx: (Math.random() - 0.5) * 2,
+                vy: Math.random() * 2 + 1,
+                size: size,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.1,
+                dragged: false,
+                shape: shape,
+                color: stoneColor,
+                mass: size,
+                lastX: 0,
+                lastY: 0
+            });
+            
+            const stonesCount = document.getElementById('stones-count');
+            if (stonesCount) stonesCount.textContent = stones.length;
+        }
+        
+        function drawStone(stone) {
+            stonesCtx.save();
+            stonesCtx.translate(stone.x, stone.y);
+            stonesCtx.rotate(stone.rotation);
+            
+            stonesCtx.fillStyle = stone.color;
+            stonesCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+            stonesCtx.lineWidth = 2;
+            
+            stonesCtx.beginPath();
+            
+            if (stone.shape === 'circle') {
+                stonesCtx.arc(0, 0, stone.size, 0, Math.PI * 2);
+            } else if (stone.shape === 'square') {
+                stonesCtx.rect(-stone.size, -stone.size, stone.size * 2, stone.size * 2);
+            } else if (stone.shape === 'triangle') {
+                stonesCtx.moveTo(0, -stone.size);
+                stonesCtx.lineTo(-stone.size * 0.866, stone.size * 0.5);
+                stonesCtx.lineTo(stone.size * 0.866, stone.size * 0.5);
+                stonesCtx.closePath();
+            } else if (stone.shape === 'irregular') {
+                // Draw irregular polygon
+                const sides = 6 + Math.floor(Math.random() * 4);
+                for (let i = 0; i < sides; i++) {
+                    const angle = (i / sides) * Math.PI * 2;
+                    const radius = stone.size * (0.7 + Math.random() * 0.3);
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    if (i === 0) {
+                        stonesCtx.moveTo(x, y);
+                            } else {
+                        stonesCtx.lineTo(x, y);
+                    }
+                }
+                stonesCtx.closePath();
+            }
+            
+            stonesCtx.fill();
+            stonesCtx.stroke();
+            stonesCtx.restore();
+        }
+        
+        function handleStonesMouseDown(e) {
+            const rect = stonesCanvas.getBoundingClientRect();
+            stonesMousePos.x = e.clientX - rect.left;
+            stonesMousePos.y = e.clientY - rect.top;
+            lastMousePos.x = stonesMousePos.x;
+            lastMousePos.y = stonesMousePos.y;
+            
+            // Check if clicking on a stone
+            for (let i = stones.length - 1; i >= 0; i--) {
+                const stone = stones[i];
+                const dist = Math.sqrt(Math.pow(stonesMousePos.x - stone.x, 2) + Math.pow(stonesMousePos.y - stone.y, 2));
+                if (dist < stone.size * 1.5) {
+                    draggedStone = stone;
+                    stone.dragged = true;
+                    stone.vx = 0;
+                    stone.vy = 0;
+                    dragStartPos.x = stonesMousePos.x;
+                    dragStartPos.y = stonesMousePos.y;
+                    stone.lastX = stone.x;
+                    stone.lastY = stone.y;
+                    break;
+                }
+            }
+        }
+        
+        function handleStonesMouseMove(e) {
+            const rect = stonesCanvas.getBoundingClientRect();
+            lastMousePos.x = stonesMousePos.x;
+            lastMousePos.y = stonesMousePos.y;
+            stonesMousePos.x = e.clientX - rect.left;
+            stonesMousePos.y = e.clientY - rect.top;
+            
+            if (draggedStone) {
+                // Update position directly while dragging
+                draggedStone.x = stonesMousePos.x;
+                draggedStone.y = stonesMousePos.y;
+            }
+        }
+        
+        function handleStonesMouseUp() {
+            if (draggedStone) {
+                // Calculate velocity based on movement while dragging
+                const dx = stonesMousePos.x - dragStartPos.x;
+                const dy = stonesMousePos.y - dragStartPos.y;
+                const dt = 0.016; // Approximate frame time
+                
+                // Set velocity based on drag distance and direction (throwing)
+                draggedStone.vx = (stonesMousePos.x - lastMousePos.x) * 20; // Scale for throw speed
+                draggedStone.vy = (stonesMousePos.y - lastMousePos.y) * 20;
+                
+                draggedStone.dragged = false;
+                draggedStone = null;
+            }
+        }
+        
+        function handleStonesTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = stonesCanvas.getBoundingClientRect();
+            stonesMousePos.x = touch.clientX - rect.left;
+            stonesMousePos.y = touch.clientY - rect.top;
+            lastMousePos.x = stonesMousePos.x;
+            lastMousePos.y = stonesMousePos.y;
+            
+            for (let i = stones.length - 1; i >= 0; i--) {
+                const stone = stones[i];
+                const dist = Math.sqrt(Math.pow(stonesMousePos.x - stone.x, 2) + Math.pow(stonesMousePos.y - stone.y, 2));
+                if (dist < stone.size * 1.5) {
+                    draggedStone = stone;
+                    stone.dragged = true;
+                    stone.vx = 0;
+                    stone.vy = 0;
+                    dragStartPos.x = stonesMousePos.x;
+                    dragStartPos.y = stonesMousePos.y;
+                    stone.lastX = stone.x;
+                    stone.lastY = stone.y;
+                    break;
+                }
+            }
+        }
+        
+        function handleStonesTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = stonesCanvas.getBoundingClientRect();
+            lastMousePos.x = stonesMousePos.x;
+            lastMousePos.y = stonesMousePos.y;
+            stonesMousePos.x = touch.clientX - rect.left;
+            stonesMousePos.y = touch.clientY - rect.top;
+            
+            if (draggedStone) {
+                draggedStone.x = stonesMousePos.x;
+                draggedStone.y = stonesMousePos.y;
+            }
+        }
+        
+        function handleStonesTouchEnd() {
+            if (draggedStone) {
+                const dx = stonesMousePos.x - dragStartPos.x;
+                const dy = stonesMousePos.y - dragStartPos.y;
+                
+                draggedStone.vx = (stonesMousePos.x - lastMousePos.x) * 20;
+                draggedStone.vy = (stonesMousePos.y - lastMousePos.y) * 20;
+                
+                draggedStone.dragged = false;
+                draggedStone = null;
+            }
+        }
+        
+        function animateStones() {
+            // Clear canvas with water/shore background
+            const gradient = stonesCtx.createLinearGradient(0, 0, 0, stonesCanvas.height);
+            gradient.addColorStop(0, '#4682B4'); // Sky blue (water)
+            gradient.addColorStop(0.6, '#5F9EA0'); // Cadet blue (shallow water)
+            gradient.addColorStop(0.6, '#D2B48C'); // Tan (shore)
+            gradient.addColorStop(1, '#CD853F'); // Peru (sand)
+            stonesCtx.fillStyle = gradient;
+            stonesCtx.fillRect(0, 0, stonesCanvas.width, stonesCanvas.height);
+            
+            // Update and draw stones
+            for (let i = stones.length - 1; i >= 0; i--) {
+                const stone = stones[i];
+                
+                if (!stone.dragged) {
+                    // Physics
+                    stone.vy += 0.2; // Gravity
+                    stone.vx *= 0.98; // Air resistance
+                    stone.vy *= 0.98;
+                    
+                    stone.x += stone.vx;
+                    stone.y += stone.vy;
+                    stone.rotation += stone.rotationSpeed;
+                    
+                    // Collision with ground (shore)
+                    const shoreLevel = stonesCanvas.height * 0.6;
+                    if (stone.y > shoreLevel - stone.size) {
+                        stone.y = shoreLevel - stone.size;
+                        stone.vy *= -0.5; // Bounce
+                        stone.vx *= 0.7; // Friction
+                        if (Math.abs(stone.vy) < 0.5) {
+                            stone.vy = 0;
+                        }
+                    }
+                    
+                    // Collision with walls
+                    if (stone.x < stone.size || stone.x > stonesCanvas.width - stone.size) {
+                        stone.vx *= -0.7;
+                        stone.x = Math.max(stone.size, Math.min(stonesCanvas.width - stone.size, stone.x));
+                    }
+                }
+                
+                // Collision with other stones
+                for (let j = 0; j < stones.length; j++) {
+                    if (i !== j) {
+                        const other = stones[j];
+                        const dx = stone.x - other.x;
+                        const dy = stone.y - other.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const minDist = stone.size + other.size;
+                        
+                        if (dist < minDist && dist > 0) {
+                            const angle = Math.atan2(dy, dx);
+                            const overlap = minDist - dist;
+                            
+                            // Push apart based on mass
+                            const totalMass = stone.mass + other.mass;
+                            const stonePush = (other.mass / totalMass) * overlap;
+                            const otherPush = (stone.mass / totalMass) * overlap;
+                            
+                            // Only move non-dragged stones
+                            if (!stone.dragged) {
+                                stone.x += Math.cos(angle) * stonePush;
+                                stone.y += Math.sin(angle) * stonePush;
+                            }
+                            if (!other.dragged) {
+                                other.x -= Math.cos(angle) * otherPush;
+                                other.y -= Math.sin(angle) * otherPush;
+                    } else {
+                                // If other is dragged, push the dragged stone back a bit
+                                stone.x += Math.cos(angle) * stonePush * 0.3;
+                                stone.y += Math.sin(angle) * stonePush * 0.3;
+                            }
+                            
+                            // Bounce for non-dragged stones
+                            if (!stone.dragged && !other.dragged) {
+                                const relativeVx = stone.vx - other.vx;
+                                const relativeVy = stone.vy - other.vy;
+                                const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+                                
+                                stone.vx -= Math.cos(angle) * dot * 0.6;
+                                stone.vy -= Math.sin(angle) * dot * 0.6;
+                                other.vx += Math.cos(angle) * dot * 0.6;
+                                other.vy += Math.sin(angle) * dot * 0.6;
+                            }
+                        }
+                    }
+                }
+                
+                drawStone(stone);
+            }
+            
+            stonesAnimationId = requestAnimationFrame(animateStones);
+        }
         
         // Clicker game
         function clickMoney() {
@@ -2332,7 +3077,7 @@
                         result.textContent = `✅ Correct! It's ${resultText}! +$${reward} (${multiplier.toFixed(1)}x)`;
                         result.style.color = '#3fb950';
                         }
-                    } else {
+                } else {
                     coinflipStreak = 0;
                     if (result) {
                         result.textContent = `❌ Wrong! It was ${resultText}`;
@@ -2761,6 +3506,17 @@
                 animationId = null;
             }
             
+            // Stop stones animation if leaving
+            if (pageId !== 'stonesPage' && stonesAnimationId) {
+                cancelAnimationFrame(stonesAnimationId);
+                stonesAnimationId = null;
+                // Remove key handler when leaving
+                if (stonesKeyHandler) {
+                    document.removeEventListener('keydown', stonesKeyHandler);
+                    stonesKeyHandler = null;
+                }
+            }
+            
             // Update money displays on page change
             updateAllMoneyDisplays();
             
@@ -2774,14 +3530,14 @@
             } else if (pageId === 'sandboxelsPage') {
                 unlockAchievement(10);
                 commandsUsed.add('sandboxles');
-            } else if (pageId === 'snakePage') {
-                commandsUsed.add('snake');
             } else if (pageId === 'coinflipPage') {
                 commandsUsed.add('coinflip');
             } else if (pageId === 'clickerPage') {
                 commandsUsed.add('clicker');
                 const clickerAmount = document.getElementById('clicker-amount');
                 if (clickerAmount) clickerAmount.textContent = clickerPerClick;
+            } else if (pageId === 'stonesPage') {
+                commandsUsed.add('stones');
             }
             
             if (commandsUsed.size >= 10) {
