@@ -1242,6 +1242,7 @@
         let clickerPerClick = 1; // Clicker base money per click
         let unlockedCommands = new Set(['home', 'back', 'cmds', 'shop', 'achievements']); // Basic commands unlocked by default
         let isGooseMode = false; // Track if in goose mode
+        let resetConfirm = false; // Track if reset command was just used (needs confirmation)
         
         // Load global data
         function loadGlobalData() {
@@ -1270,6 +1271,81 @@
                 unlockedCommands: Array.from(unlockedCommands),
                 isGooseMode: isGooseMode
             }));
+        }
+        
+        // Reset everything - clears all progress
+        function resetEverything() {
+            // Clear all localStorage
+            localStorage.removeItem('globalData');
+            localStorage.removeItem('coinflipData');
+            localStorage.removeItem('achievements');
+            
+            // Reset all variables
+            globalMoney = 0;
+            unlockedColors = new Set();
+            clickerPerClick = 1;
+            unlockedCommands = new Set(['home', 'back', 'cmds', 'shop', 'achievements']);
+            isGooseMode = false;
+            resetConfirm = false;
+            
+            // Reset coinflip data
+            coinflipStreak = 0;
+            winChanceUpgrades = 0;
+            
+            // Reset achievements
+            foundAchievements = new Set();
+            colorChangeCount = 0;
+            commandsUsed = new Set();
+            coinflipWins = 0;
+            
+            // Recreate FinHub letters (reset from GooseHub if needed)
+            const titleContainer = document.querySelector('.finhub-title');
+            if (titleContainer) {
+                titleContainer.innerHTML = '';
+                ['f', 'i', 'n', 'h', 'u', 'b'].forEach(letter => {
+                    const div = document.createElement('div');
+                    div.className = `big-letter letter-${letter}`;
+                    div.id = `letter-${letter}`;
+                    titleContainer.appendChild(div);
+                });
+                
+                createLetterPattern('f', fPattern);
+                createLetterPattern('i', iPattern);
+                createLetterPattern('n', nPattern);
+                createLetterPattern('h', hPattern);
+                createLetterPattern('u', uPattern);
+                createLetterPattern('b', bPattern);
+            }
+            
+            const subtitle = document.querySelector('.subtitle');
+            const lettersSource = document.querySelector('.letters-source');
+            if (subtitle) subtitle.textContent = 'Built with code, powered by Finley';
+            if (lettersSource) lettersSource.textContent = 'Spelled with letters from: F-I-N-L-E-Y';
+            
+            // Update displays
+            updateAllMoneyDisplays();
+            updateWinChanceDisplay();
+            const clickerAmount = document.getElementById('clicker-amount');
+            if (clickerAmount) clickerAmount.textContent = clickerPerClick;
+            
+            // Re-render menu and achievements
+            renderCommandsMenu();
+            renderAchievements();
+            
+            // Clear color changes
+            const allSmallLetters = document.querySelectorAll('.small-letter');
+            allSmallLetters.forEach(letter => {
+                letter.style.color = '';
+            });
+            
+            // Go back to main page
+            showPage('mainPage');
+            
+            // Show success message
+            commandInput.placeholder = '✅ Everything has been reset!';
+            setTimeout(() => {
+                commandInput.placeholder = 'Type a color or "home"...';
+            }, 3000);
         }
         
         // Update all money displays across all pages
@@ -1457,48 +1533,76 @@
                 const hasColorPalette = colorPalettes.hasOwnProperty(command);
                 
                 // Handle navigation commands
-                if (command === 'home') {
+                if (command === 'reset') {
+                    if (resetConfirm) {
+                        // Second time - actually reset
+                        resetEverything();
+                        commandInput.value = '';
+                        resetConfirm = false;
+                                    } else {
+                        // First time - ask for confirmation
+                        resetConfirm = true;
+                        commandInput.value = '';
+                        commandInput.placeholder = '⚠️ Type "reset" again to confirm - THIS WILL DELETE ALL PROGRESS!';
+                        setTimeout(() => {
+                            resetConfirm = false;
+                            if (commandInput.placeholder.includes('confirm')) {
+                                commandInput.placeholder = 'Type a color or "home"...';
+                            }
+                        }, 5000);
+                    }
+                } else if (command === 'home') {
+                    resetConfirm = false; // Clear reset confirmation if other command is used
                     showPage('homePage');
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'back') {
+                    resetConfirm = false; // Clear reset confirmation if other command is used
                     showPage('mainPage');
                     commandInput.value = '';
                     commandInput.placeholder = 'Type a color or "home"...';
                 } else if (command === 'sweeper') {
+                    resetConfirm = false;
                     showPage('minesweeperPage');
                     initMinesweeper();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'pong') {
+                    resetConfirm = false;
                     showPage('pongPage');
                     initPong();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'sandboxles') {
+                    resetConfirm = false;
                     showPage('sandboxelsPage');
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'coinflip') {
+                    resetConfirm = false;
                     showPage('coinflipPage');
                     resetCoinFlip();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'clicker') {
+                    resetConfirm = false;
                     showPage('clickerPage');
                     updateAllMoneyDisplays();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'shop') {
+                    resetConfirm = false;
                     showShop();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'achievements' || command === 'ach') {
+                    resetConfirm = false;
                     showPage('achievementsPage');
                     renderAchievements();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'goose') {
+                    resetConfirm = false; // Clear reset confirmation if other command is used
                     transformToGooseMode();
                     commandInput.value = '';
                     commandInput.placeholder = 'Honk! GooseHub activated!';
@@ -1506,6 +1610,7 @@
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else if (command === 'honk') {
+                    resetConfirm = false; // Clear reset confirmation if other command is used
                     if (unlockedCommands.has('honk')) {
                         playHonkSound();
                         commandInput.value = '';
@@ -1521,6 +1626,7 @@
                         }, 2000);
                     }
                 } else if (command === 'gooserain') {
+                    resetConfirm = false;
                     if (unlockedCommands.has('gooserain')) {
                         showPage('gooserainPage');
                         initGooseRain();
@@ -1534,6 +1640,7 @@
                         }, 2000);
                     }
                 } else if (command === 'cmds') {
+                    resetConfirm = false;
                     toggleCommandsMenu();
                     commandInput.value = '';
                     commandInput.placeholder = 'Commands menu toggled!';
@@ -1541,6 +1648,7 @@
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else if (command === 'rainbow') {
+                    resetConfirm = false;
                     if (unlockedColors.has('rainbow')) {
                         applyRainbowColors();
                         commandInput.value = '';
@@ -1553,6 +1661,7 @@
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else if (hasColorPalette) {
+                    resetConfirm = false;
                     if (unlockedColors.has(command)) {
                         changeAllColors(command);
                         commandInput.value = '';
@@ -1565,6 +1674,7 @@
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else {
+                    resetConfirm = false; // Clear reset confirmation if invalid command
                     commandInput.value = '';
                     commandInput.placeholder = 'Command not found. Try: cmds, home, back, or a color name...';
                     setTimeout(() => {
