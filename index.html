@@ -84,7 +84,7 @@
             grid-template-rows: repeat(10, 30px);
         }
         
-        .minesweeper-cell {
+        .cell {
             width: 30px;
             height: 30px;
             line-height: 30px;
@@ -97,32 +97,32 @@
             border-color: #fff #808080 #808080 #fff;
         }
         
-        .minesweeper-cell.revealed {
+        .cell.revealed {
             background-color: #c0c0c0;
             border: 1px solid #808080;
             border-color: #808080 #fff #fff #808080;
         }
         
-        .minesweeper-cell.flag {
+        .cell.flag {
             color: red;
             font-size: 18px;
         }
         
-        .minesweeper-cell.mine {
+        .cell.mine {
             background-color: red;
             color: black;
         }
         
-        .minesweeper-cell.number-1 { color: blue; }
-        .minesweeper-cell.number-2 { color: green; }
-        .minesweeper-cell.number-3 { color: red; }
-        .minesweeper-cell.number-4 { color: darkblue; }
-        .minesweeper-cell.number-5 { color: darkred; }
-        .minesweeper-cell.number-6 { color: teal; }
-        .minesweeper-cell.number-7 { color: black; }
-        .minesweeper-cell.number-8 { color: gray; }
+        .cell.number-1 { color: blue; }
+        .cell.number-2 { color: green; }
+        .cell.number-3 { color: red; }
+        .cell.number-4 { color: darkblue; }
+        .cell.number-5 { color: darkred; }
+        .cell.number-6 { color: teal; }
+        .cell.number-7 { color: black; }
+        .cell.number-8 { color: gray; }
         
-        #minesweeper-message {
+        #message {
             margin-top: 5px;
             font-size: 20px;
             font-weight: bold;
@@ -130,7 +130,7 @@
             color: #333;
         }
         
-        #minesweeper-restart-btn {
+        #restart-btn {
             padding: 8px 15px;
             margin-bottom: 15px;
             font-size: 16px;
@@ -142,7 +142,7 @@
             font-weight: bold;
         }
         
-        #minesweeper-restart-btn:active {
+        #restart-btn:active {
             border-top: 4px solid #808080;
             border-left: 4px solid #808080;
             border-bottom: 4px solid #fff;
@@ -411,8 +411,8 @@
     
     <!-- Minesweeper page -->
     <div class="page minesweeper-page hidden" id="minesweeperPage" oncontextmenu="return false;">
-        <button id="minesweeper-restart-btn">Restart Game</button>
-        <div id="minesweeper-message">Flags Remaining: 10</div>
+        <button id="restart-btn">Restart Game</button>
+        <div id="message">Flags Remaining: 10</div>
         <div id="minesweeper-game-container">
             <div class="minesweeper-grid" id="minesweeper-grid"></div>
         </div>
@@ -765,55 +765,44 @@
         // Minesweeper game code
         const GRID_SIZE = 10;
         const NUM_MINES = 10;
-        let minesweeperGridEl = null;
-        let minesweeperMessageEl = null;
-        let minesweeperRestartBtn = null;
-        let minesweeperBoard = [];
-        let minesweeperIsGameOver = false;
-        let minesweeperFlagsRemaining = NUM_MINES;
-        let minesweeperRevealedCount = 0;
-        
-        function initMinesweeper() {
-            minesweeperGridEl = document.getElementById('minesweeper-grid');
-            minesweeperMessageEl = document.getElementById('minesweeper-message');
-            minesweeperRestartBtn = document.getElementById('minesweeper-restart-btn');
-            
-            if (minesweeperRestartBtn) {
-                minesweeperRestartBtn.addEventListener('click', minesweeperInitGame);
-            }
-            
-            minesweeperInitGame();
-        }
-        
-        function minesweeperCreateBoard() {
-            minesweeperBoard = Array(GRID_SIZE).fill(0).map(() => 
-                Array(GRID_SIZE).fill(0).map(() => ({ 
+        const gridEl = document.getElementById('minesweeper-grid');
+        const messageEl = document.getElementById('message');
+        const restartBtn = document.getElementById('restart-btn');
+
+        let board = [];
+        let isGameOver = false;
+        let flagsRemaining = NUM_MINES;
+        let revealedCount = 0;
+
+        function createBoard() {
+            board = Array(GRID_SIZE).fill(0).map(() => 
+                Array(GRID_SIZE).fill({ 
                     isMine: false, 
                     isRevealed: false, 
                     isFlagged: false, 
                     mineCount: 0,
                     el: null
-                }))
+                })
             );
             let minesPlaced = 0;
             while (minesPlaced < NUM_MINES) {
                 const r = Math.floor(Math.random() * GRID_SIZE);
                 const c = Math.floor(Math.random() * GRID_SIZE);
-                if (!minesweeperBoard[r][c].isMine) {
-                    minesweeperBoard[r][c].isMine = true; 
+                if (!board[r][c].isMine) {
+                    board[r][c] = { ...board[r][c], isMine: true }; 
                     minesPlaced++;
                 }
             }
             for (let r = 0; r < GRID_SIZE; r++) {
                 for (let c = 0; c < GRID_SIZE; c++) {
-                    if (!minesweeperBoard[r][c].isMine) {
-                        minesweeperBoard[r][c].mineCount = minesweeperCountMines(r, c);
+                    if (!board[r][c].isMine) {
+                        board[r][c] = { ...board[r][c], mineCount: countMines(r, c) };
                     }
                 }
             }
         }
-        
-        function minesweeperCountMines(r, c) {
+
+        function countMines(r, c) {
             let count = 0;
             for (let dr = -1; dr <= 1; dr++) {
                 for (let dc = -1; dc <= 1; dc++) {
@@ -821,7 +810,7 @@
                     const nr = r + dr;
                     const nc = c + dc;
                     if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
-                        if (minesweeperBoard[nr][nc].isMine) {
+                        if (board[nr][nc].isMine) {
                             count++;
                         }
                     }
@@ -829,14 +818,14 @@
             }
             return count;
         }
-        
-        function minesweeperRevealCell(r, c) {
-            if (minesweeperIsGameOver || r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE || minesweeperBoard[r][c].isRevealed || minesweeperBoard[r][c].isFlagged) {
+
+        function revealCell(r, c) {
+            if (isGameOver || r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE || board[r][c].isRevealed || board[r][c].isFlagged) {
                 return;
             }
-            const cell = minesweeperBoard[r][c];
+            const cell = board[r][c];
             cell.isRevealed = true;
-            minesweeperRevealedCount++;
+            revealedCount++;
             cell.el.classList.add('revealed');
             cell.el.innerHTML = '';
             cell.el.style.borderColor = 'transparent';
@@ -844,7 +833,7 @@
             if (cell.isMine) {
                 cell.el.classList.add('mine');
                 cell.el.innerHTML = '💣';
-                minesweeperGameOver(false);
+                gameOver(false);
                 return;
             } 
             
@@ -854,75 +843,75 @@
             } else {
                 for (let dr = -1; dr <= 1; dr++) {
                     for (let dc = -1; dc <= 1; dc++) {
-                        minesweeperRevealCell(r + dr, c + dc);
+                        revealCell(r + dr, c + dc);
                     }
                 }
             }
-            minesweeperCheckWin();
+            checkWin();
         }
-        
-        function minesweeperToggleFlag(r, c) {
-            if (minesweeperIsGameOver || minesweeperBoard[r][c].isRevealed) return;
-            const cell = minesweeperBoard[r][c];
+
+        function toggleFlag(r, c) {
+            if (isGameOver || board[r][c].isRevealed) return;
+            const cell = board[r][c];
             if (cell.isFlagged) {
                 cell.isFlagged = false;
-                minesweeperFlagsRemaining++;
+                flagsRemaining++;
                 cell.el.innerHTML = '';
                 cell.el.classList.remove('flag');
-            } else if (minesweeperFlagsRemaining > 0) {
+            } else if (flagsRemaining > 0) {
                 cell.isFlagged = true;
-                minesweeperFlagsRemaining--;
+                flagsRemaining--;
                 cell.el.innerHTML = '🚩';
                 cell.el.classList.add('flag');
             }
-            minesweeperUpdateMessage();
+            updateMessage();
         }
-        
-        function minesweeperDrawGrid() {
-            if (!minesweeperGridEl) return;
-            minesweeperGridEl.innerHTML = '';
+
+        function drawGrid() {
+            if (!gridEl) return;
+            gridEl.innerHTML = '';
             for (let r = 0; r < GRID_SIZE; r++) {
                 for (let c = 0; c < GRID_SIZE; c++) {
-                    const cell = minesweeperBoard[r][c];
+                    const cell = board[r][c];
                     const cellEl = document.createElement('div');
-                    cellEl.classList.add('minesweeper-cell');
+                    cellEl.classList.add('cell');
                     cellEl.dataset.r = r;
                     cellEl.dataset.c = c;
                     cell.el = cellEl;
-                    cellEl.addEventListener('click', () => minesweeperRevealCell(r, c));
+                    cellEl.addEventListener('click', () => revealCell(r, c));
                     cellEl.addEventListener('contextmenu', (e) => {
                         e.preventDefault();
-                        minesweeperToggleFlag(r, c);
+                        toggleFlag(r, c);
                     });
-                    minesweeperGridEl.appendChild(cellEl);
+                    gridEl.appendChild(cellEl);
                 }
             }
-            minesweeperUpdateMessage();
+            updateMessage();
         }
-        
-        function minesweeperUpdateMessage() {
-            if (!minesweeperMessageEl) return;
-            if (!minesweeperIsGameOver) {
-                minesweeperMessageEl.innerHTML = `Flags Remaining: ${minesweeperFlagsRemaining}`;
+
+        function updateMessage() {
+            if (!messageEl) return;
+            if (!isGameOver) {
+                messageEl.innerHTML = `Flags Remaining: ${flagsRemaining}`;
             }
         }
-        
-        function minesweeperCheckWin() {
-            if (minesweeperRevealedCount === (GRID_SIZE * GRID_SIZE) - NUM_MINES) {
-                minesweeperGameOver(true);
+
+        function checkWin() {
+            if (revealedCount === (GRID_SIZE * GRID_SIZE) - NUM_MINES) {
+                gameOver(true);
             }
         }
-        
-        function minesweeperGameOver(win) {
-            minesweeperIsGameOver = true;
-            if (!minesweeperMessageEl) return;
+
+        function gameOver(win) {
+            isGameOver = true;
+            if (!messageEl) return;
             if (win) {
-                minesweeperMessageEl.innerHTML = '🎉 YOU WIN! 🎉';
-                minesweeperMessageEl.style.color = 'green';
+                messageEl.innerHTML = '🎉 YOU WIN! 🎉';
+                messageEl.style.color = 'green';
             } else {
-                minesweeperMessageEl.innerHTML = '💣 GAME OVER! 💣';
-                minesweeperMessageEl.style.color = 'red';
-                minesweeperBoard.flat().forEach(cell => {
+                messageEl.innerHTML = '💣 GAME OVER! 💣';
+                messageEl.style.color = 'red';
+                board.flat().forEach(cell => {
                     if (cell.isMine && !cell.isFlagged) {
                         cell.el.classList.add('mine');
                         cell.el.innerHTML = '💣';
@@ -930,16 +919,23 @@
                 });
             }
         }
-        
-        function minesweeperInitGame() {
-            minesweeperIsGameOver = false;
-            minesweeperFlagsRemaining = NUM_MINES;
-            minesweeperRevealedCount = 0;
-            if (minesweeperMessageEl) {
-                minesweeperMessageEl.style.color = '#333';
+
+        function initGame() {
+            isGameOver = false;
+            flagsRemaining = NUM_MINES;
+            revealedCount = 0;
+            if (messageEl) {
+                messageEl.style.color = 'black';
             }
-            minesweeperCreateBoard();
-            minesweeperDrawGrid();
+            createBoard();
+            drawGrid();
+        }
+
+        function initMinesweeper() {
+            if (restartBtn) {
+                restartBtn.addEventListener('click', initGame);
+            }
+            initGame();
         }
     </script>
 </body>
