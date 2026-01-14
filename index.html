@@ -149,6 +149,140 @@
             border-right: 4px solid #fff;
         }
         
+        /* Pong game styles */
+        .pong-page {
+            background-color: #1a1a1a;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            color: white;
+        }
+        
+        #pongCanvas {
+            border: 4px solid #f0f0f0;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            background-color: #000;
+        }
+        
+        .pong-info {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .pong-button-style {
+            transition: all 0.1s;
+            box-shadow: 0 4px #2c2c2c;
+            position: relative;
+            top: 0;
+        }
+        
+        .pong-button-style:active {
+            box-shadow: 0 0 #2c2c2c;
+            top: 4px;
+        }
+        
+        .pong-settings-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .pong-settings-modal.hidden {
+            display: none;
+        }
+        
+        .pong-settings-content {
+            background: #1f2937;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 320px;
+            border: 1px solid #4b5563;
+        }
+        
+        .pong-settings-content h3 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: white;
+            text-align: center;
+        }
+        
+        .pong-settings-content label {
+            display: block;
+            color: #e5e7eb;
+            margin-bottom: 4px;
+        }
+        
+        .pong-settings-content select,
+        .pong-settings-content input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            background: #111827;
+            color: white;
+            border: 1px solid #4b5563;
+        }
+        
+        .pong-settings-content select:focus,
+        .pong-settings-content input:focus {
+            outline: none;
+            border-color: white;
+            box-shadow: 0 0 0 1px white;
+        }
+        
+        .pong-settings-content button {
+            width: 100%;
+            margin-top: 16px;
+        }
+        
+        /* Sandboxels page styles */
+        .sandboxels-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            background-color: white;
+            border: none;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sandboxels-iframe {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sandboxels-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100000;
+            padding: 10px 15px;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .sandboxels-close-btn:hover {
+            background-color: #c9302c;
+        }
+        
         .finhub-title {
             display: flex;
             align-items: center;
@@ -418,6 +552,48 @@
         </div>
     </div>
     
+    <!-- Pong page -->
+    <div class="page pong-page hidden" id="pongPage">
+        <div class="pong-info">
+            Control: Use <strong>Mouse</strong> (move up/down) or <strong>Arrow Keys</strong>
+        </div>
+        <canvas id="pongCanvas" width="600" height="400"></canvas>
+        <div style="margin-top: 16px;">
+            <button id="settingsButton" onclick="window.toggleSettingsModal()" class="pong-button-style bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                Game Settings
+            </button>
+        </div>
+        <!-- Settings Modal (Hidden by default) -->
+        <div id="settingsModal" class="pong-settings-modal hidden">
+            <div class="pong-settings-content">
+                <h3>Game Settings</h3>
+                <!-- Bot Level Selector -->
+                <div style="margin-bottom: 16px;">
+                    <label for="botLevelSelect">Bot Difficulty:</label>
+                    <select id="botLevelSelect" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-1 focus:ring-white">
+                        <option value="easy">Easy (Slow)</option>
+                        <option value="hard" selected>Hard (Standard)</option>
+                        <option value="impossible">Impossible (Perfect)</option>
+                    </select>
+                </div>
+                <!-- Number of Balls Input -->
+                <div style="margin-bottom: 24px;">
+                    <label for="numBallsInput">Number of Balls (1-5):</label>
+                    <input type="number" id="numBallsInput" value="1" min="1" max="5" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-1 focus:ring-white">
+                </div>
+                <button id="saveSettingsButton" onclick="window.saveSettingsAndRestart()" class="pong-button-style bg-white hover:bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded-lg w-full">
+                    Apply & Restart
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sandboxels page -->
+    <div class="page sandboxels-page hidden" id="sandboxelsPage">
+        <iframe id="sandboxels-iframe" class="sandboxels-iframe" src="https://sandboxels.r74n.com/" name="sandboxels_frame"></iframe>
+        <button class="sandboxels-close-btn" onclick="closeSandboxels()">X CLOSE VIEW (Return to original site)</button>
+    </div>
+    
     <!-- Command bar in bottom left -->
     <div class="command-bar">
         <input type="text" class="command-input" id="commandInput" placeholder="Type a color or 'home'..." autocomplete="off">
@@ -435,6 +611,8 @@
                 <div class="command-item"><span class="command-name">home</span><span class="command-desc">- Go to home page</span></div>
                 <div class="command-item"><span class="command-name">back</span><span class="command-desc">- Return to main page</span></div>
                 <div class="command-item"><span class="command-name">sweeper</span><span class="command-desc">- Play Minesweeper</span></div>
+                <div class="command-item"><span class="command-name">pong</span><span class="command-desc">- Play Pong</span></div>
+                <div class="command-item"><span class="command-name">sandboxles</span><span class="command-desc">- Open Sandboxels</span></div>
             </div>
             <div class="command-category">
                 <h4>Colors</h4>
@@ -731,6 +909,15 @@
                     initMinesweeper();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'pong') {
+                    showPage('pongPage');
+                    initPong();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'sandboxles') {
+                    showPage('sandboxelsPage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'cmds') {
                     toggleCommandsMenu();
                     commandInput.value = '';
@@ -936,6 +1123,34 @@
                 restartBtn.addEventListener('click', initGame);
             }
             initGame();
+        }
+        
+        // Pong game code - placeholder for JavaScript
+        function initPong() {
+            // Pong game initialization will go here
+            // Waiting for JavaScript code...
+        }
+        
+        // Pong settings modal functions
+        window.toggleSettingsModal = function() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        };
+        
+        window.saveSettingsAndRestart = function() {
+            // Settings save and restart will go here
+            // Waiting for JavaScript code...
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        };
+        
+        // Sandboxels close function
+        function closeSandboxels() {
+            showPage('mainPage');
         }
     </script>
 </body>
