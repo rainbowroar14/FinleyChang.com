@@ -313,6 +313,65 @@
             animation: coinFlip 1s ease-in-out;
         }
         
+        /* Shop page styles */
+        .shop-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: #0d1117;
+            padding: 40px 20px;
+        }
+        
+        .upgrade-item {
+            background: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px auto;
+            max-width: 400px;
+            color: #c9d1d9;
+        }
+        
+        .upgrade-item h3 {
+            color: #58a6ff;
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+        
+        .upgrade-item p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #8b949e;
+        }
+        
+        .upgrade-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .upgrade-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.4);
+        }
+        
+        .upgrade-btn:disabled {
+            background: #30363d;
+            color: #8b949e;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
         .finhub-title {
             display: flex;
             align-items: center;
@@ -627,6 +686,12 @@
     <!-- Coinflip page -->
     <div class="page coinflip-page hidden" id="coinflipPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Coin Flip</h1>
+        <div id="money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 15px; font-weight: bold;">
+            Money: $<span id="money-count">0</span>
+        </div>
+        <div id="win-chance-display" style="color: #58a6ff; font-size: 18px; margin-bottom: 20px;">
+            Win Chance: <span id="win-chance-percent">50</span>%
+        </div>
         <div id="coin-container" style="width: 200px; height: 200px; margin: 20px auto; position: relative; perspective: 1000px;">
             <div id="coin" style="width: 200px; height: 200px; position: relative; transform-style: preserve-3d; transition: transform 0.6s;">
                 <div id="coin-front" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border: 8px solid #c9a520; display: flex; align-items: center; justify-content: center; font-size: 72px; font-weight: bold; color: #8b6914; backface-visibility: hidden; transform: rotateY(0deg);">H</div>
@@ -640,6 +705,26 @@
         </div>
         <div id="streak-display" style="color: #58a6ff; font-size: 20px; margin-top: 20px;">
             Streak: <span id="streak-count">0</span>
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="showShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Shop</button>
+        </div>
+    </div>
+    
+    <!-- Shop page -->
+    <div class="page shop-page hidden" id="shopPage">
+        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Shop</h1>
+        <div id="shop-money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 30px; font-weight: bold;">
+            Money: $<span id="shop-money-count">0</span>
+        </div>
+        <div style="color: #c9d1d9; font-size: 18px; margin-bottom: 30px;">
+            Current Win Chance: <span id="shop-win-chance">50</span>%
+        </div>
+        <div id="upgrade-container" style="margin: 20px 0;">
+            <!-- Upgrades will be added here dynamically -->
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="closeShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back to Coin Flip</button>
         </div>
     </div>
     
@@ -663,6 +748,7 @@
                 <div class="command-item"><span class="command-name">pong</span><span class="command-desc">- Play Pong</span></div>
                 <div class="command-item"><span class="command-name">sandboxles</span><span class="command-desc">- Open Sandboxels</span></div>
                 <div class="command-item"><span class="command-name">coinflip</span><span class="command-desc">- Flip a coin</span></div>
+                <div class="command-item"><span class="command-name">shop</span><span class="command-desc">- Open shop</span></div>
             </div>
             <div class="command-category">
                 <h4>Colors</h4>
@@ -973,6 +1059,10 @@
                     resetCoinFlip();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'shop') {
+                    showShop();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'cmds') {
                     toggleCommandsMenu();
                     commandInput.value = '';
@@ -1211,11 +1301,60 @@
         // Coinflip game
         let coinflipStreak = 0;
         let isCoinFlipping = false;
+        let coinflipMoney = 0;
+        let winChanceUpgrades = 0; // Number of upgrades purchased
+        const BASE_WIN_CHANCE = 50; // Base 50% chance
+        
+        // Load saved data
+        function loadCoinflipData() {
+            const saved = localStorage.getItem('coinflipData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                coinflipMoney = data.money || 0;
+                winChanceUpgrades = data.upgrades || 0;
+                coinflipStreak = data.streak || 0;
+            }
+            updateMoneyDisplay();
+            updateWinChanceDisplay();
+        }
+        
+        // Save data
+        function saveCoinflipData() {
+            localStorage.setItem('coinflipData', JSON.stringify({
+                money: coinflipMoney,
+                upgrades: winChanceUpgrades,
+                streak: coinflipStreak
+            }));
+        }
+        
+        // Calculate win chance
+        function getWinChance() {
+            return Math.min(BASE_WIN_CHANCE + winChanceUpgrades, 99); // Cap at 99%
+        }
+        
+        // Update money display
+        function updateMoneyDisplay() {
+            const moneyCount = document.getElementById('money-count');
+            const shopMoneyCount = document.getElementById('shop-money-count');
+            if (moneyCount) moneyCount.textContent = coinflipMoney;
+            if (shopMoneyCount) shopMoneyCount.textContent = coinflipMoney;
+        }
+        
+        // Update win chance display
+        function updateWinChanceDisplay() {
+            const winChancePercent = document.getElementById('win-chance-percent');
+            const shopWinChance = document.getElementById('shop-win-chance');
+            const chance = getWinChance();
+            if (winChancePercent) winChancePercent.textContent = chance;
+            if (shopWinChance) shopWinChance.textContent = chance;
+        }
         
         function resetCoinFlip() {
             const coin = document.getElementById('coin');
             const result = document.getElementById('coinflip-result');
             const streakCount = document.getElementById('streak-count');
+            
+            loadCoinflipData(); // Reload data when page is shown
             
             if (coin) {
                 coin.style.transform = 'rotateY(0deg)';
@@ -1252,8 +1391,12 @@
             // Add flipping animation
             coin.classList.add('coin-flipping');
             
-            // Random result (heads = true, tails = false)
-            const isHeads = Math.random() < 0.5;
+            // Calculate win chance
+            const winChance = getWinChance() / 100;
+            const isCorrect = Math.random() < winChance;
+            
+            // Determine result (if we win, the coin lands on our guess, otherwise opposite)
+            const isHeads = isCorrect ? (guess === 'heads') : (guess === 'tails');
             const resultText = isHeads ? 'Heads' : 'Tails';
             
             // Set final rotation
@@ -1261,13 +1404,14 @@
                 coin.classList.remove('coin-flipping');
                 coin.style.transform = isHeads ? 'rotateY(0deg)' : 'rotateY(180deg)';
                 
-                // Check if guess was correct
-                const isCorrect = (guess === 'heads' && isHeads) || (guess === 'tails' && !isHeads);
-                
                 if (isCorrect) {
                     coinflipStreak++;
+                    // Calculate reward: base $5 + (streak * $5)
+                    const reward = 5 + (coinflipStreak * 5);
+                    coinflipMoney += reward;
+                    
                     if (result) {
-                        result.textContent = `✅ Correct! It's ${resultText}!`;
+                        result.textContent = `✅ Correct! It's ${resultText}! +$${reward}`;
                         result.style.color = '#3fb950';
                     }
                 } else {
@@ -1282,6 +1426,9 @@
                     streakCount.textContent = coinflipStreak;
                 }
                 
+                updateMoneyDisplay();
+                saveCoinflipData();
+                
                 // Re-enable buttons after a delay
                 setTimeout(() => {
                     isCoinFlipping = false;
@@ -1290,6 +1437,58 @@
                 }, 500);
             }, 1000);
         }
+        
+        // Shop functions
+        function getUpgradeCost(upgradeLevel) {
+            return 20 * Math.pow(2, upgradeLevel);
+        }
+        
+        function showShop() {
+            showPage('shopPage');
+            loadCoinflipData();
+            renderShop();
+        }
+        
+        function closeShop() {
+            showPage('coinflipPage');
+            resetCoinFlip();
+        }
+        
+        function buyUpgrade() {
+            const cost = getUpgradeCost(winChanceUpgrades);
+            if (coinflipMoney >= cost) {
+                coinflipMoney -= cost;
+                winChanceUpgrades++;
+                updateMoneyDisplay();
+                updateWinChanceDisplay();
+                saveCoinflipData();
+                renderShop();
+            }
+        }
+        
+        function renderShop() {
+            const container = document.getElementById('upgrade-container');
+            if (!container) return;
+            
+            const cost = getUpgradeCost(winChanceUpgrades);
+            const canAfford = coinflipMoney >= cost;
+            const nextChance = Math.min(getWinChance() + 1, 99);
+            
+            container.innerHTML = `
+                <div class="upgrade-item">
+                    <h3>Win Chance Upgrade</h3>
+                    <p>Increase your win chance by +1%</p>
+                    <p>Current: ${getWinChance()}% → Next: ${nextChance}%</p>
+                    <p style="color: #ffd700; font-weight: bold;">Cost: $${cost}</p>
+                    <button class="upgrade-btn" onclick="buyUpgrade()" ${!canAfford ? 'disabled' : ''}>
+                        ${canAfford ? 'Buy Upgrade' : 'Not Enough Money'}
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Initialize data on page load
+        loadCoinflipData();
     </script>
 </body>
 </html>
