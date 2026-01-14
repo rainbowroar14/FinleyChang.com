@@ -27,51 +27,71 @@
         .finhub-title {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 72px;
-            font-weight: 700;
+            gap: 20px;
             margin-bottom: 30px;
-            letter-spacing: -2px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         
-        .finhub-title .letter {
+        .big-letter {
+            display: grid;
+            font-family: 'Courier New', monospace;
+            font-size: 8px;
+            line-height: 1;
+            color: #c9d1d9;
+            gap: 0;
+        }
+        
+        .big-letter .small-letter {
             display: inline-block;
-            transition: transform 0.3s ease;
+            width: 8px;
+            height: 8px;
+            text-align: center;
         }
         
-        .finhub-title:hover .letter {
-            transform: translateY(-5px);
-        }
-        
-        /* F from finley */
+        /* Big F made of small letters */
         .letter-f {
-            color: #58a6ff;
+            grid-template-columns: repeat(7, 8px);
+            grid-template-rows: repeat(10, 8px);
         }
         
-        /* I from finley */
+        /* Big i made of small letters */
         .letter-i {
-            color: #f0883e;
+            grid-template-columns: repeat(3, 8px);
+            grid-template-rows: repeat(10, 8px);
         }
         
-        /* N from finley */
+        /* Big n made of small letters */
         .letter-n {
-            color: #bc8cff;
+            grid-template-columns: repeat(7, 8px);
+            grid-template-rows: repeat(10, 8px);
         }
         
-        /* H - using L from finley (rotated/styled) */
+        /* Big H made of small letters */
         .letter-h {
-            color: #3fb950;
+            grid-template-columns: repeat(7, 8px);
+            grid-template-rows: repeat(10, 8px);
         }
         
-        /* U - using E from finley */
+        /* Big u made of small letters */
         .letter-u {
-            color: #f85149;
+            grid-template-columns: repeat(7, 8px);
+            grid-template-rows: repeat(10, 8px);
         }
         
-        /* B - using Y from finley */
+        /* Big b made of small letters */
         .letter-b {
-            color: #ffa657;
+            grid-template-columns: repeat(7, 8px);
+            grid-template-rows: repeat(10, 8px);
         }
+        
+        /* Colors for small letters */
+        .small-letter.f { color: #58a6ff; }
+        .small-letter.i { color: #f0883e; }
+        .small-letter.n { color: #bc8cff; }
+        .small-letter.l { color: #3fb950; }
+        .small-letter.e { color: #f85149; }
+        .small-letter.y { color: #ffa657; }
         
         .subtitle {
             color: #8b949e;
@@ -96,21 +116,140 @@
     </style>
 </head>
 <body>
-    <!-- FinHub title made from letters in "finley" -->
+    <!-- FinHub title - big letters made of small "finley" letters -->
     <div class="finhub-title">
-        <span class="letter letter-f">F</span>
-        <span class="letter letter-i">i</span>
-        <span class="letter letter-n">n</span>
-        <span class="letter letter-h">H</span>
-        <span class="letter letter-u">u</span>
-        <span class="letter letter-b">b</span>
+        <!-- Big F made of small letters -->
+        <div class="big-letter letter-f" id="letter-f"></div>
+        <!-- Big i made of small letters -->
+        <div class="big-letter letter-i" id="letter-i"></div>
+        <!-- Big n made of small letters -->
+        <div class="big-letter letter-n" id="letter-n"></div>
+        <!-- Big H made of small letters -->
+        <div class="big-letter letter-h" id="letter-h"></div>
+        <!-- Big u made of small letters -->
+        <div class="big-letter letter-u" id="letter-u"></div>
+        <!-- Big b made of small letters -->
+        <div class="big-letter letter-b" id="letter-b"></div>
     </div>
     
     <p class="subtitle">Built with code, powered by Finley</p>
     <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
 
     <script>
-        // Add your JavaScript here
+        // Letters from "finley" to use
+        const finleyLetters = ['f', 'i', 'n', 'l', 'e', 'y'];
+        
+        // Function to create letter patterns
+        function createLetterPattern(letter, pattern) {
+            const container = document.getElementById(`letter-${letter}`);
+            pattern.forEach(row => {
+                row.forEach(cell => {
+                    const span = document.createElement('span');
+                    span.className = 'small-letter';
+                    if (cell === 1) {
+                        // Randomly pick a letter from "finley"
+                        const randomLetter = finleyLetters[Math.floor(Math.random() * finleyLetters.length)];
+                        span.textContent = randomLetter;
+                        span.classList.add(randomLetter);
+                    } else {
+                        span.textContent = ' ';
+                    }
+                    container.appendChild(span);
+                });
+            });
+        }
+        
+        // Big F pattern
+        const fPattern = [
+            [1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,1,1,1,1,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0]
+        ];
+        
+        // Big i pattern
+        const iPattern = [
+            [1,1,1],
+            [0,1,0],
+            [0,1,0],
+            [0,1,0],
+            [0,1,0],
+            [0,1,0],
+            [0,1,0],
+            [0,1,0],
+            [0,1,0],
+            [1,1,1]
+        ];
+        
+        // Big n pattern
+        const nPattern = [
+            [1,0,0,0,0,0,1],
+            [1,1,0,0,0,0,1],
+            [1,0,1,0,0,0,1],
+            [1,0,0,1,0,0,1],
+            [1,0,0,0,1,0,1],
+            [1,0,0,0,0,1,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1]
+        ];
+        
+        // Big H pattern
+        const hPattern = [
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1]
+        ];
+        
+        // Big u pattern
+        const uPattern = [
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [0,1,1,1,1,1,0]
+        ];
+        
+        // Big b pattern
+        const bPattern = [
+            [1,1,1,1,1,0,0],
+            [1,0,0,0,0,1,0],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,1,1,1,1,0,0],
+            [1,0,0,0,0,1,0],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,1,0],
+            [1,1,1,1,1,0,0]
+        ];
+        
+        // Create all letters
+        createLetterPattern('f', fPattern);
+        createLetterPattern('i', iPattern);
+        createLetterPattern('n', nPattern);
+        createLetterPattern('h', hPattern);
+        createLetterPattern('u', uPattern);
+        createLetterPattern('b', bPattern);
     </script>
 </body>
 </html>
