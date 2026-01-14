@@ -386,20 +386,133 @@
             20%, 40%, 60%, 80% { transform: translate(5px, 5px); }
         }
         
-        .spin-effect {
-            animation: spin 1s ease-in-out;
+        /* Background effect overlay (sits behind all content, only affects background) */
+        .bg-effect-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: inherit;
         }
         
-        .shake-effect {
-            animation: shake 0.5s ease-in-out;
+        /* Ensure all content sits above the background overlay */
+        body > *:not(.bg-effect-overlay) {
+            position: relative;
+            z-index: 1;
         }
         
-        .invert-effect {
-            filter: invert(1);
+        .bg-effect-overlay.bg-spin-effect {
+            animation: bgSpin 1s ease-in-out;
         }
         
-        .upsidedown-effect {
-            transform: rotate(180deg);
+        .bg-effect-overlay.bg-shake-effect {
+            animation: bgShake 0.5s ease-in-out;
+        }
+        
+        .bg-effect-overlay.bg-invert-effect {
+            animation: bgInvert 0.5s ease-in-out;
+        }
+        
+        .bg-effect-overlay.bg-upsidedown-effect {
+            animation: bgUpsidedown 0.5s ease-in-out;
+        }
+        
+        @keyframes bgSpin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        @keyframes bgShake {
+            0%, 100% { transform: translate(0, 0); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-5px, -5px); }
+            20%, 40%, 60%, 80% { transform: translate(5px, 5px); }
+        }
+        
+        @keyframes bgInvert {
+            0%, 100% { filter: brightness(1) contrast(1) invert(0); }
+            50% { filter: brightness(1) contrast(1) invert(1); }
+        }
+        
+        @keyframes bgUpsidedown {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(-1); }
+        }
+        
+        @keyframes earthquake {
+            0%, 100% { transform: translate(0, 0); }
+            5%, 15%, 25%, 35%, 45%, 55%, 65%, 75%, 85%, 95% { transform: translate(-10px, -10px) rotate(-2deg); }
+            10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90% { transform: translate(10px, 10px) rotate(2deg); }
+        }
+        
+        .earthquake-effect {
+            animation: earthquake 0.1s infinite;
+        }
+        
+        @keyframes floatUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+        
+        /* Theme Styles */
+        .theme-1995 {
+            font-family: 'MS Sans Serif', sans-serif !important;
+            background: #C0C0C0 !important;
+        }
+        
+        .theme-1995 * {
+            border: 2px outset #c0c0c0 !important;
+            background: #c0c0c0 !important;
+            color: #000000 !important;
+        }
+        
+        .theme-cyberpunk {
+            background: #0a0e27 !important;
+            color: #ff0080 !important;
+            font-family: 'Courier New', monospace !important;
+            text-shadow: 0 0 10px #ff0080, 0 0 20px #00ffff !important;
+        }
+        
+        .theme-terminal {
+            background: #000000 !important;
+            color: #00ff00 !important;
+            font-family: 'Courier New', monospace !important;
+        }
+        
+        .theme-terminal::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.03),
+                rgba(0, 255, 0, 0.03) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        .theme-coffee {
+            background: #8B6F47 !important;
+            color: #D2B48C !important;
+            filter: sepia(100%) !important;
         }
         
         .matrix-canvas {
@@ -727,35 +840,79 @@
             display: none;
         }
         
-        /* Command feedback display */
-        .command-feedback {
+        /* Command history display (Minecraft-style chat) */
+        .command-history {
             position: fixed;
             bottom: 70px;
             left: 20px;
-            background: rgba(13, 17, 23, 0.95);
+            background: rgba(13, 17, 23, 0.85);
             border: 1px solid #30363d;
             border-radius: 6px;
             padding: 8px 12px;
             color: #c9d1d9;
             font-family: 'Courier New', monospace;
             font-size: 12px;
-            max-width: 400px;
+            max-width: 500px;
+            max-height: 300px;
+            min-width: 300px;
             z-index: 998;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
-        .command-feedback.hidden {
+        .command-history.hidden {
             display: none;
         }
         
-        .command-feedback .command-text {
+        /* Always show history when it has entries - never hide them */
+        .command-history:not(:empty):not(.hidden) {
+            display: flex !important;
+        }
+        
+        .command-history-entry {
+            margin-bottom: 4px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        .command-history-entry .command-text {
             color: #58a6ff;
             font-weight: bold;
         }
         
-        .command-feedback .feedback-text {
+        .command-history-entry .feedback-text {
             color: #8b949e;
             margin-left: 8px;
+        }
+        
+        .command-history-entry.error .command-text {
+            color: #f85149;
+        }
+        
+        .command-history-entry.error .feedback-text {
+            color: #f85149;
+        }
+        
+        /* Scrollbar styling for command history */
+        .command-history::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .command-history::-webkit-scrollbar-track {
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 3px;
+        }
+        
+        .command-history::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 3px;
+        }
+        
+        .command-history::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
         }
         
         /* Command bar in bottom left */
@@ -911,6 +1068,108 @@
             margin-left: 8px;
         }
         
+        /* Visual Effects menu - draggable tab (same style as commands menu) */
+        .visual-effects-menu {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            right: -300px;
+            width: 300px;
+            max-height: 500px;
+            background: rgba(13, 17, 23, 0.98);
+            border: 1px solid #30363d;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .visual-effects-menu.open {
+            right: 0;
+        }
+        
+        .visual-effects-menu.dragging {
+            transform: none;
+            transition: none;
+        }
+        
+        .visual-effects-menu-header {
+            background: #161b22;
+            padding: 12px 16px;
+            border-bottom: 1px solid #30363d;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .visual-effects-menu-header h3 {
+            color: #c9d1d9;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .visual-effects-menu-close {
+            background: none;
+            border: none;
+            color: #8b949e;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .visual-effects-menu-close:hover {
+            color: #c9d1d9;
+        }
+        
+        .visual-effects-list {
+            padding: 16px;
+        }
+        
+        .visual-effect-button {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        
+        .visual-effect-button:hover {
+            background: #30363d;
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+        
+        .visual-effect-button:active {
+            transform: scale(0.98);
+        }
+        
+        .visual-effect-name {
+            font-weight: bold;
+            color: #58a6ff;
+        }
+        
+        .visual-effect-desc {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+        
         @media (max-width: 768px) {
             .finhub-title {
                 font-size: 48px;
@@ -921,6 +1180,10 @@
                 left: 10px;
             }
             .commands-menu {
+                width: 250px;
+                right: -250px;
+            }
+            .visual-effects-menu {
                 width: 250px;
                 right: -250px;
             }
@@ -1132,9 +1395,9 @@
     <!-- Clock display (top left) -->
     <div class="clock-display hidden" id="clockDisplay"></div>
     
-    <!-- Command feedback display -->
-    <div class="command-feedback hidden" id="commandFeedback">
-        <span class="command-text"></span><span class="feedback-text"></span>
+    <!-- Command history display (Minecraft-style chat) -->
+    <div class="command-history" id="commandHistory">
+        <!-- Command history entries will be added here -->
     </div>
     
     <!-- Command bar in bottom left -->
@@ -1150,6 +1413,17 @@
         </div>
         <div class="commands-list" id="commandsList">
             <!-- Commands will be dynamically generated based on unlocks -->
+        </div>
+    </div>
+    
+    <!-- Visual Effects menu - draggable -->
+    <div class="visual-effects-menu" id="visualEffectsMenu">
+        <div class="visual-effects-menu-header" id="visualEffectsMenuHeader">
+            <h3>Visual Effects</h3>
+            <button class="visual-effects-menu-close" id="visualEffectsMenuClose">×</button>
+        </div>
+        <div class="visual-effects-list" id="visualEffectsList">
+            <!-- Visual effects buttons will be generated here -->
         </div>
     </div>
 
@@ -1394,20 +1668,39 @@
                     { name: 'funfact', desc: 'Get a random fun fact' },
                     { name: 'changelog', desc: 'Show recent command additions' },
                     { name: 'rickroll', desc: 'Never gonna give you up...' },
-                    { name: 'Secret6767', desc: 'Unlock all commands' },
+                    { name: 'calc', desc: 'Calculator (calc [equation])' },
+                    { name: 'math', desc: 'Quick calculator (math [equation])' },
+                    { name: 'timer', desc: 'Countdown timer (timer [seconds])' },
+                    { name: 'fortune', desc: 'Random fortune cookie advice' },
+                    { name: 'joke', desc: 'Random dad/programming joke' },
+                    { name: 'password', desc: 'Generate random password' },
+                    { name: 'ascii', desc: 'ASCII art (ascii [text])' },
+                    { name: 'credits', desc: 'Show credits' },
+                    { name: 'say', desc: 'Text-to-Speech (say [text])' },
+                    { name: 'rps', desc: 'Rock Paper Scissors (rps [rock/paper/scissors])' },
+                    { name: 'neofetch', desc: 'Display system info' },
                 ],
-                'Visual Effects': [
-                    { name: 'matrix', desc: 'Matrix falling code effect' },
-                    { name: 'confetti', desc: 'Burst of confetti particles' },
-                    { name: 'spin', desc: 'Rotate website 360 degrees' },
-                    { name: 'invert', desc: 'Invert all colors' },
-                    { name: 'shake', desc: 'Shake the screen' },
-                    { name: 'upsidedown', desc: 'Flip the page upside down' },
-                    { name: 'party', desc: 'Disco color cycling' },
-                    { name: 'chaos', desc: 'Randomly trigger 3 effects at once' },
+                'Themes': [
+                    { name: '1995', desc: 'Windows 95 style' },
+                    { name: 'cyberpunk', desc: 'Neon pink/blue glitch style' },
+                    { name: 'terminal', desc: 'CRT green terminal style' },
+                    { name: 'coffee', desc: 'Warm sepia coffee mode' },
+                    { name: 'dark', desc: 'Dark mode' },
+                    { name: 'light', desc: 'Light mode' },
+                ],
+                'Goose Expansion': [
+                    { name: 'horde', desc: 'Geese horde walking across screen', isGoose: true },
+                    { name: 'nest', desc: 'View achievements in nest visual', isGoose: true },
+                    { name: 'translate', desc: 'Translate to Honk/Geese', isGoose: true },
+                    { name: 'detect', desc: 'Goose radar detection', isGoose: true },
+                    { name: 'goosecall', desc: 'Random goose honk or hiss', isGoose: true },
+                    { name: 'steal', desc: 'Pet goose steals command menu', isGoose: true },
+                    { name: 'feed', desc: 'Feed your pet goose', isGoose: true },
+                    { name: 'hatch', desc: 'Hatch the pet goose egg', isGoose: true },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
+                    { name: 'effects', desc: 'Show/hide visual effects menu' },
                 ]
             };
             
@@ -1907,6 +2200,157 @@
             }
         }
         
+        // Visual Effects menu functionality
+        const visualEffectsMenu = document.getElementById('visualEffectsMenu');
+        const visualEffectsMenuHeader = document.getElementById('visualEffectsMenuHeader');
+        const visualEffectsMenuClose = document.getElementById('visualEffectsMenuClose');
+        
+        function toggleVisualEffectsMenu() {
+            visualEffectsMenu.classList.toggle('open');
+        }
+        
+        // Render visual effects buttons
+        function renderVisualEffectsMenu() {
+            const effectsList = document.getElementById('visualEffectsList');
+            if (!effectsList) return;
+            
+            const effects = [
+                { name: 'matrix', desc: 'Matrix falling code effect', func: triggerMatrix },
+                { name: 'confetti', desc: 'Burst of confetti particles', func: triggerConfetti },
+                { name: 'spin', desc: 'Rotate website 360 degrees', func: triggerSpin },
+                { name: 'invert', desc: 'Invert all colors', func: triggerInvert },
+                { name: 'shake', desc: 'Shake the screen', func: triggerShake },
+                { name: 'upsidedown', desc: 'Flip the page upside down', func: triggerUpsideDown },
+                { name: 'party', desc: 'Disco color cycling', func: triggerParty },
+                { name: 'chaos', desc: 'Randomly trigger 3 effects at once', func: triggerChaos },
+                { name: 'blur', desc: 'Blur filter (toggle)', func: triggerBlur },
+                { name: 'pixelate', desc: 'Pixelate filter', func: triggerPixelate },
+                { name: 'ghost', desc: '20% opacity', func: triggerGhost },
+                { name: 'mirror', desc: 'Horizontal flip', func: triggerMirror },
+                { name: 'flashbang', desc: 'White flash + sound', func: triggerFlashbang },
+                { name: 'earthquake', desc: 'Intense shake', func: triggerEarthquake },
+            ];
+            
+            let html = '';
+            effects.forEach(effect => {
+                html += `
+                    <button class="visual-effect-button" onclick="handleVisualEffect('${effect.name}')">
+                        <div class="visual-effect-name">${effect.name}</div>
+                        <div class="visual-effect-desc">${effect.desc}</div>
+                    </button>
+                `;
+            });
+            effectsList.innerHTML = html;
+        }
+        
+        // Handle visual effect button click
+        function handleVisualEffect(effectName) {
+            const originalCommand = effectName;
+            resetConfirm = false;
+            
+            if (effectName === 'matrix') {
+                triggerMatrix();
+                showCommandFeedback(originalCommand, 'Matrix effect activated!');
+            } else if (effectName === 'confetti') {
+                triggerConfetti();
+                showCommandFeedback(originalCommand, 'Confetti burst! 🎉');
+            } else if (effectName === 'spin') {
+                triggerSpin();
+                showCommandFeedback(originalCommand, 'Background spinning!');
+            } else if (effectName === 'invert') {
+                triggerInvert();
+                showCommandFeedback(originalCommand, 'Background inverted!');
+            } else if (effectName === 'shake') {
+                triggerShake();
+                showCommandFeedback(originalCommand, 'Background shaking!');
+            } else if (effectName === 'upsidedown') {
+                triggerUpsideDown();
+                showCommandFeedback(originalCommand, 'Background flipped! 🔄');
+            } else if (effectName === 'party') {
+                triggerParty();
+                showCommandFeedback(originalCommand, 'Party mode! 🎉');
+            } else if (effectName === 'chaos') {
+                triggerChaos();
+                showCommandFeedback(originalCommand, 'CHAOS! 💥✨🎨');
+            } else if (effectName === 'blur') {
+                triggerBlur();
+                showCommandFeedback(originalCommand, blurActive ? 'Blur ON' : 'Blur OFF');
+            } else if (effectName === 'pixelate') {
+                triggerPixelate();
+                showCommandFeedback(originalCommand, 'Pixelated!');
+            } else if (effectName === 'ghost') {
+                triggerGhost();
+                showCommandFeedback(originalCommand, 'Ghost mode! 👻');
+            } else if (effectName === 'mirror') {
+                triggerMirror();
+                showCommandFeedback(originalCommand, mirrorActive ? 'Mirrored! 🔄' : 'Unmirrored!');
+            } else if (effectName === 'flashbang') {
+                triggerFlashbang();
+                showCommandFeedback(originalCommand, 'FLASHBANG! 💥');
+            } else if (effectName === 'earthquake') {
+                triggerEarthquake();
+                showCommandFeedback(originalCommand, 'EARTHQUAKE! 🌍');
+            }
+        }
+        
+        // Make handleVisualEffect globally accessible
+        window.handleVisualEffect = handleVisualEffect;
+        
+        // Close menu button
+        visualEffectsMenuClose.addEventListener('click', () => {
+            visualEffectsMenu.classList.remove('open');
+        });
+        
+        // Make visual effects menu draggable
+        let isEffectsDragging = false;
+        let effectsCurrentX = 0;
+        let effectsCurrentY = 0;
+        let effectsInitialX = 0;
+        let effectsInitialY = 0;
+        
+        visualEffectsMenuHeader.addEventListener('mousedown', effectsDragStart);
+        document.addEventListener('mousemove', effectsDrag);
+        document.addEventListener('mouseup', effectsDragEnd);
+        
+        function effectsDragStart(e) {
+            if (e.target === visualEffectsMenuClose || !visualEffectsMenu.classList.contains('open')) return;
+            const rect = visualEffectsMenu.getBoundingClientRect();
+            effectsInitialX = e.clientX - rect.left;
+            effectsInitialY = e.clientY - rect.top;
+            isEffectsDragging = true;
+            visualEffectsMenu.classList.add('dragging');
+            visualEffectsMenu.style.transition = 'none';
+        }
+        
+        function effectsDrag(e) {
+            if (isEffectsDragging) {
+                e.preventDefault();
+                effectsCurrentX = e.clientX - effectsInitialX;
+                effectsCurrentY = e.clientY - effectsInitialY;
+                
+                // Keep menu within viewport
+                const maxX = window.innerWidth - visualEffectsMenu.offsetWidth;
+                const maxY = window.innerHeight - visualEffectsMenu.offsetHeight;
+                effectsCurrentX = Math.max(0, Math.min(effectsCurrentX, maxX));
+                effectsCurrentY = Math.max(0, Math.min(effectsCurrentY, maxY));
+                
+                visualEffectsMenu.style.right = 'auto';
+                visualEffectsMenu.style.left = `${effectsCurrentX}px`;
+                visualEffectsMenu.style.top = `${effectsCurrentY}px`;
+            }
+        }
+        
+        function effectsDragEnd(e) {
+            if (isEffectsDragging) {
+                isEffectsDragging = false;
+                visualEffectsMenu.classList.remove('dragging');
+                visualEffectsMenu.style.transition = 'right 0.3s ease';
+            }
+        }
+        
+        // Render visual effects menu on page load
+        renderVisualEffectsMenu();
+        
         // Clock system
         let clockEnabled = false;
         let clockInterval = null;
@@ -1962,23 +2406,60 @@
             saveClockSetting();
         }
         
-        // Command feedback helper
+        // Command history system (Minecraft-style chat)
+        const MAX_HISTORY_ENTRIES = 10; // Show only the last 10 commands
+        let commandHistory = [];
+        
         function showCommandFeedback(command, feedback, isError = false) {
-            const feedbackEl = document.getElementById('commandFeedback');
-            const commandTextEl = feedbackEl?.querySelector('.command-text');
-            const feedbackTextEl = feedbackEl?.querySelector('.feedback-text');
+            const historyEl = document.getElementById('commandHistory');
+            if (!historyEl) return;
             
-            if (feedbackEl && commandTextEl && feedbackTextEl) {
-                commandTextEl.textContent = `> ${command}`;
-                feedbackTextEl.textContent = feedback ? ` ${feedback}` : '';
-                feedbackEl.classList.remove('hidden');
-                feedbackEl.style.color = isError ? '#f85149' : '#c9d1d9'; // Red for error, default for success
-                
-                // Auto-hide after 3 seconds
-                clearTimeout(feedbackEl.timeoutId);
-                feedbackEl.timeoutId = setTimeout(() => {
-                    feedbackEl.classList.add('hidden');
-                }, 3000);
+            // Create new entry
+            const entry = document.createElement('div');
+            entry.className = `command-history-entry ${isError ? 'error' : ''}`;
+            
+            const commandSpan = document.createElement('span');
+            commandSpan.className = 'command-text';
+            commandSpan.textContent = `> ${command}`;
+            
+            const feedbackSpan = document.createElement('span');
+            feedbackSpan.className = 'feedback-text';
+            feedbackSpan.textContent = feedback ? ` ${feedback}` : '';
+            
+            entry.appendChild(commandSpan);
+            entry.appendChild(feedbackSpan);
+            
+            // Add to history
+            commandHistory.push(entry);
+            
+            // Limit history to exactly 10 entries - remove oldest if we exceed
+            while (commandHistory.length > MAX_HISTORY_ENTRIES) {
+                const removed = commandHistory.shift();
+                if (removed && removed.parentNode) {
+                    removed.parentNode.removeChild(removed);
+                }
+            }
+            
+            // Clear and rebuild history display to ensure only 10 are shown
+            historyEl.innerHTML = '';
+            commandHistory.forEach(entry => {
+                historyEl.appendChild(entry);
+            });
+            
+            // Auto-scroll to bottom
+            historyEl.scrollTop = historyEl.scrollHeight;
+            
+            // Always show history when there are entries - never hide it
+            if (commandHistory.length > 0) {
+                historyEl.classList.remove('hidden');
+            }
+        }
+        
+        // Initialize history display - show it if there are already entries
+        function initCommandHistory() {
+            const historyEl = document.getElementById('commandHistory');
+            if (historyEl && commandHistory.length > 0) {
+                historyEl.classList.remove('hidden');
             }
         }
         
@@ -2565,32 +3046,250 @@
                 } else if (command === 'spin') {
                     resetConfirm = false;
                     triggerSpin();
-                    showCommandFeedback(originalCommand, 'Spinning!');
+                    showCommandFeedback(originalCommand, 'Background spinning!');
                     commandInput.value = '';
                 } else if (command === 'invert') {
                     resetConfirm = false;
                     triggerInvert();
-                    showCommandFeedback(originalCommand, invertActive ? 'Colors inverted!' : 'Colors normal!');
+                    showCommandFeedback(originalCommand, 'Background inverted!');
                     commandInput.value = '';
                 } else if (command === 'shake') {
                     resetConfirm = false;
                     triggerShake();
-                    showCommandFeedback(originalCommand, 'Screen shaking!');
+                    showCommandFeedback(originalCommand, 'Background shaking!');
                     commandInput.value = '';
                 } else if (command === 'upsidedown') {
                     resetConfirm = false;
                     triggerUpsideDown();
-                    showCommandFeedback(originalCommand, upsidedownActive ? 'Page flipped upside down! 🔄' : 'Page flipped back!');
+                    showCommandFeedback(originalCommand, 'Background flipped! 🔄');
                     commandInput.value = '';
                 } else if (command === 'party') {
                     resetConfirm = false;
                     triggerParty();
-                    showCommandFeedback(originalCommand, partyActive ? 'Party mode ON! 🎉' : 'Party mode OFF');
+                    showCommandFeedback(originalCommand, 'Party mode! 🎉');
                     commandInput.value = '';
                 } else if (command === 'chaos') {
                     resetConfirm = false;
                     triggerChaos();
                     showCommandFeedback(originalCommand, 'CHAOS! 💥✨🎨');
+                    commandInput.value = '';
+                } else if (command === '1995') {
+                    resetConfirm = false;
+                    applyTheme1995();
+                    showCommandFeedback(originalCommand, 'Windows 95 mode activated! 🪟');
+                    commandInput.value = '';
+                } else if (command === 'cyberpunk') {
+                    resetConfirm = false;
+                    applyThemeCyberpunk();
+                    showCommandFeedback(originalCommand, 'Cyberpunk mode activated! 🌆');
+                    commandInput.value = '';
+                } else if (command === 'terminal') {
+                    resetConfirm = false;
+                    applyThemeTerminal();
+                    showCommandFeedback(originalCommand, 'Terminal mode activated! 💻');
+                    commandInput.value = '';
+                } else if (command === 'coffee') {
+                    resetConfirm = false;
+                    applyThemeCoffee();
+                    showCommandFeedback(originalCommand, 'Coffee mode activated! ☕');
+                    commandInput.value = '';
+                } else if (command === 'dark') {
+                    resetConfirm = false;
+                    applyThemeDark();
+                    showCommandFeedback(originalCommand, 'Dark mode activated! 🌙');
+                    commandInput.value = '';
+                } else if (command === 'light') {
+                    resetConfirm = false;
+                    applyThemeLight();
+                    showCommandFeedback(originalCommand, 'Light mode activated! ☀️');
+                    commandInput.value = '';
+                } else if (command.startsWith('calc ')) {
+                    resetConfirm = false;
+                    const equation = originalCommand.substring(5).trim();
+                    const result = calculateEquation(equation);
+                    showCommandFeedback(originalCommand, `= ${result}`);
+                    commandInput.value = '';
+                } else if (command.startsWith('timer ')) {
+                    resetConfirm = false;
+                    const seconds = parseInt(originalCommand.substring(6).trim());
+                    if (seconds > 0 && seconds <= 3600) {
+                        startTimer(seconds);
+                        showCommandFeedback(originalCommand, `Timer started for ${seconds} seconds`);
+                    } else {
+                        showCommandFeedback(originalCommand, 'Invalid timer duration (1-3600 seconds)', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'fortune') {
+                    resetConfirm = false;
+                    const fortune = getFortune();
+                    showCommandFeedback(originalCommand, fortune);
+                    commandInput.value = '';
+                } else if (command === 'joke') {
+                    resetConfirm = false;
+                    const joke = getJoke();
+                    showCommandFeedback(originalCommand, joke);
+                    commandInput.value = '';
+                } else if (command === 'password') {
+                    resetConfirm = false;
+                    const password = generatePassword();
+                    showCommandFeedback(originalCommand, `Generated password: ${password}`);
+                    commandInput.value = '';
+                } else if (command.startsWith('ascii ')) {
+                    resetConfirm = false;
+                    const text = originalCommand.substring(6).trim();
+                    if (text.length > 0 && text.length <= 20) {
+                        const asciiArt = generateASCII(text);
+                        // Show ASCII art in a special way (using white-space: pre)
+                        const asciiDisplay = document.createElement('div');
+                        asciiDisplay.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(13, 17, 23, 0.98); border: 2px solid #30363d; padding: 20px; color: #c9d1d9; font-family: monospace; font-size: 12px; white-space: pre; z-index: 10000; max-width: 90vw; max-height: 90vh; overflow: auto;';
+                        asciiDisplay.textContent = asciiArt;
+                        document.body.appendChild(asciiDisplay);
+                        setTimeout(() => asciiDisplay.remove(), 5000);
+                        showCommandFeedback(originalCommand, 'ASCII art displayed!');
+                    } else {
+                        showCommandFeedback(originalCommand, 'Text must be 1-20 characters', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'credits') {
+                    resetConfirm = false;
+                    showCredits();
+                    commandInput.value = '';
+                } else if (command === 'horde') {
+                    resetConfirm = false;
+                    if (petGooseActive || unlockedCommands.has('horde')) {
+                        startGeeseHorde();
+                        showCommandFeedback(originalCommand, 'Geese horde activated! 🦢🦢🦢');
+                    } else {
+                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'nest') {
+                    resetConfirm = false;
+                    if (petGooseActive || unlockedCommands.has('nest')) {
+                        showNest();
+                        showCommandFeedback(originalCommand, 'Viewing your nest! 🪺');
+                    } else {
+                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'translate') {
+                    resetConfirm = false;
+                    if (petGooseActive || unlockedCommands.has('translate')) {
+                        toggleGooseTranslate();
+                        showCommandFeedback(originalCommand, gooseTranslateActive ? 'Goose translate ON! 🦢' : 'Goose translate OFF');
+                    } else {
+                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'detect') {
+                    resetConfirm = false;
+                    if (petGooseActive || unlockedCommands.has('detect')) {
+                        detectGooseLevel();
+                        showCommandFeedback(originalCommand, '🦢 Goose Level: 100% 🦢');
+                    } else {
+                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'blur') {
+                    resetConfirm = false;
+                    triggerBlur();
+                    showCommandFeedback(originalCommand, blurActive ? 'Blur ON' : 'Blur OFF');
+                    commandInput.value = '';
+                } else if (command === 'pixelate') {
+                    resetConfirm = false;
+                    triggerPixelate();
+                    showCommandFeedback(originalCommand, 'Pixelated!');
+                    commandInput.value = '';
+                } else if (command === 'ghost') {
+                    resetConfirm = false;
+                    triggerGhost();
+                    showCommandFeedback(originalCommand, 'Ghost mode! 👻');
+                    commandInput.value = '';
+                } else if (command === 'mirror') {
+                    resetConfirm = false;
+                    triggerMirror();
+                    showCommandFeedback(originalCommand, mirrorActive ? 'Mirrored! 🔄' : 'Unmirrored!');
+                    commandInput.value = '';
+                } else if (command === 'flashbang') {
+                    resetConfirm = false;
+                    triggerFlashbang();
+                    showCommandFeedback(originalCommand, 'FLASHBANG! 💥');
+                    commandInput.value = '';
+                } else if (command === 'earthquake') {
+                    resetConfirm = false;
+                    triggerEarthquake();
+                    showCommandFeedback(originalCommand, 'EARTHQUAKE! 🌍');
+                    commandInput.value = '';
+                } else if (command.startsWith('say ')) {
+                    resetConfirm = false;
+                    const text = originalCommand.substring(4).trim();
+                    if (text.length > 0) {
+                        sayText(text);
+                        showCommandFeedback(originalCommand, `Saying: "${text}"`);
+                    } else {
+                        showCommandFeedback(originalCommand, 'Please provide text to say', true);
+                    }
+                    commandInput.value = '';
+                } else if (command.startsWith('rps ')) {
+                    resetConfirm = false;
+                    const choice = originalCommand.substring(4).trim().toLowerCase();
+                    if (['rock', 'paper', 'scissors'].includes(choice)) {
+                        const result = playRockPaperScissors(choice);
+                        showCommandFeedback(originalCommand, result);
+                    } else {
+                        showCommandFeedback(originalCommand, 'Invalid choice. Use: rock, paper, or scissors', true);
+                    }
+                    commandInput.value = '';
+                } else if (command.startsWith('math ')) {
+                    resetConfirm = false;
+                    const equation = originalCommand.substring(5).trim();
+                    const result = calculateEquation(equation);
+                    showCommandFeedback(originalCommand, `= ${result}`);
+                    commandInput.value = '';
+                } else if (command === 'neofetch') {
+                    resetConfirm = false;
+                    showNeofetch();
+                    commandInput.value = '';
+                } else if (command === 'goosecall') {
+                    resetConfirm = false;
+                    if (petGooseActive || unlockedCommands.has('goosecall')) {
+                        gooseCall();
+                        showCommandFeedback(originalCommand, '🦢 HONK! 🦢');
+                    } else {
+                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'steal') {
+                    resetConfirm = false;
+                    if (petGooseActive || unlockedCommands.has('steal')) {
+                        stealCommandMenu();
+                        showCommandFeedback(originalCommand, 'The goose stole the menu! 🦢');
+                    } else {
+                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'feed') {
+                    resetConfirm = false;
+                    if (petGooseActive || unlockedCommands.has('feed')) {
+                        feedPetGoose();
+                        showCommandFeedback(originalCommand, 'Fed the goose! 🍞');
+                    } else {
+                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'hatch') {
+                    resetConfirm = false;
+                    if (petGoose && petGoose.stage === 'egg') {
+                        hatchPetGoose();
+                        showCommandFeedback(originalCommand, 'The egg hatched! 🐣');
+                    } else {
+                        showCommandFeedback(originalCommand, 'No egg to hatch!', true);
+                    }
+                    commandInput.value = '';
+                } else if (command === 'mud') {
+                    resetConfirm = false;
+                    applyMudToWooper();
+                    showCommandFeedback(originalCommand, 'Wooper turned brown! 🟤');
                     commandInput.value = '';
                 } else if (command === '67') {
                     resetConfirm = false;
@@ -2620,6 +3319,11 @@
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
+                } else if (command === 'effects' || command === 'vfx') {
+                    resetConfirm = false;
+                    toggleVisualEffectsMenu();
+                    showCommandFeedback(originalCommand, 'Visual effects menu toggled!');
+                    commandInput.value = '';
                 } else if (command === 'rainbow') {
                     resetConfirm = false;
                     applyRainbowColors();
@@ -3003,7 +3707,7 @@
                     
                     if (y < window.innerHeight + 50) {
                         requestAnimationFrame(animate);
-                } else {
+                            } else {
                         particle.remove();
                     }
                 };
@@ -3012,69 +3716,102 @@
             }
         }
         
-        function triggerSpin() {
-            document.body.classList.add('spin-effect');
+        // Background effect overlay helper
+        function createBgOverlay(className, duration) {
+            // Remove any existing overlay
+            const existing = document.getElementById('bgEffectOverlay');
+            if (existing) existing.remove();
+            
+            // Create overlay div
+            const overlay = document.createElement('div');
+            overlay.id = 'bgEffectOverlay';
+            overlay.className = 'bg-effect-overlay ' + className;
+            
+            // Copy current background from body (try computed style first, then inline style, then fallback)
+            const computedStyle = window.getComputedStyle(document.body);
+            const bodyBg = computedStyle.background || computedStyle.backgroundColor || 
+                          document.body.style.background || document.body.style.backgroundColor || 
+                          '#0d1117';
+            overlay.style.background = bodyBg;
+            
+            // If background is empty or transparent, use fallback
+            if (!bodyBg || bodyBg === 'rgba(0, 0, 0, 0)' || bodyBg === 'transparent') {
+                overlay.style.background = '#0d1117';
+            }
+            
+            document.body.insertBefore(overlay, document.body.firstChild);
+            
+            // Remove after animation
             setTimeout(() => {
-                document.body.classList.remove('spin-effect');
-            }, 1000);
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, duration);
         }
         
-        let invertActive = false;
+        function triggerSpin() {
+            createBgOverlay('bg-spin-effect', 1000);
+        }
+        
         function triggerInvert() {
-            invertActive = !invertActive;
-            if (invertActive) {
-                document.body.classList.add('invert-effect');
-                        } else {
-                document.body.classList.remove('invert-effect');
-            }
+            createBgOverlay('bg-invert-effect', 500);
         }
         
         function triggerShake() {
-            document.body.classList.add('shake-effect');
-            setTimeout(() => {
-                document.body.classList.remove('shake-effect');
-            }, 500);
+            createBgOverlay('bg-shake-effect', 500);
+        }
+        
+        function triggerUpsideDown() {
+            createBgOverlay('bg-upsidedown-effect', 500);
         }
         
         let partyInterval = null;
-        let partyActive = false;
         const partyColors = ['black', 'red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
-        let partyColorIndex = 0;
+        const colorMap = {
+            'black': '#000000',
+            'red': '#ff0000',
+            'blue': '#0000ff',
+            'green': '#00ff00',
+            'yellow': '#ffff00',
+            'purple': '#800080',
+            'orange': '#ffa500',
+            'pink': '#ff69b4',
+            'cyan': '#00ffff'
+        };
         
         function triggerParty() {
-            partyActive = !partyActive;
-            
-            if (partyActive) {
-                // Start party mode
-                partyColorIndex = 0;
-                function cyclePartyColors() {
-                    if (!partyActive) return;
-                    const colorName = partyColors[partyColorIndex % partyColors.length];
-                    const colorMap = {
-                        'black': '#000000',
-                        'red': '#ff0000',
-                        'blue': '#0000ff',
-                        'green': '#00ff00',
-                        'yellow': '#ffff00',
-                        'purple': '#800080',
-                        'orange': '#ffa500',
-                        'pink': '#ff69b4',
-                        'cyan': '#00ffff'
-                    };
-                    document.body.style.background = colorMap[colorName];
-                    partyColorIndex++;
-                    partyInterval = setTimeout(cyclePartyColors, 100);
-                }
-                cyclePartyColors();
-            } else {
-                // Stop party mode
-                if (partyInterval) {
-                    clearTimeout(partyInterval);
-                    partyInterval = null;
-                }
-                // Restore background
-                loadBackgroundPreferences();
+            // Stop any existing party mode
+            if (partyInterval) {
+                clearTimeout(partyInterval);
+                partyInterval = null;
             }
+            
+            // Save original background
+            const originalBg = document.body.style.background || window.getComputedStyle(document.body).background;
+            
+            // Cycle through colors quickly (1 second total, ~9 colors = ~110ms per color)
+            let partyColorIndex = 0;
+            const cycleCount = 9; // Cycle through all colors once
+            const cycleDuration = 110;
+            
+            function cyclePartyColors() {
+                if (partyColorIndex >= cycleCount) {
+                    // Restore original background
+                    if (originalBg) {
+                        document.body.style.background = originalBg;
+                    } else {
+                        loadBackgroundPreferences();
+                    }
+                    return;
+                }
+                
+                const colorName = partyColors[partyColorIndex % partyColors.length];
+                document.body.style.background = colorMap[colorName];
+                partyColorIndex++;
+                partyInterval = setTimeout(cyclePartyColors, cycleDuration);
+            }
+            
+            cyclePartyColors();
         }
         
         function triggerChaos() {
@@ -3117,6 +3854,500 @@
                     console.error('Chaos action error:', e);
                 }
             });
+        }
+        
+        // ===== THEME FUNCTIONS =====
+        let currentTheme = null;
+        
+        function applyTheme1995() {
+            currentTheme = '1995';
+            document.body.classList.add('theme-1995');
+            document.body.style.fontFamily = 'MS Sans Serif, sans-serif';
+            document.body.style.background = '#C0C0C0';
+            document.body.style.color = '#000000';
+            localStorage.setItem('currentTheme', '1995');
+        }
+        
+        function applyThemeCyberpunk() {
+            currentTheme = 'cyberpunk';
+            document.body.classList.add('theme-cyberpunk');
+            document.body.style.background = '#0a0e27';
+            document.body.style.color = '#ff0080';
+            localStorage.setItem('currentTheme', 'cyberpunk');
+        }
+        
+        function applyThemeTerminal() {
+            currentTheme = 'terminal';
+            document.body.classList.add('theme-terminal');
+            document.body.style.background = '#000000';
+            document.body.style.color = '#00ff00';
+            localStorage.setItem('currentTheme', 'terminal');
+        }
+        
+        function applyThemeCoffee() {
+            currentTheme = 'coffee';
+            document.body.classList.add('theme-coffee');
+            document.body.style.background = '#8B6F47';
+            document.body.style.color = '#D2B48C';
+            localStorage.setItem('currentTheme', 'coffee');
+        }
+        
+        function applyThemeDark() {
+            currentTheme = 'dark';
+            document.body.classList.remove('theme-1995', 'theme-cyberpunk', 'theme-terminal', 'theme-coffee', 'theme-light');
+            document.body.style.background = '#0d1117';
+            document.body.style.color = '#c9d1d9';
+            localStorage.setItem('currentTheme', 'dark');
+        }
+        
+        function applyThemeLight() {
+            currentTheme = 'light';
+            document.body.classList.remove('theme-1995', 'theme-cyberpunk', 'theme-terminal', 'theme-coffee');
+            document.body.classList.add('theme-light');
+            document.body.style.background = '#ffffff';
+            document.body.style.color = '#000000';
+            localStorage.setItem('currentTheme', 'light');
+        }
+        
+        // Load theme on page load
+        function loadTheme() {
+            const saved = localStorage.getItem('currentTheme');
+            if (saved) {
+                switch(saved) {
+                    case '1995': applyTheme1995(); break;
+                    case 'cyberpunk': applyThemeCyberpunk(); break;
+                    case 'terminal': applyThemeTerminal(); break;
+                    case 'coffee': applyThemeCoffee(); break;
+                    case 'light': applyThemeLight(); break;
+                    default: applyThemeDark();
+                }
+            }
+        }
+        loadTheme();
+        
+        // ===== CALCULATOR =====
+        function calculateEquation(equation) {
+            try {
+                // Sanitize: only allow numbers, operators, parentheses, and spaces
+                const sanitized = equation.replace(/[^0-9+\-*/().\s]/g, '');
+                const result = Function('"use strict"; return (' + sanitized + ')')();
+                return isNaN(result) ? 'Invalid equation' : result;
+            } catch (e) {
+                return 'Invalid equation';
+            }
+        }
+        
+        // ===== TIMER =====
+        let timerInterval = null;
+        let timerDisplay = null;
+        
+        function startTimer(seconds) {
+            // Remove existing timer
+            if (timerDisplay) timerDisplay.remove();
+            if (timerInterval) clearInterval(timerInterval);
+            
+            // Create timer display
+            timerDisplay = document.createElement('div');
+            timerDisplay.id = 'timerDisplay';
+            timerDisplay.style.cssText = 'position: fixed; top: 80px; left: 20px; background: rgba(13, 17, 23, 0.95); border: 1px solid #30363d; border-radius: 6px; padding: 10px 15px; color: #c9d1d9; font-family: monospace; font-size: 20px; z-index: 999;';
+            document.body.appendChild(timerDisplay);
+            
+            let timeLeft = seconds;
+            timerDisplay.textContent = `Timer: ${timeLeft}s`;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Timer: ${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    timerDisplay.textContent = 'Timer: DONE!';
+                    timerDisplay.style.color = '#3fb950';
+                    clearInterval(timerInterval);
+                    setTimeout(() => {
+                        if (timerDisplay) timerDisplay.remove();
+                        timerDisplay = null;
+                        timerInterval = null;
+                    }, 3000);
+                }
+            }, 1000);
+        }
+        
+        // ===== FORTUNE =====
+        function getFortune() {
+            const fortunes = [
+                "A smile is your passport into the hearts of others.",
+                "A lifetime of happiness lies ahead of you.",
+                "A light heart carries you through all the hard times.",
+                "Adventure can be real happiness.",
+                "Believe in yourself and others will too.",
+                "Change is happening in your life, so go with the flow!",
+                "Determination is what you need now.",
+                "Every exit is an entrance to new opportunities.",
+                "Follow the middle path. Neither extreme will make you happy.",
+                "Good news will come to you by mail.",
+                "If you wish to see the best in others, show the best of yourself.",
+                "It is better to be an optimist and proven a fool than to be a pessimist and be proven right.",
+                "Judge each day not by the harvest you reap but by the seeds you plant.",
+                "Keep your face to the sunshine and you will never see shadows.",
+                "Listen to everyone. Ideas come from everywhere.",
+                "Never give up. You're not a failure if you don't give up.",
+                "Opportunity knocks at the strangest times.",
+                "Practice makes perfect, but nobody's perfect, so why practice?",
+                "Simplicity and clarity should be your theme in dress.",
+                "The best time to start something is now.",
+                "The harder you work, the luckier you get.",
+                "You will overcome the troubles that are on your mind.",
+                "Your kindness will lead you to success.",
+                "You're thinking about doing something. You should do it.",
+            ];
+            return fortunes[Math.floor(Math.random() * fortunes.length)];
+        }
+        
+        // ===== JOKE =====
+        function getJoke() {
+            const jokes = [
+                "Why don't scientists trust atoms? Because they make up everything!",
+                "I told my wife she was drawing her eyebrows too high. She looked surprised.",
+                "Why don't eggs tell jokes? They'd crack each other up!",
+                "What do you call a fake noodle? An impasta!",
+                "How do you organize a space party? You planet!",
+                "Why did the scarecrow win an award? He was outstanding in his field!",
+                "I'm reading a book about anti-gravity. It's impossible to put down!",
+                "How does a penguin build its house? Igloos it together!",
+                "Why don't programmers like nature? It has too many bugs.",
+                "A SQL query walks into a bar, walks up to two tables and asks: 'Can I join you?'",
+                "Why do Java developers wear glasses? Because they can't C#!",
+                "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+                "There are only 10 kinds of people in the world: those who know binary and those who don't.",
+                "Why did the programmer quit his job? He didn't get arrays!",
+                "['hip','hip'] // (hip hip array!)",
+                "What's the object-oriented way to become wealthy? Inheritance.",
+                "Why did the programmer get stuck in the shower? He followed the bottle instructions: Lather. Rinse. Repeat.",
+            ];
+            return jokes[Math.floor(Math.random() * jokes.length)];
+        }
+        
+        // ===== PASSWORD GENERATOR =====
+        function generatePassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let password = '';
+            for (let i = 0; i < 16; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+        
+        // ===== ASCII ART =====
+        const asciiFont = {
+            'A': ['  /\\  ', ' /  \\ ', '/____\\', '|    |', '|____|'],
+            'B': [' ____ ', '|  _ \\', '| |_) |', '|  _ <', '|____/'],
+            'C': ['  ____ ', ' / ___|', '| |    ', '| |___ ', ' \\____|'],
+            'D': [' ____  ', '|  _ \\ ', '| | | |', '| |_| |', '|____/ '],
+            'E': [' _____ ', '| ____|', '| |_   ', '|  _|  ', '|_____|'],
+            'F': [' _____ ', '| ____|', '| |_   ', '|  _|  ', '| |    '],
+            'G': ['  ____ ', ' / ___|', '| |  _ ', '| |_| |', ' \\____|'],
+            'H': [' _   _ ', '| | | |', '| |_| |', '|  _  |', '|_| |_|'],
+            'I': [' _____ ', '|_   _|', '  | |  ', '  | |  ', '  |_|  '],
+            'J': ['     _ ', '    | |', '    | |', ' _  | |', '|_| |_|'],
+            'K': [' _  __', '| |/ /', '| \' / ', '| . \\ ', '|_|\\_\\'],
+            'L': [' _     ', '| |    ', '| |    ', '| |___ ', '|_____|'],
+            'M': [' __  __ ', '|  \\/  |', '| |\\/| |', '| |  | |', '|_|  |_|'],
+            'N': [' _   _ ', '| \\ | |', '|  \\| |', '| |\\  |', '|_| \\_|'],
+            'O': ['  ___  ', ' / _ \\ ', '| | | |', '| |_| |', ' \\___/ '],
+            'P': [' ____  ', '|  _ \\ ', '| |_) |', '|  __/ ', '|_|    '],
+            'Q': ['  ___  ', ' / _ \\ ', '| | | |', '| |\\ \\ ', ' \\_\\ \\_'],
+            'R': [' ____  ', '|  _ \\ ', '| |_) |', '|    / ', '|_|\\_\\ '],
+            'S': [' ____  ', '|  __| ', '|  __| ', '| |___ ', '|_____|'],
+            'T': [' _____ ', '|_   _|', '  | |  ', '  | |  ', '  |_|  '],
+            'U': [' _   _ ', '| | | |', '| | | |', '| |_| |', ' \\___/ '],
+            'V': ['__     __', '\\ \\   / /', ' \\ \\ / / ', '  \\ V /  ', '   \\_/   '],
+            'W': ['__        __', '\\ \\      / /', ' \\ \\ /\\ / / ', '  \\ V  V /  ', '   \\_/\\_/   '],
+            'X': ['__  __', '\\ \\/ /', ' \\  / ', ' /  \\ ', '/_/\\_\\'],
+            'Y': ['__   __', '\\ \\ / /', ' \\ V / ', '  | |  ', '  |_|  '],
+            'Z': [' _____', '/__  /', '  / / ', ' / /__', '/_____|'],
+            ' ': [' ', ' ', ' ', ' ', ' '],
+            '0': ['  ___  ', ' / _ \\ ', '| | | |', '| |_| |', ' \\___/ '],
+            '1': ['  _  ', ' / | ', '| |  ', '| |  ', '|_|  '],
+            '2': [' ____  ', '|_  _| ', '  | |  ', ' / /   ', '/____| '],
+            '3': [' _____ ', '|_   _|', '  | |  ', '  | |  ', '  |_|  '],
+            '4': [' _  _  ', '| || | ', '| || |_', '|__   _|', '   |_|  '],
+            '5': [' _____ ', '| ____|', '|  __| ', '| |___ ', '|_____|'],
+            '6': ['  ___  ', ' / ___|', '| |    ', '| |___ ', ' \\____|'],
+            '7': [' _____ ', '|_   _|', '  | |  ', ' / /   ', '/_/    '],
+            '8': ['  ___  ', ' | _ \\ ', ' | |_) |', ' |  _ < ', ' |_| \\_\\'],
+            '9': ['  ___  ', ' | _ \\ ', ' | |_) |', ' |  _ < ', '  |_|\\_\\'],
+        };
+        
+        function generateASCII(text) {
+            const lines = ['', '', '', '', ''];
+            for (let char of text) {
+                const upper = char.toUpperCase();
+                const letter = asciiFont[upper] || asciiFont[' '];
+                for (let i = 0; i < 5; i++) {
+                    lines[i] += (letter[i] || ' ') + ' ';
+                }
+            }
+            return lines.join('\n');
+        }
+        
+        // ===== CREDITS =====
+        function showCredits() {
+            const credits = `CREDITS
+        
+Finley Chang - Creator
+Tyler Bayne - Goose Creator
+Declan - Wooper Creator`;
+            showCommandFeedback('credits', credits);
+        }
+        
+        // ===== GOOSE EXPANSION =====
+        let geeseHordeActive = false;
+        let geeseHordeInterval = null;
+        let gooseTranslateActive = false;
+        
+        function startGeeseHorde() {
+            if (geeseHordeActive) return;
+            geeseHordeActive = true;
+            
+            // Spawn geese walking across screen
+            geeseHordeInterval = setInterval(() => {
+                const goose = document.createElement('div');
+                goose.textContent = '🦢';
+                goose.style.cssText = `position: fixed; font-size: 40px; top: ${Math.random() * (window.innerHeight - 100)}px; left: -50px; z-index: 500; pointer-events: none;`;
+                document.body.appendChild(goose);
+                
+                let x = -50;
+                const speed = Math.random() * 2 + 1;
+                const animate = () => {
+                    x += speed;
+                    goose.style.left = x + 'px';
+                    if (x < window.innerWidth + 50) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        goose.remove();
+                    }
+                };
+                animate();
+            }, 300);
+            
+            // Stop after 30 seconds
+            setTimeout(() => {
+                clearInterval(geeseHordeInterval);
+                geeseHordeActive = false;
+            }, 30000);
+        }
+        
+        function showNest() {
+            // Show achievements in a nest visual (use achievements page but style as nest)
+            showPage('achievementsPage');
+        }
+        
+        function toggleGooseTranslate() {
+            gooseTranslateActive = !gooseTranslateActive;
+            // Store original input handler
+            if (!window.originalCommandHandler) {
+                window.originalCommandHandler = commandInput.value;
+            }
+            
+            if (gooseTranslateActive) {
+                // Replace all input with HONK/GEESE
+                commandInput.addEventListener('input', function gooseTranslateHandler(e) {
+                    const current = commandInput.value;
+                    const words = current.split(/\s+/);
+                    const translated = words.map(() => Math.random() > 0.5 ? 'HONK' : 'GEESE').join(' ');
+                    if (commandInput.value !== translated) {
+                        commandInput.value = translated;
+                    }
+                });
+            } else {
+                // Remove translate handler (will be removed on next toggle)
+                commandInput.value = '';
+            }
+        }
+        
+        function detectGooseLevel() {
+            // Visual "radar" effect
+            const radar = document.createElement('div');
+            radar.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: #00ff00; padding: 30px; border: 3px solid #00ff00; font-family: monospace; font-size: 24px; z-index: 10000; text-align: center;';
+            radar.innerHTML = '🦢<br>GOOSE LEVEL: 100%<br>🦢';
+            document.body.appendChild(radar);
+            
+            setTimeout(() => {
+                radar.remove();
+            }, 3000);
+        }
+        
+        // ===== NEW VISUAL EFFECTS =====
+        let blurActive = false;
+        function triggerBlur() {
+            blurActive = !blurActive;
+            if (blurActive) {
+                document.body.style.filter = 'blur(5px)';
+            } else {
+                document.body.style.filter = '';
+            }
+        }
+        
+        function triggerPixelate() {
+            document.body.style.filter = 'pixelate(8px)';
+            setTimeout(() => {
+                document.body.style.filter = '';
+            }, 3000);
+        }
+        
+        function triggerGhost() {
+            document.body.style.opacity = '0.2';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 3000);
+        }
+        
+        let mirrorActive = false;
+        function triggerMirror() {
+            mirrorActive = !mirrorActive;
+            if (mirrorActive) {
+                document.body.style.transform = 'scaleX(-1)';
+            } else {
+                document.body.style.transform = '';
+            }
+        }
+        
+        function triggerFlashbang() {
+            const flash = document.createElement('div');
+            flash.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 99999; pointer-events: none;';
+            document.body.appendChild(flash);
+            
+            // High-pitched ringing sound using Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 2000; // High pitch
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 1);
+            
+            setTimeout(() => {
+                flash.remove();
+            }, 1000);
+        }
+        
+        function triggerEarthquake() {
+            document.body.classList.add('earthquake-effect');
+            setTimeout(() => {
+                document.body.classList.remove('earthquake-effect');
+            }, 2000);
+        }
+        
+        // ===== UTILITY FUNCTIONS =====
+        function sayText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                speechSynthesis.speak(utterance);
+            } else {
+                showCommandFeedback('say', 'Text-to-Speech not supported in this browser', true);
+            }
+        }
+        
+        function playRockPaperScissors(playerChoice) {
+            const choices = ['rock', 'paper', 'scissors'];
+            const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+            
+            const results = {
+                'rock': { 'rock': 'Tie! Both chose rock', 'paper': 'You lose! Paper covers rock', 'scissors': 'You win! Rock crushes scissors' },
+                'paper': { 'rock': 'You win! Paper covers rock', 'paper': 'Tie! Both chose paper', 'scissors': 'You lose! Scissors cut paper' },
+                'scissors': { 'rock': 'You lose! Rock crushes scissors', 'paper': 'You win! Scissors cut paper', 'scissors': 'Tie! Both chose scissors' }
+            };
+            
+            return `You: ${playerChoice} | Computer: ${computerChoice}\n${results[playerChoice][computerChoice]}`;
+        }
+        
+        function showNeofetch() {
+            const browser = navigator.userAgent.includes('Chrome') ? 'Chrome' : 
+                           navigator.userAgent.includes('Firefox') ? 'Firefox' : 
+                           navigator.userAgent.includes('Safari') ? 'Safari' : 'Unknown';
+            const os = navigator.platform;
+            const gooseStatus = petGooseActive ? (petGoose?.stage || 'goose') : 'None';
+            
+            const neofetch = `
+╔═══════════════════════════════╗
+║      FINHUB v1.0              ║
+╠═══════════════════════════════╣
+║ Browser: ${browser.padEnd(20)} ║
+║ OS:      ${os.padEnd(20)} ║
+║ Goose:   ${gooseStatus.padEnd(20)} ║
+╚═══════════════════════════════╝`;
+            
+            const neofetchDisplay = document.createElement('div');
+            neofetchDisplay.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(13, 17, 23, 0.98); border: 2px solid #30363d; padding: 20px; color: #c9d1d9; font-family: monospace; font-size: 14px; white-space: pre; z-index: 10000;';
+            neofetchDisplay.textContent = neofetch;
+            document.body.appendChild(neofetchDisplay);
+            setTimeout(() => neofetchDisplay.remove(), 5000);
+        }
+        
+        // ===== GOOSE/WOOPER FUNCTIONS =====
+        function gooseCall() {
+            // Random honk or hiss
+            const sounds = ['honk', 'hiss'];
+            const sound = sounds[Math.floor(Math.random() * sounds.length)];
+            
+            if (sound === 'honk') {
+                playHonk();
+            } else {
+                // Hiss sound (higher frequency)
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.frequency.value = 3000;
+                oscillator.type = 'sawtooth';
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+        }
+        
+        let feedCount = 0;
+        function feedPetGoose() {
+            if (!petGooseActive || !petGoose) return;
+            feedCount++;
+            localStorage.setItem('gooseFeedCount', feedCount.toString());
+            
+            // Visual feedback
+            const feedEffect = document.createElement('div');
+            feedEffect.textContent = '🍞';
+            feedEffect.style.cssText = `position: fixed; font-size: 30px; right: ${petGoose.x}px; bottom: ${window.innerHeight - petGoose.y}px; z-index: 1001; pointer-events: none; animation: floatUp 1s ease-out forwards;`;
+            document.body.appendChild(feedEffect);
+            setTimeout(() => feedEffect.remove(), 1000);
+            
+            if (feedCount >= 10) {
+                unlockAchievement(12); // fatgoose achievement
+                showCommandFeedback('feed', 'The goose is getting fat! 🐷 Achievement unlocked!');
+            }
+        }
+        
+        function stealCommandMenu() {
+            const menu = document.getElementById('commandsMenu');
+            if (!menu) return;
+            
+            menu.style.display = 'none';
+            setTimeout(() => {
+                menu.style.display = '';
+            }, 5000);
+        }
+        
+        function applyMudToWooper() {
+            // Change wooperbird goose colors to brown
+            if (wooperbirdGoose) {
+                wooperbirdGoose.muddy = true;
+            }
         }
         
         // Background selection system
