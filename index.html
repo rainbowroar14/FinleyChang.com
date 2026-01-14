@@ -829,26 +829,6 @@
         <div id="streak-display" style="color: #58a6ff; font-size: 20px; margin-top: 20px;">
             Streak: <span id="streak-count">0</span>
         </div>
-        <div style="margin-top: 30px;">
-            <button onclick="showShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Shop</button>
-        </div>
-    </div>
-    
-    <!-- Shop page -->
-    <div class="page shop-page hidden" id="shopPage">
-        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Shop</h1>
-        <div id="shop-money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 30px; font-weight: bold;">
-            Money: $<span id="shop-money-count">0</span>
-        </div>
-        <div style="color: #c9d1d9; font-size: 18px; margin-bottom: 30px;">
-            Current Win Chance: <span id="shop-win-chance">50</span>%
-        </div>
-        <div id="upgrade-container" style="margin: 20px 0;">
-            <!-- Upgrades will be added here dynamically -->
-        </div>
-        <div style="margin-top: 30px;">
-            <button onclick="closeShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back to Coin Flip</button>
-        </div>
     </div>
     
     <!-- Clicker page -->
@@ -862,9 +842,6 @@
         </div>
         <div style="margin: 40px 0;">
             <button id="clicker-button" onclick="clickMoney()" style="padding: 30px 60px; font-size: 32px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.1s; user-select: none;">CLICK ME!</button>
-        </div>
-        <div style="margin-top: 30px;">
-            <button onclick="showShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Shop</button>
         </div>
     </div>
     
@@ -1094,15 +1071,17 @@
             saveGlobalData();
         }
         
-        // Render commands menu dynamically based on unlocks
+        // Render commands menu dynamically - show all commands except goose ones until unlocked
         function renderCommandsMenu() {
             const commandsList = document.getElementById('commandsList');
             if (!commandsList) return;
             
+            const gooseCommands = ['goose', 'honk', 'gooserain']; // Goose commands that need to be unlocked
+            
             const commandDefinitions = {
                 'Navigation': [
-                    { name: 'home', desc: 'Go to home page', unlock: true },
-                    { name: 'back', desc: 'Return to main page', unlock: true },
+                    { name: 'home', desc: 'Go to home page' },
+                    { name: 'back', desc: 'Return to main page' },
                     { name: 'sweeper', desc: 'Play Minesweeper' },
                     { name: 'pong', desc: 'Play Pong' },
                     { name: 'sandboxles', desc: 'Open Sandboxels' },
@@ -1110,10 +1089,9 @@
                     { name: 'coinflip', desc: 'Flip a coin' },
                     { name: 'clicker', desc: 'Play clicker game' },
                     { name: 'finley', desc: 'Transform back to FinHub' },
-                    { name: 'shop', desc: 'Open shop', unlock: true },
-                    { name: 'achievements', desc: 'View achievements', unlock: true },
+                    { name: 'achievements', desc: 'View achievements' },
                     { name: 'goose', desc: 'Transform to GooseHub' },
-                    { name: 'gooserain', desc: 'Make it rain geese!' },
+                    { name: 'gooserain', desc: 'Make it rain geese!', isGoose: true },
                 ],
                 'Colors': [
                     { name: 'rainbow', desc: 'Rainbow colors' },
@@ -1131,10 +1109,10 @@
                     { name: 'silver', desc: 'Silver' },
                 ],
                 'Actions': [
-                    { name: 'honk', desc: 'Play honk sound' },
+                    { name: 'honk', desc: 'Play honk sound', isGoose: true },
                 ],
                 'Menu': [
-                    { name: 'cmds', desc: 'Show/hide this menu', unlock: true },
+                    { name: 'cmds', desc: 'Show/hide this menu' },
                 ]
             };
             
@@ -1142,10 +1120,11 @@
             Object.keys(commandDefinitions).forEach(category => {
                 const commands = commandDefinitions[category];
                 const visibleCommands = commands.filter(cmd => {
-                    if (cmd.unlock) return true;
-                    if (unlockedCommands.has(cmd.name)) return true;
-                    if (unlockedColors.has(cmd.name)) return true;
-                    return false;
+                    // Hide goose commands if not unlocked
+                    if (cmd.isGoose && !unlockedCommands.has(cmd.name)) {
+                        return false;
+                    }
+                    return true;
                 });
                 
                 if (visibleCommands.length > 0) {
@@ -1287,9 +1266,9 @@
         
         // Global money system - shared across all tabs
         let globalMoney = 0;
-        let unlockedColors = new Set(); // Colors start locked
+        let unlockedColors = new Set(); // Colors are unlocked by default (not used anymore but keeping for compatibility)
         let clickerPerClick = 1; // Clicker base money per click
-        let unlockedCommands = new Set(['home', 'back', 'cmds', 'shop', 'achievements']); // Basic commands unlocked by default
+        let unlockedCommands = new Set(); // Only goose commands need to be unlocked
         let isGooseMode = false; // Track if in goose mode
         let resetConfirm = false; // Track if reset command was just used (needs confirmation)
         
@@ -1301,7 +1280,7 @@
                 globalMoney = data.money || 0;
                 unlockedColors = new Set(data.unlockedColors || []);
                 clickerPerClick = data.clickerPerClick || 1;
-                unlockedCommands = new Set(data.unlockedCommands || ['home', 'back', 'cmds', 'shop', 'achievements']);
+                unlockedCommands = new Set(data.unlockedCommands || []); // Only goose commands stored
                 isGooseMode = data.isGooseMode || false;
             }
             updateAllMoneyDisplays();
@@ -1333,7 +1312,7 @@
             globalMoney = 0;
             unlockedColors = new Set();
             clickerPerClick = 1;
-            unlockedCommands = new Set(['home', 'back', 'cmds', 'shop', 'achievements']);
+            unlockedCommands = new Set(); // Reset goose command unlocks
             isGooseMode = false;
             resetConfirm = false;
             
@@ -1399,7 +1378,7 @@
         
         // Update all money displays across all pages
         function updateAllMoneyDisplays() {
-            const displays = ['money-count', 'shop-money-count', 'clicker-money-count'];
+            const displays = ['money-count', 'clicker-money-count'];
             displays.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = globalMoney;
@@ -1467,12 +1446,8 @@
             'rainbow': 100
         };
         
-        // Function to change all letter colors with different shades (only if unlocked)
+        // Function to change all letter colors with different shades (all colors unlocked)
         function changeAllColors(colorName) {
-            if (!unlockedColors.has(colorName)) {
-                return; // Color is locked
-            }
-            
             const palette = colorPalettes[colorName];
             if (!palette) {
                 // Special case for rainbow
@@ -1652,11 +1627,6 @@
                     updateAllMoneyDisplays();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
-                } else if (command === 'shop') {
-                    resetConfirm = false;
-                    showShop();
-                    commandInput.value = '';
-                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'achievements' || command === 'ach') {
                     resetConfirm = false;
                     showPage('achievementsPage');
@@ -1680,9 +1650,9 @@
                         setTimeout(() => {
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
-                                    } else {
+                    } else {
                         commandInput.value = '';
-                        commandInput.placeholder = 'Honk command not unlocked yet!';
+                        commandInput.placeholder = 'Honk command not unlocked yet! Use "goose" first.';
                         setTimeout(() => {
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
@@ -1696,7 +1666,7 @@
                         commandInput.placeholder = 'Type "back" to return';
                     } else {
                         commandInput.value = '';
-                        commandInput.placeholder = 'Goose rain not unlocked yet!';
+                        commandInput.placeholder = 'Goose rain not unlocked yet! Use "goose" first.';
                         setTimeout(() => {
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
@@ -1711,27 +1681,17 @@
                     }, 2000);
                 } else if (command === 'rainbow') {
                     resetConfirm = false;
-                    if (unlockedColors.has('rainbow')) {
-                        applyRainbowColors();
-                        commandInput.value = '';
-                        commandInput.placeholder = 'Rainbow colors applied!';
-                                    } else {
-                        commandInput.value = '';
-                        commandInput.placeholder = 'Rainbow color is locked! Buy it in the shop.';
-                    }
+                    applyRainbowColors();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Rainbow colors applied!';
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else if (hasColorPalette) {
                     resetConfirm = false;
-                    if (unlockedColors.has(command)) {
-                        changeAllColors(command);
-                        commandInput.value = '';
-                        commandInput.placeholder = `Changed to ${command}!`;
-                    } else {
-                        commandInput.value = '';
-                        commandInput.placeholder = `${command} is locked! Buy it in the shop.`;
-                    }
+                    changeAllColors(command);
+                    commandInput.value = '';
+                    commandInput.placeholder = `Changed to ${command}!`;
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
@@ -2298,7 +2258,6 @@
         // Update win chance display
         function updateWinChanceDisplay() {
             const winChancePercent = document.getElementById('win-chance-percent');
-            const shopWinChance = document.getElementById('shop-win-chance');
             const chance = getWinChance();
             if (winChancePercent) winChancePercent.textContent = chance;
             if (shopWinChance) shopWinChance.textContent = chance;
