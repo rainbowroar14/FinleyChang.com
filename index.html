@@ -2690,18 +2690,24 @@
             const shape = STONE_SHAPES[Math.floor(Math.random() * STONE_SHAPES.length)];
             const stoneColor = `rgb(${Math.floor(Math.random() * 60 + 80)}, ${Math.floor(Math.random() * 40 + 60)}, ${Math.floor(Math.random() * 40 + 60)})`;
             
+            // Add random scaling for stretched shapes
+            const scaleX = Math.random() * 0.8 + 0.6; // 0.6 to 1.4
+            const scaleY = Math.random() * 0.8 + 0.6; // 0.6 to 1.4
+            
             stones.push({
                 x: Math.random() * stonesCanvas.width,
                 y: -50,
                 vx: (Math.random() - 0.5) * 2,
                 vy: Math.random() * 2 + 1,
                 size: size,
+                scaleX: scaleX,
+                scaleY: scaleY,
                 rotation: Math.random() * Math.PI * 2,
                 rotationSpeed: (Math.random() - 0.5) * 0.1,
                 dragged: false,
                 shape: shape,
                 color: stoneColor,
-                mass: size,
+                mass: size * scaleX * scaleY, // Mass based on area
                 lastX: 0,
                 lastY: 0
             });
@@ -2714,6 +2720,7 @@
             stonesCtx.save();
             stonesCtx.translate(stone.x, stone.y);
             stonesCtx.rotate(stone.rotation);
+            stonesCtx.scale(stone.scaleX || 1, stone.scaleY || 1); // Apply scaling for stretched shapes
             
             stonesCtx.fillStyle = stone.color;
             stonesCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
@@ -2731,16 +2738,18 @@
                 stonesCtx.lineTo(stone.size * 0.866, stone.size * 0.5);
                 stonesCtx.closePath();
             } else if (stone.shape === 'irregular') {
-                // Draw irregular polygon
-                const sides = 6 + Math.floor(Math.random() * 4);
+                // Draw irregular polygon with random variations
+                const sides = 5 + Math.floor(Math.random() * 6); // 5-10 sides
+                const seed = stone.x * 1000 + stone.y; // Use position as seed for consistency
                 for (let i = 0; i < sides; i++) {
                     const angle = (i / sides) * Math.PI * 2;
-                    const radius = stone.size * (0.7 + Math.random() * 0.3);
+                    const radiusVariation = 0.5 + ((seed + i * 137) % 50) / 100; // 0.5 to 1.0
+                    const radius = stone.size * radiusVariation;
                     const x = Math.cos(angle) * radius;
                     const y = Math.sin(angle) * radius;
                     if (i === 0) {
                         stonesCtx.moveTo(x, y);
-                            } else {
+                    } else {
                         stonesCtx.lineTo(x, y);
                     }
                 }
@@ -2798,9 +2807,9 @@
                 const dy = stonesMousePos.y - dragStartPos.y;
                 const dt = 0.016; // Approximate frame time
                 
-                // Set velocity based on drag distance and direction (throwing)
-                draggedStone.vx = (stonesMousePos.x - lastMousePos.x) * 20; // Scale for throw speed
-                draggedStone.vy = (stonesMousePos.y - lastMousePos.y) * 20;
+                // Set velocity based on drag distance and direction (throwing) - reduced power
+                draggedStone.vx = (stonesMousePos.x - lastMousePos.x) * 8; // Reduced from 20 to 8
+                draggedStone.vy = (stonesMousePos.y - lastMousePos.y) * 8;
                 
                 draggedStone.dragged = false;
                 draggedStone = null;
@@ -2853,8 +2862,8 @@
                 const dx = stonesMousePos.x - dragStartPos.x;
                 const dy = stonesMousePos.y - dragStartPos.y;
                 
-                draggedStone.vx = (stonesMousePos.x - lastMousePos.x) * 20;
-                draggedStone.vy = (stonesMousePos.y - lastMousePos.y) * 20;
+                draggedStone.vx = (stonesMousePos.x - lastMousePos.x) * 8; // Reduced from 20 to 8
+                draggedStone.vy = (stonesMousePos.y - lastMousePos.y) * 8;
                 
                 draggedStone.dragged = false;
                 draggedStone = null;
