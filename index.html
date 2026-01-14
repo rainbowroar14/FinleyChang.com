@@ -108,9 +108,50 @@
             font-style: italic;
         }
         
+        /* Command bar in bottom left */
+        .command-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 250px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .command-bar::before {
+            content: '>';
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        
+        .command-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .command-input::placeholder {
+            color: #6e7681;
+        }
+        
         @media (max-width: 768px) {
             .finhub-title {
                 font-size: 48px;
+            }
+            .command-bar {
+                min-width: 200px;
+                bottom: 10px;
+                left: 10px;
             }
         }
     </style>
@@ -134,6 +175,11 @@
     
     <p class="subtitle">Built with code, powered by Finley</p>
     <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
+    
+    <!-- Command bar in bottom left -->
+    <div class="command-bar">
+        <input type="text" class="command-input" id="commandInput" placeholder="Type a color (black, red, blue, green, yellow, purple, orange, white, pink, cyan)..." autocomplete="off">
+    </div>
 
     <script>
         // Letters from "finley" to use
@@ -272,6 +318,61 @@
         createLetterPattern('h', hPattern);
         createLetterPattern('u', uPattern);
         createLetterPattern('b', bPattern);
+        
+        // Color command system
+        const colorMap = {
+            'black': '#000000',
+            'red': '#ff0000',
+            'blue': '#0000ff',
+            'green': '#00ff00',
+            'yellow': '#ffff00',
+            'purple': '#800080',
+            'orange': '#ffa500',
+            'white': '#ffffff',
+            'pink': '#ff69b4',
+            'cyan': '#00ffff',
+            'lime': '#00ff00',
+            'magenta': '#ff00ff',
+            'brown': '#a52a2a',
+            'gray': '#808080',
+            'grey': '#808080',
+            'gold': '#ffd700',
+            'silver': '#c0c0c0'
+        };
+        
+        // Function to change all letter colors
+        function changeAllColors(color) {
+            const allSmallLetters = document.querySelectorAll('.small-letter');
+            allSmallLetters.forEach(letter => {
+                if (letter.textContent.trim() !== '') {
+                    letter.style.color = color;
+                }
+            });
+        }
+        
+        // Command input handler
+        const commandInput = document.getElementById('commandInput');
+        commandInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const command = commandInput.value.toLowerCase().trim();
+                const color = colorMap[command];
+                
+                if (color) {
+                    changeAllColors(color);
+                    commandInput.value = '';
+                    commandInput.placeholder = `Changed to ${command}!`;
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color (black, red, blue, green, yellow, purple, orange, white, pink, cyan)...';
+                    }, 2000);
+                } else {
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Color not found. Try: black, red, blue, green, yellow...';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color (black, red, blue, green, yellow, purple, orange, white, pink, cyan)...';
+                    }, 2000);
+                }
+            }
+        });
     </script>
 </body>
 </html>
