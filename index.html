@@ -800,6 +800,12 @@
         <button class="sandboxels-close-btn" onclick="closeSandboxels()">X CLOSE VIEW (Return to original site)</button>
     </div>
     
+    <!-- Snake page -->
+    <div class="page sandboxels-page hidden" id="snakePage">
+        <iframe id="snake-iframe" class="sandboxels-iframe" src="https://www.google.com/fbx?fbx=snake_arcade" name="snake_frame"></iframe>
+        <button class="sandboxels-close-btn" onclick="closeSnake()">X CLOSE VIEW (Return to original site)</button>
+    </div>
+    
     <!-- Coinflip page -->
     <div class="page coinflip-page hidden" id="coinflipPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Coin Flip</h1>
@@ -1005,6 +1011,43 @@
             [1,1,1,1,1,1,1]
         ];
         
+        // Transform to FinHub mode (revert from GooseHub)
+        function transformToFinHubMode() {
+            isGooseMode = false;
+            const subtitle = document.querySelector('.subtitle');
+            const lettersSource = document.querySelector('.letters-source');
+            
+            if (subtitle) {
+                subtitle.textContent = 'Built with code, powered by Finley';
+            }
+            if (lettersSource) {
+                lettersSource.textContent = 'Spelled with letters from: F-I-N-L-E-Y';
+            }
+            
+            // Clear and recreate title with FINHUB letters
+            const titleContainer = document.querySelector('.finhub-title');
+            if (titleContainer) {
+                titleContainer.innerHTML = '';
+                // Create containers for F, I, N, H, U, B
+                ['f', 'i', 'n', 'h', 'u', 'b'].forEach(letter => {
+                    const div = document.createElement('div');
+                    div.className = `big-letter letter-${letter}`;
+                    div.id = `letter-${letter}`;
+                    titleContainer.appendChild(div);
+                });
+                
+                createLetterPattern('f', fPattern, finleyLetters);
+                createLetterPattern('i', iPattern, finleyLetters);
+                createLetterPattern('n', nPattern, finleyLetters);
+                createLetterPattern('h', hPattern, finleyLetters);
+                createLetterPattern('u', uPattern, finleyLetters);
+                createLetterPattern('b', bPattern, finleyLetters);
+            }
+            
+            renderCommandsMenu();
+            saveGlobalData();
+        }
+        
         // Transform to GooseHub mode
         function transformToGooseMode() {
             isGooseMode = true;
@@ -1022,22 +1065,26 @@
             const titleContainer = document.querySelector('.finhub-title');
             if (titleContainer) {
                 titleContainer.innerHTML = '';
-                // Create containers for G, O, O, S, E, H, U, B
-                ['g', 'o', 'o2', 's', 'e', 'h', 'u', 'b'].forEach(letter => {
+                // Create containers for G, O, O, S, E, H, U, B (need unique IDs for the two O's)
+                const gooseLetters = ['g', 'o', 'o2', 's', 'e', 'h', 'u', 'b'];
+                gooseLetters.forEach(letter => {
                     const div = document.createElement('div');
                     div.className = `big-letter letter-${letter.replace('2', '')}`;
                     div.id = `letter-${letter}`;
                     titleContainer.appendChild(div);
                 });
                 
-                createLetterPattern('g', gPattern, tylerLetters);
-                createLetterPattern('o', oPattern, tylerLetters);
-                createLetterPattern('o2', oPattern, tylerLetters);
-                createLetterPattern('s', sPattern, tylerLetters);
-                createLetterPattern('e', ePattern, tylerLetters);
-                createLetterPattern('h', hPattern, tylerLetters);
-                createLetterPattern('u', uPattern, tylerLetters);
-                createLetterPattern('b', bPattern, tylerLetters);
+                // Wait a tiny bit for DOM to update, then create patterns
+                setTimeout(() => {
+                    createLetterPattern('g', gPattern, tylerLetters);
+                    createLetterPattern('o', oPattern, tylerLetters);
+                    createLetterPattern('o2', oPattern, tylerLetters);
+                    createLetterPattern('s', sPattern, tylerLetters);
+                    createLetterPattern('e', ePattern, tylerLetters);
+                    createLetterPattern('h', hPattern, tylerLetters);
+                    createLetterPattern('u', uPattern, tylerLetters);
+                    createLetterPattern('b', bPattern, tylerLetters);
+                }, 10);
             }
             
             // Unlock honk and gooserain commands
@@ -1059,8 +1106,10 @@
                     { name: 'sweeper', desc: 'Play Minesweeper' },
                     { name: 'pong', desc: 'Play Pong' },
                     { name: 'sandboxles', desc: 'Open Sandboxels' },
+                    { name: 'snake', desc: 'Play Google Snake' },
                     { name: 'coinflip', desc: 'Flip a coin' },
                     { name: 'clicker', desc: 'Play clicker game' },
+                    { name: 'finley', desc: 'Transform back to FinHub' },
                     { name: 'shop', desc: 'Open shop', unlock: true },
                     { name: 'achievements', desc: 'View achievements', unlock: true },
                     { name: 'goose', desc: 'Transform to GooseHub' },
@@ -1578,6 +1627,19 @@
                     showPage('sandboxelsPage');
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'snake') {
+                    resetConfirm = false;
+                    showPage('snakePage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'finley') {
+                    resetConfirm = false;
+                    transformToFinHubMode();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Welcome back to FinHub!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
                 } else if (command === 'coinflip') {
                     resetConfirm = false;
                     showPage('coinflipPage');
@@ -1885,6 +1947,11 @@
         
         // Sandboxels close function
         function closeSandboxels() {
+            showPage('mainPage');
+        }
+        
+        // Snake close function
+        function closeSnake() {
             showPage('mainPage');
         }
         
@@ -2748,6 +2815,8 @@
             } else if (pageId === 'sandboxelsPage') {
                 unlockAchievement(10);
                 commandsUsed.add('sandboxles');
+            } else if (pageId === 'snakePage') {
+                commandsUsed.add('snake');
             } else if (pageId === 'coinflipPage') {
                 commandsUsed.add('coinflip');
             } else if (pageId === 'clickerPage') {
