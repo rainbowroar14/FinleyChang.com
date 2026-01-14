@@ -425,6 +425,26 @@
             height: 2px;
         }
         
+        /* Clicker page styles */
+        .clicker-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #0d1117;
+        }
+        
+        #clicker-button:active {
+            transform: scale(0.95);
+        }
+        
+        #clicker-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.5);
+        }
+        
         .achievement-sprite:hover {
             transform: scale(1.2);
             z-index: 10;
@@ -780,6 +800,12 @@
         <button class="sandboxels-close-btn" onclick="closeSandboxels()">X CLOSE VIEW (Return to original site)</button>
     </div>
     
+    <!-- Snake page -->
+    <div class="page sandboxels-page hidden" id="snakePage">
+        <iframe id="snake-iframe" class="sandboxels-iframe" src="https://www.google.com/fbx?fbx=snake_arcade" name="snake_frame"></iframe>
+        <button class="sandboxels-close-btn" onclick="closeSnake()">X CLOSE VIEW (Return to original site)</button>
+    </div>
+    
     <!-- Coinflip page -->
     <div class="page coinflip-page hidden" id="coinflipPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Coin Flip</h1>
@@ -802,6 +828,43 @@
         </div>
         <div id="streak-display" style="color: #58a6ff; font-size: 20px; margin-top: 20px;">
             Streak: <span id="streak-count">0</span>
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="showShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Shop</button>
+        </div>
+    </div>
+    
+    <!-- Shop page -->
+    <div class="page shop-page hidden" id="shopPage">
+        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Shop</h1>
+        <div id="shop-money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 30px; font-weight: bold;">
+            Money: $<span id="shop-money-count">0</span>
+        </div>
+        <div style="color: #c9d1d9; font-size: 18px; margin-bottom: 30px;">
+            Current Win Chance: <span id="shop-win-chance">50</span>%
+        </div>
+        <div id="upgrade-container" style="margin: 20px 0;">
+            <!-- Upgrades will be added here dynamically -->
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="closeShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back to Coin Flip</button>
+        </div>
+    </div>
+    
+    <!-- Clicker page -->
+    <div class="page clicker-page hidden" id="clickerPage">
+        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Clicker Game</h1>
+        <div id="clicker-money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 15px; font-weight: bold;">
+            Money: $<span id="clicker-money-count">0</span>
+        </div>
+        <div id="clicker-per-click" style="color: #58a6ff; font-size: 18px; margin-bottom: 20px;">
+            Money Per Click: $<span id="clicker-amount">1</span>
+        </div>
+        <div style="margin: 40px 0;">
+            <button id="clicker-button" onclick="clickMoney()" style="padding: 30px 60px; font-size: 32px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.1s; user-select: none;">CLICK ME!</button>
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="showShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Shop</button>
         </div>
     </div>
     
@@ -1024,6 +1087,9 @@
                 }, 10);
             }
             
+            // Unlock honk and gooserain commands
+            unlockCommand('honk');
+            unlockCommand('gooserain');
             renderCommandsMenu();
             saveGlobalData();
         }
@@ -1037,32 +1103,35 @@
                 'Navigation': [
                     { name: 'home', desc: 'Go to home page', unlock: true },
                     { name: 'back', desc: 'Return to main page', unlock: true },
-                    { name: 'sweeper', desc: 'Play Minesweeper', unlock: true },
-                    { name: 'pong', desc: 'Play Pong', unlock: true },
-                    { name: 'sandboxles', desc: 'Open Sandboxels', unlock: true },
-                    { name: 'coinflip', desc: 'Flip a coin', unlock: true },
-                    { name: 'finley', desc: 'Transform back to FinHub', unlock: true },
+                    { name: 'sweeper', desc: 'Play Minesweeper' },
+                    { name: 'pong', desc: 'Play Pong' },
+                    { name: 'sandboxles', desc: 'Open Sandboxels' },
+                    { name: 'snake', desc: 'Play Google Snake' },
+                    { name: 'coinflip', desc: 'Flip a coin' },
+                    { name: 'clicker', desc: 'Play clicker game' },
+                    { name: 'finley', desc: 'Transform back to FinHub' },
+                    { name: 'shop', desc: 'Open shop', unlock: true },
                     { name: 'achievements', desc: 'View achievements', unlock: true },
-                    { name: 'goose', desc: 'Transform to GooseHub', unlock: true },
-                    { name: 'gooserain', desc: 'Make it rain geese!', unlock: true },
+                    { name: 'goose', desc: 'Transform to GooseHub' },
+                    { name: 'gooserain', desc: 'Make it rain geese!' },
                 ],
                 'Colors': [
-                    { name: 'rainbow', desc: 'Rainbow colors', unlock: true },
-                    { name: 'black', desc: 'Black', unlock: true },
-                    { name: 'red', desc: 'Red', unlock: true },
-                    { name: 'blue', desc: 'Blue', unlock: true },
-                    { name: 'green', desc: 'Green', unlock: true },
-                    { name: 'yellow', desc: 'Yellow', unlock: true },
-                    { name: 'purple', desc: 'Purple', unlock: true },
-                    { name: 'orange', desc: 'Orange', unlock: true },
-                    { name: 'white', desc: 'White', unlock: true },
-                    { name: 'pink', desc: 'Pink', unlock: true },
-                    { name: 'cyan', desc: 'Cyan', unlock: true },
-                    { name: 'gold', desc: 'Gold', unlock: true },
-                    { name: 'silver', desc: 'Silver', unlock: true },
+                    { name: 'rainbow', desc: 'Rainbow colors' },
+                    { name: 'black', desc: 'Black' },
+                    { name: 'red', desc: 'Red' },
+                    { name: 'blue', desc: 'Blue' },
+                    { name: 'green', desc: 'Green' },
+                    { name: 'yellow', desc: 'Yellow' },
+                    { name: 'purple', desc: 'Purple' },
+                    { name: 'orange', desc: 'Orange' },
+                    { name: 'white', desc: 'White' },
+                    { name: 'pink', desc: 'Pink' },
+                    { name: 'cyan', desc: 'Cyan' },
+                    { name: 'gold', desc: 'Gold' },
+                    { name: 'silver', desc: 'Silver' },
                 ],
                 'Actions': [
-                    { name: 'honk', desc: 'Play honk sound', unlock: true },
+                    { name: 'honk', desc: 'Play honk sound' },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu', unlock: true },
@@ -1072,10 +1141,16 @@
             let html = '';
             Object.keys(commandDefinitions).forEach(category => {
                 const commands = commandDefinitions[category];
+                const visibleCommands = commands.filter(cmd => {
+                    if (cmd.unlock) return true;
+                    if (unlockedCommands.has(cmd.name)) return true;
+                    if (unlockedColors.has(cmd.name)) return true;
+                    return false;
+                });
                 
-                if (commands.length > 0) {
+                if (visibleCommands.length > 0) {
                     html += `<div class="command-category"><h4>${category}</h4>`;
-                    commands.forEach(cmd => {
+                    visibleCommands.forEach(cmd => {
                         html += `<div class="command-item"><span class="command-name">${cmd.name}</span><span class="command-desc">- ${cmd.desc}</span></div>`;
                     });
                     html += `</div>`;
@@ -1212,9 +1287,9 @@
         
         // Global money system - shared across all tabs
         let globalMoney = 0;
-        // All colors unlocked by default
-        let unlockedColors = new Set(Object.keys(colorPalettes).concat(['rainbow']));
-        let unlockedCommands = new Set(['home', 'back', 'cmds', 'achievements', 'sweeper', 'pong', 'sandboxles', 'coinflip', 'goose', 'honk', 'gooserain', 'finley']); // All commands unlocked by default
+        let unlockedColors = new Set(); // Colors start locked
+        let clickerPerClick = 1; // Clicker base money per click
+        let unlockedCommands = new Set(['home', 'back', 'cmds', 'shop', 'achievements']); // Basic commands unlocked by default
         let isGooseMode = false; // Track if in goose mode
         let resetConfirm = false; // Track if reset command was just used (needs confirmation)
         
@@ -1224,9 +1299,9 @@
             if (saved) {
                 const data = JSON.parse(saved);
                 globalMoney = data.money || 0;
-                // Always keep all colors unlocked
-                unlockedColors = new Set(Object.keys(colorPalettes).concat(['rainbow']));
-                unlockedCommands = new Set(['home', 'back', 'cmds', 'achievements', 'sweeper', 'pong', 'sandboxles', 'coinflip', 'goose', 'honk', 'gooserain', 'finley']);
+                unlockedColors = new Set(data.unlockedColors || []);
+                clickerPerClick = data.clickerPerClick || 1;
+                unlockedCommands = new Set(data.unlockedCommands || ['home', 'back', 'cmds', 'shop', 'achievements']);
                 isGooseMode = data.isGooseMode || false;
             }
             updateAllMoneyDisplays();
@@ -1240,6 +1315,9 @@
         function saveGlobalData() {
             localStorage.setItem('globalData', JSON.stringify({
                 money: globalMoney,
+                unlockedColors: Array.from(unlockedColors),
+                clickerPerClick: clickerPerClick,
+                unlockedCommands: Array.from(unlockedCommands),
                 isGooseMode: isGooseMode
             }));
         }
@@ -1253,8 +1331,9 @@
             
             // Reset all variables
             globalMoney = 0;
-            unlockedColors = new Set(Object.keys(colorPalettes).concat(['rainbow']));
-            unlockedCommands = new Set(['home', 'back', 'cmds', 'achievements', 'sweeper', 'pong', 'sandboxles', 'coinflip', 'goose', 'honk', 'gooserain', 'finley']);
+            unlockedColors = new Set();
+            clickerPerClick = 1;
+            unlockedCommands = new Set(['home', 'back', 'cmds', 'shop', 'achievements']);
             isGooseMode = false;
             resetConfirm = false;
             
@@ -1294,6 +1373,9 @@
             
             // Update displays
             updateAllMoneyDisplays();
+            updateWinChanceDisplay();
+            const clickerAmount = document.getElementById('clicker-amount');
+            if (clickerAmount) clickerAmount.textContent = clickerPerClick;
             
             // Re-render menu and achievements
             renderCommandsMenu();
@@ -1317,7 +1399,7 @@
         
         // Update all money displays across all pages
         function updateAllMoneyDisplays() {
-            const displays = ['money-count'];
+            const displays = ['money-count', 'shop-money-count', 'clicker-money-count'];
             displays.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = globalMoney;
@@ -1385,8 +1467,12 @@
             'rainbow': 100
         };
         
-        // Function to change all letter colors with different shades (all colors unlocked)
+        // Function to change all letter colors with different shades (only if unlocked)
         function changeAllColors(colorName) {
+            if (!unlockedColors.has(colorName)) {
+                return; // Color is locked
+            }
+            
             const palette = colorPalettes[colorName];
             if (!palette) {
                 // Special case for rainbow
@@ -1541,6 +1627,11 @@
                     showPage('sandboxelsPage');
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'snake') {
+                    resetConfirm = false;
+                    showPage('snakePage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'finley') {
                     resetConfirm = false;
                     transformToFinHubMode();
@@ -1553,6 +1644,17 @@
                     resetConfirm = false;
                     showPage('coinflipPage');
                     resetCoinFlip();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'clicker') {
+                    resetConfirm = false;
+                    showPage('clickerPage');
+                    updateAllMoneyDisplays();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'shop') {
+                    resetConfirm = false;
+                    showShop();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'achievements' || command === 'ach') {
@@ -1570,19 +1672,35 @@
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else if (command === 'honk') {
-                    resetConfirm = false;
-                    playHonkSound();
-                    commandInput.value = '';
-                    commandInput.placeholder = 'HONK! 🦢';
-                    setTimeout(() => {
-                        commandInput.placeholder = 'Type a color or "home"...';
-                    }, 2000);
+                    resetConfirm = false; // Clear reset confirmation if other command is used
+                    if (unlockedCommands.has('honk')) {
+                        playHonkSound();
+                        commandInput.value = '';
+                        commandInput.placeholder = 'HONK! 🦢';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Honk command not unlocked yet!';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
                 } else if (command === 'gooserain') {
                     resetConfirm = false;
-                    showPage('gooserainPage');
-                    initGooseRain();
-                    commandInput.value = '';
-                    commandInput.placeholder = 'Type "back" to return';
+                    if (unlockedCommands.has('gooserain')) {
+                        showPage('gooserainPage');
+                        initGooseRain();
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Type "back" to return';
+                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Goose rain not unlocked yet!';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
                 } else if (command === 'cmds') {
                     resetConfirm = false;
                     toggleCommandsMenu();
@@ -1593,17 +1711,27 @@
                     }, 2000);
                 } else if (command === 'rainbow') {
                     resetConfirm = false;
-                    applyRainbowColors();
-                    commandInput.value = '';
-                    commandInput.placeholder = 'Rainbow colors applied!';
+                    if (unlockedColors.has('rainbow')) {
+                        applyRainbowColors();
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Rainbow colors applied!';
+                                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Rainbow color is locked! Buy it in the shop.';
+                    }
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else if (hasColorPalette) {
                     resetConfirm = false;
-                    changeAllColors(command);
-                    commandInput.value = '';
-                    commandInput.placeholder = `Changed to ${command}!`;
+                    if (unlockedColors.has(command)) {
+                        changeAllColors(command);
+                        commandInput.value = '';
+                        commandInput.placeholder = `Changed to ${command}!`;
+                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = `${command} is locked! Buy it in the shop.`;
+                    }
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
@@ -1819,6 +1947,11 @@
         
         // Sandboxels close function
         function closeSandboxels() {
+            showPage('mainPage');
+        }
+        
+        // Snake close function
+        function closeSnake() {
             showPage('mainPage');
         }
         
@@ -2118,6 +2251,19 @@
             }
         });
         
+        // Clicker game
+        function clickMoney() {
+            addMoney(clickerPerClick);
+            // Button animation
+            const btn = document.getElementById('clicker-button');
+            if (btn) {
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 100);
+            }
+        }
+        
         // Coinflip game
         let coinflipStreak = 0;
         let isCoinFlipping = false;
@@ -2152,8 +2298,10 @@
         // Update win chance display
         function updateWinChanceDisplay() {
             const winChancePercent = document.getElementById('win-chance-percent');
+            const shopWinChance = document.getElementById('shop-win-chance');
             const chance = getWinChance();
             if (winChancePercent) winChancePercent.textContent = chance;
+            if (shopWinChance) shopWinChance.textContent = chance;
         }
         
         function resetCoinFlip() {
@@ -2248,9 +2396,137 @@
             }, 1000);
         }
         
+        // Shop functions
+        function getUpgradeCost(upgradeLevel) {
+            return 20 * Math.pow(2, upgradeLevel);
+        }
+        
+        function showShop() {
+            showPage('shopPage');
+            loadCoinflipData();
+            renderShop();
+        }
+        
+        function closeShop() {
+            showPage('mainPage');
+        }
+        
+        function buyUpgrade() {
+            const cost = getUpgradeCost(winChanceUpgrades);
+            if (spendMoney(cost)) {
+                winChanceUpgrades++;
+                updateWinChanceDisplay();
+                saveCoinflipData();
+                renderShop();
+            }
+        }
+        
+        function buyColor(colorName) {
+            const cost = colorCosts[colorName];
+            if (cost && spendMoney(cost)) {
+                unlockedColors.add(colorName);
+                saveGlobalData();
+                renderShop();
+            }
+        }
+        
+        function buyClickerUpgrade() {
+            const cost = clickerPerClick * 10;
+            if (spendMoney(cost)) {
+                clickerPerClick++;
+                const clickerAmount = document.getElementById('clicker-amount');
+                if (clickerAmount) clickerAmount.textContent = clickerPerClick;
+                saveGlobalData();
+                renderShop();
+            }
+        }
+        
+        function renderShop() {
+            const container = document.getElementById('upgrade-container');
+            if (!container) return;
+            
+            let html = '';
+            
+            // Win Chance Upgrade
+            const winChanceCost = getUpgradeCost(winChanceUpgrades);
+            const canAffordWinChance = globalMoney >= winChanceCost;
+            const nextChance = Math.min(getWinChance() + 1, 99);
+            html += `
+                <div class="upgrade-item">
+                    <h3>Win Chance Upgrade</h3>
+                    <p>Increase your win chance by +1%</p>
+                    <p>Current: ${getWinChance()}% → Next: ${nextChance}%</p>
+                    <p style="color: #ffd700; font-weight: bold;">Cost: $${winChanceCost}</p>
+                    <button class="upgrade-btn" onclick="buyUpgrade()" ${!canAffordWinChance ? 'disabled' : ''}>
+                        ${canAffordWinChance ? 'Buy Upgrade' : 'Not Enough Money'}
+                    </button>
+                </div>
+            `;
+            
+            // Clicker Upgrade
+            const clickerCost = clickerPerClick * 10;
+            const canAffordClicker = globalMoney >= clickerCost;
+            html += `
+                <div class="upgrade-item">
+                    <h3>Clicker Upgrade</h3>
+                    <p>Increase money per click by +$1</p>
+                    <p>Current: $${clickerPerClick} → Next: $${clickerPerClick + 1}</p>
+                    <p style="color: #ffd700; font-weight: bold;">Cost: $${clickerCost}</p>
+                    <button class="upgrade-btn" onclick="buyClickerUpgrade()" ${!canAffordClicker ? 'disabled' : ''}>
+                        ${canAffordClicker ? 'Buy Upgrade' : 'Not Enough Money'}
+                    </button>
+                </div>
+            `;
+            
+            // Colors section
+            html += `<div class="upgrade-item" style="margin-top: 30px;"><h3>Colors</h3>`;
+            Object.keys(colorPalettes).forEach(colorName => {
+                const cost = colorCosts[colorName];
+                const isUnlocked = unlockedColors.has(colorName);
+                const canAfford = globalMoney >= cost;
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; background: #21262d; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: ${isUnlocked ? '#3fb950' : '#8b949e'}; text-transform: capitalize;">${colorName}</strong>
+                            ${isUnlocked ? '<span style="color: #3fb950; margin-left: 10px;">✓ Unlocked</span>' : ''}
+                        </div>
+                        ${!isUnlocked ? `
+                            <button class="upgrade-btn" onclick="buyColor('${colorName}')" ${!canAfford ? 'disabled' : ''} style="padding: 6px 12px; font-size: 14px;">
+                                ${canAfford ? `Buy ($${cost})` : `$${cost}`}
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            // Rainbow color
+            const rainbowCost = colorCosts['rainbow'];
+            const rainbowUnlocked = unlockedColors.has('rainbow');
+            const canAffordRainbow = globalMoney >= rainbowCost;
+            html += `
+                <div style="margin: 10px 0; padding: 10px; background: #21262d; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: ${rainbowUnlocked ? '#3fb950' : '#8b949e'};">Rainbow</strong>
+                        ${rainbowUnlocked ? '<span style="color: #3fb950; margin-left: 10px;">✓ Unlocked</span>' : ''}
+                    </div>
+                    ${!rainbowUnlocked ? `
+                        <button class="upgrade-btn" onclick="buyColor('rainbow')" ${!canAffordRainbow ? 'disabled' : ''} style="padding: 6px 12px; font-size: 14px;">
+                            ${canAffordRainbow ? `Buy ($${rainbowCost})` : `$${rainbowCost}`}
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            html += `</div>`;
+            
+            container.innerHTML = html;
+        }
+        
         // Initialize global data on page load
         loadGlobalData();
         loadCoinflipData();
+        
+        // Update clicker display
+        const clickerAmount = document.getElementById('clicker-amount');
+        if (clickerAmount) clickerAmount.textContent = clickerPerClick;
         
         // Achievements system
         const TOTAL_ACHIEVEMENTS = 256;
@@ -2539,8 +2815,14 @@
             } else if (pageId === 'sandboxelsPage') {
                 unlockAchievement(10);
                 commandsUsed.add('sandboxles');
+            } else if (pageId === 'snakePage') {
+                commandsUsed.add('snake');
             } else if (pageId === 'coinflipPage') {
                 commandsUsed.add('coinflip');
+            } else if (pageId === 'clickerPage') {
+                commandsUsed.add('clicker');
+                const clickerAmount = document.getElementById('clicker-amount');
+                if (clickerAmount) clickerAmount.textContent = clickerPerClick;
             }
             
             if (commandsUsed.size >= 10) {
@@ -2576,6 +2858,16 @@
             }, 1500);
         };
         
+        // Track shop upgrades - hook into buyUpgrade function
+        const originalBuyUpgradeFunc = buyUpgrade;
+        buyUpgrade = function() {
+            originalBuyUpgradeFunc();
+            setTimeout(() => {
+                if (winChanceUpgrades >= 5) {
+                    unlockAchievement(9);
+                }
+            }, 100);
+        };
     </script>
 </body>
 </html>
