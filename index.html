@@ -911,33 +911,38 @@
         createLetterPattern('u', uPattern);
         createLetterPattern('b', bPattern);
         
-        // Color command system
-        const colorMap = {
-            'black': '#000000',
-            'red': '#ff0000',
-            'blue': '#0000ff',
-            'green': '#00ff00',
-            'yellow': '#ffff00',
-            'purple': '#800080',
-            'orange': '#ffa500',
-            'white': '#ffffff',
-            'pink': '#ff69b4',
-            'cyan': '#00ffff',
-            'lime': '#00ff00',
-            'magenta': '#ff00ff',
-            'brown': '#a52a2a',
-            'gray': '#808080',
-            'grey': '#808080',
-            'gold': '#ffd700',
-            'silver': '#c0c0c0'
+        // Color command system with multiple shades
+        const colorPalettes = {
+            'black': ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#000000', '#0d0d0d', '#262626'],
+            'red': ['#ff0000', '#cc0000', '#ff3333', '#990000', '#ff6666', '#ff1a1a', '#b30000', '#ff4d4d'],
+            'blue': ['#0000ff', '#0000cc', '#3333ff', '#000099', '#6666ff', '#1a1aff', '#0000b3', '#4d4dff'],
+            'green': ['#00ff00', '#00cc00', '#33ff33', '#009900', '#66ff66', '#1aff1a', '#00b300', '#4dff4d'],
+            'yellow': ['#ffff00', '#cccc00', '#ffff33', '#999900', '#ffff66', '#ffff1a', '#b3b300', '#ffff4d'],
+            'purple': ['#800080', '#660066', '#993399', '#4d004d', '#b366b3', '#8c1a8c', '#5c005c', '#cc66cc'],
+            'orange': ['#ffa500', '#cc8400', '#ffb833', '#996300', '#ffcc66', '#ffad1a', '#b37500', '#ffd24d'],
+            'white': ['#ffffff', '#e6e6e6', '#cccccc', '#f5f5f5', '#ffffff', '#fafafa', '#d9d9d9', '#ffffff'],
+            'pink': ['#ff69b4', '#cc5490', '#ff7fc4', '#993f6c', '#ff99d4', '#ff73ba', '#b34a85', '#ff8fce'],
+            'cyan': ['#00ffff', '#00cccc', '#33ffff', '#009999', '#66ffff', '#1affff', '#00b3b3', '#4dffff'],
+            'lime': ['#00ff00', '#00cc00', '#33ff33', '#009900', '#66ff66', '#1aff1a', '#00b300', '#4dff4d'],
+            'magenta': ['#ff00ff', '#cc00cc', '#ff33ff', '#990099', '#ff66ff', '#ff1aff', '#b300b3', '#ff4dff'],
+            'brown': ['#a52a2a', '#842121', '#b84d4d', '#661919', '#cc7070', '#ad3333', '#8b1f1f', '#c55c5c'],
+            'gray': ['#808080', '#666666', '#999999', '#4d4d4d', '#b3b3b3', '#737373', '#595959', '#a6a6a6'],
+            'grey': ['#808080', '#666666', '#999999', '#4d4d4d', '#b3b3b3', '#737373', '#595959', '#a6a6a6'],
+            'gold': ['#ffd700', '#ccac00', '#ffdd33', '#998000', '#ffe666', '#ffdb1a', '#b39900', '#ffe84d'],
+            'silver': ['#c0c0c0', '#999999', '#d4d4d4', '#737373', '#e6e6e6', '#b8b8b8', '#8c8c8c', '#d9d9d9']
         };
         
-        // Function to change all letter colors
-        function changeAllColors(color) {
+        // Function to change all letter colors with different shades
+        function changeAllColors(colorName) {
+            const palette = colorPalettes[colorName];
+            if (!palette) return;
+            
             const allSmallLetters = document.querySelectorAll('.small-letter');
             allSmallLetters.forEach(letter => {
                 if (letter.textContent.trim() !== '') {
-                    letter.style.color = color;
+                    // Randomly pick a shade from the palette
+                    const randomShade = palette[Math.floor(Math.random() * palette.length)];
+                    letter.style.color = randomShade;
                 }
             });
         }
@@ -1029,7 +1034,7 @@
         commandInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const command = commandInput.value.toLowerCase().trim();
-                const color = colorMap[command];
+                const hasColorPalette = colorPalettes.hasOwnProperty(command);
                 
                 // Handle navigation commands
                 if (command === 'home') {
@@ -1077,8 +1082,8 @@
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
-                } else if (color) {
-                    changeAllColors(color);
+                } else if (hasColorPalette) {
+                    changeAllColors(command);
                     commandInput.value = '';
                     commandInput.placeholder = `Changed to ${command}!`;
                     setTimeout(() => {
@@ -1172,7 +1177,7 @@
             if (cell.mineCount > 0) {
                 cell.el.innerHTML = cell.mineCount;
                 cell.el.classList.add(`number-${cell.mineCount}`);
-            } else {
+                } else {
                 for (let dr = -1; dr <= 1; dr++) {
                     for (let dc = -1; dc <= 1; dc++) {
                         revealCell(r + dr, c + dc);
@@ -1240,7 +1245,7 @@
             if (win) {
                 messageEl.innerHTML = '🎉 YOU WIN! 🎉';
                 messageEl.style.color = 'green';
-            } else {
+                                    } else {
                 messageEl.innerHTML = '💣 GAME OVER! 💣';
                 messageEl.style.color = 'red';
                 board.flat().forEach(cell => {
