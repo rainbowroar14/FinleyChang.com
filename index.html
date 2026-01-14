@@ -197,7 +197,7 @@
         .pong-settings-content {
             background: #1f2937;
             padding: 24px;
-            border-radius: 12px;
+            border-radius: 12px; 
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 320px;
@@ -406,10 +406,11 @@
             cursor: pointer;
             position: relative;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            display: grid;
+            grid-template-columns: repeat(16, 2px);
+            grid-template-rows: repeat(16, 2px);
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
             filter: grayscale(100%) brightness(0.3);
         }
         
@@ -417,6 +418,31 @@
             filter: none;
             border-color: #58a6ff;
             background: #161b22;
+        }
+        
+        .pixel {
+            width: 2px;
+            height: 2px;
+        }
+        
+        /* Clicker page styles */
+        .clicker-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #0d1117;
+        }
+        
+        #clicker-button:active {
+            transform: scale(0.95);
+        }
+        
+        #clicker-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.5);
         }
         
         .achievement-sprite:hover {
@@ -819,6 +845,23 @@
         </div>
     </div>
     
+    <!-- Clicker page -->
+    <div class="page clicker-page hidden" id="clickerPage">
+        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Clicker Game</h1>
+        <div id="clicker-money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 15px; font-weight: bold;">
+            Money: $<span id="clicker-money-count">0</span>
+        </div>
+        <div id="clicker-per-click" style="color: #58a6ff; font-size: 18px; margin-bottom: 20px;">
+            Money Per Click: $<span id="clicker-amount">1</span>
+        </div>
+        <div style="margin: 40px 0;">
+            <button id="clicker-button" onclick="clickMoney()" style="padding: 30px 60px; font-size: 32px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.1s; user-select: none;">CLICK ME!</button>
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="showShop()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Shop</button>
+        </div>
+    </div>
+    
     <!-- Achievements page -->
     <div class="page achievements-page hidden" id="achievementsPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 10px;">Achievements</h1>
@@ -853,6 +896,7 @@
                 <div class="command-item"><span class="command-name">pong</span><span class="command-desc">- Play Pong</span></div>
                 <div class="command-item"><span class="command-name">sandboxles</span><span class="command-desc">- Open Sandboxels</span></div>
                 <div class="command-item"><span class="command-name">coinflip</span><span class="command-desc">- Flip a coin</span></div>
+                <div class="command-item"><span class="command-name">clicker</span><span class="command-desc">- Play clicker game</span></div>
                 <div class="command-item"><span class="command-name">shop</span><span class="command-desc">- Open shop</span></div>
                 <div class="command-item"><span class="command-name">achievements</span><span class="command-desc">- View achievements</span></div>
             </div>
@@ -1017,6 +1061,59 @@
         createLetterPattern('u', uPattern);
         createLetterPattern('b', bPattern);
         
+        // Global money system - shared across all tabs
+        let globalMoney = 0;
+        let unlockedColors = new Set(); // Colors start locked
+        let clickerPerClick = 1; // Clicker base money per click
+        
+        // Load global data
+        function loadGlobalData() {
+            const saved = localStorage.getItem('globalData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                globalMoney = data.money || 0;
+                unlockedColors = new Set(data.unlockedColors || []);
+                clickerPerClick = data.clickerPerClick || 1;
+            }
+            updateAllMoneyDisplays();
+        }
+        
+        // Save global data
+        function saveGlobalData() {
+            localStorage.setItem('globalData', JSON.stringify({
+                money: globalMoney,
+                unlockedColors: Array.from(unlockedColors),
+                clickerPerClick: clickerPerClick
+            }));
+        }
+        
+        // Update all money displays across all pages
+        function updateAllMoneyDisplays() {
+            const displays = ['money-count', 'shop-money-count', 'clicker-money-count'];
+            displays.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = globalMoney;
+            });
+        }
+        
+        // Add money (global)
+        function addMoney(amount) {
+            globalMoney += amount;
+            updateAllMoneyDisplays();
+            saveGlobalData();
+        }
+        
+        // Spend money (global)
+        function spendMoney(amount) {
+            if (globalMoney >= amount) {
+                globalMoney -= amount;
+                updateAllMoneyDisplays();
+                saveGlobalData();
+                return true;
+            }
+            return false;
+        }
+        
         // Color command system with multiple shades
         const colorPalettes = {
             'black': ['#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#000000', '#0d0d0d', '#262626'],
@@ -1038,10 +1135,42 @@
             'silver': ['#c0c0c0', '#999999', '#d4d4d4', '#737373', '#e6e6e6', '#b8b8b8', '#8c8c8c', '#d9d9d9']
         };
         
-        // Function to change all letter colors with different shades
+        // Color costs in shop
+        const colorCosts = {
+            'black': 10,
+            'red': 20,
+            'blue': 20,
+            'green': 20,
+            'yellow': 25,
+            'purple': 30,
+            'orange': 30,
+            'white': 15,
+            'pink': 35,
+            'cyan': 25,
+            'lime': 20,
+            'magenta': 35,
+            'brown': 25,
+            'gray': 15,
+            'grey': 15,
+            'gold': 50,
+            'silver': 40,
+            'rainbow': 100
+        };
+        
+        // Function to change all letter colors with different shades (only if unlocked)
         function changeAllColors(colorName) {
+            if (!unlockedColors.has(colorName)) {
+                return; // Color is locked
+            }
+            
             const palette = colorPalettes[colorName];
-            if (!palette) return;
+            if (!palette) {
+                // Special case for rainbow
+                if (colorName === 'rainbow') {
+                    applyRainbowColors();
+                }
+                return;
+            }
             
             const allSmallLetters = document.querySelectorAll('.small-letter');
             allSmallLetters.forEach(letter => {
@@ -1049,10 +1178,10 @@
                     // Randomly pick a shade from the palette
                     const randomShade = palette[Math.floor(Math.random() * palette.length)];
                     letter.style.color = randomShade;
-                }
-            });
-        }
-        
+                            }
+                        });
+                    }
+
         // Function to apply rainbow colors
         function applyRainbowColors() {
             const rainbowColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
@@ -1170,6 +1299,11 @@
                     resetCoinFlip();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'clicker') {
+                    showPage('clickerPage');
+                    updateAllMoneyDisplays();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'shop') {
                     showShop();
                     commandInput.value = '';
@@ -1187,16 +1321,26 @@
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else if (command === 'rainbow') {
-                    applyRainbowColors();
-                    commandInput.value = '';
-                    commandInput.placeholder = 'Rainbow colors applied!';
+                    if (unlockedColors.has('rainbow')) {
+                        applyRainbowColors();
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Rainbow colors applied!';
+                                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Rainbow color is locked! Buy it in the shop.';
+                    }
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else if (hasColorPalette) {
-                    changeAllColors(command);
-                    commandInput.value = '';
-                    commandInput.placeholder = `Changed to ${command}!`;
+                    if (unlockedColors.has(command)) {
+                        changeAllColors(command);
+                        commandInput.value = '';
+                        commandInput.placeholder = `Changed to ${command}!`;
+                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = `${command} is locked! Buy it in the shop.`;
+                    }
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
@@ -1356,7 +1500,7 @@
             if (win) {
                 messageEl.innerHTML = '🎉 YOU WIN! 🎉';
                 messageEl.style.color = 'green';
-                                    } else {
+                } else {
                 messageEl.innerHTML = '💣 GAME OVER! 💣';
                 messageEl.style.color = 'red';
                 board.flat().forEach(cell => {
@@ -1414,10 +1558,22 @@
             showPage('mainPage');
         }
         
+        // Clicker game
+        function clickMoney() {
+            addMoney(clickerPerClick);
+            // Button animation
+            const btn = document.getElementById('clicker-button');
+            if (btn) {
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 100);
+            }
+        }
+        
         // Coinflip game
         let coinflipStreak = 0;
         let isCoinFlipping = false;
-        let coinflipMoney = 0;
         let winChanceUpgrades = 0; // Number of upgrades purchased
         const BASE_WIN_CHANCE = 50; // Base 50% chance
         
@@ -1426,18 +1582,16 @@
             const saved = localStorage.getItem('coinflipData');
             if (saved) {
                 const data = JSON.parse(saved);
-                coinflipMoney = data.money || 0;
                 winChanceUpgrades = data.upgrades || 0;
                 coinflipStreak = data.streak || 0;
             }
-            updateMoneyDisplay();
+            updateAllMoneyDisplays();
             updateWinChanceDisplay();
         }
         
         // Save data
         function saveCoinflipData() {
             localStorage.setItem('coinflipData', JSON.stringify({
-                money: coinflipMoney,
                 upgrades: winChanceUpgrades,
                 streak: coinflipStreak
             }));
@@ -1446,14 +1600,6 @@
         // Calculate win chance
         function getWinChance() {
             return Math.min(BASE_WIN_CHANCE + winChanceUpgrades, 99); // Cap at 99%
-        }
-        
-        // Update money display
-        function updateMoneyDisplay() {
-            const moneyCount = document.getElementById('money-count');
-            const shopMoneyCount = document.getElementById('shop-money-count');
-            if (moneyCount) moneyCount.textContent = coinflipMoney;
-            if (shopMoneyCount) shopMoneyCount.textContent = coinflipMoney;
         }
         
         // Update win chance display
@@ -1522,15 +1668,19 @@
                 
                 if (isCorrect) {
                     coinflipStreak++;
-                    // Calculate reward: base $5 + (streak * $5)
-                    const reward = 5 + (coinflipStreak * 5);
-                    coinflipMoney += reward;
+                    // Calculate reward: base 2x multiplier, +0.5x per streak
+                    // Base reward is $10, multiplied by (2 + streak * 0.5)
+                    const multiplier = 2 + (coinflipStreak * 0.5);
+                    const baseReward = 10;
+                    const reward = Math.floor(baseReward * multiplier);
+                    
+                    addMoney(reward);
                     
                     if (result) {
-                        result.textContent = `✅ Correct! It's ${resultText}! +$${reward}`;
+                        result.textContent = `✅ Correct! It's ${resultText}! +$${reward} (${multiplier.toFixed(1)}x)`;
                         result.style.color = '#3fb950';
-                    }
-                } else {
+                        }
+                    } else {
                     coinflipStreak = 0;
                     if (result) {
                         result.textContent = `❌ Wrong! It was ${resultText}`;
@@ -1542,7 +1692,6 @@
                     streakCount.textContent = coinflipStreak;
                 }
                 
-                updateMoneyDisplay();
                 saveCoinflipData();
                 
                 // Re-enable buttons after a delay
@@ -1566,18 +1715,35 @@
         }
         
         function closeShop() {
-            showPage('coinflipPage');
-            resetCoinFlip();
+            showPage('mainPage');
         }
         
         function buyUpgrade() {
             const cost = getUpgradeCost(winChanceUpgrades);
-            if (coinflipMoney >= cost) {
-                coinflipMoney -= cost;
+            if (spendMoney(cost)) {
                 winChanceUpgrades++;
-                updateMoneyDisplay();
                 updateWinChanceDisplay();
                 saveCoinflipData();
+                renderShop();
+            }
+        }
+        
+        function buyColor(colorName) {
+            const cost = colorCosts[colorName];
+            if (cost && spendMoney(cost)) {
+                unlockedColors.add(colorName);
+                saveGlobalData();
+                renderShop();
+            }
+        }
+        
+        function buyClickerUpgrade() {
+            const cost = clickerPerClick * 10;
+            if (spendMoney(cost)) {
+                clickerPerClick++;
+                const clickerAmount = document.getElementById('clicker-amount');
+                if (clickerAmount) clickerAmount.textContent = clickerPerClick;
+                saveGlobalData();
                 renderShop();
             }
         }
@@ -1586,25 +1752,88 @@
             const container = document.getElementById('upgrade-container');
             if (!container) return;
             
-            const cost = getUpgradeCost(winChanceUpgrades);
-            const canAfford = coinflipMoney >= cost;
-            const nextChance = Math.min(getWinChance() + 1, 99);
+            let html = '';
             
-            container.innerHTML = `
+            // Win Chance Upgrade
+            const winChanceCost = getUpgradeCost(winChanceUpgrades);
+            const canAffordWinChance = globalMoney >= winChanceCost;
+            const nextChance = Math.min(getWinChance() + 1, 99);
+            html += `
                 <div class="upgrade-item">
                     <h3>Win Chance Upgrade</h3>
                     <p>Increase your win chance by +1%</p>
                     <p>Current: ${getWinChance()}% → Next: ${nextChance}%</p>
-                    <p style="color: #ffd700; font-weight: bold;">Cost: $${cost}</p>
-                    <button class="upgrade-btn" onclick="buyUpgrade()" ${!canAfford ? 'disabled' : ''}>
-                        ${canAfford ? 'Buy Upgrade' : 'Not Enough Money'}
+                    <p style="color: #ffd700; font-weight: bold;">Cost: $${winChanceCost}</p>
+                    <button class="upgrade-btn" onclick="buyUpgrade()" ${!canAffordWinChance ? 'disabled' : ''}>
+                        ${canAffordWinChance ? 'Buy Upgrade' : 'Not Enough Money'}
                     </button>
                 </div>
             `;
+            
+            // Clicker Upgrade
+            const clickerCost = clickerPerClick * 10;
+            const canAffordClicker = globalMoney >= clickerCost;
+            html += `
+                <div class="upgrade-item">
+                    <h3>Clicker Upgrade</h3>
+                    <p>Increase money per click by +$1</p>
+                    <p>Current: $${clickerPerClick} → Next: $${clickerPerClick + 1}</p>
+                    <p style="color: #ffd700; font-weight: bold;">Cost: $${clickerCost}</p>
+                    <button class="upgrade-btn" onclick="buyClickerUpgrade()" ${!canAffordClicker ? 'disabled' : ''}>
+                        ${canAffordClicker ? 'Buy Upgrade' : 'Not Enough Money'}
+                    </button>
+                </div>
+            `;
+            
+            // Colors section
+            html += `<div class="upgrade-item" style="margin-top: 30px;"><h3>Colors</h3>`;
+            Object.keys(colorPalettes).forEach(colorName => {
+                const cost = colorCosts[colorName];
+                const isUnlocked = unlockedColors.has(colorName);
+                const canAfford = globalMoney >= cost;
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; background: #21262d; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: ${isUnlocked ? '#3fb950' : '#8b949e'}; text-transform: capitalize;">${colorName}</strong>
+                            ${isUnlocked ? '<span style="color: #3fb950; margin-left: 10px;">✓ Unlocked</span>' : ''}
+                        </div>
+                        ${!isUnlocked ? `
+                            <button class="upgrade-btn" onclick="buyColor('${colorName}')" ${!canAfford ? 'disabled' : ''} style="padding: 6px 12px; font-size: 14px;">
+                                ${canAfford ? `Buy ($${cost})` : `$${cost}`}
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            // Rainbow color
+            const rainbowCost = colorCosts['rainbow'];
+            const rainbowUnlocked = unlockedColors.has('rainbow');
+            const canAffordRainbow = globalMoney >= rainbowCost;
+            html += `
+                <div style="margin: 10px 0; padding: 10px; background: #21262d; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: ${rainbowUnlocked ? '#3fb950' : '#8b949e'};">Rainbow</strong>
+                        ${rainbowUnlocked ? '<span style="color: #3fb950; margin-left: 10px;">✓ Unlocked</span>' : ''}
+                    </div>
+                    ${!rainbowUnlocked ? `
+                        <button class="upgrade-btn" onclick="buyColor('rainbow')" ${!canAffordRainbow ? 'disabled' : ''} style="padding: 6px 12px; font-size: 14px;">
+                            ${canAffordRainbow ? `Buy ($${rainbowCost})` : `$${rainbowCost}`}
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            html += `</div>`;
+            
+            container.innerHTML = html;
         }
         
-        // Initialize data on page load
+        // Initialize global data on page load
+        loadGlobalData();
         loadCoinflipData();
+        
+        // Update clicker display
+        const clickerAmount = document.getElementById('clicker-amount');
+        if (clickerAmount) clickerAmount.textContent = clickerPerClick;
         
         // Achievements system
         const TOTAL_ACHIEVEMENTS = 256;
@@ -1673,6 +1902,136 @@
             if (totalCount) totalCount.textContent = TOTAL_ACHIEVEMENTS;
         }
         
+        // Generate 16x16 pixel art patterns for achievements
+        function generatePixelPattern(achievementId) {
+            const patterns = {
+                0: (() => {
+                    // Welcome - smiley face
+                    const p = Array(256).fill('#000000');
+                    for (let y = 0; y < 16; y++) {
+                        for (let x = 0; x < 16; x++) {
+                            const i = y * 16 + x;
+                            if (x >= 3 && x <= 12 && y >= 3 && y <= 10) p[i] = '#FFA500'; // Face
+                            if ((x === 5 || x === 10) && (y === 5 || y === 6)) p[i] = '#000000'; // Eyes
+                            if (x >= 6 && x <= 9 && y === 9) p[i] = '#000000'; // Mouth
+                        }
+                    }
+                    return p;
+                })(),
+                1: (() => {
+                    // Explorer - compass
+                    const p = Array(256).fill('#000000');
+                    const center = 8;
+                    for (let y = 0; y < 16; y++) {
+                        for (let x = 0; x < 16; x++) {
+                            const i = y * 16 + x;
+                            const dx = x - center;
+                            const dy = y - center;
+                            const dist = Math.sqrt(dx*dx + dy*dy);
+                            if (dist <= 6) p[i] = '#C0C0C0';
+                            if (dist <= 5) p[i] = '#808080';
+                            if ((x === center || y === center) && dist <= 7) p[i] = '#FFD700';
+                        }
+                    }
+                    return p;
+                })(),
+                2: (() => {
+                    // Color Master - palette
+                    const p = Array(256).fill('#000000');
+                    for (let y = 0; y < 16; y++) {
+                        for (let x = 0; x < 16; x++) {
+                            const i = y * 16 + x;
+                            if (x >= 2 && x <= 13 && y >= 2 && y <= 13) {
+                                const section = Math.floor((x - 2) / 3);
+                                const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'];
+                                p[i] = colors[section % 4];
+                            }
+                        }
+                    }
+                    return p;
+                })(),
+                4: (() => {
+                    // Sweeper Pro - bomb
+                    const p = Array(256).fill('#000000');
+                    for (let y = 0; y < 16; y++) {
+                        for (let x = 0; x < 16; x++) {
+                            const i = y * 16 + x;
+                            const dx = x - 8;
+                            const dy = y - 8;
+                            if (dx*dx + dy*dy <= 36) p[i] = '#333333';
+                            if (dx*dx + dy*dy <= 25) p[i] = '#000000';
+                            if (x >= 7 && x <= 9 && y >= 2 && y <= 5) p[i] = '#FF0000';
+                        }
+                    }
+                    return p;
+                })(),
+                5: (() => {
+                    // Pong Champion - paddle
+                    const p = Array(256).fill('#000000');
+                    for (let y = 0; y < 16; y++) {
+                        for (let x = 0; x < 16; x++) {
+                            const i = y * 16 + x;
+                            if (x >= 6 && x <= 9 && y >= 2 && y <= 13) p[i] = '#FFFFFF';
+                            if (x === 7 || x === 8) {
+                                if (y >= 4 && y <= 6) p[i] = '#000000';
+                                if (y >= 9 && y <= 11) p[i] = '#000000';
+                            }
+                        }
+                    }
+                    return p;
+                })(),
+                6: (() => {
+                    // Coinflip Streak - coin
+                    const p = Array(256).fill('#000000');
+                    for (let y = 0; y < 16; y++) {
+                        for (let x = 0; x < 16; x++) {
+                            const i = y * 16 + x;
+                            const dx = x - 8;
+                            const dy = y - 8;
+                            if (dx*dx + dy*dy <= 49) p[i] = '#FFD700';
+                            if (dx*dx + dy*dy <= 42) p[i] = '#FFA500';
+                            if (x === 8 && y >= 3 && y <= 12) p[i] = '#000000';
+                        }
+                    }
+                    return p;
+                })(),
+                7: (() => {
+                    // Rich - money bag
+                    const p = Array(256).fill('#000000');
+                    for (let y = 0; y < 16; y++) {
+                        for (let x = 0; x < 16; x++) {
+                            const i = y * 16 + x;
+                            if (x >= 4 && x <= 11 && y >= 4 && y <= 12) p[i] = '#00AA00';
+                            if (x >= 5 && x <= 10 && y >= 5 && y <= 11) p[i] = '#008800';
+                            if (x >= 6 && x <= 9 && y >= 2 && y <= 4) p[i] = '#888888';
+                            if (x === 7 || x === 8) {
+                                if (y === 6 || y === 8 || y === 10) p[i] = '#FFD700';
+                            }
+                        }
+                    }
+                    return p;
+                })(),
+            };
+            
+            // Use specific pattern or generate unique one
+            if (patterns[achievementId]) {
+                return patterns[achievementId];
+            }
+            
+            // Generate unique pattern for each achievement
+            const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080', '#FF69B4', '#00FF7F'];
+            const seed = achievementId * 137; // Unique seed per achievement
+            return Array(256).fill(0).map((_, i) => {
+                const x = i % 16;
+                const y = Math.floor(i / 16);
+                const hash = ((x * seed + y) * 17) % 100;
+                if (hash < 30) return colors[achievementId % colors.length];
+                if (hash < 50) return colors[(achievementId * 3) % colors.length];
+                if (hash < 60) return colors[(achievementId * 7) % colors.length];
+                return '#202020';
+            });
+        }
+        
         // Render achievements grid
         function renderAchievements() {
             const grid = document.getElementById('achievements-grid');
@@ -1686,8 +2045,16 @@
                 
                 const sprite = document.createElement('div');
                 sprite.className = `achievement-sprite ${isFound ? 'found' : ''}`;
-                sprite.textContent = achievement.emoji;
                 sprite.dataset.id = i;
+                
+                // Create pixel sprite
+                const pixelPattern = generatePixelPattern(i);
+                for (let j = 0; j < 256; j++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'pixel';
+                    pixel.style.backgroundColor = pixelPattern[j];
+                    sprite.appendChild(pixel);
+                }
                 
                 // Tooltip
                 const tooltip = document.createElement('div');
@@ -1731,10 +2098,13 @@
             }
         };
         
-        // Track navigation for achievements
+        // Track navigation for achievements and update money displays
         const originalShowPage = showPage;
         showPage = function(pageId) {
             originalShowPage(pageId);
+            
+            // Update money displays on page change
+            updateAllMoneyDisplays();
             
             if (pageId === 'homePage') {
                 unlockAchievement(1);
@@ -1748,6 +2118,10 @@
                 commandsUsed.add('sandboxles');
             } else if (pageId === 'coinflipPage') {
                 commandsUsed.add('coinflip');
+            } else if (pageId === 'clickerPage') {
+                commandsUsed.add('clicker');
+                const clickerAmount = document.getElementById('clicker-amount');
+                if (clickerAmount) clickerAmount.textContent = clickerPerClick;
             }
             
             if (commandsUsed.size >= 10) {
@@ -1764,12 +2138,11 @@
             }
         };
         
-        // Track coinflip achievements - wrap the guessCoin function
+        // Track coinflip achievements - hook into guessCoin function
         let coinflipWins = 0;
-        const originalGuessCoinFunc = window.guessCoin || guessCoin;
-        window.guessCoin = function(guess) {
+        const originalGuessCoinFunc = guessCoin;
+        guessCoin = function(guess) {
             const oldStreak = coinflipStreak;
-            const oldMoney = coinflipMoney;
             originalGuessCoinFunc(guess);
             
             // Check achievements after the coin flip completes
@@ -1780,23 +2153,20 @@
                     if (coinflipWins >= 10 && coinflipStreak >= 10) unlockAchievement(8);
                 }
                 
-                if (coinflipMoney >= 100) unlockAchievement(7);
+                if (globalMoney >= 100) unlockAchievement(7);
             }, 1500);
         };
         
-        // Track shop upgrades - wrap the buyUpgrade function  
-        const originalBuyUpgradeFunc = window.buyUpgrade || buyUpgrade;
-        window.buyUpgrade = function() {
+        // Track shop upgrades - hook into buyUpgrade function
+        const originalBuyUpgradeFunc = buyUpgrade;
+        buyUpgrade = function() {
             originalBuyUpgradeFunc();
-            if (winChanceUpgrades >= 5) {
-                unlockAchievement(9);
-            }
+            setTimeout(() => {
+                if (winChanceUpgrades >= 5) {
+                    unlockAchievement(9);
+                }
+            }, 100);
         };
-        
-        // Ensure welcome achievement unlocks on first visit
-        if (foundAchievements.size === 0) {
-            unlockAchievement(0);
-        }
     </script>
 </body>
 </html>
