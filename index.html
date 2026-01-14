@@ -167,6 +167,101 @@
             color: #6e7681;
         }
         
+        /* Commands menu - draggable tab */
+        .commands-menu {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            right: -300px;
+            width: 300px;
+            max-height: 500px;
+            background: rgba(13, 17, 23, 0.98);
+            border: 1px solid #30363d;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .commands-menu.open {
+            right: 0;
+        }
+        
+        .commands-menu.dragging {
+            transform: none;
+            transition: none;
+        }
+        
+        .commands-menu-header {
+            background: #161b22;
+            padding: 12px 16px;
+            border-bottom: 1px solid #30363d;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .commands-menu-header h3 {
+            color: #c9d1d9;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .commands-menu-close {
+            background: none;
+            border: none;
+            color: #8b949e;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .commands-menu-close:hover {
+            color: #c9d1d9;
+        }
+        
+        .commands-list {
+            padding: 16px;
+        }
+        
+        .command-category {
+            margin-bottom: 20px;
+        }
+        
+        .command-category h4 {
+            color: #58a6ff;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .command-item {
+            color: #c9d1d9;
+            font-size: 13px;
+            padding: 6px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .command-item .command-name {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        
+        .command-item .command-desc {
+            color: #8b949e;
+            margin-left: 8px;
+        }
+        
         @media (max-width: 768px) {
             .finhub-title {
                 font-size: 48px;
@@ -175,6 +270,10 @@
                 min-width: 200px;
                 bottom: 10px;
                 left: 10px;
+            }
+            .commands-menu {
+                width: 250px;
+                right: -250px;
             }
         }
     </style>
@@ -210,6 +309,41 @@
     <!-- Command bar in bottom left -->
     <div class="command-bar">
         <input type="text" class="command-input" id="commandInput" placeholder="Type a color or 'home'..." autocomplete="off">
+    </div>
+    
+    <!-- Commands menu - draggable -->
+    <div class="commands-menu" id="commandsMenu">
+        <div class="commands-menu-header" id="commandsMenuHeader">
+            <h3>Commands</h3>
+            <button class="commands-menu-close" id="commandsMenuClose">×</button>
+        </div>
+        <div class="commands-list">
+            <div class="command-category">
+                <h4>Navigation</h4>
+                <div class="command-item"><span class="command-name">home</span><span class="command-desc">- Go to home page</span></div>
+                <div class="command-item"><span class="command-name">back</span><span class="command-desc">- Return to main page</span></div>
+            </div>
+            <div class="command-category">
+                <h4>Colors</h4>
+                <div class="command-item"><span class="command-name">rainbow</span><span class="command-desc">- Rainbow colors</span></div>
+                <div class="command-item"><span class="command-name">black</span><span class="command-desc">- Black</span></div>
+                <div class="command-item"><span class="command-name">red</span><span class="command-desc">- Red</span></div>
+                <div class="command-item"><span class="command-name">blue</span><span class="command-desc">- Blue</span></div>
+                <div class="command-item"><span class="command-name">green</span><span class="command-desc">- Green</span></div>
+                <div class="command-item"><span class="command-name">yellow</span><span class="command-desc">- Yellow</span></div>
+                <div class="command-item"><span class="command-name">purple</span><span class="command-desc">- Purple</span></div>
+                <div class="command-item"><span class="command-name">orange</span><span class="command-desc">- Orange</span></div>
+                <div class="command-item"><span class="command-name">white</span><span class="command-desc">- White</span></div>
+                <div class="command-item"><span class="command-name">pink</span><span class="command-desc">- Pink</span></div>
+                <div class="command-item"><span class="command-name">cyan</span><span class="command-desc">- Cyan</span></div>
+                <div class="command-item"><span class="command-name">gold</span><span class="command-desc">- Gold</span></div>
+                <div class="command-item"><span class="command-name">silver</span><span class="command-desc">- Silver</span></div>
+            </div>
+            <div class="command-category">
+                <h4>Menu</h4>
+                <div class="command-item"><span class="command-name">cmds</span><span class="command-desc">- Show/hide this menu</span></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -381,12 +515,86 @@
             });
         }
         
+        // Function to apply rainbow colors
+        function applyRainbowColors() {
+            const rainbowColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+            const allSmallLetters = document.querySelectorAll('.small-letter');
+            let colorIndex = 0;
+            allSmallLetters.forEach(letter => {
+                if (letter.textContent.trim() !== '') {
+                    letter.style.color = rainbowColors[colorIndex % rainbowColors.length];
+                    colorIndex++;
+                }
+            });
+        }
+        
         // Navigation system
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.add('hidden');
             });
             document.getElementById(pageId).classList.remove('hidden');
+        }
+        
+        // Commands menu functionality
+        const commandsMenu = document.getElementById('commandsMenu');
+        const commandsMenuHeader = document.getElementById('commandsMenuHeader');
+        const commandsMenuClose = document.getElementById('commandsMenuClose');
+        
+        function toggleCommandsMenu() {
+            commandsMenu.classList.toggle('open');
+        }
+        
+        // Close menu button
+        commandsMenuClose.addEventListener('click', () => {
+            commandsMenu.classList.remove('open');
+        });
+        
+        // Make menu draggable
+        let isDragging = false;
+        let currentX = 0;
+        let currentY = 0;
+        let initialX = 0;
+        let initialY = 0;
+        
+        commandsMenuHeader.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+        
+        function dragStart(e) {
+            if (e.target === commandsMenuClose || !commandsMenu.classList.contains('open')) return;
+            const rect = commandsMenu.getBoundingClientRect();
+            initialX = e.clientX - rect.left;
+            initialY = e.clientY - rect.top;
+            isDragging = true;
+            commandsMenu.classList.add('dragging');
+            commandsMenu.style.transition = 'none';
+        }
+        
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+                
+                // Keep menu within viewport
+                const maxX = window.innerWidth - commandsMenu.offsetWidth;
+                const maxY = window.innerHeight - commandsMenu.offsetHeight;
+                currentX = Math.max(0, Math.min(currentX, maxX));
+                currentY = Math.max(0, Math.min(currentY, maxY));
+                
+                commandsMenu.style.right = 'auto';
+                commandsMenu.style.left = `${currentX}px`;
+                commandsMenu.style.top = `${currentY}px`;
+            }
+        }
+        
+        function dragEnd(e) {
+            if (isDragging) {
+                isDragging = false;
+                commandsMenu.classList.remove('dragging');
+                commandsMenu.style.transition = 'right 0.3s ease';
+            }
         }
         
         // Command input handler
@@ -405,16 +613,30 @@
                     showPage('mainPage');
                     commandInput.value = '';
                     commandInput.placeholder = 'Type a color or "home"...';
+                } else if (command === 'cmds') {
+                    toggleCommandsMenu();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Commands menu toggled!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'rainbow') {
+                    applyRainbowColors();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Rainbow colors applied!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
                 } else if (color) {
                     changeAllColors(color);
                     commandInput.value = '';
                     commandInput.placeholder = `Changed to ${command}!`;
                     setTimeout(() => {
-                        commandInput.placeholder = 'Type a color (black, red, blue, green, yellow, purple, orange, white, pink, cyan)...';
+                        commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
                 } else {
                     commandInput.value = '';
-                    commandInput.placeholder = 'Command not found. Try: home, back, or a color name...';
+                    commandInput.placeholder = 'Command not found. Try: cmds, home, back, or a color name...';
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
