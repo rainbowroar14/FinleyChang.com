@@ -876,50 +876,28 @@
         </div>
     </div>
     
+    <!-- Goose Rain page -->
+    <div class="page gooserain-page hidden" id="gooserainPage">
+        <canvas id="gooseCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #87CEEB 0%, #98D8C8 100%); cursor: crosshair;"></canvas>
+        <div style="position: fixed; top: 20px; left: 20px; color: white; font-size: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 1000;">
+            Geese: <span id="goose-count">0</span>
+        </div>
+        <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
+    </div>
+    
     <!-- Command bar in bottom left -->
     <div class="command-bar">
         <input type="text" class="command-input" id="commandInput" placeholder="Type a color or 'home'..." autocomplete="off">
     </div>
     
-    <!-- Commands menu - draggable -->
+        <!-- Commands menu - draggable -->
     <div class="commands-menu" id="commandsMenu">
         <div class="commands-menu-header" id="commandsMenuHeader">
             <h3>Commands</h3>
             <button class="commands-menu-close" id="commandsMenuClose">×</button>
         </div>
-        <div class="commands-list">
-            <div class="command-category">
-                <h4>Navigation</h4>
-                <div class="command-item"><span class="command-name">home</span><span class="command-desc">- Go to home page</span></div>
-                <div class="command-item"><span class="command-name">back</span><span class="command-desc">- Return to main page</span></div>
-                <div class="command-item"><span class="command-name">sweeper</span><span class="command-desc">- Play Minesweeper</span></div>
-                <div class="command-item"><span class="command-name">pong</span><span class="command-desc">- Play Pong</span></div>
-                <div class="command-item"><span class="command-name">sandboxles</span><span class="command-desc">- Open Sandboxels</span></div>
-                <div class="command-item"><span class="command-name">coinflip</span><span class="command-desc">- Flip a coin</span></div>
-                <div class="command-item"><span class="command-name">clicker</span><span class="command-desc">- Play clicker game</span></div>
-                <div class="command-item"><span class="command-name">shop</span><span class="command-desc">- Open shop</span></div>
-                <div class="command-item"><span class="command-name">achievements</span><span class="command-desc">- View achievements</span></div>
-            </div>
-            <div class="command-category">
-                <h4>Colors</h4>
-                <div class="command-item"><span class="command-name">rainbow</span><span class="command-desc">- Rainbow colors</span></div>
-                <div class="command-item"><span class="command-name">black</span><span class="command-desc">- Black</span></div>
-                <div class="command-item"><span class="command-name">red</span><span class="command-desc">- Red</span></div>
-                <div class="command-item"><span class="command-name">blue</span><span class="command-desc">- Blue</span></div>
-                <div class="command-item"><span class="command-name">green</span><span class="command-desc">- Green</span></div>
-                <div class="command-item"><span class="command-name">yellow</span><span class="command-desc">- Yellow</span></div>
-                <div class="command-item"><span class="command-name">purple</span><span class="command-desc">- Purple</span></div>
-                <div class="command-item"><span class="command-name">orange</span><span class="command-desc">- Orange</span></div>
-                <div class="command-item"><span class="command-name">white</span><span class="command-desc">- White</span></div>
-                <div class="command-item"><span class="command-name">pink</span><span class="command-desc">- Pink</span></div>
-                <div class="command-item"><span class="command-name">cyan</span><span class="command-desc">- Cyan</span></div>
-                <div class="command-item"><span class="command-name">gold</span><span class="command-desc">- Gold</span></div>
-                <div class="command-item"><span class="command-name">silver</span><span class="command-desc">- Silver</span></div>
-            </div>
-            <div class="command-category">
-                <h4>Menu</h4>
-                <div class="command-item"><span class="command-name">cmds</span><span class="command-desc">- Show/hide this menu</span></div>
-            </div>
+        <div class="commands-list" id="commandsList">
+            <!-- Commands will be dynamically generated based on unlocks -->
         </div>
     </div>
 
@@ -949,16 +927,18 @@
         }
         
         // Function to create letter patterns
-        function createLetterPattern(letter, pattern) {
+        function createLetterPattern(letter, pattern, sourceLetters = finleyLetters) {
             const container = document.getElementById(`letter-${letter}`);
+            if (!container) return;
+            container.innerHTML = ''; // Clear existing
             const expandedPattern = expandPattern(pattern);
             expandedPattern.forEach(row => {
                 row.forEach(cell => {
                     const span = document.createElement('span');
                     span.className = 'small-letter';
                     if (cell === 1) {
-                        // Randomly pick a letter from "finley"
-                        const randomLetter = finleyLetters[Math.floor(Math.random() * finleyLetters.length)];
+                        // Randomly pick a letter from source
+                        const randomLetter = sourceLetters[Math.floor(Math.random() * sourceLetters.length)];
                         span.textContent = randomLetter;
                         span.classList.add(randomLetter);
                 } else {
@@ -968,6 +948,198 @@
                 });
             });
         }
+        
+        // Transform to GooseHub mode
+        function transformToGooseMode() {
+            isGooseMode = true;
+            const subtitle = document.querySelector('.subtitle');
+            const lettersSource = document.querySelector('.letters-source');
+            
+            if (subtitle) {
+                subtitle.textContent = 'Built with feathers, powered by birds';
+            }
+            if (lettersSource) {
+                lettersSource.textContent = 'Spelled with letters from: T-Y-L-E-R';
+            }
+            
+            // Clear and recreate title with GOOSEHUB letters
+            const titleContainer = document.querySelector('.finhub-title');
+            if (titleContainer) {
+                titleContainer.innerHTML = '';
+                // Create containers for G, O, O, S, E, H, U, B
+                ['g', 'o', 'o2', 's', 'e', 'h', 'u', 'b'].forEach(letter => {
+                    const div = document.createElement('div');
+                    div.className = `big-letter letter-${letter.replace('2', '')}`;
+                    div.id = `letter-${letter}`;
+                    titleContainer.appendChild(div);
+                });
+                
+                createLetterPattern('g', gPattern, tylerLetters);
+                createLetterPattern('o', oPattern, tylerLetters);
+                createLetterPattern('o2', oPattern, tylerLetters);
+                createLetterPattern('s', sPattern, tylerLetters);
+                createLetterPattern('e', ePattern, tylerLetters);
+                createLetterPattern('h', hPattern, tylerLetters);
+                createLetterPattern('u', uPattern, tylerLetters);
+                createLetterPattern('b', bPattern, tylerLetters);
+            }
+            
+            // Unlock honk and gooserain commands
+            unlockCommand('honk');
+            unlockCommand('gooserain');
+            renderCommandsMenu();
+            saveGlobalData();
+        }
+        
+        // Render commands menu dynamically based on unlocks
+        function renderCommandsMenu() {
+            const commandsList = document.getElementById('commandsList');
+            if (!commandsList) return;
+            
+            const commandDefinitions = {
+                'Navigation': [
+                    { name: 'home', desc: 'Go to home page', unlock: true },
+                    { name: 'back', desc: 'Return to main page', unlock: true },
+                    { name: 'sweeper', desc: 'Play Minesweeper' },
+                    { name: 'pong', desc: 'Play Pong' },
+                    { name: 'sandboxles', desc: 'Open Sandboxels' },
+                    { name: 'coinflip', desc: 'Flip a coin' },
+                    { name: 'clicker', desc: 'Play clicker game' },
+                    { name: 'shop', desc: 'Open shop', unlock: true },
+                    { name: 'achievements', desc: 'View achievements', unlock: true },
+                    { name: 'goose', desc: 'Transform to GooseHub' },
+                    { name: 'gooserain', desc: 'Make it rain geese!' },
+                ],
+                'Colors': [
+                    { name: 'rainbow', desc: 'Rainbow colors' },
+                    { name: 'black', desc: 'Black' },
+                    { name: 'red', desc: 'Red' },
+                    { name: 'blue', desc: 'Blue' },
+                    { name: 'green', desc: 'Green' },
+                    { name: 'yellow', desc: 'Yellow' },
+                    { name: 'purple', desc: 'Purple' },
+                    { name: 'orange', desc: 'Orange' },
+                    { name: 'white', desc: 'White' },
+                    { name: 'pink', desc: 'Pink' },
+                    { name: 'cyan', desc: 'Cyan' },
+                    { name: 'gold', desc: 'Gold' },
+                    { name: 'silver', desc: 'Silver' },
+                ],
+                'Actions': [
+                    { name: 'honk', desc: 'Play honk sound' },
+                ],
+                'Menu': [
+                    { name: 'cmds', desc: 'Show/hide this menu', unlock: true },
+                ]
+            };
+            
+            let html = '';
+            Object.keys(commandDefinitions).forEach(category => {
+                const commands = commandDefinitions[category];
+                const visibleCommands = commands.filter(cmd => {
+                    if (cmd.unlock) return true;
+                    if (unlockedCommands.has(cmd.name)) return true;
+                    if (unlockedColors.has(cmd.name)) return true;
+                    return false;
+                });
+                
+                if (visibleCommands.length > 0) {
+                    html += `<div class="command-category"><h4>${category}</h4>`;
+                    visibleCommands.forEach(cmd => {
+                        html += `<div class="command-item"><span class="command-name">${cmd.name}</span><span class="command-desc">- ${cmd.desc}</span></div>`;
+                    });
+                    html += `</div>`;
+                }
+            });
+            
+            commandsList.innerHTML = html;
+        }
+        
+        // Unlock a command
+        function unlockCommand(commandName) {
+            unlockedCommands.add(commandName);
+            renderCommandsMenu();
+            saveGlobalData();
+        }
+        
+        // Play honk sound
+        function playHonkSound() {
+            try {
+                // Generate honk sound using Web Audio API
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(180, audioContext.currentTime + 0.1);
+                oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                console.log('Could not play honk sound:', e);
+            }
+        }
+        
+        // Letter patterns for GOOSEHUB
+        const gPattern = [
+            [0,1,1,1,1,1,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,1,1,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,1,1,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [0,1,1,1,1,1,0]
+        ];
+        
+        const oPattern = [
+            [0,1,1,1,1,1,0],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [0,1,1,1,1,1,0]
+        ];
+        
+        const sPattern = [
+            [0,1,1,1,1,1,0],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [0,1,1,1,1,1,0],
+            [0,0,0,0,0,0,1],
+            [0,0,0,0,0,0,1],
+            [0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [0,1,1,1,1,1,0]
+        ];
+        
+        const ePattern = [
+            [1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,1,1,1,1,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,1,1,1,1,1,1]
+        ];
         
         // Big F pattern (original - will be expanded to 3x wide, 2x tall)
         const fPattern = [
@@ -1065,6 +1237,9 @@
         let globalMoney = 0;
         let unlockedColors = new Set(); // Colors start locked
         let clickerPerClick = 1; // Clicker base money per click
+        let unlockedCommands = new Set(['home', 'back', 'cmds', 'shop', 'achievements']); // Basic commands unlocked by default
+        let isGooseMode = false; // Track if in goose mode
+        let tylerLetters = ['t', 'y', 'l', 'e', 'r']; // Letters for GooseHub
         
         // Load global data
         function loadGlobalData() {
@@ -1074,8 +1249,14 @@
                 globalMoney = data.money || 0;
                 unlockedColors = new Set(data.unlockedColors || []);
                 clickerPerClick = data.clickerPerClick || 1;
+                unlockedCommands = new Set(data.unlockedCommands || ['home', 'back', 'cmds', 'shop', 'achievements']);
+                isGooseMode = data.isGooseMode || false;
             }
             updateAllMoneyDisplays();
+            renderCommandsMenu();
+            if (isGooseMode) {
+                transformToGooseMode();
+            }
         }
         
         // Save global data
@@ -1083,7 +1264,9 @@
             localStorage.setItem('globalData', JSON.stringify({
                 money: globalMoney,
                 unlockedColors: Array.from(unlockedColors),
-                clickerPerClick: clickerPerClick
+                clickerPerClick: clickerPerClick,
+                unlockedCommands: Array.from(unlockedCommands),
+                isGooseMode: isGooseMode
             }));
         }
         
@@ -1313,6 +1496,41 @@
                     renderAchievements();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'goose') {
+                    transformToGooseMode();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Honk! GooseHub activated!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'honk') {
+                    if (unlockedCommands.has('honk')) {
+                        playHonkSound();
+                        commandInput.value = '';
+                        commandInput.placeholder = 'HONK! 🦢';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Honk command not unlocked yet!';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
+                } else if (command === 'gooserain') {
+                    if (unlockedCommands.has('gooserain')) {
+                        showPage('gooserainPage');
+                        initGooseRain();
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Type "back" to return';
+                    } else {
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Goose rain not unlocked yet!';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
                 } else if (command === 'cmds') {
                     toggleCommandsMenu();
                     commandInput.value = '';
@@ -1432,7 +1650,7 @@
             if (cell.mineCount > 0) {
                 cell.el.innerHTML = cell.mineCount;
                 cell.el.classList.add(`number-${cell.mineCount}`);
-                } else {
+                    } else {
                 for (let dr = -1; dr <= 1; dr++) {
                     for (let dc = -1; dc <= 1; dc++) {
                         revealCell(r + dr, c + dc);
@@ -1500,7 +1718,7 @@
             if (win) {
                 messageEl.innerHTML = '🎉 YOU WIN! 🎉';
                 messageEl.style.color = 'green';
-                } else {
+                    } else {
                 messageEl.innerHTML = '💣 GAME OVER! 💣';
                 messageEl.style.color = 'red';
                 board.flat().forEach(cell => {
@@ -1557,6 +1775,265 @@
         function closeSandboxels() {
             showPage('mainPage');
         }
+        
+        // Goose Rain game with physics
+        let geese = [];
+        let animationId = null;
+        let canvas, ctx;
+        let draggedGoose = null;
+        let mousePos = { x: 0, y: 0 };
+        
+        function initGooseRain() {
+            canvas = document.getElementById('gooseCanvas');
+            if (!canvas) return;
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx = canvas.getContext('2d');
+            
+            geese = [];
+            const gooseCount = document.getElementById('goose-count');
+            if (gooseCount) gooseCount.textContent = 0;
+            
+            // Stop previous animation
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            // Mouse/touch events for dragging
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd);
+            
+            // Spawn geese
+            spawnGoose();
+            const spawnInterval = setInterval(() => {
+                if (document.getElementById('gooserainPage').classList.contains('hidden')) {
+                    clearInterval(spawnInterval);
+                    return;
+                }
+                spawnGoose();
+            }, 500);
+            
+            // Start animation loop
+            animate();
+        }
+        
+        function spawnGoose() {
+            geese.push({
+                x: Math.random() * canvas.width,
+                y: -50,
+                vx: (Math.random() - 0.5) * 2,
+                vy: Math.random() * 2 + 1,
+                size: Math.random() * 30 + 20,
+                rotation: (Math.random() - 0.5) * 0.2,
+                rotationSpeed: (Math.random() - 0.5) * 0.05,
+                dragged: false
+            });
+            
+            const gooseCount = document.getElementById('goose-count');
+            if (gooseCount) gooseCount.textContent = geese.length;
+        }
+        
+        function drawGoose(goose) {
+                    ctx.save();
+            ctx.translate(goose.x, goose.y);
+            ctx.rotate(goose.rotation);
+            
+            // Draw goose body (simple oval)
+            ctx.fillStyle = '#FFFFFF';
+                    ctx.beginPath();
+            ctx.ellipse(0, 0, goose.size * 0.6, goose.size * 0.4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw goose head
+            ctx.fillStyle = '#FFFFFF';
+                        ctx.beginPath();
+            ctx.arc(goose.size * 0.5, -goose.size * 0.2, goose.size * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+                        ctx.stroke();
+            
+            // Draw beak
+            ctx.fillStyle = '#FFA500';
+                    ctx.beginPath();
+            ctx.moveTo(goose.size * 0.7, -goose.size * 0.2);
+            ctx.lineTo(goose.size * 0.9, -goose.size * 0.15);
+            ctx.lineTo(goose.size * 0.7, -goose.size * 0.1);
+                    ctx.closePath();
+                    ctx.fill();
+            ctx.strokeStyle = '#000000';
+            ctx.stroke();
+            
+            // Draw eye
+            ctx.fillStyle = '#000000';
+                    ctx.beginPath();
+            ctx.arc(goose.size * 0.55, -goose.size * 0.25, 3, 0, Math.PI * 2);
+                    ctx.fill();
+            
+                    ctx.restore();
+        }
+        
+        function handleMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = e.clientX - rect.left;
+            mousePos.y = e.clientY - rect.top;
+            
+            // Check if clicking on a goose
+            for (let i = geese.length - 1; i >= 0; i--) {
+                const goose = geese[i];
+                const dist = Math.sqrt(Math.pow(mousePos.x - goose.x, 2) + Math.pow(mousePos.y - goose.y, 2));
+                if (dist < goose.size) {
+                    draggedGoose = goose;
+                    goose.dragged = true;
+                    goose.vx = 0;
+                    goose.vy = 0;
+                    break;
+                }
+            }
+        }
+        
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = e.clientX - rect.left;
+            mousePos.y = e.clientY - rect.top;
+            
+            if (draggedGoose) {
+                draggedGoose.x = mousePos.x;
+                draggedGoose.y = mousePos.y;
+            }
+        }
+        
+        function handleMouseUp() {
+            if (draggedGoose) {
+                draggedGoose.dragged = false;
+                draggedGoose = null;
+            }
+        }
+        
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = touch.clientX - rect.left;
+            mousePos.y = touch.clientY - rect.top;
+            
+            for (let i = geese.length - 1; i >= 0; i--) {
+                const goose = geese[i];
+                const dist = Math.sqrt(Math.pow(mousePos.x - goose.x, 2) + Math.pow(mousePos.y - goose.y, 2));
+                if (dist < goose.size) {
+                    draggedGoose = goose;
+                    goose.dragged = true;
+                    goose.vx = 0;
+                    goose.vy = 0;
+                    break;
+                }
+            }
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = touch.clientX - rect.left;
+            mousePos.y = touch.clientY - rect.top;
+            
+            if (draggedGoose) {
+                draggedGoose.x = mousePos.x;
+                draggedGoose.y = mousePos.y;
+            }
+        }
+        
+        function handleTouchEnd() {
+            if (draggedGoose) {
+                draggedGoose.dragged = false;
+                draggedGoose = null;
+            }
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update and draw geese
+            for (let i = geese.length - 1; i >= 0; i--) {
+                const goose = geese[i];
+                
+                if (!goose.dragged) {
+                    // Physics
+                    goose.vy += 0.1; // Gravity
+                    goose.vx *= 0.99; // Air resistance
+                    goose.vy *= 0.99;
+                    
+                    goose.x += goose.vx;
+                    goose.y += goose.vy;
+                    goose.rotation += goose.rotationSpeed;
+                    
+                    // Collision with ground
+                    if (goose.y > canvas.height - goose.size) {
+                        goose.y = canvas.height - goose.size;
+                        goose.vy *= -0.6; // Bounce
+                        goose.vx *= 0.8; // Friction
+                        if (Math.abs(goose.vy) < 0.5) {
+                            goose.vy = 0;
+                        }
+                    }
+                    
+                    // Collision with walls
+                    if (goose.x < goose.size || goose.x > canvas.width - goose.size) {
+                        goose.vx *= -0.8;
+                        goose.x = Math.max(goose.size, Math.min(canvas.width - goose.size, goose.x));
+                    }
+                    
+                    // Collision with other geese
+                    for (let j = 0; j < geese.length; j++) {
+                        if (i !== j && !geese[j].dragged) {
+                            const other = geese[j];
+                            const dx = goose.x - other.x;
+                            const dy = goose.y - other.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            const minDist = goose.size + other.size;
+                            
+                            if (dist < minDist && dist > 0) {
+                                const angle = Math.atan2(dy, dx);
+                                const overlap = minDist - dist;
+                                
+                                goose.x += Math.cos(angle) * overlap * 0.5;
+                                goose.y += Math.sin(angle) * overlap * 0.5;
+                                other.x -= Math.cos(angle) * overlap * 0.5;
+                                other.y -= Math.sin(angle) * overlap * 0.5;
+                                
+                                // Bounce
+                                const relativeVx = goose.vx - other.vx;
+                                const relativeVy = goose.vy - other.vy;
+                                const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
+                                
+                                goose.vx -= Math.cos(angle) * dot * 0.5;
+                                goose.vy -= Math.sin(angle) * dot * 0.5;
+                                other.vx += Math.cos(angle) * dot * 0.5;
+                                other.vy += Math.sin(angle) * dot * 0.5;
+                            }
+                        }
+                    }
+                }
+                
+                drawGoose(goose);
+            }
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Handle window resize for goose rain
+        window.addEventListener('resize', () => {
+            if (canvas && !document.getElementById('gooserainPage').classList.contains('hidden')) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
         
         // Clicker game
         function clickMoney() {
@@ -1872,7 +2349,7 @@
             const saved = localStorage.getItem('achievements');
             if (saved) {
                 foundAchievements = new Set(JSON.parse(saved));
-                } else {
+                    } else {
                 // First visit - unlock welcome achievement
                 unlockAchievement(0);
             }
@@ -2098,10 +2575,16 @@
             }
         };
         
-        // Track navigation for achievements and update money displays
-        const originalShowPage = showPage;
+        // Track navigation for achievements - override showPage
+        const originalShowPageForAchievements = showPage;
         showPage = function(pageId) {
-            originalShowPage(pageId);
+            originalShowPageForAchievements(pageId);
+            
+            // Stop goose rain animation if leaving
+            if (pageId !== 'gooserainPage' && animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
             
             // Update money displays on page change
             updateAllMoneyDisplays();
