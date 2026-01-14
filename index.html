@@ -1,10 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Finley Chang</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinHub - Finley Chang</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #0d1117;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .finhub-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -2px;
+        }
+        
+        .finhub-title .letter {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        
+        .finhub-title:hover .letter {
+            transform: translateY(-5px);
+        }
+        
+        /* F from finley */
+        .letter-f {
+            color: #58a6ff;
+        }
+        
+        /* I from finley */
+        .letter-i {
+            color: #f0883e;
+        }
+        
+        /* N from finley */
+        .letter-n {
+            color: #bc8cff;
+        }
+        
+        /* H - using L from finley (rotated/styled) */
+        .letter-h {
+            color: #3fb950;
+        }
+        
+        /* U - using E from finley */
+        .letter-u {
+            color: #f85149;
+        }
+        
+        /* B - using Y from finley */
+        .letter-b {
+            color: #ffa657;
+        }
+        
+        .subtitle {
+            color: #8b949e;
+            font-size: 18px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .letters-source {
+            color: #6e7681;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .finhub-title {
+                font-size: 48px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello! This is finleychang.com</h1>
-    <p>You can code anything here!</p>
+    <!-- FinHub title made from letters in "finley" -->
+    <div class="finhub-title">
+        <span class="letter letter-f">F</span>
+        <span class="letter letter-i">i</span>
+        <span class="letter letter-n">n</span>
+        <span class="letter letter-h">H</span>
+        <span class="letter letter-u">u</span>
+        <span class="letter letter-b">b</span>
+    </div>
+    
+    <p class="subtitle">Built with code, powered by Finley</p>
+    <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
+
+    <script>
+        // Add your JavaScript here
+    </script>
 </body>
 </html>
