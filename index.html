@@ -313,6 +313,57 @@
             animation: coinFlip 1s ease-in-out;
         }
         
+        /* Jumpscare overlay */
+        .jumpscare-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.9);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .jumpscare-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+            animation: jumpscarePop 0.3s ease-out, jumpscareFade 0.5s ease-in 0.8s forwards;
+        }
+        
+        .jumpscare-image {
+            max-width: 90vw;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            transform: scale(0.1);
+        }
+        
+        @keyframes jumpscarePop {
+            0% {
+                transform: scale(0.1);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes jumpscareFade {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        
         /* Shop page styles */
         .shop-page {
             text-align: center;
@@ -761,14 +812,17 @@
     <!-- Pong page -->
     <div class="page sandboxels-page hidden" id="pongPage">
         <iframe id="pong-iframe" class="sandboxels-iframe" src="https://web-pong.com/" name="pong_frame"></iframe>
-        <button class="sandboxels-close-btn" onclick="closePong()">X CLOSE VIEW (Return to original site)</button>
                     </div>
     
     <!-- Sandboxels page -->
     <div class="page sandboxels-page hidden" id="sandboxelsPage">
         <iframe id="sandboxels-iframe" class="sandboxels-iframe" src="https://shalbito.vercel.app/" name="sandboxels_frame"></iframe>
-        <button class="sandboxels-close-btn" onclick="closeSandboxels()">X CLOSE VIEW (Return to original site)</button>
         </div>
+        
+    <!-- Paint page -->
+    <div class="page sandboxels-page hidden" id="paintPage">
+        <iframe id="paint-iframe" class="sandboxels-iframe" src="https://kleki.com/" name="paint_frame"></iframe>
+            </div>
         
     <!-- Coinflip page -->
     <div class="page coinflip-page hidden" id="coinflipPage">
@@ -814,10 +868,10 @@
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 10px;">Achievements</h1>
         <div id="achievements-stats" style="color: #58a6ff; font-size: 18px; margin-bottom: 20px;">
             Found: <span id="found-count">0</span> / <span id="total-count">256</span>
-        </div>
+                </div>
         <div id="achievements-grid" class="achievements-grid">
             <!-- Achievements will be generated here -->
-        </div>
+            </div>
         <div style="margin-top: 30px;">
             <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
         </div>
@@ -1090,6 +1144,7 @@
                     { name: 'sweeper', desc: 'Play Minesweeper' },
                     { name: 'pong', desc: 'Play Pong' },
                     { name: 'sandboxles', desc: 'Open Sandboxels' },
+                    { name: 'paint', desc: 'Open Paint (Kleki)' },
                     { name: 'snake', desc: 'Play Google Snake' },
                     { name: 'coinflip', desc: 'Flip a coin' },
                     { name: 'clicker', desc: 'Play clicker game' },
@@ -1505,7 +1560,7 @@
         
         // Function to apply wooper colors (blue and pink)
         function applyWooperColors() {
-            const wooperColors = ['#1a1aff', '#ff69b4']; // Blue and pink
+            const wooperColors = ['#0000ff', '#ff69b4']; // Blue and pink
             const allSmallLetters = document.querySelectorAll('.small-letter');
             let colorIndex = 0;
             allSmallLetters.forEach(letter => {
@@ -1642,6 +1697,11 @@
                 } else if (command === 'sandboxles') {
                     resetConfirm = false;
                     showPage('sandboxelsPage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'paint') {
+                    resetConfirm = false;
+                    showPage('paintPage');
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'snake') {
@@ -1890,6 +1950,14 @@
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
                     }
+                } else if (command === 'jumpscare') {
+                    resetConfirm = false;
+                    triggerJumpscare();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'BOO! 👻';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
                 } else if (command === 'cmds') {
                     resetConfirm = false;
                     toggleCommandsMenu();
@@ -2134,6 +2202,44 @@
             showPage('mainPage');
         }
         
+        // Jumpscare function
+        function triggerJumpscare() {
+            // Remove any existing jumpscare overlay
+            const existing = document.getElementById('jumpscareOverlay');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'jumpscareOverlay';
+            overlay.className = 'jumpscare-overlay';
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.className = 'jumpscare-image';
+            // Note: You'll need to add your image file to the project and set the src
+            // For now, using a placeholder - replace with your image path/URL
+            img.src = 'jumpscare.jpg'; // Change this to your image file path or URL
+            img.alt = 'Jumpscare';
+            
+            overlay.appendChild(img);
+            document.body.appendChild(overlay);
+            
+            // Trigger animation by adding active class
+            setTimeout(() => {
+                overlay.classList.add('active');
+            }, 10);
+            
+            // Remove overlay after animation completes
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                setTimeout(() => {
+                    overlay.remove();
+                }, 500);
+            }, 1300); // 300ms pop + 800ms delay + 500ms fade
+        }
+        
         // Background selection system
         let bgMode = 'solid'; // 'solid' or 'gradient'
         let selectedGradientColor1 = null;
@@ -2334,6 +2440,8 @@
         let canvas, ctx;
         let draggedGoose = null;
         let mousePos = { x: 0, y: 0 };
+        let lastGooseMousePos = { x: 0, y: 0 };
+        let gooseDragStartPos = { x: 0, y: 0 };
         
         // Stones game with physics
         let stones = [];
@@ -2447,6 +2555,10 @@
             const rect = canvas.getBoundingClientRect();
             mousePos.x = e.clientX - rect.left;
             mousePos.y = e.clientY - rect.top;
+            lastGooseMousePos.x = mousePos.x;
+            lastGooseMousePos.y = mousePos.y;
+            gooseDragStartPos.x = mousePos.x;
+            gooseDragStartPos.y = mousePos.y;
             
             // Check if clicking on a goose
             for (let i = geese.length - 1; i >= 0; i--) {
@@ -2457,8 +2569,6 @@
                     goose.dragged = true;
                     goose.vx = 0;
                     goose.vy = 0;
-                    goose.targetX = mousePos.x;
-                    goose.targetY = mousePos.y;
                     break;
                 }
             }
@@ -2466,18 +2576,24 @@
         
         function handleMouseMove(e) {
             const rect = canvas.getBoundingClientRect();
+            lastGooseMousePos.x = mousePos.x;
+            lastGooseMousePos.y = mousePos.y;
             mousePos.x = e.clientX - rect.left;
             mousePos.y = e.clientY - rect.top;
             
             if (draggedGoose) {
-                // Set target position (not direct position - creates weight/inertia)
-                draggedGoose.targetX = mousePos.x;
-                draggedGoose.targetY = mousePos.y;
+                // Update position directly while dragging
+                draggedGoose.x = mousePos.x;
+                draggedGoose.y = mousePos.y;
             }
         }
         
         function handleMouseUp() {
             if (draggedGoose) {
+                // Set velocity based on movement while dragging (throwing)
+                draggedGoose.vx = (mousePos.x - lastGooseMousePos.x) * 8;
+                draggedGoose.vy = (mousePos.y - lastGooseMousePos.y) * 8;
+                
                 draggedGoose.dragged = false;
                 draggedGoose = null;
             }
@@ -2489,6 +2605,10 @@
             const rect = canvas.getBoundingClientRect();
             mousePos.x = touch.clientX - rect.left;
             mousePos.y = touch.clientY - rect.top;
+            lastGooseMousePos.x = mousePos.x;
+            lastGooseMousePos.y = mousePos.y;
+            gooseDragStartPos.x = mousePos.x;
+            gooseDragStartPos.y = mousePos.y;
             
             for (let i = geese.length - 1; i >= 0; i--) {
                 const goose = geese[i];
@@ -2498,8 +2618,6 @@
                     goose.dragged = true;
                     goose.vx = 0;
                     goose.vy = 0;
-                    goose.targetX = mousePos.x;
-                    goose.targetY = mousePos.y;
                     break;
                 }
             }
@@ -2509,18 +2627,24 @@
             e.preventDefault();
             const touch = e.touches[0];
             const rect = canvas.getBoundingClientRect();
+            lastGooseMousePos.x = mousePos.x;
+            lastGooseMousePos.y = mousePos.y;
             mousePos.x = touch.clientX - rect.left;
             mousePos.y = touch.clientY - rect.top;
             
             if (draggedGoose) {
-                // Set target position (not direct position - creates weight/inertia)
-                draggedGoose.targetX = mousePos.x;
-                draggedGoose.targetY = mousePos.y;
+                // Update position directly while dragging
+                draggedGoose.x = mousePos.x;
+                draggedGoose.y = mousePos.y;
             }
         }
         
         function handleTouchEnd() {
             if (draggedGoose) {
+                // Set velocity based on movement while dragging (throwing)
+                draggedGoose.vx = (mousePos.x - lastGooseMousePos.x) * 8;
+                draggedGoose.vy = (mousePos.y - lastGooseMousePos.y) * 8;
+                
                 draggedGoose.dragged = false;
                 draggedGoose = null;
             }
@@ -2534,15 +2658,7 @@
                 const goose = geese[i];
                 
                 if (goose.dragged) {
-                    // Weighted dragging - use interpolation for heavy feel
-                    // Heavier geese (larger mass) move slower toward target
-                    const dragSpeed = 0.15 - (goose.mass / 1000); // Heavier = slower (0.05 to 0.15)
-                    const dx = goose.targetX - goose.x;
-                    const dy = goose.targetY - goose.y;
-                    
-                    goose.x += dx * dragSpeed;
-                    goose.y += dy * dragSpeed;
-                    
+                    // Position is updated directly in mouse/touch handlers
                     // Keep rotation while dragging
                     goose.rotation += goose.rotationSpeed * 0.5;
                 } else {
@@ -2686,7 +2802,7 @@
         const STONE_SHAPES = ['circle', 'square', 'triangle', 'irregular'];
         
         function spawnStone() {
-            const size = Math.random() * 25 + 15;
+            const size = Math.random() * 40 + 40; // Increased from 15-40 to 40-80 (bigger)
             const shape = STONE_SHAPES[Math.floor(Math.random() * STONE_SHAPES.length)];
             const stoneColor = `rgb(${Math.floor(Math.random() * 60 + 80)}, ${Math.floor(Math.random() * 40 + 60)}, ${Math.floor(Math.random() * 40 + 60)})`;
             
@@ -2702,14 +2818,13 @@
                 size: size,
                 scaleX: scaleX,
                 scaleY: scaleY,
-                rotation: Math.random() * Math.PI * 2,
-                rotationSpeed: (Math.random() - 0.5) * 0.1,
                 dragged: false,
                 shape: shape,
                 color: stoneColor,
-                mass: size * scaleX * scaleY, // Mass based on area
+                mass: size * scaleX * scaleY * 3, // Increased mass (3x heavier)
                 lastX: 0,
-                lastY: 0
+                lastY: 0,
+                collisionRadius: size * Math.max(scaleX, scaleY) // Collision radius based on max scaled dimension
             });
             
             const stonesCount = document.getElementById('stones-count');
@@ -2719,8 +2834,7 @@
         function drawStone(stone) {
             stonesCtx.save();
             stonesCtx.translate(stone.x, stone.y);
-            stonesCtx.rotate(stone.rotation);
-            stonesCtx.scale(stone.scaleX || 1, stone.scaleY || 1); // Apply scaling for stretched shapes
+            stonesCtx.scale(stone.scaleX || 1, stone.scaleY || 1); // Apply scaling for stretched shapes (no rotation)
             
             stonesCtx.fillStyle = stone.color;
             stonesCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
@@ -2749,7 +2863,7 @@
                     const y = Math.sin(angle) * radius;
                     if (i === 0) {
                         stonesCtx.moveTo(x, y);
-                    } else {
+                            } else {
                         stonesCtx.lineTo(x, y);
                     }
                 }
@@ -2772,7 +2886,8 @@
             for (let i = stones.length - 1; i >= 0; i--) {
                 const stone = stones[i];
                 const dist = Math.sqrt(Math.pow(stonesMousePos.x - stone.x, 2) + Math.pow(stonesMousePos.y - stone.y, 2));
-                if (dist < stone.size * 1.5) {
+                const collisionRadius = stone.collisionRadius || (stone.size * Math.max(stone.scaleX || 1, stone.scaleY || 1));
+                if (dist < collisionRadius * 1.5) {
                     draggedStone = stone;
                     stone.dragged = true;
                     stone.vx = 0;
@@ -2828,7 +2943,8 @@
             for (let i = stones.length - 1; i >= 0; i--) {
                 const stone = stones[i];
                 const dist = Math.sqrt(Math.pow(stonesMousePos.x - stone.x, 2) + Math.pow(stonesMousePos.y - stone.y, 2));
-                if (dist < stone.size * 1.5) {
+                const collisionRadius = stone.collisionRadius || (stone.size * Math.max(stone.scaleX || 1, stone.scaleY || 1));
+                if (dist < collisionRadius * 1.5) {
                     draggedStone = stone;
                     stone.dragged = true;
                     stone.vx = 0;
@@ -2892,12 +3008,12 @@
                     
                     stone.x += stone.vx;
                     stone.y += stone.vy;
-                    stone.rotation += stone.rotationSpeed;
                     
                     // Collision with ground (shore)
                     const shoreLevel = stonesCanvas.height * 0.6;
-                    if (stone.y > shoreLevel - stone.size) {
-                        stone.y = shoreLevel - stone.size;
+                    const collisionRadius = stone.collisionRadius || (stone.size * Math.max(stone.scaleX || 1, stone.scaleY || 1));
+                    if (stone.y > shoreLevel - collisionRadius) {
+                        stone.y = shoreLevel - collisionRadius;
                         stone.vy *= -0.5; // Bounce
                         stone.vx *= 0.7; // Friction
                         if (Math.abs(stone.vy) < 0.5) {
@@ -2906,9 +3022,9 @@
                     }
                     
                     // Collision with walls
-                    if (stone.x < stone.size || stone.x > stonesCanvas.width - stone.size) {
+                    if (stone.x < collisionRadius || stone.x > stonesCanvas.width - collisionRadius) {
                         stone.vx *= -0.7;
-                        stone.x = Math.max(stone.size, Math.min(stonesCanvas.width - stone.size, stone.x));
+                        stone.x = Math.max(collisionRadius, Math.min(stonesCanvas.width - collisionRadius, stone.x));
                     }
                 }
                 
@@ -2919,7 +3035,9 @@
                         const dx = stone.x - other.x;
                         const dy = stone.y - other.y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
-                        const minDist = stone.size + other.size;
+                        const stoneCollisionRadius = stone.collisionRadius || (stone.size * Math.max(stone.scaleX || 1, stone.scaleY || 1));
+                        const otherCollisionRadius = other.collisionRadius || (other.size * Math.max(other.scaleX || 1, other.scaleY || 1));
+                        const minDist = stoneCollisionRadius + otherCollisionRadius;
                         
                         if (dist < minDist && dist > 0) {
                             const angle = Math.atan2(dy, dx);
