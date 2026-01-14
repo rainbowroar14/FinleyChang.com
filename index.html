@@ -1,127 +1,516 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Finley's Hub</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinHub - Finley Chang</title>
     <style>
-        /* --- Reset / Layout --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html,body { height: 100%; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
             background: #0d1117;
-            color: #c9d1d9;
             min-height: 100vh;
             padding: 20px;
-            overflow: hidden;
-            cursor: none; /* hide native cursor so custom cursor shows */
         }
-
-        .page { min-height: calc(100vh - 40px); display:flex; flex-direction:column; align-items:center; justify-content:center; }
-        .hidden { display: none; }
-
-        /* Title / big letters */
-        .finhub-title { display:flex; align-items:center; gap:20px; margin-bottom:30px; flex-wrap:wrap; justify-content:center; }
-        .big-letter { display:grid; font-family: 'Courier New', monospace; font-size:8px; line-height:1; gap:0; }
-        .small-letter { display:inline-block; width:8px; height:8px; text-align:center; font-size:10px; }
-        /* fallback color classes (lowercase) */
+        
+        .page {
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .page.hidden {
+            display: none;
+        }
+        
+        .home-page {
+            text-align: center;
+        }
+        
+        .home-page h1 {
+            color: #c9d1d9;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .home-page p {
+            color: #8b949e;
+            font-size: 18px;
+        }
+        
+        .home-page a {
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 20px;
+            margin-top: 20px;
+            display: inline-block;
+            padding: 12px 24px;
+            border: 1px solid #58a6ff;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .home-page a:hover {
+            background: rgba(88, 166, 255, 0.1);
+            color: #79c0ff;
+            transform: translateY(-2px);
+        }
+        
+        /* Minesweeper game styles */
+        .minesweeper-page {
+            background-color: #eee;
+            font-family: Arial, sans-serif;
+        }
+        
+        #minesweeper-game-container {
+            display: inline-block;
+            border: 4px solid #c0c0c0;
+            border-top: 4px solid #fff;
+            border-left: 4px solid #fff;
+        }
+        
+        .minesweeper-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(10, 30px);
+        }
+        
+        .cell {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #d1d1d1;
+            border: 1px solid transparent;
+            border-color: #fff #808080 #808080 #fff;
+        }
+        
+        .cell.revealed {
+            background-color: #c0c0c0;
+            border: 1px solid #808080;
+            border-color: #808080 #fff #fff #808080;
+        }
+        
+        .cell.flag {
+            color: red;
+            font-size: 18px;
+        }
+        
+        .cell.mine {
+            background-color: red;
+            color: black;
+        }
+        
+        .cell.number-1 { color: blue; }
+        .cell.number-2 { color: green; }
+        .cell.number-3 { color: red; }
+        .cell.number-4 { color: darkblue; }
+        .cell.number-5 { color: darkred; }
+        .cell.number-6 { color: teal; }
+        .cell.number-7 { color: black; }
+        .cell.number-8 { color: gray; }
+        
+        #message {
+            margin-top: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            height: 25px;
+            color: #333;
+        }
+        
+        #restart-btn {
+            padding: 8px 15px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 4px solid #c0c0c0;
+            border-top: 4px solid #fff;
+            border-left: 4px solid #fff;
+            background-color: #d1d1d1;
+            font-weight: bold;
+        }
+        
+        #restart-btn:active {
+            border-top: 4px solid #808080;
+            border-left: 4px solid #808080;
+            border-bottom: 4px solid #fff;
+            border-right: 4px solid #fff;
+        }
+        
+        /* Pong game styles */
+        .pong-page {
+            background-color: #1a1a1a;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            color: white;
+        }
+        
+        #pongCanvas {
+            border: 4px solid #f0f0f0;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            background-color: #000;
+        }
+        
+        .pong-info {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .pong-button-style {
+            transition: all 0.1s;
+            box-shadow: 0 4px #2c2c2c;
+            position: relative;
+            top: 0;
+        }
+        
+        .pong-button-style:active {
+            box-shadow: 0 0 #2c2c2c;
+            top: 4px;
+        }
+        
+        .pong-settings-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .pong-settings-modal.hidden {
+            display: none;
+        }
+        
+        .pong-settings-content {
+            background: #1f2937;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 320px;
+            border: 1px solid #4b5563;
+        }
+        
+        .pong-settings-content h3 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: white;
+            text-align: center;
+        }
+        
+        .pong-settings-content label {
+            display: block;
+            color: #e5e7eb;
+            margin-bottom: 4px;
+        }
+        
+        .pong-settings-content select,
+        .pong-settings-content input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            background: #111827;
+            color: white;
+            border: 1px solid #4b5563;
+        }
+        
+        .pong-settings-content select:focus,
+        .pong-settings-content input:focus {
+            outline: none;
+            border-color: white;
+            box-shadow: 0 0 0 1px white;
+        }
+        
+        .pong-settings-content button {
+            width: 100%;
+            margin-top: 16px;
+        }
+        
+        /* Sandboxels page styles */
+        .sandboxels-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            background-color: white;
+            border: none;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sandboxels-iframe {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sandboxels-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100000;
+            padding: 10px 15px;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .sandboxels-close-btn:hover {
+            background-color: #c9302c;
+        }
+        
+        .finhub-title {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .big-letter {
+            display: grid;
+            font-family: 'Courier New', monospace;
+            font-size: 8px;
+            line-height: 1;
+            color: #c9d1d9;
+            gap: 0;
+        }
+        
+        .big-letter .small-letter {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            text-align: center;
+        }
+        
+        /* Big F made of small letters - 3 thick, 2x tall */
+        .letter-f {
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
+        }
+        
+        /* Big i made of small letters - 3 thick, 2x tall */
+        .letter-i {
+            grid-template-columns: repeat(9, 8px);
+            grid-template-rows: repeat(20, 8px);
+        }
+        
+        /* Big n made of small letters - 3 thick, 2x tall */
+        .letter-n {
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
+        }
+        
+        /* Big H made of small letters - 3 thick, 2x tall */
+        .letter-h {
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
+        }
+        
+        /* Big u made of small letters - 3 thick, 2x tall */
+        .letter-u {
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
+        }
+        
+        /* Big b made of small letters - 3 thick, 2x tall */
+        .letter-b {
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
+        }
+        
+        /* Colors for small letters */
         .small-letter.f { color: #58a6ff; }
         .small-letter.i { color: #f0883e; }
         .small-letter.n { color: #bc8cff; }
         .small-letter.l { color: #3fb950; }
         .small-letter.e { color: #f85149; }
         .small-letter.y { color: #ffa657; }
-
-        /* grid templates for each letter container - these should fit the expanded patterns used below */
-        .letter-f { grid-auto-flow: row; }
-        .letter-i { grid-auto-flow: row; }
-        .letter-n { grid-auto-flow: row; }
-        .letter-h { grid-auto-flow: row; }
-        .letter-u { grid-auto-flow: row; }
-        .letter-b { grid-auto-flow: row; }
-
-        .subtitle { color: #8b949e; font-size: 18px; text-align:center; margin-top: 20px; }
-        .letters-source { color: #6e7681; font-size:14px; text-align:center; margin-top:10px; font-style: italic; }
-
-        /* Command bar */
+        
+        .subtitle {
+            color: #8b949e;
+            font-size: 18px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .letters-source {
+            color: #6e7681;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        /* Command bar in bottom left */
         .command-bar {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: rgba(13,17,23,0.95);
+            background: rgba(13, 17, 23, 0.95);
             border: 1px solid #30363d;
-            border-radius:6px;
+            border-radius: 6px;
             padding: 8px 12px;
-            display:flex;
-            gap:8px;
-            min-width:250px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 250px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-        .command-bar::before { content:'>'; color:#58a6ff; font-weight:bold; padding-right:8px; }
-        .command-input { background:transparent; border:none; outline:none; color:#c9d1d9; font-family:'Courier New', monospace; font-size:14px; flex:1; }
-        .command-input::placeholder { color:#6e7681; }
-
-        /* Commands menu */
-        .commands-menu { position: fixed; top: 50%; transform: translateY(-50%); right: -300px; width:300px; max-height:500px; background: rgba(13,17,23,0.98); border:1px solid #30363d; border-right:none; border-radius:8px 0 0 8px; box-shadow:-4px 0 12px rgba(0,0,0,0.3); transition: right 0.3s ease; z-index:1000; overflow-y:auto; }
-        .commands-menu.open { right: 0; }
-        .commands-menu-header { background:#161b22; padding:12px 16px; border-bottom:1px solid #30363d; cursor:move; display:flex; justify-content:space-between; align-items:center; user-select:none; }
-        .commands-menu-header h3 { color:#c9d1d9; font-size:16px; margin:0; }
-        .commands-menu-close { background:none; border:none; color:#8b949e; font-size:20px; cursor:pointer; width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
-        .commands-list { padding:16px; color:#c9d1d9; }
-        .command-category h4 { color:#58a6ff; font-size:14px; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
-        .command-item { font-family:'Courier New', monospace; color:#c9d1d9; margin-bottom:6px; font-size:13px; }
-        .command-item .command-name { color:#58a6ff; font-weight:bold; }
-
-        /* Minesweeper */
-        .minesweeper-page { background-color: #eee; font-family: Arial, sans-serif; color:#222; padding:20px; border-radius:8px; }
-        #minesweeper-game-container { display:inline-block; border:4px solid #c0c0c0; border-top:4px solid #fff; border-left:4px solid #fff; margin-top:12px; }
-        .minesweeper-grid { display:grid; grid-template-columns: repeat(10, 30px); grid-auto-rows: 30px; }
-        .cell { width:30px; height:30px; line-height:30px; text-align:center; font-weight:bold; font-size:16px; cursor:pointer; background-color:#d1d1d1; border:1px solid transparent; border-color:#fff #808080 #808080 #fff; user-select:none; }
-        .cell.revealed { background-color:#c0c0c0; border:1px solid #808080; border-color:#808080 #fff #fff #808080; cursor:default; }
-        .cell.flag { color:red; font-size:18px; }
-        .cell.mine { background-color:red; color:black; }
-        .cell.number-1 { color:blue; }
-        .cell.number-2 { color:green; }
-        .cell.number-3 { color:red; }
-        .cell.number-4 { color:darkblue; }
-        .cell.number-5 { color:darkred; }
-        .cell.number-6 { color:teal; }
-        .cell.number-7 { color:black; }
-        .cell.number-8 { color:gray; }
-        #message { margin-top:8px; font-size:16px; font-weight:bold; color:#333; }
-
-        /* Pong minimal placeholder */
-        .pong-page { background-color:#1a1a1a; color:white; padding:20px; border-radius:8px; }
-
-        /* Sandboxels page */
-        .sandboxels-page { position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background-color:white; display:flex; flex-direction:column; }
-        .sandboxels-iframe { flex-grow:1; width:100%; height:100%; border:none; }
-
-        /* Custom cursor (simple smooth dot + ring) */
-        .custom-cursor-dot, .custom-cursor-ring {
+        
+        .command-bar::before {
+            content: '>';
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        
+        .command-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .command-input::placeholder {
+            color: #6e7681;
+        }
+        
+        /* Commands menu - draggable tab */
+        .commands-menu {
             position: fixed;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            transition: opacity 0.15s ease;
-            z-index: 2000;
+            top: 50%;
+            transform: translateY(-50%);
+            right: -300px;
+            width: 300px;
+            max-height: 500px;
+            background: rgba(13, 17, 23, 0.98);
+            border: 1px solid #30363d;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
         }
-        .custom-cursor-dot {
-            width: 8px; height: 8px; background: #58a6ff; border-radius:50%;
-            box-shadow: 0 0 8px rgba(88,166,255,0.6);
+        
+        .commands-menu.open {
+            right: 0;
         }
-        .custom-cursor-ring {
-            width: 36px; height: 36px; border-radius:50%; border:2px solid rgba(88,166,255,0.4);
-            transform: translate(-50%, -50%);
+        
+        .commands-menu.dragging {
+            transform: none;
+            transition: none;
         }
-        .cursor-hidden { opacity: 0; }
-
+        
+        .commands-menu-header {
+            background: #161b22;
+            padding: 12px 16px;
+            border-bottom: 1px solid #30363d;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .commands-menu-header h3 {
+            color: #c9d1d9;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .commands-menu-close {
+            background: none;
+            border: none;
+            color: #8b949e;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .commands-menu-close:hover {
+            color: #c9d1d9;
+        }
+        
+        .commands-list {
+            padding: 16px;
+        }
+        
+        .command-category {
+            margin-bottom: 20px;
+        }
+        
+        .command-category h4 {
+            color: #58a6ff;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .command-item {
+            color: #c9d1d9;
+            font-size: 13px;
+            padding: 6px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .command-item .command-name {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        
+        .command-item .command-desc {
+            color: #8b949e;
+            margin-left: 8px;
+        }
+        
         @media (max-width: 768px) {
-            .command-bar { min-width:200px; bottom:10px; left:10px; }
-            .commands-menu { width:250px; right:-250px; }
+            .finhub-title {
+                font-size: 48px;
+            }
+            .command-bar {
+                min-width: 200px;
+                bottom: 10px;
+                left: 10px;
+            }
+            .commands-menu {
+                width: 250px;
+                right: -250px;
+            }
         }
     </style>
 </head>
@@ -129,59 +518,89 @@
     <!-- Main page with FinHub title -->
     <div class="page" id="mainPage">
         <div class="finhub-title">
-            <div class="big-letter letter-f" id="letter-f" aria-hidden="true"></div>
-            <div class="big-letter letter-i" id="letter-i" aria-hidden="true"></div>
-            <div class="big-letter letter-n" id="letter-n" aria-hidden="true"></div>
-            <div class="big-letter letter-h" id="letter-h" aria-hidden="true"></div>
-            <div class="big-letter letter-u" id="letter-u" aria-hidden="true"></div>
-            <div class="big-letter letter-b" id="letter-b" aria-hidden="true"></div>
+            <!-- Big F made of small letters -->
+            <div class="big-letter letter-f" id="letter-f"></div>
+            <!-- Big i made of small letters -->
+            <div class="big-letter letter-i" id="letter-i"></div>
+            <!-- Big n made of small letters -->
+            <div class="big-letter letter-n" id="letter-n"></div>
+            <!-- Big H made of small letters -->
+            <div class="big-letter letter-h" id="letter-h"></div>
+            <!-- Big u made of small letters -->
+            <div class="big-letter letter-u" id="letter-u"></div>
+            <!-- Big b made of small letters -->
+            <div class="big-letter letter-b" id="letter-b"></div>
         </div>
-
+        
         <p class="subtitle">Built with code, powered by Finley</p>
         <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
     </div>
-
+    
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
         <h1>Welcome to the home</h1>
         <p>Type "back" in the command bar to return</p>
-        <a href="https://sso.browardschools.com/" target="_blank" rel="noopener">Broward Schools Login</a>
+        <a href="https://sso.browardschools.com/" target="_blank">Broward Schools Login</a>
     </div>
-
+    
     <!-- Minesweeper page -->
     <div class="page minesweeper-page hidden" id="minesweeperPage" oncontextmenu="return false;">
-        <div style="display:flex; align-items:center; gap:12px; flex-direction:column;">
-            <button id="restart-btn">Restart Game</button>
-            <div id="message">Flags Remaining: 10</div>
-            <div id="minesweeper-game-container">
-                <div class="minesweeper-grid" id="minesweeper-grid" aria-hidden="false"></div>
+        <button id="restart-btn">Restart Game</button>
+        <div id="message">Flags Remaining: 10</div>
+        <div id="minesweeper-game-container">
+            <div class="minesweeper-grid" id="minesweeper-grid"></div>
+        </div>
+    </div>
+    
+    <!-- Pong page -->
+    <div class="page pong-page hidden" id="pongPage">
+        <div class="pong-info">
+            Control: Use <strong>Mouse</strong> (move up/down) or <strong>Arrow Keys</strong>
+        </div>
+        <canvas id="pongCanvas" width="600" height="400"></canvas>
+        <div style="margin-top: 16px;">
+            <button id="settingsButton" onclick="window.toggleSettingsModal()" class="pong-button-style bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                Game Settings
+            </button>
+        </div>
+        <!-- Settings Modal (Hidden by default) -->
+        <div id="settingsModal" class="pong-settings-modal hidden">
+            <div class="pong-settings-content">
+                <h3>Game Settings</h3>
+                <!-- Bot Level Selector -->
+                <div style="margin-bottom: 16px;">
+                    <label for="botLevelSelect">Bot Difficulty:</label>
+                    <select id="botLevelSelect" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-1 focus:ring-white">
+                        <option value="easy">Easy (Slow)</option>
+                        <option value="hard" selected>Hard (Standard)</option>
+                        <option value="impossible">Impossible (Perfect)</option>
+                    </select>
+                </div>
+                <!-- Number of Balls Input -->
+                <div style="margin-bottom: 24px;">
+                    <label for="numBallsInput">Number of Balls (1-5):</label>
+                    <input type="number" id="numBallsInput" value="1" min="1" max="5" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-1 focus:ring-white">
+                </div>
+                <button id="saveSettingsButton" onclick="window.saveSettingsAndRestart()" class="pong-button-style bg-white hover:bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded-lg w-full">
+                    Apply & Restart
+                </button>
             </div>
         </div>
     </div>
-
-    <!-- Pong page (placeholder / minimal) -->
-    <div class="page pong-page hidden" id="pongPage">
-        <div class="pong-info">Control: Use <strong>Mouse</strong> (move up/down) or <strong>Arrow Keys</strong></div>
-        <canvas id="pongCanvas" width="600" height="400"></canvas>
-        <div style="margin-top:16px;">
-            <button id="settingsButton" onclick="toggleSettingsModal()" class="pong-button-style">Game Settings</button>
-        </div>
-        <div id="settingsModal" class="pong-settings-modal hidden" style="display:none;"></div>
-    </div>
-
+    
     <!-- Sandboxels page -->
     <div class="page sandboxels-page hidden" id="sandboxelsPage">
-        <iframe id="sandboxels-iframe" class="sandboxels-iframe" src="https://shalbito.vercel.app/" name="sandboxels_frame"></iframe>
-        <button class="sandboxels-close-btn" onclick="closeSandboxels()" style="position:absolute; top:10px; right:10px; z-index:10001; padding:10px 15px; background:#d9534f; color:white; border:none; border-radius:5px; cursor:pointer;">X CLOSE VIEW</button>
+        <iframe id="sandboxels-iframe" class="sandboxels-iframe" src="https://sandboxels.r74n.com/" name="sandboxels_frame"></iframe>
+        <button class="sandboxels-close-btn" onclick="closeSandboxels()">X CLOSE VIEW (Return to original site)</button>
     </div>
-
-    <!-- Command bar -->
-    <div class="command-bar" role="search" aria-label="Command bar">
-        <input type="text" class="command-input" id="commandInput" placeholder="Type a color or 'home'..." autocomplete="off" />
+    
+    <!-- Command bar in bottom left -->
+    <div class="command-bar">
+        <input type="text" class="command-input" id="commandInput" placeholder="Type a color or 'home'..." autocomplete="off">
     </div>
-
-    <!-- Commands menu -->
-    <div class="commands-menu" id="commandsMenu" aria-hidden="true">
+    
+    <!-- Commands menu - draggable -->
+    <div class="commands-menu" id="commandsMenu">
         <div class="commands-menu-header" id="commandsMenuHeader">
             <h3>Commands</h3>
             <button class="commands-menu-close" id="commandsMenuClose">×</button>
@@ -189,104 +608,82 @@
         <div class="commands-list">
             <div class="command-category">
                 <h4>Navigation</h4>
-                <div class="command-item"><span class="command-name">home</span><span class="command-desc"> - Go to home page</span></div>
-                <div class="command-item"><span class="command-name">back</span><span class="command-desc"> - Return to main page</span></div>
-                <div class="command-item"><span class="command-name">sweeper</span><span class="command-desc"> - Play Minesweeper</span></div>
-                <div class="command-item"><span class="command-name">pong</span><span class="command-desc"> - Play Pong</span></div>
-                <div class="command-item"><span class="command-name">sandboxels</span><span class="command-desc"> - Open Sandboxels</span></div>
+                <div class="command-item"><span class="command-name">home</span><span class="command-desc">- Go to home page</span></div>
+                <div class="command-item"><span class="command-name">back</span><span class="command-desc">- Return to main page</span></div>
+                <div class="command-item"><span class="command-name">sweeper</span><span class="command-desc">- Play Minesweeper</span></div>
+                <div class="command-item"><span class="command-name">pong</span><span class="command-desc">- Play Pong</span></div>
+                <div class="command-item"><span class="command-name">sandboxles</span><span class="command-desc">- Open Sandboxels</span></div>
             </div>
             <div class="command-category">
                 <h4>Colors</h4>
-                <div class="command-item"><span class="command-name">rainbow</span><span class="command-desc"> - Rainbow colors</span></div>
-                <div class="command-item"><span class="command-name">black</span><span class="command-desc"> - Black</span></div>
-                <div class="command-item"><span class="command-name">red</span><span class="command-desc"> - Red</span></div>
-                <div class="command-item"><span class="command-name">blue</span><span class="command-desc"> - Blue</span></div>
-                <div class="command-item"><span class="command-name">green</span><span class="command-desc"> - Green</span></div>
-                <div class="command-item"><span class="command-name">yellow</span><span class="command-desc"> - Yellow</span></div>
-                <div class="command-item"><span class="command-name">purple</span><span class="command-desc"> - Purple</span></div>
-                <div class="command-item"><span class="command-name">orange</span><span class="command-desc"> - Orange</span></div>
-                <div class="command-item"><span class="command-name">white</span><span class="command-desc"> - White</span></div>
-                <div class="command-item"><span class="command-name">pink</span><span class="command-desc"> - Pink</span></div>
-                <div class="command-item"><span class="command-name">cyan</span><span class="command-desc"> - Cyan</span></div>
-                <div class="command-item"><span class="command-name">gold</span><span class="command-desc"> - Gold</span></div>
-                <div class="command-item"><span class="command-name">silver</span><span class="command-desc"> - Silver</span></div>
+                <div class="command-item"><span class="command-name">rainbow</span><span class="command-desc">- Rainbow colors</span></div>
+                <div class="command-item"><span class="command-name">black</span><span class="command-desc">- Black</span></div>
+                <div class="command-item"><span class="command-name">red</span><span class="command-desc">- Red</span></div>
+                <div class="command-item"><span class="command-name">blue</span><span class="command-desc">- Blue</span></div>
+                <div class="command-item"><span class="command-name">green</span><span class="command-desc">- Green</span></div>
+                <div class="command-item"><span class="command-name">yellow</span><span class="command-desc">- Yellow</span></div>
+                <div class="command-item"><span class="command-name">purple</span><span class="command-desc">- Purple</span></div>
+                <div class="command-item"><span class="command-name">orange</span><span class="command-desc">- Orange</span></div>
+                <div class="command-item"><span class="command-name">white</span><span class="command-desc">- White</span></div>
+                <div class="command-item"><span class="command-name">pink</span><span class="command-desc">- Pink</span></div>
+                <div class="command-item"><span class="command-name">cyan</span><span class="command-desc">- Cyan</span></div>
+                <div class="command-item"><span class="command-name">gold</span><span class="command-desc">- Gold</span></div>
+                <div class="command-item"><span class="command-name">silver</span><span class="command-desc">- Silver</span></div>
             </div>
             <div class="command-category">
                 <h4>Menu</h4>
-                <div class="command-item"><span class="command-name">cmds</span><span class="command-desc"> - Show/hide this menu</span></div>
+                <div class="command-item"><span class="command-name">cmds</span><span class="command-desc">- Show/hide this menu</span></div>
             </div>
         </div>
     </div>
 
-    <!-- Custom cursor elements -->
-    <div class="custom-cursor-dot" id="cursorDot" aria-hidden="true"></div>
-    <div class="custom-cursor-ring" id="cursorRing" aria-hidden="true"></div>
-
     <script>
-        /************************************************************************
-         * Fixes & features:
-         * - Corrected the stray character that caused a syntax error.
-         * - Ensured small-letter classes use lowercase so CSS rules match.
-         * - Rewrote minesweeper board initialization to avoid shared object bugs.
-         * - Added a small, smooth custom cursor (dot + ring) "imported like cursor".
-         * - Kept the existing command system; you can toggle pages via commands.
-         ************************************************************************/
-
-        // Letters used to fill the big letters
-        const finleyLetters = ['F','I','N','L','E','Y'];
-
-        // Expand pattern -> make each cell 3x wide and duplicate rows to be 2x tall
+        // Letters from "finley" to use
+        const finleyLetters = ['f', 'i', 'n', 'l', 'e', 'y'];
+        
+        // Function to expand pattern: make 3x wider and 2x taller
         function expandPattern(pattern) {
             const expanded = [];
+            // Make each row 3x wider
             pattern.forEach(row => {
                 const wideRow = [];
                 row.forEach(cell => {
+                    // Repeat each cell 3 times
                     wideRow.push(cell, cell, cell);
                 });
                 expanded.push(wideRow);
             });
-            // duplicate each row to be 2x tall
-            const tall = [];
+            // Make 2x taller by duplicating each row
+            const tallExpanded = [];
             expanded.forEach(row => {
-                tall.push(row.slice());
-                tall.push(row.slice());
+                tallExpanded.push(row); // Original row
+                tallExpanded.push(row); // Duplicate row
             });
-            return tall;
+            return tallExpanded;
         }
-
-        // Create a letter pattern inside container id letter-<letter>
+        
+        // Function to create letter patterns
         function createLetterPattern(letter, pattern) {
             const container = document.getElementById(`letter-${letter}`);
-            if (!container) return;
-            container.innerHTML = ''; // clear any previous content
-
-            const expanded = expandPattern(pattern);
-
-            // set appropriate grid columns/rows to match the expanded pattern dimensions
-            // number of columns equals expanded[0].length
-            const cols = (expanded[0] && expanded[0].length) || 0;
-            const rows = expanded.length;
-            container.style.gridTemplateColumns = `repeat(${cols}, 8px)`;
-            container.style.gridTemplateRows = `repeat(${rows}, 8px)`;
-
-            expanded.forEach(row => {
+            const expandedPattern = expandPattern(pattern);
+            expandedPattern.forEach(row => {
                 row.forEach(cell => {
                     const span = document.createElement('span');
                     span.className = 'small-letter';
                     if (cell === 1) {
+                        // Randomly pick a letter from "finley"
                         const randomLetter = finleyLetters[Math.floor(Math.random() * finleyLetters.length)];
                         span.textContent = randomLetter;
-                        // add lowercase class so CSS like .small-letter.f applies
-                        span.classList.add(randomLetter.toLowerCase());
+                        span.classList.add(randomLetter);
                     } else {
-                        span.textContent = '\u00A0'; // non-breaking space for consistent layout
+                        span.textContent = ' ';
                     }
                     container.appendChild(span);
                 });
             });
         }
-
-        // Patterns (originals are 7x10 etc; they get expanded)
+        
+        // Big F pattern (original - will be expanded to 3x wide, 2x tall)
         const fPattern = [
             [1,1,1,1,1,1,1],
             [1,0,0,0,0,0,0],
@@ -299,6 +696,8 @@
             [1,0,0,0,0,0,0],
             [1,0,0,0,0,0,0]
         ];
+        
+        // Big i pattern
         const iPattern = [
             [1,1,1],
             [0,1,0],
@@ -311,6 +710,8 @@
             [0,1,0],
             [1,1,1]
         ];
+        
+        // Big n pattern
         const nPattern = [
             [1,0,0,0,0,0,1],
             [1,1,0,0,0,0,1],
@@ -323,6 +724,8 @@
             [1,0,0,0,0,0,1],
             [1,0,0,0,0,0,1]
         ];
+        
+        // Big H pattern
         const hPattern = [
             [1,0,0,0,0,0,1],
             [1,0,0,0,0,0,1],
@@ -335,6 +738,8 @@
             [1,0,0,0,0,0,1],
             [1,0,0,0,0,0,1]
         ];
+        
+        // Big u pattern
         const uPattern = [
             [1,0,0,0,0,0,1],
             [1,0,0,0,0,0,1],
@@ -347,6 +752,8 @@
             [1,0,0,0,0,0,1],
             [0,1,1,1,1,1,0]
         ];
+        
+        // Big b pattern
         const bPattern = [
             [1,1,1,1,1,0,0],
             [1,0,0,0,0,1,0],
@@ -359,65 +766,16 @@
             [1,0,0,0,0,1,0],
             [1,1,1,1,1,0,0]
         ];
-
-        // Create all letters (this runs now so the elements populate)
+        
+        // Create all letters
         createLetterPattern('f', fPattern);
         createLetterPattern('i', iPattern);
         createLetterPattern('n', nPattern);
         createLetterPattern('h', hPattern);
         createLetterPattern('u', uPattern);
         createLetterPattern('b', bPattern);
-
-        /*********************
-         * Custom cursor code
-         *********************/
-        (function setupCursor() {
-            const dot = document.getElementById('cursorDot');
-            const ring = document.getElementById('cursorRing');
-            let mouseX = window.innerWidth / 2;
-            let mouseY = window.innerHeight / 2;
-            let ringX = mouseX, ringY = mouseY;
-            const ease = 0.16;
-
-            window.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                dot.style.left = mouseX + 'px';
-                dot.style.top = mouseY + 'px';
-            });
-
-            // smooth ring movement
-            function animate() {
-                ringX += (mouseX - ringX) * ease;
-                ringY += (mouseY - ringY) * ease;
-                ring.style.left = ringX + 'px';
-                ring.style.top = ringY + 'px';
-                requestAnimationFrame(animate);
-            }
-            animate();
-
-            window.addEventListener('mousedown', () => {
-                dot.style.transform = 'translate(-50%,-50%) scale(0.75)';
-                ring.style.transform = 'translate(-50%,-50%) scale(0.85)';
-            });
-            window.addEventListener('mouseup', () => {
-                dot.style.transform = 'translate(-50%,-50%) scale(1)';
-                ring.style.transform = 'translate(-50%,-50%) scale(1)';
-            });
-            // hide on blur
-            window.addEventListener('mouseout', () => {
-                dot.classList.add('cursor-hidden');
-                ring.classList.add('cursor-hidden');
-            });
-            window.addEventListener('mouseover', () => {
-                dot.classList.remove('cursor-hidden');
-                ring.classList.remove('cursor-hidden');
-            });
-        })();
-
-        /*********************
-         * Color commands map
-         *********************/
+        
+        // Color command system
         const colorMap = {
             'black': '#000000',
             'red': '#ff0000',
@@ -437,130 +795,161 @@
             'gold': '#ffd700',
             'silver': '#c0c0c0'
         };
-
+        
+        // Function to change all letter colors
         function changeAllColors(color) {
-            const allSmall = document.querySelectorAll('.small-letter');
-            allSmall.forEach(s => {
-                if (s.textContent.trim() !== '') s.style.color = color;
-            });
-        }
-        function applyRainbowColors() {
-            const rainbow = ['#ff0000','#ff7f00','#ffff00','#00ff00','#0000ff','#4b0082','#9400d3'];
-            const allSmall = document.querySelectorAll('.small-letter');
-            let idx = 0;
-            allSmall.forEach(s => {
-                if (s.textContent.trim() !== '') {
-                    s.style.color = rainbow[idx % rainbow.length];
-                    idx++;
+            const allSmallLetters = document.querySelectorAll('.small-letter');
+            allSmallLetters.forEach(letter => {
+                if (letter.textContent.trim() !== '') {
+                    letter.style.color = color;
                 }
             });
         }
-
-        /*********************
-         * Navigation / commands menu
-         *********************/
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('hidden');
+        
+        // Function to apply rainbow colors
+        function applyRainbowColors() {
+            const rainbowColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+            const allSmallLetters = document.querySelectorAll('.small-letter');
+            let colorIndex = 0;
+            allSmallLetters.forEach(letter => {
+                if (letter.textContent.trim() !== '') {
+                    letter.style.color = rainbowColors[colorIndex % rainbowColors.length];
+                    colorIndex++;
+                }
+            });
         }
-
+        
+        // Navigation system
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+        
+        // Commands menu functionality
         const commandsMenu = document.getElementById('commandsMenu');
         const commandsMenuHeader = document.getElementById('commandsMenuHeader');
         const commandsMenuClose = document.getElementById('commandsMenuClose');
-
+        
         function toggleCommandsMenu() {
             commandsMenu.classList.toggle('open');
         }
-        commandsMenuClose.addEventListener('click', () => commandsMenu.classList.remove('open'));
-
-        // drag for commands menu
+        
+        // Close menu button
+        commandsMenuClose.addEventListener('click', () => {
+            commandsMenu.classList.remove('open');
+        });
+        
+        // Make menu draggable
         let isDragging = false;
-        let offsetX=0, offsetY=0;
-        commandsMenuHeader.addEventListener('mousedown', (e) => {
-            if (!commandsMenu.classList.contains('open')) return;
-            if (e.target === commandsMenuClose) return;
-            isDragging = true;
+        let currentX = 0;
+        let currentY = 0;
+        let initialX = 0;
+        let initialY = 0;
+        
+        commandsMenuHeader.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+        
+        function dragStart(e) {
+            if (e.target === commandsMenuClose || !commandsMenu.classList.contains('open')) return;
             const rect = commandsMenu.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
+            initialX = e.clientX - rect.left;
+            initialY = e.clientY - rect.top;
+            isDragging = true;
             commandsMenu.classList.add('dragging');
             commandsMenu.style.transition = 'none';
-        });
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            e.preventDefault();
-            let x = e.clientX - offsetX;
-            let y = e.clientY - offsetY;
-            // clamp
-            x = Math.max(0, Math.min(x, window.innerWidth - commandsMenu.offsetWidth));
-            y = Math.max(0, Math.min(y, window.innerHeight - commandsMenu.offsetHeight));
-            commandsMenu.style.left = x + 'px';
-            commandsMenu.style.top = y + 'px';
-            commandsMenu.style.right = 'auto';
-        });
-        document.addEventListener('mouseup', () => {
+        }
+        
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+                
+                // Keep menu within viewport
+                const maxX = window.innerWidth - commandsMenu.offsetWidth;
+                const maxY = window.innerHeight - commandsMenu.offsetHeight;
+                currentX = Math.max(0, Math.min(currentX, maxX));
+                currentY = Math.max(0, Math.min(currentY, maxY));
+                
+                commandsMenu.style.right = 'auto';
+                commandsMenu.style.left = `${currentX}px`;
+                commandsMenu.style.top = `${currentY}px`;
+            }
+        }
+        
+        function dragEnd(e) {
             if (isDragging) {
                 isDragging = false;
                 commandsMenu.classList.remove('dragging');
                 commandsMenu.style.transition = 'right 0.3s ease';
             }
-        });
-
-        // command input handling
+        }
+        
+        // Command input handler
         const commandInput = document.getElementById('commandInput');
         commandInput.addEventListener('keydown', (e) => {
-            if (e.key !== 'Enter') return;
-            const raw = commandInput.value.toLowerCase().trim();
-            const color = colorMap[raw];
-
-            if (raw === 'home') {
-                showPage('homePage');
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (raw === 'back') {
-                showPage('mainPage');
-                commandInput.value = '';
-                commandInput.placeholder = 'Type a color or "home"...';
-            } else if (raw === 'sweeper' || raw === 'minesweeper') {
-                showPage('minesweeperPage');
-                initMinesweeper();
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (raw === 'pong') {
-                showPage('pongPage');
-                // initPong() // placeholder - can be extended
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (raw === 'sandboxels' || raw === 'sandboxles') {
-                showPage('sandboxelsPage');
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (raw === 'cmds') {
-                toggleCommandsMenu();
-                commandInput.value = '';
-                commandInput.placeholder = 'Commands menu toggled!';
-                setTimeout(() => commandInput.placeholder = 'Type a color or "home"...', 2000);
-            } else if (raw === 'rainbow') {
-                applyRainbowColors();
-                commandInput.value = '';
-                commandInput.placeholder = 'Rainbow colors applied!';
-                setTimeout(() => commandInput.placeholder = 'Type a color or "home"...', 2000);
-            } else if (color) {
-                changeAllColors(color);
-                commandInput.value = '';
-                commandInput.placeholder = `Changed to ${raw}!`;
-                setTimeout(() => commandInput.placeholder = 'Type a color or "home"...', 2000);
-            } else {
-                commandInput.value = '';
-                commandInput.placeholder = 'Command not found. Try: cmds, home, back, or a color name...';
-                setTimeout(() => commandInput.placeholder = 'Type a color or "home"...', 2000);
+            if (e.key === 'Enter') {
+                const command = commandInput.value.toLowerCase().trim();
+                const color = colorMap[command];
+                
+                // Handle navigation commands
+                if (command === 'home') {
+                    showPage('homePage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'back') {
+                    showPage('mainPage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type a color or "home"...';
+                } else if (command === 'sweeper') {
+                    showPage('minesweeperPage');
+                    initMinesweeper();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'pong') {
+                    showPage('pongPage');
+                    initPong();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'sandboxles') {
+                    showPage('sandboxelsPage');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'cmds') {
+                    toggleCommandsMenu();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Commands menu toggled!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'rainbow') {
+                    applyRainbowColors();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Rainbow colors applied!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (color) {
+                    changeAllColors(color);
+                    commandInput.value = '';
+                    commandInput.placeholder = `Changed to ${command}!`;
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else {
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Command not found. Try: cmds, home, back, or a color name...';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                }
             }
         });
-
-        /*********************
-         * Minesweeper implementation (simple & robust)
-         *********************/
+        
+        // Minesweeper game code
         const GRID_SIZE = 10;
         const NUM_MINES = 10;
         const gridEl = document.getElementById('minesweeper-grid');
@@ -572,191 +961,197 @@
         let flagsRemaining = NUM_MINES;
         let revealedCount = 0;
 
-        function initMinesweeper() {
-            // reset state
-            isGameOver = false;
-            flagsRemaining = NUM_MINES;
-            revealedCount = 0;
-            messageEl.textContent = `Flags Remaining: ${flagsRemaining}`;
-
-            // initialize board as independent objects
-            board = [];
-            for (let r = 0; r < GRID_SIZE; r++) {
-                const row = [];
-                for (let c = 0; c < GRID_SIZE; c++) {
-                    row.push({
-                        isMine: false,
-                        isRevealed: false,
-                        isFlagged: false,
-                        mineCount: 0,
-                        el: null
-                    });
-                }
-                board.push(row);
-            }
-
-            // place mines randomly
-            let placed = 0;
-            while (placed < NUM_MINES) {
+        function createBoard() {
+            board = Array(GRID_SIZE).fill(0).map(() => 
+                Array(GRID_SIZE).fill({ 
+                    isMine: false, 
+                    isRevealed: false, 
+                    isFlagged: false, 
+                    mineCount: 0,
+                    el: null
+                })
+            );
+            let minesPlaced = 0;
+            while (minesPlaced < NUM_MINES) {
                 const r = Math.floor(Math.random() * GRID_SIZE);
                 const c = Math.floor(Math.random() * GRID_SIZE);
                 if (!board[r][c].isMine) {
-                    board[r][c].isMine = true;
-                    placed++;
+                    board[r][c] = { ...board[r][c], isMine: true }; 
+                    minesPlaced++;
                 }
             }
-
-            // calculate neighbor counts
             for (let r = 0; r < GRID_SIZE; r++) {
                 for (let c = 0; c < GRID_SIZE; c++) {
-                    board[r][c].mineCount = countMines(r,c);
-                }
-            }
-
-            renderGrid();
-        }
-
-        function countMines(r,c) {
-            let cnt = 0;
-            for (let dr=-1; dr<=1; dr++) {
-                for (let dc=-1; dc<=1; dc++) {
-                    if (dr===0 && dc===0) continue;
-                    const nr = r + dr, nc = c + dc;
-                    if (nr>=0 && nr<GRID_SIZE && nc>=0 && nc<GRID_SIZE) {
-                        if (board[nr][nc].isMine) cnt++;
+                    if (!board[r][c].isMine) {
+                        board[r][c] = { ...board[r][c], mineCount: countMines(r, c) };
                     }
                 }
             }
-            return cnt;
         }
 
-        function renderGrid() {
-            gridEl.innerHTML = '';
-            gridEl.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 30px)`;
-            for (let r = 0; r < GRID_SIZE; r++) {
-                for (let c = 0; c < GRID_SIZE; c++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'cell';
-                    cell.dataset.r = r;
-                    cell.dataset.c = c;
-                    cell.setAttribute('role','button');
-                    cell.setAttribute('aria-label', `cell ${r}-${c}`);
-                    // attach events
-                    cell.addEventListener('click', onCellClick);
-                    cell.addEventListener('contextmenu', onCellRightClick);
-                    gridEl.appendChild(cell);
-                    board[r][c].el = cell;
+        function countMines(r, c) {
+            let count = 0;
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    if (dr === 0 && dc === 0) continue;
+                    const nr = r + dr;
+                    const nc = c + dc;
+                    if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+                        if (board[nr][nc].isMine) {
+                            count++;
+                        }
+                    }
                 }
             }
-        }
-
-        function onCellClick(e) {
-            if (isGameOver) return;
-            const r = parseInt(this.dataset.r, 10);
-            const c = parseInt(this.dataset.c, 10);
-            const cellObj = board[r][c];
-            if (cellObj.isFlagged || cellObj.isRevealed) return;
-            revealCell(r,c);
-            checkWin();
-        }
-
-        function onCellRightClick(e) {
-            e.preventDefault();
-            if (isGameOver) return;
-            const r = parseInt(this.dataset.r, 10);
-            const c = parseInt(this.dataset.c, 10);
-            const cellObj = board[r][c];
-            if (cellObj.isRevealed) return;
-            if (cellObj.isFlagged) {
-                cellObj.isFlagged = false;
-                cellObj.el.classList.remove('flag');
-                cellObj.el.textContent = '';
-                flagsRemaining++;
-            } else {
-                if (flagsRemaining <= 0) return;
-                cellObj.isFlagged = true;
-                cellObj.el.classList.add('flag');
-                cellObj.el.textContent = '⛳';
-                flagsRemaining--;
-            }
-            messageEl.textContent = `Flags Remaining: ${flagsRemaining}`;
+            return count;
         }
 
         function revealCell(r, c) {
-            const cellObj = board[r][c];
-            if (cellObj.isRevealed || cellObj.isFlagged) return;
-            cellObj.isRevealed = true;
-            cellObj.el.classList.add('revealed');
-            if (cellObj.isMine) {
-                cellObj.el.classList.add('mine');
-                cellObj.el.textContent = '💣';
-                endGame(false);
+            if (isGameOver || r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE || board[r][c].isRevealed || board[r][c].isFlagged) {
                 return;
             }
+            const cell = board[r][c];
+            cell.isRevealed = true;
             revealedCount++;
-            if (cellObj.mineCount > 0) {
-                cellObj.el.textContent = cellObj.mineCount;
-                cellObj.el.classList.add(`number-${cellObj.mineCount}`);
+            cell.el.classList.add('revealed');
+            cell.el.innerHTML = '';
+            cell.el.style.borderColor = 'transparent';
+
+            if (cell.isMine) {
+                cell.el.classList.add('mine');
+                cell.el.innerHTML = '💣';
+                gameOver(false);
+                return;
+            } 
+            
+            if (cell.mineCount > 0) {
+                cell.el.innerHTML = cell.mineCount;
+                cell.el.classList.add(`number-${cell.mineCount}`);
             } else {
-                cellObj.el.textContent = '';
-                // flood fill neighbors
-                for (let dr=-1; dr<=1; dr++) {
-                    for (let dc=-1; dc<=1; dc++) {
-                        if (dr===0 && dc===0) continue;
-                        const nr = r + dr, nc = c + dc;
-                        if (nr>=0 && nr<GRID_SIZE && nc>=0 && nc<GRID_SIZE) {
-                            revealCell(nr,nc);
-                        }
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        revealCell(r + dr, c + dc);
                     }
                 }
             }
+            checkWin();
         }
 
-        function endGame(won) {
-            isGameOver = true;
-            // reveal all mines when lost
-            if (!won) {
-                for (let r=0; r<GRID_SIZE; r++) {
-                    for (let c=0; c<GRID_SIZE; c++) {
-                        if (board[r][c].isMine) {
-                            board[r][c].el.classList.add('revealed','mine');
-                            board[r][c].el.textContent = '💣';
-                        }
-                    }
+        function toggleFlag(r, c) {
+            if (isGameOver || board[r][c].isRevealed) return;
+            const cell = board[r][c];
+            if (cell.isFlagged) {
+                cell.isFlagged = false;
+                flagsRemaining++;
+                cell.el.innerHTML = '';
+                cell.el.classList.remove('flag');
+            } else if (flagsRemaining > 0) {
+                cell.isFlagged = true;
+                flagsRemaining--;
+                cell.el.innerHTML = '🚩';
+                cell.el.classList.add('flag');
+            }
+            updateMessage();
+        }
+
+        function drawGrid() {
+            if (!gridEl) return;
+            gridEl.innerHTML = '';
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    const cell = board[r][c];
+                    const cellEl = document.createElement('div');
+                    cellEl.classList.add('cell');
+                    cellEl.dataset.r = r;
+                    cellEl.dataset.c = c;
+                    cell.el = cellEl;
+                    cellEl.addEventListener('click', () => revealCell(r, c));
+                    cellEl.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        toggleFlag(r, c);
+                    });
+                    gridEl.appendChild(cellEl);
                 }
-                messageEl.textContent = 'Game Over! You hit a mine.';
-            } else {
-                messageEl.textContent = 'You Win! 🎉';
+            }
+            updateMessage();
+        }
+
+        function updateMessage() {
+            if (!messageEl) return;
+            if (!isGameOver) {
+                messageEl.innerHTML = `Flags Remaining: ${flagsRemaining}`;
             }
         }
 
         function checkWin() {
-            // win when all non-mine cells are revealed
-            const totalCells = GRID_SIZE * GRID_SIZE;
-            const nonMines = totalCells - NUM_MINES;
-            if (revealedCount >= nonMines) {
-                endGame(true);
+            if (revealedCount === (GRID_SIZE * GRID_SIZE) - NUM_MINES) {
+                gameOver(true);
             }
         }
 
-        restartBtn.addEventListener('click', () => initMinesweeper());
+        function gameOver(win) {
+            isGameOver = true;
+            if (!messageEl) return;
+            if (win) {
+                messageEl.innerHTML = '🎉 YOU WIN! 🎉';
+                messageEl.style.color = 'green';
+            } else {
+                messageEl.innerHTML = '💣 GAME OVER! 💣';
+                messageEl.style.color = 'red';
+                board.flat().forEach(cell => {
+                    if (cell.isMine && !cell.isFlagged) {
+                        cell.el.classList.add('mine');
+                        cell.el.innerHTML = '💣';
+                    }
+                });
+            }
+        }
 
-        /*********************
-         * Sandbox helpers
-         *********************/
+        function initGame() {
+            isGameOver = false;
+            flagsRemaining = NUM_MINES;
+            revealedCount = 0;
+            if (messageEl) {
+                messageEl.style.color = 'black';
+            }
+            createBoard();
+            drawGrid();
+        }
+
+        function initMinesweeper() {
+            if (restartBtn) {
+                restartBtn.addEventListener('click', initGame);
+            }
+            initGame();
+        }
+        
+        // Pong game code - placeholder for JavaScript
+        function initPong() {
+            // Pong game initialization will go here
+            // Waiting for JavaScript code...
+        }
+        
+        // Pong settings modal functions
+        window.toggleSettingsModal = function() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        };
+        
+        window.saveSettingsAndRestart = function() {
+            // Settings save and restart will go here
+            // Waiting for JavaScript code...
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        };
+        
+        // Sandboxels close function
         function closeSandboxels() {
             showPage('mainPage');
         }
-
-        /*********************
-         * initialize default view
-         *********************/
-        showPage('mainPage');
-
-        // optional: start a fresh minesweeper board in background so it's ready when user opens it
-        // but don't show it yet
-        initMinesweeper();
-
     </script>
 </body>
 </html>
