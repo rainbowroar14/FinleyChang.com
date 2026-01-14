@@ -949,6 +949,62 @@
             });
         }
         
+        // Letters for GooseHub (TYLER)
+        const tylerLetters = ['t', 'y', 'l', 'e', 'r'];
+        
+        // Letter patterns for GOOSEHUB
+        const gPattern = [
+            [0,1,1,1,1,1,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,1,1,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,1,1,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [0,1,1,1,1,1,0]
+        ];
+        
+        const oPattern = [
+            [0,1,1,1,1,1,0],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [0,1,1,1,1,1,0]
+        ];
+        
+        const sPattern = [
+            [0,1,1,1,1,1,0],
+            [1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [0,1,1,1,1,1,0],
+            [0,0,0,0,0,0,1],
+            [0,0,0,0,0,0,1],
+            [0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,1],
+            [0,1,1,1,1,1,0]
+        ];
+        
+        const ePattern = [
+            [1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,1,1,1,1,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,0,0,0,0,0,0],
+            [1,1,1,1,1,1,1]
+        ];
+        
         // Transform to GooseHub mode
         function transformToGooseMode() {
             isGooseMode = true;
@@ -1088,59 +1144,6 @@
             }
         }
         
-        // Letter patterns for GOOSEHUB
-        const gPattern = [
-            [0,1,1,1,1,1,0],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,1,1,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,1,1,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [0,1,1,1,1,1,0]
-        ];
-        
-        const oPattern = [
-            [0,1,1,1,1,1,0],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [0,1,1,1,1,1,0]
-        ];
-        
-        const sPattern = [
-            [0,1,1,1,1,1,0],
-            [1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,0,0,0],
-            [0,1,1,1,1,1,0],
-            [0,0,0,0,0,0,1],
-            [0,0,0,0,0,0,1],
-            [0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,1],
-            [0,1,1,1,1,1,0]
-        ];
-        
-        const ePattern = [
-            [1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,0,0,0],
-            [1,1,1,1,1,0,0],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,0,0,0],
-            [1,0,0,0,0,0,0],
-            [1,1,1,1,1,1,1]
-        ];
-        
         // Big F pattern (original - will be expanded to 3x wide, 2x tall)
         const fPattern = [
             [1,1,1,1,1,1,1],
@@ -1239,7 +1242,6 @@
         let clickerPerClick = 1; // Clicker base money per click
         let unlockedCommands = new Set(['home', 'back', 'cmds', 'shop', 'achievements']); // Basic commands unlocked by default
         let isGooseMode = false; // Track if in goose mode
-        let tylerLetters = ['t', 'y', 'l', 'e', 'r']; // Letters for GooseHub
         
         // Load global data
         function loadGlobalData() {
@@ -1831,7 +1833,10 @@
                 size: Math.random() * 30 + 20,
                 rotation: (Math.random() - 0.5) * 0.2,
                 rotationSpeed: (Math.random() - 0.5) * 0.05,
-                dragged: false
+                dragged: false,
+                targetX: 0,
+                targetY: 0,
+                mass: Math.random() * 30 + 20 // Weight based on size
             });
             
             const gooseCount = document.getElementById('goose-count');
@@ -1893,6 +1898,8 @@
                     goose.dragged = true;
                     goose.vx = 0;
                     goose.vy = 0;
+                    goose.targetX = mousePos.x;
+                    goose.targetY = mousePos.y;
                     break;
                 }
             }
@@ -1904,8 +1911,9 @@
             mousePos.y = e.clientY - rect.top;
             
             if (draggedGoose) {
-                draggedGoose.x = mousePos.x;
-                draggedGoose.y = mousePos.y;
+                // Set target position (not direct position - creates weight/inertia)
+                draggedGoose.targetX = mousePos.x;
+                draggedGoose.targetY = mousePos.y;
             }
         }
         
@@ -1931,6 +1939,8 @@
                     goose.dragged = true;
                     goose.vx = 0;
                     goose.vy = 0;
+                    goose.targetX = mousePos.x;
+                    goose.targetY = mousePos.y;
                     break;
                 }
             }
@@ -1944,8 +1954,9 @@
             mousePos.y = touch.clientY - rect.top;
             
             if (draggedGoose) {
-                draggedGoose.x = mousePos.x;
-                draggedGoose.y = mousePos.y;
+                // Set target position (not direct position - creates weight/inertia)
+                draggedGoose.targetX = mousePos.x;
+                draggedGoose.targetY = mousePos.y;
             }
         }
         
@@ -1963,7 +1974,19 @@
             for (let i = geese.length - 1; i >= 0; i--) {
                 const goose = geese[i];
                 
-                if (!goose.dragged) {
+                if (goose.dragged) {
+                    // Weighted dragging - use interpolation for heavy feel
+                    // Heavier geese (larger mass) move slower toward target
+                    const dragSpeed = 0.15 - (goose.mass / 1000); // Heavier = slower (0.05 to 0.15)
+                    const dx = goose.targetX - goose.x;
+                    const dy = goose.targetY - goose.y;
+                    
+                    goose.x += dx * dragSpeed;
+                    goose.y += dy * dragSpeed;
+                    
+                    // Keep rotation while dragging
+                    goose.rotation += goose.rotationSpeed * 0.5;
+                } else {
                     // Physics
                     goose.vy += 0.1; // Gravity
                     goose.vx *= 0.99; // Air resistance
@@ -1988,26 +2011,42 @@
                         goose.vx *= -0.8;
                         goose.x = Math.max(goose.size, Math.min(canvas.width - goose.size, goose.x));
                     }
-                    
-                    // Collision with other geese
-                    for (let j = 0; j < geese.length; j++) {
-                        if (i !== j && !geese[j].dragged) {
-                            const other = geese[j];
-                            const dx = goose.x - other.x;
-                            const dy = goose.y - other.y;
-                            const dist = Math.sqrt(dx * dx + dy * dy);
-                            const minDist = goose.size + other.size;
+                }
+                
+                // Collision with other geese (works for both dragged and non-dragged)
+                for (let j = 0; j < geese.length; j++) {
+                    if (i !== j) {
+                        const other = geese[j];
+                        const dx = goose.x - other.x;
+                        const dy = goose.y - other.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const minDist = goose.size + other.size;
+                        
+                        if (dist < minDist && dist > 0) {
+                            const angle = Math.atan2(dy, dx);
+                            const overlap = minDist - dist;
                             
-                            if (dist < minDist && dist > 0) {
-                                const angle = Math.atan2(dy, dx);
-                                const overlap = minDist - dist;
-                                
-                                goose.x += Math.cos(angle) * overlap * 0.5;
-                                goose.y += Math.sin(angle) * overlap * 0.5;
-                                other.x -= Math.cos(angle) * overlap * 0.5;
-                                other.y -= Math.sin(angle) * overlap * 0.5;
-                                
-                                // Bounce
+                            // Push apart based on mass (heavier geese push more)
+                            const totalMass = goose.mass + other.mass;
+                            const goosePush = (other.mass / totalMass) * overlap;
+                            const otherPush = (goose.mass / totalMass) * overlap;
+                            
+                            // Only move non-dragged geese, or both if both are dragged
+                            if (!goose.dragged) {
+                                goose.x += Math.cos(angle) * goosePush;
+                                goose.y += Math.sin(angle) * goosePush;
+                            }
+                            if (!other.dragged) {
+                                other.x -= Math.cos(angle) * otherPush;
+                                other.y -= Math.sin(angle) * otherPush;
+                    } else {
+                                // If other is dragged, push the dragged goose back a bit
+                                goose.x += Math.cos(angle) * goosePush * 0.3;
+                                goose.y += Math.sin(angle) * goosePush * 0.3;
+                            }
+                            
+                            // Bounce for non-dragged geese
+                            if (!goose.dragged && !other.dragged) {
                                 const relativeVx = goose.vx - other.vx;
                                 const relativeVy = goose.vy - other.vy;
                                 const dot = relativeVx * Math.cos(angle) + relativeVy * Math.sin(angle);
