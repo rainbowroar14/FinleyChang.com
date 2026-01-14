@@ -49,40 +49,40 @@
             text-align: center;
         }
         
-        /* Big F made of small letters */
+        /* Big F made of small letters - 3 thick, 2x tall */
         .letter-f {
-            grid-template-columns: repeat(7, 8px);
-            grid-template-rows: repeat(10, 8px);
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
         }
         
-        /* Big i made of small letters */
+        /* Big i made of small letters - 3 thick, 2x tall */
         .letter-i {
-            grid-template-columns: repeat(3, 8px);
-            grid-template-rows: repeat(10, 8px);
+            grid-template-columns: repeat(9, 8px);
+            grid-template-rows: repeat(20, 8px);
         }
         
-        /* Big n made of small letters */
+        /* Big n made of small letters - 3 thick, 2x tall */
         .letter-n {
-            grid-template-columns: repeat(7, 8px);
-            grid-template-rows: repeat(10, 8px);
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
         }
         
-        /* Big H made of small letters */
+        /* Big H made of small letters - 3 thick, 2x tall */
         .letter-h {
-            grid-template-columns: repeat(7, 8px);
-            grid-template-rows: repeat(10, 8px);
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
         }
         
-        /* Big u made of small letters */
+        /* Big u made of small letters - 3 thick, 2x tall */
         .letter-u {
-            grid-template-columns: repeat(7, 8px);
-            grid-template-rows: repeat(10, 8px);
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
         }
         
-        /* Big b made of small letters */
+        /* Big b made of small letters - 3 thick, 2x tall */
         .letter-b {
-            grid-template-columns: repeat(7, 8px);
-            grid-template-rows: repeat(10, 8px);
+            grid-template-columns: repeat(21, 8px);
+            grid-template-rows: repeat(20, 8px);
         }
         
         /* Colors for small letters */
@@ -139,10 +139,32 @@
         // Letters from "finley" to use
         const finleyLetters = ['f', 'i', 'n', 'l', 'e', 'y'];
         
+        // Function to expand pattern: make 3x wider and 2x taller
+        function expandPattern(pattern) {
+            const expanded = [];
+            // Make each row 3x wider
+            pattern.forEach(row => {
+                const wideRow = [];
+                row.forEach(cell => {
+                    // Repeat each cell 3 times
+                    wideRow.push(cell, cell, cell);
+                });
+                expanded.push(wideRow);
+            });
+            // Make 2x taller by duplicating each row
+            const tallExpanded = [];
+            expanded.forEach(row => {
+                tallExpanded.push(row); // Original row
+                tallExpanded.push(row); // Duplicate row
+            });
+            return tallExpanded;
+        }
+        
         // Function to create letter patterns
         function createLetterPattern(letter, pattern) {
             const container = document.getElementById(`letter-${letter}`);
-            pattern.forEach(row => {
+            const expandedPattern = expandPattern(pattern);
+            expandedPattern.forEach(row => {
                 row.forEach(cell => {
                     const span = document.createElement('span');
                     span.className = 'small-letter';
@@ -159,7 +181,7 @@
             });
         }
         
-        // Big F pattern
+        // Big F pattern (original - will be expanded to 3x wide, 2x tall)
         const fPattern = [
             [1,1,1,1,1,1,1],
             [1,0,0,0,0,0,0],
