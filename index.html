@@ -7094,6 +7094,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🐍</text></svg>") no-repeat center';
             } else if (type === 'blockbreaker') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🧱</text></svg>") no-repeat center';
+            } else if (type === 'chatbot') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🤖</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -7147,6 +7149,8 @@ body.theme-flashcard button:hover {
                     openSnakeApp(iconId, name);
                 } else if (type === 'blockbreaker') {
                     openBlockBreakerApp(iconId, name);
+                } else if (type === 'chatbot') {
+                    openChatbotApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -7398,6 +7402,16 @@ body.theme-flashcard button:hover {
                         <button id="install-blockbreaker" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🤖</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Chatbot</div>
+                            <div style="font-size: 11px; color: #666;">AI chatbot assistant</div>
+                        </div>
+                        <button id="install-chatbot" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
             `;
             
             content.appendChild(storeContent);
@@ -7519,6 +7533,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('blockbreaker', 'Block Breaker', x, y);
                         alert('Block Breaker installed successfully!');
+                    };
+                }
+                
+                const installChatbotBtn = document.getElementById('install-chatbot');
+                if (installChatbotBtn) {
+                    installChatbotBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'chatbot');
+                        if (alreadyInstalled) {
+                            alert('Chatbot is already installed!');
+                            return;
+                        }
+                        
+                        // Add Chatbot icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('chatbot', 'Chatbot', x, y);
+                        alert('Chatbot installed successfully!');
                     };
                 }
             }, 100);
@@ -7840,6 +7872,10 @@ body.theme-flashcard button:hover {
             }
             if (type === 'blockbreaker') {
                 openBlockBreakerApp(iconId, name);
+                return;
+            }
+            if (type === 'chatbot') {
+                openChatbotApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -8824,7 +8860,7 @@ body.theme-flashcard button:hover {
             // Game constants
             const PADDLE_WIDTH = 80;
             const PADDLE_HEIGHT = 10;
-            const BALL_RADIUS = 8;
+            const BALL_RADIUS = 12;
             const BLOCK_ROWS = 5;
             const BLOCK_COLS = 8;
             const BLOCK_WIDTH = 45;
@@ -8837,8 +8873,8 @@ body.theme-flashcard button:hover {
             let paddleX = (canvas.width - PADDLE_WIDTH) / 2;
             let ballX = canvas.width / 2;
             let ballY = canvas.height - 50;
-            let ballSpeedX = 4;
-            let ballSpeedY = -4;
+            let ballSpeedX = 2;
+            let ballSpeedY = -2;
             let score = 0;
             let lives = 3;
             let blocks = [];
@@ -8881,11 +8917,14 @@ body.theme-flashcard button:hover {
                 ctx.fillStyle = '#fff';
                 ctx.fillRect(paddleX, canvas.height - 30, PADDLE_WIDTH, PADDLE_HEIGHT);
                 
-                // Draw ball
+                // Draw ball (bigger and brighter)
                 ctx.beginPath();
                 ctx.arc(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
+                ctx.fillStyle = '#ffff00';
                 ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
                 ctx.closePath();
             }
             
@@ -8913,7 +8952,7 @@ body.theme-flashcard button:hover {
                     ballSpeedY = -Math.abs(ballSpeedY);
                     // Add spin based on where ball hits paddle
                     const hitPos = (ballX - paddleX) / PADDLE_WIDTH;
-                    ballSpeedX = (hitPos - 0.5) * 8;
+                    ballSpeedX = (hitPos - 0.5) * 4;
                 }
                 
                 // Ball collision with blocks
@@ -8966,8 +9005,8 @@ body.theme-flashcard button:hover {
             function resetBall() {
                 ballX = canvas.width / 2;
                 ballY = canvas.height - 50;
-                ballSpeedX = 4 * (Math.random() > 0.5 ? 1 : -1);
-                ballSpeedY = -4;
+                ballSpeedX = 2 * (Math.random() > 0.5 ? 1 : -1);
+                ballSpeedY = -2;
             }
             
             function startGame() {
@@ -9084,6 +9123,157 @@ body.theme-flashcard button:hover {
             
             // Start the game
             startGame();
+        }
+        
+        // Chatbot app
+        function openChatbotApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '450px';
+            window.style.height = '500px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.display = 'flex';
+            content.style.flexDirection = 'column';
+            content.style.height = 'calc(100% - 20px)';
+            content.style.overflow = 'hidden';
+            
+            // Chat messages area
+            const messagesArea = document.createElement('div');
+            messagesArea.id = `chatbot-messages-${iconId}`;
+            messagesArea.style.cssText = 'flex: 1; overflow-y: auto; border: 1px inset #c0c0c0; padding: 10px; margin-bottom: 10px; background: #fff; font-size: 11px; font-family: "MS Sans Serif", Arial, sans-serif;';
+            
+            // Welcome message
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.style.cssText = 'margin-bottom: 10px; color: #666; font-style: italic;';
+            welcomeMsg.textContent = 'Chatbot: Hello! How can I help you today?';
+            messagesArea.appendChild(welcomeMsg);
+            
+            // Input area
+            const inputContainer = document.createElement('div');
+            inputContainer.style.cssText = 'display: flex; gap: 5px;';
+            
+            const inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.id = `chatbot-input-${iconId}`;
+            inputField.style.cssText = 'flex: 1; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px; font-family: "MS Sans Serif", Arial, sans-serif;';
+            inputField.placeholder = 'Type your message...';
+            
+            const sendBtn = document.createElement('button');
+            sendBtn.textContent = 'Send';
+            sendBtn.style.cssText = 'padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; font-weight: bold; cursor: pointer; font-family: "MS Sans Serif", Arial, sans-serif;';
+            
+            // Send function
+            const sendMessage = () => {
+                const message = inputField.value.trim();
+                if (!message) return;
+                
+                // Add user message
+                const userMsg = document.createElement('div');
+                userMsg.style.cssText = 'margin-bottom: 10px; text-align: right; color: #000;';
+                userMsg.textContent = `You: ${message}`;
+                messagesArea.appendChild(userMsg);
+                
+                // Clear input
+                inputField.value = '';
+                
+                // Scroll to bottom
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+                
+                // Add bot response after a short delay
+                setTimeout(() => {
+                    const botMsg = document.createElement('div');
+                    botMsg.style.cssText = 'margin-bottom: 10px; color: #000;';
+                    botMsg.textContent = 'Chatbot: sorry i dont understand mabey try again later';
+                    messagesArea.appendChild(botMsg);
+                    messagesArea.scrollTop = messagesArea.scrollHeight;
+                }, 300);
+            };
+            
+            sendBtn.onclick = sendMessage;
+            inputField.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            inputContainer.appendChild(inputField);
+            inputContainer.appendChild(sendBtn);
+            
+            content.appendChild(messagesArea);
+            content.appendChild(inputContainer);
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'chatbot',
+                element: window
+            });
+            
+            updateTaskbar();
+            
+            // Focus input field
+            setTimeout(() => inputField.focus(), 100);
         }
         
         // Make functions globally accessible
@@ -11170,6 +11360,30 @@ body.theme-flashcard button:hover {
                         description: 'Added a classic Block Breaker (Breakout) game to the Remote Desktop App Store. Break all the blocks using the paddle to bounce the ball. Features 5 rows of colored blocks, 3 lives, and score tracking. Install it from the App Store in Remote Desktop, then double-click the Block Breaker icon to play. Use mouse or arrow keys to control the paddle.',
                         userRequest: 'add block breaker as a app'
                     });
+                    localStorage.setItem('changelog', JSON.stringify(entries));
+                }
+                // Check if Chatbot entry already exists
+                const hasChatbot = entries.some(e => e.title && e.title.includes('Chatbot'));
+                const hasBlockBreakerUpdate = entries.some(e => e.title && e.title.includes('Block Breaker improvements'));
+                if (!hasChatbot || !hasBlockBreakerUpdate) {
+                    // Add Block Breaker improvements
+                    if (!hasBlockBreakerUpdate) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🔧 Block Breaker Game Improvements',
+                            description: 'Made the ball slower (speed reduced from 4 to 2) and more visible (increased size from 8 to 12 pixels, changed color to bright yellow with white border). The ball is now easier to track and control.',
+                            userRequest: 'make the ball slower and I cant see the ball mover'
+                        });
+                    }
+                    // Add Chatbot entry
+                    if (!hasChatbot) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🤖 Added Chatbot App to Desktop',
+                            description: 'Added a Chatbot app to the Remote Desktop App Store. The chatbot responds to every message with "sorry i dont understand mabey try again later". Install it from the App Store in Remote Desktop, then double-click the Chatbot icon to chat.',
+                            userRequest: 'make another one thats called chatbot and every time it responds by saying sorry i dont understand mabey try again later'
+                        });
+                    }
                     localStorage.setItem('changelog', JSON.stringify(entries));
                 }
                 return entries;
