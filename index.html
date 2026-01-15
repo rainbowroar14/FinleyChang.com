@@ -5189,6 +5189,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>💣</text></svg>") no-repeat center';
             } else if (type === 'pong') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎮</text></svg>") no-repeat center';
+            } else if (type === 'sandboxles') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🏖️</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -5236,6 +5238,8 @@ body.theme-flashcard button:hover {
                     openAppStore();
                 } else if (type === 'pong') {
                     openPongApp(iconId, name);
+                } else if (type === 'sandboxles') {
+                    openSandboxlesApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -5457,6 +5461,16 @@ body.theme-flashcard button:hover {
                         <button id="install-pong" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🏖️</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Sandboxles</div>
+                            <div style="font-size: 11px; color: #666;">Interactive sandbox playground</div>
+                        </div>
+                        <button id="install-sandboxles" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
             `;
             
             content.appendChild(storeContent);
@@ -5524,6 +5538,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('pong', 'Pong', x, y);
                         alert('Pong installed successfully!');
+                    };
+                }
+                
+                const installSandboxlesBtn = document.getElementById('install-sandboxles');
+                if (installSandboxlesBtn) {
+                    installSandboxlesBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'sandboxles');
+                        if (alreadyInstalled) {
+                            alert('Sandboxles is already installed!');
+                            return;
+                        }
+                        
+                        // Add Sandboxles icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('sandboxles', 'Sandboxles', x, y);
+                        alert('Sandboxles installed successfully!');
                     };
                 }
             }, 100);
@@ -6181,6 +6213,173 @@ body.theme-flashcard button:hover {
             updateTaskbar();
         }
         
+        // Sandboxles app
+        function openSandboxlesApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '700px';
+            window.style.height = '500px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const minimizeBtn = document.createElement('button');
+            minimizeBtn.className = 'win95-window-button';
+            minimizeBtn.textContent = '_';
+            minimizeBtn.onclick = () => {
+                window.classList.toggle('minimized');
+                updateTaskbar();
+            };
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(minimizeBtn);
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content - sandbox playground
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.overflow = 'auto';
+            content.style.height = '100%';
+            content.style.background = '#f0f0f0';
+            
+            // Create a simple interactive sandbox
+            const sandboxDiv = document.createElement('div');
+            sandboxDiv.style.cssText = 'width: 100%; height: 100%; min-height: 400px; background: #fff; border: 1px inset #c0c0c0; position: relative; overflow: hidden;';
+            sandboxDiv.id = `sandbox-${iconId}`;
+            
+            // Add some interactive elements
+            const info = document.createElement('div');
+            info.style.cssText = 'padding: 10px; background: #e0e0e0; border-bottom: 1px inset #c0c0c0; font-size: 11px; margin-bottom: 5px;';
+            info.innerHTML = '<strong>Sandbox Playground</strong><br>Click to create elements, drag to move them around! Double-click to remove.';
+            
+            // Make sandbox interactive - clicking creates colored boxes
+            let elementCounter = 0;
+            sandboxDiv.addEventListener('click', (e) => {
+                if (e.target === sandboxDiv) {
+                    const box = document.createElement('div');
+                    box.style.cssText = `
+                        position: absolute;
+                        left: ${e.offsetX - 25}px;
+                        top: ${e.offsetY - 25}px;
+                        width: 50px;
+                        height: 50px;
+                        background: hsl(${Math.random() * 360}, 70%, 60%);
+                        border: 2px outset #c0c0c0;
+                        cursor: move;
+                        user-select: none;
+                    `;
+                    box.textContent = ++elementCounter;
+                    box.style.display = 'flex';
+                    box.style.alignItems = 'center';
+                    box.style.justifyContent = 'center';
+                    box.style.fontSize = '20px';
+                    box.style.fontWeight = 'bold';
+                    box.style.color = '#000';
+                    
+                    // Make draggable
+                    let isDragging = false;
+                    let startX, startY, initialX, initialY;
+                    
+                    box.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        isDragging = true;
+                        startX = e.clientX;
+                        startY = e.clientY;
+                        const rect = box.getBoundingClientRect();
+                        initialX = rect.left;
+                        initialY = rect.top;
+                        box.style.zIndex = '1000';
+                    });
+                    
+                    document.addEventListener('mousemove', (e) => {
+                        if (!isDragging) return;
+                        const dx = e.clientX - startX;
+                        const dy = e.clientY - startY;
+                        box.style.left = (initialX + dx) + 'px';
+                        box.style.top = (initialY + dy) + 'px';
+                    });
+                    
+                    document.addEventListener('mouseup', () => {
+                        if (isDragging) {
+                            isDragging = false;
+                            box.style.zIndex = '1';
+                        }
+                    });
+                    
+                    // Double-click to remove
+                    box.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        box.remove();
+                    });
+                    
+                    sandboxDiv.appendChild(box);
+                }
+            });
+            
+            content.appendChild(info);
+            content.appendChild(sandboxDiv);
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'sandboxles',
+                element: window
+            });
+            
+            updateTaskbar();
+        }
+        
         function updateTaskbar() {
             const taskbarApps = document.getElementById('taskbarApps');
             if (!taskbarApps) return;
@@ -6247,7 +6446,7 @@ body.theme-flashcard button:hover {
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.border = 'none';
-            iframe.src = 'https://www.ponggame.org/';
+            iframe.src = 'https://sethclydesdale.github.io/browser-pong/';
             
             content.appendChild(iframe);
             window.appendChild(header);
