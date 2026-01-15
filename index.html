@@ -816,6 +816,184 @@
             background: #484f58;
         }
         
+        /* Edit Profile Modal */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .edit-modal.show {
+            display: flex;
+        }
+        
+        .edit-modal-content {
+            background: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: #c9d1d9;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .edit-modal-content h2 {
+            color: #58a6ff;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        
+        .edit-field {
+            margin-bottom: 20px;
+        }
+        
+        .edit-field label {
+            display: block;
+            color: #c9d1d9;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .edit-field input,
+        .edit-field textarea {
+            width: 100%;
+            padding: 10px 15px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        
+        .edit-field input:focus,
+        .edit-field textarea:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+        
+        .edit-field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .edit-field small {
+            display: block;
+            color: #8b949e;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .emoji-picker {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .emoji-preview {
+            width: 80px;
+            height: 80px;
+            background: #0d1117;
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .emoji-preview:hover {
+            border-color: #58a6ff;
+            transform: scale(1.1);
+        }
+        
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+        }
+        
+        .emoji-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+        
+        .emoji-option:hover {
+            background: #21262d;
+            border-color: #58a6ff;
+            transform: scale(1.2);
+        }
+        
+        .emoji-option.selected {
+            background: #1f6feb;
+            border-color: #58a6ff;
+        }
+        
+        .edit-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        
+        .edit-save-btn,
+        .edit-cancel-btn {
+            padding: 10px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .edit-save-btn {
+            background: #238636;
+            color: white;
+        }
+        
+        .edit-save-btn:hover {
+            background: #2ea043;
+        }
+        
+        .edit-cancel-btn {
+            background: #30363d;
+            color: #c9d1d9;
+        }
+        
+        .edit-cancel-btn:hover {
+            background: #484f58;
+        }
+        
         /* Command History Display */
         .command-history {
             position: fixed;
@@ -2588,6 +2766,38 @@ body.theme-flashcard button:hover {
     <!-- Clock display (top left) -->
     <div class="clock-display hidden" id="clockDisplay"></div>
     
+    <!-- Edit Profile Modal -->
+    <div class="edit-modal" id="editModal">
+        <div class="edit-modal-content">
+            <h2>✏️ Edit Profile</h2>
+            <div class="edit-form">
+                <div class="edit-field">
+                    <label>User ID:</label>
+                    <input type="text" id="editUserId" placeholder="Your user ID" maxlength="20">
+                    <small>3-20 characters (letters, numbers, _, -)</small>
+                </div>
+                <div class="edit-field">
+                    <label>Bio:</label>
+                    <textarea id="editBio" placeholder="Tell us about yourself..." maxlength="200"></textarea>
+                    <small><span id="bioCharCount">0</span>/200 characters</small>
+                </div>
+                <div class="edit-field">
+                    <label>Avatar Emoji:</label>
+                    <div class="emoji-picker">
+                        <div class="emoji-preview" id="emojiPreview">👤</div>
+                        <div class="emoji-grid" id="emojiGrid">
+                            <!-- Emojis will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="edit-buttons">
+                    <button class="edit-save-btn" id="editSaveBtn">Save</button>
+                    <button class="edit-cancel-btn" id="editCancelBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Terms and Agreements Modal -->
     <div class="terms-modal" id="termsModal">
         <div class="terms-modal-content">
@@ -3584,6 +3794,141 @@ body.theme-flashcard button:hover {
             alert('You must accept the terms to use this website.');
         }
         
+        // Edit Profile Menu
+        const popularEmojis = ['👤', '😀', '😃', '😄', '😁', '😆', '😊', '😎', '🤓', '🧐', '😏', '😌', '😉', '🤗', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤩', '🥳', '😇', '🤠', '🤡', '🥸', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🦉', '🦄', '🐝', '🦋', '🐛', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷️', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🦬', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦤', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', '🦨', '🦡', '🦫', '🦦', '🦥', '🐁', '🐀', '🐿️', '🦔'];
+        
+        function openEditMenu() {
+            const modal = document.getElementById('editModal');
+            const userIdInput = document.getElementById('editUserId');
+            const bioInput = document.getElementById('editBio');
+            const emojiPreview = document.getElementById('emojiPreview');
+            const emojiGrid = document.getElementById('emojiGrid');
+            
+            if (!modal) return;
+            
+            const currentUserId = getUserId();
+            const currentBio = getUserBio(currentUserId) || '';
+            const currentAvatar = getUserAvatar(currentUserId);
+            
+            // Populate fields
+            userIdInput.value = currentUserId;
+            bioInput.value = currentBio;
+            emojiPreview.textContent = currentAvatar;
+            updateBioCharCount();
+            
+            // Populate emoji grid
+            emojiGrid.innerHTML = '';
+            popularEmojis.forEach(emoji => {
+                const emojiBtn = document.createElement('div');
+                emojiBtn.className = 'emoji-option';
+                if (emoji === currentAvatar) {
+                    emojiBtn.classList.add('selected');
+                }
+                emojiBtn.textContent = emoji;
+                emojiBtn.onclick = () => {
+                    // Remove previous selection
+                    emojiGrid.querySelectorAll('.emoji-option').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    // Select this one
+                    emojiBtn.classList.add('selected');
+                    emojiPreview.textContent = emoji;
+                };
+                emojiGrid.appendChild(emojiBtn);
+            });
+            
+            // Show modal
+            modal.classList.add('show');
+        }
+        
+        function closeEditMenu() {
+            const modal = document.getElementById('editModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+        
+        function saveEditProfile() {
+            const userIdInput = document.getElementById('editUserId');
+            const bioInput = document.getElementById('editBio');
+            const emojiPreview = document.getElementById('emojiPreview');
+            
+            if (!userIdInput || !bioInput || !emojiPreview) return;
+            
+            const newUserId = userIdInput.value.trim();
+            const newBio = bioInput.value.trim();
+            const newAvatar = emojiPreview.textContent;
+            
+            // Validate user ID
+            if (newUserId.length < 3 || newUserId.length > 20) {
+                showCommandFeedback('edit', 'User ID must be 3-20 characters', false);
+                return;
+            }
+            
+            const validIdPattern = /^[a-zA-Z0-9_-]+$/;
+            if (!validIdPattern.test(newUserId)) {
+                showCommandFeedback('edit', 'User ID can only contain letters, numbers, _, and -', false);
+                return;
+            }
+            
+            const oldUserId = getUserId();
+            
+            // Change user ID if different
+            if (newUserId !== oldUserId) {
+                const result = setUserId(newUserId);
+                if (result === false) {
+                    showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
+                    return;
+                } else if (result === true) {
+                    finishSaving(newUserId, newBio, newAvatar);
+                } else {
+                    // Promise result
+                    result.then((success) => {
+                        if (success) {
+                            finishSaving(newUserId, newBio, newAvatar);
+                        } else {
+                            showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
+                        }
+                    });
+                    return;
+                }
+            } else {
+                finishSaving(newUserId, newBio, newAvatar);
+            }
+        }
+        
+        function finishSaving(userId, bio, avatar) {
+            // Save bio
+            setUserBio(userId, bio);
+            
+            // Save avatar
+            setUserAvatar(userId, avatar);
+            
+            // Sync to Firebase if available
+            if (database) {
+                try {
+                    database.ref(`users/${userId}`).update({
+                        bio: bio,
+                        avatar: avatar,
+                        lastSeen: Date.now()
+                    });
+                } catch (e) {
+                    console.warn('Could not sync profile to Firebase:', e);
+                }
+            }
+            
+            showCommandFeedback('edit', 'Profile saved successfully!', true);
+            closeEditMenu();
+        }
+        
+        function updateBioCharCount() {
+            const bioInput = document.getElementById('editBio');
+            const charCount = document.getElementById('bioCharCount');
+            if (bioInput && charCount) {
+                charCount.textContent = bioInput.value.length;
+            }
+        }
+        
         // Initialize command history toggle
         document.addEventListener('DOMContentLoaded', () => {
             const toggle = document.getElementById('commandHistoryToggle');
@@ -3605,6 +3950,31 @@ body.theme-flashcard button:hover {
             }
             if (disagreeBtn) {
                 disagreeBtn.addEventListener('click', rejectTerms);
+            }
+            
+            // Edit modal buttons
+            const editSaveBtn = document.getElementById('editSaveBtn');
+            const editCancelBtn = document.getElementById('editCancelBtn');
+            const editBio = document.getElementById('editBio');
+            
+            if (editSaveBtn) {
+                editSaveBtn.addEventListener('click', saveEditProfile);
+            }
+            if (editCancelBtn) {
+                editCancelBtn.addEventListener('click', closeEditMenu);
+            }
+            if (editBio) {
+                editBio.addEventListener('input', updateBioCharCount);
+            }
+            
+            // Close edit modal when clicking outside
+            const editModal = document.getElementById('editModal');
+            if (editModal) {
+                editModal.addEventListener('click', (e) => {
+                    if (e.target === editModal) {
+                        closeEditMenu();
+                    }
+                });
             }
         });
         
@@ -3752,6 +4122,17 @@ body.theme-flashcard button:hover {
             const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
             bios[userId] = bio;
             localStorage.setItem('userBios', JSON.stringify(bios));
+        }
+        
+        function getUserAvatar(userId) {
+            const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
+            return avatars[userId] || '👤';
+        }
+        
+        function setUserAvatar(userId, emoji) {
+            const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
+            avatars[userId] = emoji;
+            localStorage.setItem('userAvatars', JSON.stringify(avatars));
         }
         
         function getAllUserBios() {
@@ -4458,6 +4839,9 @@ body.theme-flashcard button:hover {
                     resetConfirm = false;
                     const targetId = command.substring(7).trim();
                     showWhoami(targetId);
+                } else if (command === 'edit') {
+                    resetConfirm = false;
+                    openEditMenu();
                 } else if (command === 'chat') {
                     resetConfirm = false;
                     showPage('chatPage');
