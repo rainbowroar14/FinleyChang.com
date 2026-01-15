@@ -1115,27 +1115,10 @@
             color: #58a6ff;
             font-size: 13px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
         
         .chat-message.own-message .chat-message-user {
             color: #3fb950;
-        }
-        
-        .chat-message-avatar {
-            font-size: 18px;
-            display: inline-block;
-        }
-        
-        .chat-message-avatar-img {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            object-fit: cover;
-            display: inline-block;
-            vertical-align: middle;
         }
         
         .chat-message-time {
@@ -2397,172 +2380,6 @@ body.theme-flashcard button:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Hatsune Miku Theme */
-body.theme-miku {
-    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
-    background: linear-gradient(135deg, #39c5bb 0%, #00d4ff 50%, #ff69b4 100%) !important;
-    color: #ffffff;
-    position: relative;
-    overflow-x: hidden;
-}
-
-body.theme-miku::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(circle at 20% 50%, rgba(255, 105, 180, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(255, 255, 255, 0.03) 2px,
-            rgba(255, 255, 255, 0.03) 4px
-        );
-    pointer-events: none;
-    z-index: 1;
-    animation: mikuSparkle 3s ease-in-out infinite;
-}
-
-@keyframes mikuSparkle {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
-}
-
-body.theme-miku * {
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-body.theme-miku .command-bar,
-body.theme-miku .clock-display,
-body.theme-miku .command-feedback,
-body.theme-miku .commands-menu {
-    background: rgba(57, 197, 187, 0.95) !important;
-    border: 3px solid #ffffff !important;
-    box-shadow: 
-        0 0 20px rgba(0, 212, 255, 0.6),
-        0 0 40px rgba(255, 105, 180, 0.4),
-        inset 0 0 20px rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
-    backdrop-filter: blur(10px);
-}
-
-body.theme-miku .command-input {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 2px solid #ff69b4 !important;
-    color: #39c5bb !important;
-    text-shadow: none !important;
-    box-shadow: 
-        0 0 10px rgba(255, 105, 180, 0.5),
-        inset 0 0 10px rgba(0, 212, 255, 0.2) !important;
-    font-weight: bold;
-}
-
-body.theme-miku .command-input::placeholder {
-    color: rgba(57, 197, 187, 0.6) !important;
-}
-
-body.theme-miku .command-bar::before {
-    color: #ffffff !important;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
-}
-
-body.theme-miku .page {
-    background: linear-gradient(135deg, #39c5bb 0%, #00d4ff 50%, #ff69b4 100%) !important;
-}
-
-body.theme-miku .home-page h1 {
-    color: #ffffff !important;
-    text-shadow: 
-        0 0 20px rgba(0, 212, 255, 0.8),
-        0 0 40px rgba(255, 105, 180, 0.6),
-        0 4px 8px rgba(0, 0, 0, 0.3) !important;
-    animation: mikuGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes mikuGlow {
-    0% { 
-        text-shadow: 
-            0 0 20px rgba(0, 212, 255, 0.8),
-            0 0 40px rgba(255, 105, 180, 0.6),
-            0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-    100% { 
-        text-shadow: 
-            0 0 30px rgba(0, 212, 255, 1),
-            0 0 60px rgba(255, 105, 180, 0.8),
-            0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-}
-
-body.theme-miku .subtitle {
-    color: #ffffff !important;
-    text-shadow: 
-        0 0 15px rgba(255, 105, 180, 0.7),
-        0 2px 4px rgba(0, 0, 0, 0.3) !important;
-}
-
-body.theme-miku .letters-source {
-    color: rgba(255, 255, 255, 0.9) !important;
-    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5) !important;
-}
-
-body.theme-miku button {
-    background: linear-gradient(135deg, #39c5bb 0%, #00d4ff 100%) !important;
-    border: 2px solid #ffffff !important;
-    color: #ffffff !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-    box-shadow: 
-        0 0 15px rgba(0, 212, 255, 0.5),
-        0 4px 8px rgba(0, 0, 0, 0.2) !important;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-body.theme-miku button:hover {
-    background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%) !important;
-    box-shadow: 
-        0 0 25px rgba(255, 105, 180, 0.8),
-        0 6px 12px rgba(0, 0, 0, 0.3) !important;
-    transform: translateY(-2px);
-}
-
-body.theme-miku button:active {
-    transform: translateY(0);
-    box-shadow: 
-        0 0 15px rgba(255, 105, 180, 0.6),
-        0 2px 4px rgba(0, 0, 0, 0.3) !important;
-}
-
-body.theme-miku .small-letter {
-    text-shadow: 0 0 10px currentColor, 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-}
-
-body.theme-miku .visit-counter {
-    background: rgba(57, 197, 187, 0.95) !important;
-    border: 3px solid #ffffff !important;
-    box-shadow: 
-        0 0 20px rgba(0, 212, 255, 0.6),
-        0 0 40px rgba(255, 105, 180, 0.4) !important;
-    color: #ffffff !important;
-}
-
-body.theme-miku .visit-counter-number {
-    text-shadow: 
-        0 0 20px rgba(0, 212, 255, 0.8),
-        0 0 40px rgba(255, 105, 180, 0.6) !important;
-    animation: mikuPulse 2s ease-in-out infinite;
-}
-
-@keyframes mikuPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
 /* Flashcard theme - interactive flashcards */
 .flashcard {
     position: fixed;
@@ -2818,17 +2635,16 @@ body.theme-miku .visit-counter-number {
 <body>
     <!-- Main page with FinHub title -->
     <div class="page" id="mainPage">
-        <div class="home-page">
-            <div class="finhub-title">
-                <!-- Big F made of small letters -->
-                <div class="big-letter letter-f" id="letter-f"></div>
-                <!-- Big i made of small letters -->
-                <div class="big-letter letter-i" id="letter-i"></div>
-                <!-- Big n made of small letters -->
-                <div class="big-letter letter-n" id="letter-n"></div>
-                <!-- Big H made of small letters -->
-                <div class="big-letter letter-h" id="letter-h"></div>
-                <!-- Big u made of small letters -->
+        <div class="finhub-title">
+            <!-- Big F made of small letters -->
+            <div class="big-letter letter-f" id="letter-f"></div>
+            <!-- Big i made of small letters -->
+            <div class="big-letter letter-i" id="letter-i"></div>
+            <!-- Big n made of small letters -->
+            <div class="big-letter letter-n" id="letter-n"></div>
+            <!-- Big H made of small letters -->
+            <div class="big-letter letter-h" id="letter-h"></div>
+            <!-- Big u made of small letters -->
             <div class="big-letter letter-u" id="letter-u"></div>
             <!-- Big b made of small letters -->
             <div class="big-letter letter-b" id="letter-b"></div>
@@ -2838,7 +2654,7 @@ body.theme-miku .visit-counter-number {
         <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
         <!-- Canvas for wooperbird goose on main page -->
         <canvas id="wooperbirdCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;"></canvas>
-        </div>
+                </div>
     
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
@@ -3133,33 +2949,11 @@ body.theme-miku .visit-counter-number {
                     <small><span id="bioCharCount">0</span>/200 characters</small>
                 </div>
                 <div class="edit-field">
-                    <label>Avatar:</label>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-size: 12px;">Upload Image:</label>
-                        <input type="file" id="avatarImageUpload" accept="image/*" style="display: none;">
-                        <button onclick="document.getElementById('avatarImageUpload').click()" style="padding: 8px 15px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">Choose Image</button>
-                        <div id="avatarImagePreview" style="margin-top: 10px;">
-                            <img id="avatarImagePreviewImg" src="" style="max-width: 80px; max-height: 80px; border-radius: 50%; border: 2px solid #30363d; display: none;">
-                        </div>
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-size: 12px;">Or Choose Emoji:</label>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-size: 12px;">Upload Image:</label>
-                            <input type="file" id="avatarImageUpload" accept="image/*" style="display: none;">
-                            <button onclick="document.getElementById('avatarImageUpload').click()" style="padding: 8px 15px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">Choose Image</button>
-                            <div id="avatarImagePreview" style="margin-top: 10px;">
-                                <img id="avatarImagePreviewImg" src="" style="max-width: 80px; max-height: 80px; border-radius: 50%; border: 2px solid #30363d; display: none;">
-                            </div>
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-size: 12px;">Or Choose Emoji:</label>
-                            <div class="emoji-picker">
-                                <div class="emoji-preview" id="emojiPreview">👤</div>
-                                <div class="emoji-grid" id="emojiGrid">
-                                    <!-- Emojis will be populated here -->
-                                </div>
-                            </div>
+                    <label>Avatar Emoji:</label>
+                    <div class="emoji-picker">
+                        <div class="emoji-preview" id="emojiPreview">👤</div>
+                        <div class="emoji-grid" id="emojiGrid">
+                            <!-- Emojis will be populated here -->
                         </div>
                     </div>
                 </div>
@@ -3199,6 +2993,52 @@ body.theme-miku .visit-counter-number {
     <!-- Command feedback display -->
     <div class="command-feedback hidden" id="commandFeedback">
         <span class="command-text"></span><span class="feedback-text"></span>
+    </div>
+    
+    <!-- Chat Page -->
+    <div class="page hidden" id="chatPage">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>💬 Online Chat</h2>
+                <div class="online-users" id="onlineUsers">
+                    <div class="online-users-title">👥 Online Users</div>
+                    <div id="onlineUsersList"></div>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="500">
+                <button class="chat-send-btn" id="chatSendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Friends List Modal -->
+    <div class="friends-modal" id="friendsModal">
+        <div class="friends-modal-content">
+            <h2>👥 My Friends</h2>
+            <div class="friends-list" id="friendsList">
+                <!-- Friends will be populated here -->
+            </div>
+            <div class="friends-buttons">
+                <button class="friends-close-btn" id="friendsCloseBtn">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Private Chat Page -->
+    <div class="page hidden" id="privateChatPage">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2 id="privateChatTitle">💬 Private Chat</h2>
+                <button class="chat-back-btn" id="privateChatBackBtn">← Back to Friends</button>
+            </div>
+            <div class="chat-messages" id="privateChatMessages"></div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="privateChatInput" placeholder="Type a message..." maxlength="500">
+                <button class="chat-send-btn" id="privateChatSendBtn">Send</button>
+            </div>
+        </div>
     </div>
     
     <!-- Visit Counter -->
@@ -3643,6 +3483,14 @@ body.theme-miku .visit-counter-number {
             [1,1,1,1,1,0,0]
         ];
         
+        // Create all letters
+        createLetterPattern('f', fPattern);
+        createLetterPattern('i', iPattern);
+        createLetterPattern('n', nPattern);
+        createLetterPattern('h', hPattern);
+        createLetterPattern('u', uPattern);
+        createLetterPattern('b', bPattern);
+        
         // Global money system - shared across all tabs
         let globalMoney = 0;
         let unlockedColors = new Set(); // Colors are unlocked by default (not used anymore but keeping for compatibility)
@@ -3883,45 +3731,10 @@ body.theme-miku .visit-counter-number {
         
         // Navigation system
         function showPage(pageId) {
-            // Hide all pages
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.add('hidden');
             });
-            
-            // Show the requested page
-            const targetPage = document.getElementById(pageId);
-            if (!targetPage) {
-                console.error(`Page with id "${pageId}" not found`);
-                const commandInput = document.getElementById('commandInput');
-                if (commandInput) {
-                    showCommandFeedback(pageId, `Page "${pageId}" not found`, false);
-                }
-                // Show main page as fallback
-                const mainPage = document.getElementById('mainPage');
-                if (mainPage) {
-                    mainPage.classList.remove('hidden');
-                }
-                return;
-            }
-            
-            targetPage.classList.remove('hidden');
-            
-            // Stop goose rain animation if leaving
-            if (pageId !== 'gooserainPage' && typeof animationId !== 'undefined' && animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-            }
-            
-            // Stop stones animation if leaving
-            if (pageId !== 'stonesPage' && typeof stonesAnimationId !== 'undefined' && stonesAnimationId) {
-                cancelAnimationFrame(stonesAnimationId);
-                stonesAnimationId = null;
-                // Remove key handler when leaving
-                if (typeof stonesKeyHandler !== 'undefined' && stonesKeyHandler) {
-                    document.removeEventListener('keydown', stonesKeyHandler);
-                    stonesKeyHandler = null;
-                }
-            }
+            document.getElementById(pageId).classList.remove('hidden');
             
             // Show/hide command bar based on page
             const commandBar = document.querySelector('.command-bar');
@@ -3930,56 +3743,6 @@ body.theme-miku .visit-counter-number {
                     commandBar.style.display = 'none';
                 } else {
                     commandBar.style.display = 'flex';
-                }
-            }
-            
-            // Update money displays on page change
-            updateAllMoneyDisplays();
-            
-            // Achievement tracking
-            if (pageId === 'homePage' || pageId === 'mainPage') {
-                if (typeof unlockAchievement === 'function') {
-                    unlockAchievement(1);
-                }
-            } else if (pageId === 'minesweeperPage') {
-                if (typeof commandsUsed !== 'undefined') {
-                    commandsUsed.add('sweeper');
-                }
-            } else if (pageId === 'pongPage') {
-                if (typeof unlockAchievement === 'function') {
-                    unlockAchievement(5);
-                }
-                if (typeof commandsUsed !== 'undefined') {
-                    commandsUsed.add('pong');
-                }
-            } else if (pageId === 'sandboxelsPage') {
-                if (typeof unlockAchievement === 'function') {
-                    unlockAchievement(10);
-                }
-                if (typeof commandsUsed !== 'undefined') {
-                    commandsUsed.add('sandboxles');
-                }
-            } else if (pageId === 'coinflipPage') {
-                if (typeof commandsUsed !== 'undefined') {
-                    commandsUsed.add('coinflip');
-                }
-            } else if (pageId === 'clickerPage') {
-                if (typeof commandsUsed !== 'undefined') {
-                    commandsUsed.add('clicker');
-                }
-                const clickerAmount = document.getElementById('clicker-amount');
-                if (clickerAmount && typeof clickerPerClick !== 'undefined') {
-                    clickerAmount.textContent = clickerPerClick;
-                }
-            } else if (pageId === 'stonesPage') {
-                if (typeof commandsUsed !== 'undefined') {
-                    commandsUsed.add('stones');
-                }
-            }
-            
-            if (typeof commandsUsed !== 'undefined' && commandsUsed.size >= 10) {
-                if (typeof unlockAchievement === 'function') {
-                    unlockAchievement(11);
                 }
             }
         }
@@ -4241,46 +4004,18 @@ body.theme-miku .visit-counter-number {
             const bioInput = document.getElementById('editBio');
             const emojiPreview = document.getElementById('emojiPreview');
             const emojiGrid = document.getElementById('emojiGrid');
-            const avatarImagePreview = document.getElementById('avatarImagePreviewImg');
-            const avatarImageUpload = document.getElementById('avatarImageUpload');
             
             if (!modal) return;
             
             const currentUserId = getUserId();
             const currentBio = getUserBio(currentUserId) || '';
             const currentAvatar = getUserAvatar(currentUserId);
-            const currentAvatarImage = getUserAvatarImage(currentUserId);
             
             // Populate fields
             userIdInput.value = currentUserId;
             bioInput.value = currentBio;
             emojiPreview.textContent = currentAvatar;
             updateBioCharCount();
-            
-            // Show avatar image if exists
-            if (currentAvatarImage) {
-                avatarImagePreview.src = currentAvatarImage;
-                avatarImagePreview.style.display = 'block';
-            } else {
-                avatarImagePreview.style.display = 'none';
-            }
-            
-            // Handle image upload
-            if (avatarImageUpload) {
-                avatarImageUpload.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (file && file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            avatarImagePreview.src = event.target.result;
-                            avatarImagePreview.style.display = 'block';
-                            // Clear emoji when image is selected
-                            emojiPreview.textContent = '';
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
-            }
             
             // Populate emoji grid
             emojiGrid.innerHTML = '';
@@ -4318,14 +4053,12 @@ body.theme-miku .visit-counter-number {
             const userIdInput = document.getElementById('editUserId');
             const bioInput = document.getElementById('editBio');
             const emojiPreview = document.getElementById('emojiPreview');
-            const avatarImagePreview = document.getElementById('avatarImagePreviewImg');
             
             if (!userIdInput || !bioInput || !emojiPreview) return;
             
             const newUserId = userIdInput.value.trim();
             const newBio = bioInput.value.trim();
-            const newAvatar = emojiPreview.textContent || '👤';
-            const newAvatarImage = avatarImagePreview && avatarImagePreview.style.display !== 'none' ? avatarImagePreview.src : null;
+            const newAvatar = emojiPreview.textContent;
             
             // Validate user ID
             if (newUserId.length < 3 || newUserId.length > 20) {
@@ -4348,12 +4081,12 @@ body.theme-miku .visit-counter-number {
                     showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
                     return;
                 } else if (result === true) {
-                    finishSaving(newUserId, newBio, newAvatar, newAvatarImage);
+                    finishSaving(newUserId, newBio, newAvatar);
                 } else {
                     // Promise result
                     result.then((success) => {
                         if (success) {
-                            finishSaving(newUserId, newBio, newAvatar, newAvatarImage);
+                            finishSaving(newUserId, newBio, newAvatar);
                         } else {
                             showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
                         }
@@ -4361,39 +4094,25 @@ body.theme-miku .visit-counter-number {
                     return;
                 }
             } else {
-                finishSaving(newUserId, newBio, newAvatar, newAvatarImage);
+                finishSaving(newUserId, newBio, newAvatar);
             }
         }
         
-        function finishSaving(userId, bio, avatar, avatarImage) {
+        function finishSaving(userId, bio, avatar) {
             // Save bio
             setUserBio(userId, bio);
             
             // Save avatar
             setUserAvatar(userId, avatar);
             
-            // Save avatar image if provided
-            if (avatarImage) {
-                setUserAvatarImage(userId, avatarImage);
-            } else {
-                // Clear avatar image if emoji is selected
-                const avatarImages = JSON.parse(localStorage.getItem('userAvatarImages') || '{}');
-                delete avatarImages[userId];
-                localStorage.setItem('userAvatarImages', JSON.stringify(avatarImages));
-            }
-            
             // Sync to Firebase if available
             if (database) {
                 try {
-                    const updateData = {
+                    database.ref(`users/${userId}`).update({
                         bio: bio,
                         avatar: avatar,
                         lastSeen: Date.now()
-                    };
-                    if (avatarImage) {
-                        updateData.avatarImage = avatarImage;
-                    }
-                    database.ref(`users/${userId}`).update(updateData);
+                    });
                 } catch (e) {
                     console.warn('Could not sync profile to Firebase:', e);
                 }
@@ -4510,23 +4229,6 @@ body.theme-miku .visit-counter-number {
             
             // Update visit counter
             updateVisitCounter();
-            
-            // Create FinHub letter patterns
-            createLetterPattern('f', fPattern);
-            createLetterPattern('i', iPattern);
-            createLetterPattern('n', nPattern);
-            createLetterPattern('h', hPattern);
-            createLetterPattern('u', uPattern);
-            createLetterPattern('b', bPattern);
-            
-            // Load global data
-            loadGlobalData();
-            loadCoinflipData();
-            
-            // Check if blocked on page load
-            if (checkBlocked()) {
-                // Already showing limbo page
-            }
         });
         
         // Load command history from localStorage
@@ -4684,17 +4386,6 @@ body.theme-miku .visit-counter-number {
             const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
             avatars[userId] = emoji;
             localStorage.setItem('userAvatars', JSON.stringify(avatars));
-        }
-        
-        function getUserAvatarImage(userId) {
-            const avatarImages = JSON.parse(localStorage.getItem('userAvatarImages') || '{}');
-            return avatarImages[userId] || null;
-        }
-        
-        function setUserAvatarImage(userId, imageData) {
-            const avatarImages = JSON.parse(localStorage.getItem('userAvatarImages') || '{}');
-            avatarImages[userId] = imageData;
-            localStorage.setItem('userAvatarImages', JSON.stringify(avatarImages));
         }
         
         // Friends System
@@ -5109,6 +4800,35 @@ body.theme-miku .visit-counter-number {
             }
         }
         
+        // Visit Counter
+        function updateVisitCounter() {
+            const counter = document.getElementById('visitCounterNumber');
+            if (!counter) return;
+            
+            if (database) {
+                const visitsRef = database.ref('siteStats/visits');
+                visitsRef.transaction((current) => {
+                    return (current || 0) + 1;
+                }, (error, committed, snapshot) => {
+                    if (!error && committed && snapshot) {
+                        counter.textContent = snapshot.val().toLocaleString();
+                    }
+                });
+                
+                // Listen for updates
+                visitsRef.on('value', (snapshot) => {
+                    const visits = snapshot.val() || 0;
+                    counter.textContent = visits.toLocaleString();
+                });
+            } else {
+                // Fallback to localStorage
+                let visits = parseInt(localStorage.getItem('siteVisits') || '0');
+                visits++;
+                localStorage.setItem('siteVisits', visits.toString());
+                counter.textContent = visits.toLocaleString();
+            }
+        }
+        
         // Whoami profile
         function showWhoami(targetUserId = null) {
             const currentUserId = getUserId();
@@ -5271,19 +4991,9 @@ body.theme-miku .visit-counter-number {
             const time = new Date(message.timestamp);
             const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            // Get avatar (emoji or image)
-            const avatar = getUserAvatar(message.userId);
-            const avatarImg = getUserAvatarImage(message.userId);
-            let avatarHtml = '';
-            if (avatarImg) {
-                avatarHtml = `<img src="${avatarImg}" class="chat-message-avatar-img" alt="avatar">`;
-            } else {
-                avatarHtml = `<span class="chat-message-avatar">${avatar}</span>`;
-            }
-            
             messageDiv.innerHTML = `
                 <div class="chat-message-header">
-                    <span class="chat-message-user" onclick="showWhoami('${message.userId}')">${avatarHtml} ${message.userId}</span>
+                    <span class="chat-message-user" onclick="showWhoami('${message.userId}')">${message.userId}</span>
                     <span class="chat-message-time">${timeStr}</span>
                 </div>
                 <div class="chat-message-text">${escapeHtml(message.text)}</div>
@@ -5382,53 +5092,47 @@ body.theme-miku .visit-counter-number {
         // Load clock setting on page load
         loadClockSetting();
         
-        // Command input handler - wait for DOM to be ready
-        document.addEventListener('DOMContentLoaded', () => {
-            const commandInput = document.getElementById('commandInput');
-            
-            if (!commandInput) {
-                console.error('Command input element not found!');
-                return;
+        // Command input handler
+        const commandInput = document.getElementById('commandInput');
+        
+        // Semicolon key to focus command bar (works even when paper app is active)
+        document.addEventListener('keydown', (e) => {
+            // Only trigger if semicolon is pressed and not already typing in command input
+            if (e.key === ';' && document.activeElement !== commandInput) {
+                const activeEl = document.activeElement;
+                
+                // Block semicolon only if in a regular input/textarea (not contentEditable like paper app)
+                const isRegularInput = activeEl && (
+                    (activeEl.tagName === 'INPUT' && activeEl.id !== 'commandInput') || 
+                    activeEl.tagName === 'TEXTAREA'
+                );
+                
+                // Allow semicolon from anywhere except regular inputs/textareas
+                // This includes paper app (contentEditable) and other places
+                if (!isRegularInput) {
+                    e.preventDefault();
+                    commandInput.focus();
+                    commandInput.select(); // Select any existing text
+                }
+            }
+        });
+        
+        commandInput.addEventListener('keydown', (e) => {
+            // Disable commands when on remote desktop
+            const remoteDesktopPage = document.getElementById('remoteDesktopPage');
+            if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
+                // Allow semicolon to work, but block other commands
+                if (e.key !== ';' && e.key !== 'Enter') {
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    showCommandFeedback('command', 'Commands disabled on desktop. Use ; to exit.', false);
+                    return;
+                }
             }
             
-            // Semicolon key to focus command bar (works even when paper app is active)
-            document.addEventListener('keydown', (e) => {
-                // Only trigger if semicolon is pressed and not already typing in command input
-                if (e.key === ';' && document.activeElement !== commandInput) {
-                    const activeEl = document.activeElement;
-                    
-                    // Block semicolon only if in a regular input/textarea (not contentEditable like paper app)
-                    const isRegularInput = activeEl && (
-                        (activeEl.tagName === 'INPUT' && activeEl.id !== 'commandInput') || 
-                        activeEl.tagName === 'TEXTAREA'
-                    );
-                    
-                    // Allow semicolon from anywhere except regular inputs/textareas
-                    // This includes paper app (contentEditable) and other places
-                    if (!isRegularInput) {
-                        e.preventDefault();
-                        commandInput.focus();
-                        commandInput.select(); // Select any existing text
-                    }
-                }
-            });
-            
-            commandInput.addEventListener('keydown', (e) => {
-                // Disable commands when on remote desktop
-                const remoteDesktopPage = document.getElementById('remoteDesktopPage');
-                if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
-                    // Allow semicolon to work, but block other commands
-                    if (e.key !== ';' && e.key !== 'Enter') {
-                        return;
-                    }
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        showCommandFeedback('command', 'Commands disabled on desktop. Use ; to exit.', false);
-                        return;
-                    }
-                }
-                
-                if (e.key === 'Enter') {
+            if (e.key === 'Enter') {
                 const command = commandInput.value.toLowerCase().trim();
                 const hasColorPalette = colorPalettes.hasOwnProperty(command);
                 
@@ -5460,7 +5164,7 @@ body.theme-miku .visit-counter-number {
                     }
                 } else if (command === 'home') {
                     resetConfirm = false; // Clear reset confirmation if other command is used
-                    showPage('mainPage');
+                    showPage('homePage');
                     showCommandFeedback('home', 'Navigated to home page', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
@@ -5825,10 +5529,40 @@ body.theme-miku .visit-counter-number {
                     resetConfirm = false;
                     const targetId = command.substring(7).trim();
                     showWhoami(targetId);
-                } else if (command === 'bottle flip' || command === 'bottleflip') {
+                } else if (command === 'edit') {
                     resetConfirm = false;
-                    flipBottle();
-                    showCommandFeedback('bottle flip', 'Bottle flipped!', true);
+                    openEditMenu();
+                } else if (command.startsWith('friend ')) {
+                    resetConfirm = false;
+                    const friendId = command.substring(7).trim();
+                    if (!friendId) {
+                        showCommandFeedback('friend', 'Please provide a user ID. Usage: friend [user id]', false);
+                    } else if (friendId === getUserId()) {
+                        showCommandFeedback('friend', 'You cannot add yourself as a friend!', false);
+                    } else {
+                        if (addFriend(friendId)) {
+                            showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
+                        } else {
+                            showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                        }
+                    }
+                } else if (command === 'friends') {
+                    resetConfirm = false;
+                    openFriendsList();
+                } else if (command === 'chat') {
+                    resetConfirm = false;
+                    const chatPage = document.getElementById('chatPage');
+                    if (chatPage && !chatPage.classList.contains('hidden')) {
+                        // Chat is open, close it
+                        showPage('mainPage');
+                        showCommandFeedback('chat', 'Chat closed!', true);
+                    } else {
+                        // Chat is closed, open it
+                        showPage('chatPage');
+                        loadChatMessages();
+                        loadOnlineUsers();
+                        showCommandFeedback('chat', 'Chat opened!', true);
+                    }
                 } else if (command === 'whoami') {
                     resetConfirm = false;
                     showWhoami();
@@ -5933,8 +5667,7 @@ body.theme-miku .visit-counter-number {
                     }, 2000);
                 }
             }
-            });
-        }); // End DOMContentLoaded for command input
+        });
         
         // Minesweeper game code
         const GRID_SIZE = 10;
@@ -6428,7 +6161,7 @@ body.theme-miku .visit-counter-number {
         }
         
         // Theme System
-        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean', 'clouds', 'flashcard', 'miku'];
+        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean', 'clouds', 'flashcard'];
         let currentTheme = 'dark'; // Default theme
         
         // Load saved theme
@@ -7265,12 +6998,8 @@ body.theme-miku .visit-counter-number {
                 // Add default icons only if no saved state
                 addDesktopIcon('paper', 'Paper', 10, 10);
                 addDesktopIcon('paint', 'Paint', 10, 100);
-                addDesktopIcon('yabber', 'Yabber', 10, 190);
-                addDesktopIcon('socialmedia', 'Social Media', 10, 280);
-                addDesktopIcon('personalize', 'Personalize', 10, 370);
-                addDesktopIcon('music', 'Music', 10, 460);
-                addDesktopIcon('computer', 'Computer', 10, 550);
-                addDesktopIcon('appstore', 'App Store', 10, 640);
+                addDesktopIcon('computer', 'Computer', 10, 190);
+                addDesktopIcon('appstore', 'App Store', 10, 280);
                 saveDesktopState();
             }
             
@@ -7340,8 +7069,6 @@ body.theme-miku .visit-counter-number {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎮</text></svg>") no-repeat center';
             } else if (type === 'sandboxles') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🏖️</text></svg>") no-repeat center';
-            } else if (type === 'snake') {
-                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🐍</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -7387,20 +7114,10 @@ body.theme-miku .visit-counter-number {
                 // Actually open the app
                 if (type === 'appstore') {
                     openAppStore();
-                } else if (type === 'yabber') {
-                    openYabberApp(iconId, name);
-                } else if (type === 'socialmedia') {
-                    openSocialMediaApp(iconId, name);
-                } else if (type === 'personalize') {
-                    openPersonalizeApp(iconId, name);
-                } else if (type === 'music') {
-                    openMusicApp(iconId, name);
                 } else if (type === 'pong') {
                     openPongApp(iconId, name);
                 } else if (type === 'sandboxles') {
                     openSandboxlesApp(iconId, name);
-                } else if (type === 'snake') {
-                    openSnakeApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -7632,19 +7349,6 @@ body.theme-miku .visit-counter-number {
                         <button id="install-sandboxles" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
-                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-                        <div style="font-size: 32px;">🐍</div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Snake</div>
-                            <div style="font-size: 11px; color: #666;">Retro 8x8 grid snake game</div>
-                        </div>
-                        <button id="install-snake" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
-                    </div>
-                </div>
-                <div style="border: 1px inset #c0c0c0; padding: 10px; margin-top: 15px; background: #e0e0e0; font-size: 11px;">
-                    <strong>Storage:</strong> <span id="storage-display">0 / 5 GB</span> (<span id="app-count">0 / 7 apps</span>)
-                </div>
             `;
             
             content.appendChild(storeContent);
@@ -7725,68 +7429,14 @@ body.theme-miku .visit-counter-number {
                             return;
                         }
                         
-                        // Check storage limit
-                        if (!canInstallApp()) {
-                            alert('Storage limit reached! You can only have 7 apps installed. Delete an app to free up space.');
-                            return;
-                        }
-                        
                         // Add Sandboxles icon to desktop
                         const x = Math.random() * 200 + 50;
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('sandboxles', 'Sandboxles', x, y);
-                        updateStorageDisplay();
                         alert('Sandboxles installed successfully!');
                     };
                 }
-                
-                const installSnakeBtn = document.getElementById('install-snake');
-                if (installSnakeBtn) {
-                    installSnakeBtn.onclick = () => {
-                        // Check if already installed
-                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'snake');
-                        if (alreadyInstalled) {
-                            alert('Snake is already installed!');
-                            return;
-                        }
-                        
-                        // Check storage limit
-                        if (!canInstallApp()) {
-                            alert('Storage limit reached! You can only have 7 apps installed. Delete an app to free up space.');
-                            return;
-                        }
-                        
-                        // Add Snake icon to desktop
-                        const x = Math.random() * 200 + 50;
-                        const y = Math.random() * 200 + 50;
-                        addDesktopIcon('snake', 'Snake', x, y);
-                        updateStorageDisplay();
-                        alert('Snake installed successfully!');
-                    };
-                }
             }, 100);
-            
-            // Storage limit function
-            function getInstalledAppCount() {
-                const systemApps = ['paper', 'paint', 'computer', 'appstore', 'yabber', 'socialmedia', 'personalize', 'music'];
-                return desktopIcons.filter(icon => !systemApps.includes(icon.type)).length;
-            }
-            
-            function updateStorageDisplay() {
-                const storageDisplay = document.getElementById('storage-display');
-                const appCountDisplay = document.getElementById('app-count');
-                const appCount = getInstalledAppCount();
-                const storageUsed = Math.round((appCount / 7) * 5 * 10) / 10;
-                if (storageDisplay) storageDisplay.textContent = `${storageUsed} / 5 GB`;
-                if (appCountDisplay) appCountDisplay.textContent = `${appCount} / 7 apps`;
-            }
-            
-            function canInstallApp() {
-                return getInstalledAppCount() < 7;
-            }
-            
-            // Update display on open
-            updateStorageDisplay();
         }
         
         // Minesweeper app
@@ -8091,27 +7741,12 @@ body.theme-miku .visit-counter-number {
                 icon.element.remove();
                 desktopIcons = desktopIcons.filter(i => i.id !== iconId);
                 selectedIcon = null;
-                saveDesktopState();
-                // Update storage display if App Store is open
-                const storageDisplay = document.getElementById('storage-display');
-                if (storageDisplay) {
-                    const systemApps = ['paper', 'paint', 'computer', 'appstore', 'yabber', 'socialmedia', 'personalize', 'music'];
-                    const appCount = desktopIcons.filter(i => !systemApps.includes(i.type)).length;
-                    const storageUsed = Math.round((appCount / 7) * 5 * 10) / 10;
-                    storageDisplay.textContent = `${storageUsed} / 5 GB`;
-                    const appCountDisplay = document.getElementById('app-count');
-                    if (appCountDisplay) appCountDisplay.textContent = `${appCount} / 7 apps`;
-                }
             }
         }
         
         function openDesktopApp(type, iconId, name) {
             if (type === 'minesweeper') {
                 openMinesweeperApp(iconId, name);
-                return;
-            }
-            if (type === 'snake') {
-                openSnakeApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -8456,236 +8091,7 @@ body.theme-miku .visit-counter-number {
             updateTaskbar();
         }
         
-        // Snake app
-        function openSnakeApp(iconId, name) {
-            windowZIndex++;
-            const window = document.createElement('div');
-            window.className = 'win95-window';
-            window.style.left = '150px';
-            window.style.top = '100px';
-            window.style.width = '400px';
-            window.style.height = '450px';
-            window.style.zIndex = windowZIndex;
-            
-            // Header
-            const header = document.createElement('div');
-            header.className = 'win95-window-header';
-            
-            const title = document.createElement('div');
-            title.className = 'win95-window-title';
-            title.textContent = name;
-            
-            const controls = document.createElement('div');
-            controls.className = 'win95-window-controls';
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'win95-window-button';
-            closeBtn.textContent = '×';
-            
-            let gameLoop = null;
-            let keyHandler = null;
-            
-            closeBtn.onclick = () => {
-                if (gameLoop) clearInterval(gameLoop);
-                if (keyHandler) document.removeEventListener('keydown', keyHandler);
-                window.remove();
-                desktopWindows = desktopWindows.filter(w => w.element !== window);
-                updateTaskbar();
-            };
-            
-            controls.appendChild(closeBtn);
-            header.appendChild(title);
-            header.appendChild(controls);
-            
-            // Content
-            const content = document.createElement('div');
-            content.className = 'win95-window-content';
-            content.style.padding = '10px';
-            content.style.display = 'flex';
-            content.style.flexDirection = 'column';
-            content.style.alignItems = 'center';
-            content.style.background = '#c0c0c0';
-            
-            // Score display
-            const scoreDiv = document.createElement('div');
-            scoreDiv.style.cssText = 'font-size: 14px; font-weight: bold; margin-bottom: 10px; font-family: "MS Sans Serif", Arial, sans-serif;';
-            scoreDiv.textContent = 'Score: 0';
-            scoreDiv.id = `snake-score-${iconId}`;
-            
-            // Game canvas - 8x8 grid, each cell 40px
-            const canvas = document.createElement('canvas');
-            canvas.id = `snake-canvas-${iconId}`;
-            canvas.width = 320; // 8 * 40
-            canvas.height = 320; // 8 * 40
-            canvas.style.cssText = 'border: 2px inset #c0c0c0; background: #ffffff; image-rendering: pixelated;';
-            
-            const ctx = canvas.getContext('2d');
-            
-            // Game state
-            let snake = [{x: 4, y: 4}];
-            let direction = {x: 1, y: 0};
-            let nextDirection = {x: 1, y: 0};
-            let apple = {x: 2, y: 2};
-            let score = 0;
-            let gameRunning = false;
-            
-            // Generate new apple position
-            function generateApple() {
-                do {
-                    apple.x = Math.floor(Math.random() * 8);
-                    apple.y = Math.floor(Math.random() * 8);
-                } while (snake.some(segment => segment.x === apple.x && segment.y === apple.y));
-            }
-            
-            // Draw game
-            function draw() {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, 320, 320);
-                
-                // Draw grid lines
-                ctx.strokeStyle = '#e0e0e0';
-                ctx.lineWidth = 1;
-                for (let i = 0; i <= 8; i++) {
-                    ctx.beginPath();
-                    ctx.moveTo(i * 40, 0);
-                    ctx.lineTo(i * 40, 320);
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(0, i * 40);
-                    ctx.lineTo(320, i * 40);
-                    ctx.stroke();
-                }
-                
-                // Draw apple (red)
-                ctx.fillStyle = '#ff0000';
-                ctx.fillRect(apple.x * 40 + 2, apple.y * 40 + 2, 36, 36);
-                
-                // Draw snake (black)
-                ctx.fillStyle = '#000000';
-                snake.forEach(segment => {
-                    ctx.fillRect(segment.x * 40 + 2, segment.y * 40 + 2, 36, 36);
-                });
-            }
-            
-            // Game loop
-            function gameStep() {
-                if (!gameRunning) return;
-                
-                direction = {...nextDirection};
-                const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
-                
-                // Check wall collision
-                if (head.x < 0 || head.x >= 8 || head.y < 0 || head.y >= 8) {
-                    gameRunning = false;
-                    alert(`Game Over! Score: ${score}`);
-                    scoreDiv.textContent = 'Score: 0';
-                    snake = [{x: 4, y: 4}];
-                    direction = {x: 1, y: 0};
-                    nextDirection = {x: 1, y: 0};
-                    score = 0;
-                    generateApple();
-                    draw();
-                    startBtn.textContent = 'Start Game';
-                    startBtn.disabled = false;
-                    return;
-                }
-                
-                // Check self collision
-                if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-                    gameRunning = false;
-                    alert(`Game Over! Score: ${score}`);
-                    scoreDiv.textContent = 'Score: 0';
-                    snake = [{x: 4, y: 4}];
-                    direction = {x: 1, y: 0};
-                    nextDirection = {x: 1, y: 0};
-                    score = 0;
-                    generateApple();
-                    draw();
-                    startBtn.textContent = 'Start Game';
-                    startBtn.disabled = false;
-                    return;
-                }
-                
-                snake.unshift(head);
-                
-                // Check apple collision
-                if (head.x === apple.x && head.y === apple.y) {
-                    score++;
-                    scoreDiv.textContent = `Score: ${score}`;
-                    generateApple();
-                } else {
-                    snake.pop();
-                }
-                
-                draw();
-            }
-            
-            // Controls
-            keyHandler = (e) => {
-                if (!gameRunning) return;
-                if (e.key === 'ArrowUp' && direction.y === 0) {
-                    nextDirection = {x: 0, y: -1};
-                } else if (e.key === 'ArrowDown' && direction.y === 0) {
-                    nextDirection = {x: 0, y: 1};
-                } else if (e.key === 'ArrowLeft' && direction.x === 0) {
-                    nextDirection = {x: -1, y: 0};
-                } else if (e.key === 'ArrowRight' && direction.x === 0) {
-                    nextDirection = {x: 1, y: 0};
-                }
-            };
-            
-            document.addEventListener('keydown', keyHandler);
-            
-            // Start button
-            const startBtn = document.createElement('button');
-            startBtn.textContent = 'Start Game';
-            startBtn.style.cssText = 'padding: 8px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; font-weight: bold; margin-top: 10px; font-family: "MS Sans Serif", Arial, sans-serif; cursor: pointer;';
-            startBtn.onclick = () => {
-                if (!gameRunning) {
-                    gameRunning = true;
-                    startBtn.textContent = 'Playing...';
-                    startBtn.disabled = true;
-                    gameLoop = setInterval(gameStep, 300);
-                }
-            };
-            
-            content.appendChild(scoreDiv);
-            content.appendChild(canvas);
-            content.appendChild(startBtn);
-            window.appendChild(header);
-            window.appendChild(content);
-            document.getElementById('remoteDesktop').appendChild(window);
-            
-            // Initial draw
-            generateApple();
-            draw();
-            
-            // Make draggable
-            let isDragging = false;
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                window.style.zIndex = ++windowZIndex;
-                const initialX = e.clientX - window.offsetLeft;
-                const initialY = e.clientY - window.offsetTop;
-                
-                const onMove = (e) => {
-                    if (isDragging) {
-                        window.style.left = (e.clientX - initialX) + 'px';
-                        window.style.top = (e.clientY - initialY) + 'px';
-                    }
-                };
-                
-                const onUp = () => {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                };
-                
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
-            });
-        }
-        
+        // Sandboxles app
         function openSandboxlesApp(iconId, name) {
             windowZIndex++;
             const window = document.createElement('div');
@@ -10638,6 +10044,10 @@ body.theme-miku .visit-counter-number {
             }
         });
         
+        // Initialize global data on page load
+        loadGlobalData();
+        loadCoinflipData();
+        
         // Check if blocked on page load
         if (checkBlocked()) {
             // Already showing limbo page
@@ -10894,666 +10304,6 @@ body.theme-miku .visit-counter-number {
         // Initialize achievements on page load
         loadAchievements();
         
-        // Bottle Flip Command
-        function flipBottle() {
-            const bottle = document.createElement('div');
-            bottle.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 60px;
-                height: 120px;
-                background: linear-gradient(to bottom, #1a73e8 0%, #1a73e8 40%, #fff 40%, #fff 60%, #1a73e8 60%, #1a73e8 100%);
-                border: 3px solid #0d47a1;
-                border-radius: 8px 8px 20px 20px;
-                z-index: 10000;
-                transition: transform 0.6s ease-in-out;
-            `;
-            document.body.appendChild(bottle);
-            
-            // Random rotation (multiple flips)
-            const rotations = 720 + Math.random() * 720; // 2-4 full rotations
-            bottle.style.transform = `translate(-50%, -50%) rotate(${rotations}deg)`;
-            
-            setTimeout(() => {
-                const landed = Math.random() > 0.5; // 50% chance
-                if (landed) {
-                    bottle.style.background = 'linear-gradient(to bottom, #fff 0%, #fff 40%, #1a73e8 40%, #1a73e8 60%, #fff 60%, #fff 100%)';
-                    showCommandFeedback('bottle flip', 'Bottle landed! 🎉', true);
-                } else {
-                    showCommandFeedback('bottle flip', 'Bottle fell over 😔', false);
-                }
-                
-                setTimeout(() => {
-                    bottle.remove();
-                }, 2000);
-            }, 600);
-        }
-        
-        // Desktop Apps: Yabber, Social Media, Personalize, Music
-        function openYabberApp(iconId, name) {
-            windowZIndex++;
-            const window = document.createElement('div');
-            window.className = 'win95-window';
-            window.style.left = '100px';
-            window.style.top = '100px';
-            window.style.width = '600px';
-            window.style.height = '500px';
-            window.style.zIndex = windowZIndex;
-            
-            const header = document.createElement('div');
-            header.className = 'win95-window-header';
-            const title = document.createElement('div');
-            title.className = 'win95-window-title';
-            title.textContent = name;
-            const controls = document.createElement('div');
-            controls.className = 'win95-window-controls';
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'win95-window-button';
-            closeBtn.textContent = '×';
-            closeBtn.onclick = () => window.remove();
-            controls.appendChild(closeBtn);
-            header.appendChild(title);
-            header.appendChild(controls);
-            
-            const content = document.createElement('div');
-            content.className = 'win95-window-content';
-            content.style.padding = '10px';
-            content.style.display = 'flex';
-            content.style.flexDirection = 'column';
-            content.style.height = 'calc(100% - 30px)';
-            
-            const messagesDiv = document.createElement('div');
-            messagesDiv.id = `yabber-messages-${iconId}`;
-            messagesDiv.style.cssText = 'flex: 1; overflow-y: auto; border: 1px inset #c0c0c0; background: #fff; padding: 10px; margin-bottom: 10px; font-size: 11px;';
-            
-            const inputContainer = document.createElement('div');
-            inputContainer.style.cssText = 'display: flex; gap: 5px;';
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = 'Type a message...';
-            input.style.cssText = 'flex: 1; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px;';
-            const sendBtn = document.createElement('button');
-            sendBtn.textContent = 'Send';
-            sendBtn.style.cssText = 'padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; cursor: pointer;';
-            
-            sendBtn.onclick = () => {
-                if (input.value.trim()) {
-                    const msgDiv = document.createElement('div');
-                    msgDiv.style.cssText = 'margin-bottom: 5px; padding: 5px; background: #e0e0e0; border: 1px inset #c0c0c0;';
-                    msgDiv.innerHTML = `<strong>${getUserId()}:</strong> ${input.value}`;
-                    messagesDiv.appendChild(msgDiv);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    input.value = '';
-                }
-            };
-            
-            input.onkeypress = (e) => {
-                if (e.key === 'Enter') sendBtn.onclick();
-            };
-            
-            inputContainer.appendChild(input);
-            inputContainer.appendChild(sendBtn);
-            content.appendChild(messagesDiv);
-            content.appendChild(inputContainer);
-            window.appendChild(header);
-            window.appendChild(content);
-            document.getElementById('remoteDesktop').appendChild(window);
-            
-            // Make draggable
-            let isDragging = false;
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                window.style.zIndex = ++windowZIndex;
-                const initialX = e.clientX - window.offsetLeft;
-                const initialY = e.clientY - window.offsetTop;
-                const onMove = (e) => {
-                    if (isDragging) {
-                        window.style.left = (e.clientX - initialX) + 'px';
-                        window.style.top = (e.clientY - initialY) + 'px';
-                    }
-                };
-                const onUp = () => {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                };
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
-            });
-        }
-        
-        function openSocialMediaApp(iconId, name) {
-            windowZIndex++;
-            const window = document.createElement('div');
-            window.className = 'win95-window';
-            window.style.left = '150px';
-            window.style.top = '100px';
-            window.style.width = '500px';
-            window.style.height = '450px';
-            window.style.zIndex = windowZIndex;
-            
-            const header = document.createElement('div');
-            header.className = 'win95-window-header';
-            const title = document.createElement('div');
-            title.className = 'win95-window-title';
-            title.textContent = name;
-            const controls = document.createElement('div');
-            controls.className = 'win95-window-controls';
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'win95-window-button';
-            closeBtn.textContent = '×';
-            closeBtn.onclick = () => window.remove();
-            controls.appendChild(closeBtn);
-            header.appendChild(title);
-            header.appendChild(controls);
-            
-            const content = document.createElement('div');
-            content.className = 'win95-window-content';
-            content.style.padding = '10px';
-            content.style.overflow = 'auto';
-            
-            // Create tabs
-            const tabsDiv = document.createElement('div');
-            tabsDiv.style.cssText = 'display: flex; gap: 5px; margin-bottom: 10px; border-bottom: 2px solid #808080;';
-            
-            const friendsTab = document.createElement('button');
-            friendsTab.textContent = 'Friends';
-            friendsTab.style.cssText = 'padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; cursor: pointer; font-weight: bold;';
-            
-            const requestsTab = document.createElement('button');
-            requestsTab.textContent = 'Requests';
-            requestsTab.style.cssText = 'padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; cursor: pointer;';
-            
-            const sentTab = document.createElement('button');
-            sentTab.textContent = 'Sent';
-            sentTab.style.cssText = 'padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; cursor: pointer;';
-            
-            const friendsList = document.createElement('div');
-            friendsList.id = `social-friends-${iconId}`;
-            friendsList.style.cssText = 'font-size: 11px;';
-            
-            function renderFriends() {
-                friendsTab.style.fontWeight = 'bold';
-                requestsTab.style.fontWeight = 'normal';
-                sentTab.style.fontWeight = 'normal';
-                
-                const friends = getFriends();
-                friendsList.innerHTML = '';
-                if (friends.length === 0) {
-                    friendsList.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">No friends yet. Accept friend requests to chat!</div>';
-                } else {
-                    friends.forEach(friendId => {
-                        const friendDiv = document.createElement('div');
-                        friendDiv.style.cssText = 'padding: 8px; margin-bottom: 5px; border: 1px inset #c0c0c0; background: #fff; cursor: pointer;';
-                        friendDiv.innerHTML = `<strong>${getUserAvatar(friendId)} ${friendId}</strong><br><small>${getUserBio(friendId) || 'No bio'}</small>`;
-                        friendDiv.onclick = () => {
-                        // Open private chat
-                        const chatWindow = document.createElement('div');
-                        chatWindow.className = 'win95-window';
-                        chatWindow.style.left = '200px';
-                        chatWindow.style.top = '150px';
-                        chatWindow.style.width = '500px';
-                        chatWindow.style.height = '400px';
-                        chatWindow.style.zIndex = ++windowZIndex;
-                        
-                        const chatHeader = document.createElement('div');
-                        chatHeader.className = 'win95-window-header';
-                        const chatTitle = document.createElement('div');
-                        chatTitle.className = 'win95-window-title';
-                        chatTitle.textContent = `Chat with ${friendId}`;
-                        const chatControls = document.createElement('div');
-                        chatControls.className = 'win95-window-controls';
-                        const chatClose = document.createElement('button');
-                        chatClose.className = 'win95-window-button';
-                        chatClose.textContent = '×';
-                        chatClose.onclick = () => chatWindow.remove();
-                        chatControls.appendChild(chatClose);
-                        chatHeader.appendChild(chatTitle);
-                        chatHeader.appendChild(chatControls);
-                        
-                        const chatContent = document.createElement('div');
-                        chatContent.className = 'win95-window-content';
-                        chatContent.style.cssText = 'padding: 10px; display: flex; flex-direction: column; height: calc(100% - 30px);';
-                        
-                        const chatMessages = document.createElement('div');
-                        chatMessages.id = `private-chat-${friendId}`;
-                        chatMessages.style.cssText = 'flex: 1; overflow-y: auto; border: 1px inset #c0c0c0; background: #fff; padding: 10px; margin-bottom: 10px; font-size: 11px;';
-                        
-                        const chatInputContainer = document.createElement('div');
-                        chatInputContainer.style.cssText = 'display: flex; gap: 5px;';
-                        const chatInput = document.createElement('input');
-                        chatInput.type = 'text';
-                        chatInput.placeholder = 'Type a message...';
-                        chatInput.style.cssText = 'flex: 1; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px;';
-                        const chatSend = document.createElement('button');
-                        chatSend.textContent = 'Send';
-                        chatSend.style.cssText = 'padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; cursor: pointer;';
-                        
-                        chatSend.onclick = () => {
-                            if (chatInput.value.trim()) {
-                                const msgDiv = document.createElement('div');
-                                msgDiv.style.cssText = 'margin-bottom: 5px; padding: 5px; background: #e0e0e0; border: 1px inset #c0c0c0;';
-                                msgDiv.innerHTML = `<strong>${getUserId()}:</strong> ${chatInput.value}`;
-                                chatMessages.appendChild(msgDiv);
-                                chatMessages.scrollTop = chatMessages.scrollHeight;
-                                chatInput.value = '';
-                            }
-                        };
-                        
-                        chatInput.onkeypress = (e) => {
-                            if (e.key === 'Enter') chatSend.onclick();
-                        };
-                        
-                        chatInputContainer.appendChild(chatInput);
-                        chatInputContainer.appendChild(chatSend);
-                        chatContent.appendChild(chatMessages);
-                        chatContent.appendChild(chatInputContainer);
-                        chatWindow.appendChild(chatHeader);
-                        chatWindow.appendChild(chatContent);
-                        document.getElementById('remoteDesktop').appendChild(chatWindow);
-                        
-                        // Make draggable
-                        let isDragging = false;
-                        chatHeader.addEventListener('mousedown', (e) => {
-                            isDragging = true;
-                            chatWindow.style.zIndex = ++windowZIndex;
-                            const initialX = e.clientX - chatWindow.offsetLeft;
-                            const initialY = e.clientY - chatWindow.offsetTop;
-                            const onMove = (e) => {
-                                if (isDragging) {
-                                    chatWindow.style.left = (e.clientX - initialX) + 'px';
-                                    chatWindow.style.top = (e.clientY - initialY) + 'px';
-                                }
-                            };
-                            const onUp = () => {
-                                isDragging = false;
-                                document.removeEventListener('mousemove', onMove);
-                                document.removeEventListener('mouseup', onUp);
-                            };
-                            document.addEventListener('mousemove', onMove);
-                            document.addEventListener('mouseup', onUp);
-                        });
-                    };
-                    friendsList.appendChild(friendDiv);
-                });
-            }
-            
-            function renderRequests() {
-                friendsTab.style.fontWeight = 'normal';
-                requestsTab.style.fontWeight = 'bold';
-                sentTab.style.fontWeight = 'normal';
-                
-                const requests = getFriendRequests();
-                friendsList.innerHTML = '';
-                if (requests.length === 0) {
-                    friendsList.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">No pending friend requests.</div>';
-                } else {
-                    requests.forEach(requestId => {
-                        const requestDiv = document.createElement('div');
-                        requestDiv.style.cssText = 'padding: 8px; margin-bottom: 5px; border: 1px inset #c0c0c0; background: #fff;';
-                        requestDiv.innerHTML = `
-                            <strong>${getUserAvatar(requestId)} ${requestId}</strong><br>
-                            <small>${getUserBio(requestId) || 'No bio'}</small><br>
-                            <div style="margin-top: 5px; display: flex; gap: 5px;">
-                                <button id="accept-${iconId}-${requestId}" style="padding: 4px 10px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 10px; cursor: pointer;">Accept</button>
-                                <button id="decline-${iconId}-${requestId}" style="padding: 4px 10px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 10px; cursor: pointer;">Decline</button>
-                            </div>
-                        `;
-                        
-                        setTimeout(() => {
-                            const acceptBtn = document.getElementById(`accept-${iconId}-${requestId}`);
-                            const declineBtn = document.getElementById(`decline-${iconId}-${requestId}`);
-                            if (acceptBtn) {
-                                acceptBtn.onclick = () => {
-                                    if (acceptFriendRequest(requestId)) {
-                                        renderRequests();
-                                        renderFriends();
-                                    }
-                                };
-                            }
-                            if (declineBtn) {
-                                declineBtn.onclick = () => {
-                                    if (declineFriendRequest(requestId)) {
-                                        renderRequests();
-                                    }
-                                };
-                            }
-                        }, 10);
-                        
-                        friendsList.appendChild(requestDiv);
-                    });
-                }
-            }
-            
-            function renderSent() {
-                friendsTab.style.fontWeight = 'normal';
-                requestsTab.style.fontWeight = 'normal';
-                sentTab.style.fontWeight = 'bold';
-                
-                const sent = getSentFriendRequests();
-                friendsList.innerHTML = '';
-                if (sent.length === 0) {
-                    friendsList.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">No sent friend requests.</div>';
-                } else {
-                    sent.forEach(requestId => {
-                        const sentDiv = document.createElement('div');
-                        sentDiv.style.cssText = 'padding: 8px; margin-bottom: 5px; border: 1px inset #c0c0c0; background: #fff;';
-                        sentDiv.innerHTML = `<strong>${getUserAvatar(requestId)} ${requestId}</strong><br><small>${getUserBio(requestId) || 'No bio'}</small><br><small style="color: #666;">Request sent - waiting for acceptance</small>`;
-                        friendsList.appendChild(sentDiv);
-                    });
-                }
-            }
-            
-            friendsTab.onclick = renderFriends;
-            requestsTab.onclick = renderRequests;
-            sentTab.onclick = renderSent;
-            
-            tabsDiv.appendChild(friendsTab);
-            tabsDiv.appendChild(requestsTab);
-            tabsDiv.appendChild(sentTab);
-            
-            content.appendChild(tabsDiv);
-            content.appendChild(friendsList);
-            
-            window.appendChild(header);
-            window.appendChild(content);
-            document.getElementById('remoteDesktop').appendChild(window);
-            
-            // Show friends by default
-            renderFriends();
-            
-            // Make draggable
-            let isDragging = false;
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                window.style.zIndex = ++windowZIndex;
-                const initialX = e.clientX - window.offsetLeft;
-                const initialY = e.clientY - window.offsetTop;
-                const onMove = (e) => {
-                    if (isDragging) {
-                        window.style.left = (e.clientX - initialX) + 'px';
-                        window.style.top = (e.clientY - initialY) + 'px';
-                    }
-                };
-                const onUp = () => {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                };
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
-            });
-        }
-        
-        function openPersonalizeApp(iconId, name) {
-            windowZIndex++;
-            const window = document.createElement('div');
-            window.className = 'win95-window';
-            window.style.left = '200px';
-            window.style.top = '100px';
-            window.style.width = '500px';
-            window.style.height = '500px';
-            window.style.zIndex = windowZIndex;
-            
-            const header = document.createElement('div');
-            header.className = 'win95-window-header';
-            const title = document.createElement('div');
-            title.className = 'win95-window-title';
-            title.textContent = name;
-            const controls = document.createElement('div');
-            controls.className = 'win95-window-controls';
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'win95-window-button';
-            closeBtn.textContent = '×';
-            closeBtn.onclick = () => window.remove();
-            controls.appendChild(closeBtn);
-            header.appendChild(title);
-            header.appendChild(controls);
-            
-            const content = document.createElement('div');
-            content.className = 'win95-window-content';
-            content.style.padding = '20px';
-            content.style.overflow = 'auto';
-            content.style.fontSize = '11px';
-            
-            const userIdLabel = document.createElement('label');
-            userIdLabel.textContent = 'User ID:';
-            userIdLabel.style.cssText = 'display: block; margin-bottom: 5px; font-weight: bold;';
-            const userIdInput = document.createElement('input');
-            userIdInput.type = 'text';
-            userIdInput.value = getUserId();
-            userIdInput.style.cssText = 'width: 100%; padding: 5px; border: 1px inset #c0c0c0; margin-bottom: 15px; font-size: 11px;';
-            
-            const bioLabel = document.createElement('label');
-            bioLabel.textContent = 'Bio:';
-            bioLabel.style.cssText = 'display: block; margin-bottom: 5px; font-weight: bold;';
-            const bioInput = document.createElement('textarea');
-            bioInput.value = getUserBio(getUserId()) || '';
-            bioInput.style.cssText = 'width: 100%; height: 80px; padding: 5px; border: 1px inset #c0c0c0; margin-bottom: 15px; font-size: 11px; resize: vertical;';
-            
-            const avatarLabel = document.createElement('label');
-            avatarLabel.textContent = 'Avatar Emoji:';
-            avatarLabel.style.cssText = 'display: block; margin-bottom: 5px; font-weight: bold;';
-            const avatarInput = document.createElement('input');
-            avatarInput.type = 'text';
-            avatarInput.value = getUserAvatar(getUserId());
-            avatarInput.style.cssText = 'width: 100%; padding: 5px; border: 1px inset #c0c0c0; margin-bottom: 15px; font-size: 20px; text-align: center;';
-            
-            const avatarImageLabel = document.createElement('label');
-            avatarImageLabel.textContent = 'Or Upload Avatar Image:';
-            avatarImageLabel.style.cssText = 'display: block; margin-bottom: 5px; font-weight: bold;';
-            const avatarImageInput = document.createElement('input');
-            avatarImageInput.type = 'file';
-            avatarImageInput.accept = 'image/*';
-            avatarImageInput.style.cssText = 'width: 100%; padding: 5px; border: 1px inset #c0c0c0; margin-bottom: 15px; font-size: 11px;';
-            const avatarPreview = document.createElement('img');
-            avatarPreview.id = `avatar-preview-${iconId}`;
-            avatarPreview.style.cssText = 'max-width: 80px; max-height: 80px; border: 1px inset #c0c0c0; display: none; margin-bottom: 15px;';
-            
-            avatarImageInput.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        avatarPreview.src = event.target.result;
-                        avatarPreview.style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            
-            const saveBtn = document.createElement('button');
-            saveBtn.textContent = 'Save';
-            saveBtn.style.cssText = 'padding: 8px 20px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; cursor: pointer; font-weight: bold;';
-            
-            saveBtn.onclick = () => {
-                const newUserId = userIdInput.value.trim();
-                const newBio = bioInput.value.trim();
-                const newAvatar = avatarInput.value || '👤';
-                const newAvatarImage = avatarPreview.style.display !== 'none' ? avatarPreview.src : null;
-                
-                if (newUserId.length >= 3 && newUserId.length <= 20) {
-                    if (newUserId !== getUserId()) {
-                        setUserId(newUserId);
-                    }
-                    setUserBio(newUserId, newBio);
-                    setUserAvatar(newUserId, newAvatar);
-                    if (newAvatarImage) {
-                        setUserAvatarImage(newUserId, newAvatarImage);
-                    }
-                    alert('Profile saved!');
-                } else {
-                    alert('User ID must be 3-20 characters');
-                }
-            };
-            
-            content.appendChild(userIdLabel);
-            content.appendChild(userIdInput);
-            content.appendChild(bioLabel);
-            content.appendChild(bioInput);
-            content.appendChild(avatarLabel);
-            content.appendChild(avatarInput);
-            content.appendChild(avatarImageLabel);
-            content.appendChild(avatarImageInput);
-            content.appendChild(avatarPreview);
-            content.appendChild(saveBtn);
-            window.appendChild(header);
-            window.appendChild(content);
-            document.getElementById('remoteDesktop').appendChild(window);
-            
-            // Make draggable
-            let isDragging = false;
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                window.style.zIndex = ++windowZIndex;
-                const initialX = e.clientX - window.offsetLeft;
-                const initialY = e.clientY - window.offsetTop;
-                const onMove = (e) => {
-                    if (isDragging) {
-                        window.style.left = (e.clientX - initialX) + 'px';
-                        window.style.top = (e.clientY - initialY) + 'px';
-                    }
-                };
-                const onUp = () => {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                };
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
-            });
-        }
-        
-        function openMusicApp(iconId, name) {
-            windowZIndex++;
-            const window = document.createElement('div');
-            window.className = 'win95-window';
-            window.style.left = '150px';
-            window.style.top = '100px';
-            window.style.width = '500px';
-            window.style.height = '400px';
-            window.style.zIndex = windowZIndex;
-            
-            const header = document.createElement('div');
-            header.className = 'win95-window-header';
-            const title = document.createElement('div');
-            title.className = 'win95-window-title';
-            title.textContent = name;
-            const controls = document.createElement('div');
-            controls.className = 'win95-window-controls';
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'win95-window-button';
-            closeBtn.textContent = '×';
-            closeBtn.onclick = () => {
-                const audio = document.getElementById(`music-player-${iconId}`);
-                if (audio) audio.pause();
-                window.remove();
-            };
-            controls.appendChild(closeBtn);
-            header.appendChild(title);
-            header.appendChild(controls);
-            
-            const content = document.createElement('div');
-            content.className = 'win95-window-content';
-            content.style.padding = '20px';
-            content.style.fontSize = '11px';
-            
-            const songs = [];
-            for (let i = 1; i <= 3; i++) {
-                const songDiv = document.createElement('div');
-                songDiv.style.cssText = 'margin-bottom: 15px; padding: 10px; border: 1px inset #c0c0c0; background: #fff;';
-                
-                const songLabel = document.createElement('label');
-                songLabel.textContent = `Song ${i}:`;
-                songLabel.style.cssText = 'display: block; margin-bottom: 5px; font-weight: bold;';
-                
-                const songInput = document.createElement('input');
-                songInput.type = 'file';
-                songInput.accept = 'audio/mp3,audio/*';
-                songInput.id = `song-${i}-${iconId}`;
-                songInput.style.cssText = 'width: 100%; padding: 5px; border: 1px inset #c0c0c0; margin-bottom: 5px; font-size: 11px;';
-                
-                const songName = document.createElement('div');
-                songName.id = `song-name-${i}-${iconId}`;
-                songName.style.cssText = 'font-size: 10px; color: #666; margin-bottom: 5px;';
-                songName.textContent = 'No file selected';
-                
-                const playBtn = document.createElement('button');
-                playBtn.textContent = '▶ Play';
-                playBtn.style.cssText = 'padding: 5px 10px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; cursor: pointer; margin-right: 5px;';
-                
-                const audio = document.createElement('audio');
-                audio.id = `audio-${i}-${iconId}`;
-                audio.style.cssText = 'display: none;';
-                
-                songInput.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (file && file.type.startsWith('audio/')) {
-                        const url = URL.createObjectURL(file);
-                        audio.src = url;
-                        songName.textContent = file.name;
-                        songs[i - 1] = { audio, name: file.name };
-                    }
-                };
-                
-                playBtn.onclick = () => {
-                    // Stop all other songs
-                    songs.forEach((s, idx) => {
-                        if (s && idx !== i - 1) s.audio.pause();
-                    });
-                    if (songs[i - 1] && songs[i - 1].audio) {
-                        if (songs[i - 1].audio.paused) {
-                            songs[i - 1].audio.play();
-                            playBtn.textContent = '⏸ Pause';
-                        } else {
-                            songs[i - 1].audio.pause();
-                            playBtn.textContent = '▶ Play';
-                        }
-                    }
-                };
-                
-                audio.addEventListener('ended', () => {
-                    playBtn.textContent = '▶ Play';
-                });
-                
-                songDiv.appendChild(songLabel);
-                songDiv.appendChild(songInput);
-                songDiv.appendChild(songName);
-                songDiv.appendChild(playBtn);
-                songDiv.appendChild(audio);
-                content.appendChild(songDiv);
-                songs.push(null);
-            }
-            
-            window.appendChild(header);
-            window.appendChild(content);
-            document.getElementById('remoteDesktop').appendChild(window);
-            
-            // Make draggable
-            let isDragging = false;
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                window.style.zIndex = ++windowZIndex;
-                const initialX = e.clientX - window.offsetLeft;
-                const initialY = e.clientY - window.offsetTop;
-                const onMove = (e) => {
-                    if (isDragging) {
-                        window.style.left = (e.clientX - initialX) + 'px';
-                        window.style.top = (e.clientY - initialY) + 'px';
-                    }
-                };
-                const onUp = () => {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                };
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
-            });
-        }
-        
         // Achievement triggers
         let colorChangeCount = 0;
         let commandsUsed = new Set();
@@ -11570,6 +10320,55 @@ body.theme-miku .visit-counter-number {
             }
         };
         
+        // Track navigation for achievements - override showPage
+        const originalShowPageForAchievements = showPage;
+        showPage = function(pageId) {
+            originalShowPageForAchievements(pageId);
+            
+            // Stop goose rain animation if leaving
+            if (pageId !== 'gooserainPage' && animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            // Stop stones animation if leaving
+            if (pageId !== 'stonesPage' && stonesAnimationId) {
+                cancelAnimationFrame(stonesAnimationId);
+                stonesAnimationId = null;
+                // Remove key handler when leaving
+                if (stonesKeyHandler) {
+                    document.removeEventListener('keydown', stonesKeyHandler);
+                    stonesKeyHandler = null;
+                }
+            }
+            
+            // Update money displays on page change
+            updateAllMoneyDisplays();
+            
+            if (pageId === 'homePage') {
+                unlockAchievement(1);
+            } else if (pageId === 'minesweeperPage') {
+                commandsUsed.add('sweeper');
+            } else if (pageId === 'pongPage') {
+                unlockAchievement(5);
+                commandsUsed.add('pong');
+            } else if (pageId === 'sandboxelsPage') {
+                unlockAchievement(10);
+                commandsUsed.add('sandboxles');
+            } else if (pageId === 'coinflipPage') {
+                commandsUsed.add('coinflip');
+            } else if (pageId === 'clickerPage') {
+                commandsUsed.add('clicker');
+                const clickerAmount = document.getElementById('clicker-amount');
+                if (clickerAmount) clickerAmount.textContent = clickerPerClick;
+            } else if (pageId === 'stonesPage') {
+                commandsUsed.add('stones');
+            }
+            
+            if (commandsUsed.size >= 10) {
+                unlockAchievement(11);
+            }
+        };
         
         // Track Minesweeper win
         const originalGameOver = gameOver;
