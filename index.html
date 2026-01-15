@@ -2596,7 +2596,9 @@ body.theme-flashcard button:hover {
                 'Actions': [
                     { name: 'honk', desc: 'Play honk sound', isGoose: true },
                     { name: 'clock', desc: 'Toggle clock (true/false)' },
-                    { name: 'whoami', desc: 'Display user profile' },
+                    { name: 'whoami', desc: 'Display your user profile' },
+                    { name: 'whoami [id]', desc: 'Display another user\'s profile by ID' },
+                    { name: 'iam [bio]', desc: 'Set your bio/profile text' },
                 ],
                 'Themes': [
                     { name: 'theme 1995', desc: 'Windows 95 grey boxed look' },
@@ -2618,7 +2620,9 @@ body.theme-flashcard button:hover {
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
                     { name: 'clock', desc: 'Toggle clock (true/false)' },
-                    { name: 'whoami', desc: 'Display user profile' },
+                    { name: 'whoami', desc: 'Display your user profile' },
+                    { name: 'whoami [id]', desc: 'Display another user\'s profile by ID' },
+                    { name: 'iam [bio]', desc: 'Set your bio/profile text' },
                 ]
             };
             
@@ -3261,9 +3265,56 @@ body.theme-flashcard button:hover {
             localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
         }
         
+        // User Profile System
+        function getUserId() {
+            let userId = localStorage.getItem('userId');
+            if (!userId) {
+                // Generate a unique ID (8 character alphanumeric)
+                userId = 'user_' + Math.random().toString(36).substr(2, 8);
+                localStorage.setItem('userId', userId);
+            }
+            return userId;
+        }
+        
+        function getUserBio(userId) {
+            const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
+            return bios[userId] || null;
+        }
+        
+        function setUserBio(userId, bio) {
+            const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
+            bios[userId] = bio;
+            localStorage.setItem('userBios', JSON.stringify(bios));
+        }
+        
+        function getAllUserBios() {
+            return JSON.parse(localStorage.getItem('userBios') || '{}');
+        }
+        
         // Whoami profile
-        function showWhoami() {
-            const profile = `User: Finley Chang | Location: Florida | Status: Building cool stuff | Favorite Command: goose 🦢`;
+        function showWhoami(targetUserId = null) {
+            const currentUserId = getUserId();
+            const userId = targetUserId || currentUserId;
+            
+            let profile;
+            if (userId === currentUserId) {
+                // Show own profile
+                const bio = getUserBio(userId);
+                if (bio) {
+                    profile = `ID: ${userId} | Bio: ${bio}`;
+                } else {
+                    profile = `ID: ${userId} | Bio: (No bio set. Use "iam [your bio]" to set one)`;
+                }
+            } else {
+                // Show other user's profile
+                const bio = getUserBio(userId);
+                if (bio) {
+                    profile = `ID: ${userId} | Bio: ${bio}`;
+                } else {
+                    profile = `ID: ${userId} | Bio: (User not found or has no bio)`;
+                }
+            }
+            
             showCommandFeedback('whoami', profile, true);
             const commandInput = document.getElementById('commandInput');
             if (commandInput) {
@@ -3272,6 +3323,26 @@ body.theme-flashcard button:hover {
                 setTimeout(() => {
                     commandInput.placeholder = 'Type a color or "home"...';
                 }, 2000);
+            }
+        }
+        
+        function setBio(bioText) {
+            if (!bioText || bioText.trim() === '') {
+                showCommandFeedback('iam', 'Please provide a bio. Usage: iam [your bio]', false);
+                return;
+            }
+            
+            const userId = getUserId();
+            setUserBio(userId, bioText.trim());
+            showCommandFeedback('iam', `Bio updated! Your ID is: ${userId}`, true);
+            
+            const commandInput = document.getElementById('commandInput');
+            if (commandInput) {
+                commandInput.value = '';
+                commandInput.placeholder = `Bio set! Your ID: ${userId}`;
+                setTimeout(() => {
+                    commandInput.placeholder = 'Type a color or "home"...';
+                }, 3000);
             }
         }
         
@@ -3697,9 +3768,17 @@ body.theme-flashcard button:hover {
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
+                } else if (command.startsWith('whoami ')) {
+                    resetConfirm = false;
+                    const targetId = command.substring(7).trim();
+                    showWhoami(targetId);
                 } else if (command === 'whoami') {
                     resetConfirm = false;
                     showWhoami();
+                } else if (command.startsWith('iam ')) {
+                    resetConfirm = false;
+                    const bioText = command.substring(4).trim();
+                    setBio(bioText);
                 } else if (command === 'stars') {
                     resetConfirm = false;
                     spawnMoreStars(50);
