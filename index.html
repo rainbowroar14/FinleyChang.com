@@ -1226,10 +1226,6 @@
                 width: 250px;
                 right: -250px;
             }
-            .visual-effects-menu {
-                width: 250px;
-                right: -250px;
-            }
             #jumpscareMenu {
                 width: 250px;
                 right: -250px;
@@ -1473,17 +1469,6 @@
         </div>
         <div class="commands-list" id="commandsList">
             <!-- Commands will be dynamically generated based on unlocks -->
-        </div>
-    </div>
-    
-    <!-- Visual Effects menu - draggable -->
-    <div class="visual-effects-menu" id="visualEffectsMenu">
-        <div class="visual-effects-menu-header" id="visualEffectsMenuHeader">
-            <h3>Visual Effects</h3>
-            <button class="visual-effects-menu-close" id="visualEffectsMenuClose">×</button>
-        </div>
-        <div class="visual-effects-list" id="visualEffectsList">
-            <!-- Visual effects buttons will be generated here -->
         </div>
     </div>
     
@@ -1769,9 +1754,24 @@
                     { name: 'feed', desc: 'Feed your pet goose', isGoose: true },
                     { name: 'hatch', desc: 'Hatch the pet goose egg', isGoose: true },
                 ],
+                'Visual Effects': [
+                    { name: 'matrix', desc: 'Matrix falling code effect' },
+                    { name: 'confetti', desc: 'Burst of confetti particles' },
+                    { name: 'spin', desc: 'Rotate website 360 degrees' },
+                    { name: 'invert', desc: 'Invert all colors' },
+                    { name: 'shake', desc: 'Shake the screen' },
+                    { name: 'upsidedown', desc: 'Flip the page upside down' },
+                    { name: 'party', desc: 'Disco color cycling' },
+                    { name: 'chaos', desc: 'Randomly trigger 3 random commands' },
+                    { name: 'blur', desc: 'Blur filter (toggle)' },
+                    { name: 'pixelate', desc: 'Pixelate filter' },
+                    { name: 'ghost', desc: '20% opacity' },
+                    { name: 'mirror', desc: 'Horizontal flip (toggle)' },
+                    { name: 'flashbang', desc: 'White flash + sound' },
+                    { name: 'earthquake', desc: 'Intense shake' },
+                ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
-                    { name: 'effects', desc: 'Show/hide visual effects menu' },
                     { name: 'jumpscaremenu', desc: 'Show/hide jumpscare menu' },
                     { name: 'resetappearance', desc: 'Reset all themes, backgrounds, and visual effects' },
                 ],
@@ -2449,22 +2449,6 @@
             }
         }
         
-        // Visual Effects menu functionality
-        const visualEffectsMenu = document.getElementById('visualEffectsMenu');
-        const visualEffectsMenuHeader = document.getElementById('visualEffectsMenuHeader');
-        const visualEffectsMenuClose = document.getElementById('visualEffectsMenuClose');
-        
-        function toggleVisualEffectsMenu() {
-            visualEffectsMenu.classList.toggle('open');
-            // Reset position if closing
-            if (!visualEffectsMenu.classList.contains('open')) {
-                visualEffectsMenu.style.right = '-300px';
-                visualEffectsMenu.style.left = 'auto';
-                visualEffectsMenu.style.top = '50%';
-                visualEffectsMenu.style.transform = 'translateY(-50%)';
-            }
-        }
-        
         // Jumpscare menu functionality
         const jumpscareMenu = document.getElementById('jumpscareMenu');
         const jumpscareMenuHeader = document.getElementById('jumpscareMenuHeader');
@@ -2480,107 +2464,6 @@
                 jumpscareMenu.style.transform = 'translateY(-50%)';
             }
         }
-        
-        // Render visual effects buttons
-        function renderVisualEffectsMenu() {
-            const effectsList = document.getElementById('visualEffectsList');
-            if (!effectsList) return;
-            
-            const effects = [
-                { name: 'matrix', desc: 'Matrix falling code effect', func: triggerMatrix },
-                { name: 'confetti', desc: 'Burst of confetti particles', func: triggerConfetti },
-                { name: 'spin', desc: 'Rotate website 360 degrees', func: triggerSpin },
-                { name: 'invert', desc: 'Invert all colors', func: triggerInvert },
-                { name: 'shake', desc: 'Shake the screen', func: triggerShake },
-                { name: 'upsidedown', desc: 'Flip the page upside down', func: triggerUpsideDown },
-                { name: 'party', desc: 'Disco color cycling', func: triggerParty },
-                { name: 'chaos', desc: 'Randomly trigger 3 random commands at once', func: triggerChaos },
-                { name: 'blur', desc: 'Blur filter (toggle)', func: triggerBlur },
-                { name: 'pixelate', desc: 'Pixelate filter', func: triggerPixelate },
-                { name: 'ghost', desc: '20% opacity', func: triggerGhost },
-                { name: 'mirror', desc: 'Horizontal flip', func: triggerMirror },
-                { name: 'flashbang', desc: 'White flash + sound', func: triggerFlashbang },
-                { name: 'earthquake', desc: 'Intense shake', func: triggerEarthquake },
-            ];
-            
-            let html = '';
-            effects.forEach(effect => {
-                html += `
-                    <button class="visual-effect-button" onclick="handleVisualEffect('${effect.name}')">
-                        <div class="visual-effect-name">${effect.name}</div>
-                        <div class="visual-effect-desc">${effect.desc}</div>
-                    </button>
-                `;
-            });
-            effectsList.innerHTML = html;
-        }
-        
-        // Handle visual effect button click
-        function handleVisualEffect(effectName) {
-            const originalCommand = effectName;
-            resetConfirm = false;
-            
-            if (effectName === 'matrix') {
-                triggerMatrix();
-                showCommandFeedback(originalCommand, 'Matrix effect activated!');
-            } else if (effectName === 'confetti') {
-                triggerConfetti();
-                showCommandFeedback(originalCommand, 'Confetti burst! 🎉');
-            } else if (effectName === 'spin') {
-                triggerSpin();
-                showCommandFeedback(originalCommand, 'Background spinning!');
-            } else if (effectName === 'invert') {
-                triggerInvert();
-                showCommandFeedback(originalCommand, 'Background inverted!');
-            } else if (effectName === 'shake') {
-                triggerShake();
-                showCommandFeedback(originalCommand, 'Background shaking!');
-            } else if (effectName === 'upsidedown') {
-                triggerUpsideDown();
-                showCommandFeedback(originalCommand, 'Background flipped! 🔄');
-            } else if (effectName === 'party') {
-                triggerParty();
-                showCommandFeedback(originalCommand, 'Party mode! 🎉');
-            } else if (effectName === 'chaos') {
-                triggerChaos();
-                showCommandFeedback(originalCommand, 'CHAOS! 💥✨🎨');
-            } else if (effectName === 'blur') {
-                triggerBlur();
-                showCommandFeedback(originalCommand, blurActive ? 'Blur ON' : 'Blur OFF');
-            } else if (effectName === 'pixelate') {
-                triggerPixelate();
-                showCommandFeedback(originalCommand, 'Pixelated!');
-            } else if (effectName === 'ghost') {
-                triggerGhost();
-                showCommandFeedback(originalCommand, 'Ghost mode! 👻');
-            } else if (effectName === 'mirror') {
-                triggerMirror();
-                showCommandFeedback(originalCommand, mirrorActive ? 'Mirrored! 🔄' : 'Unmirrored!');
-            } else if (effectName === 'flashbang') {
-                triggerFlashbang();
-                showCommandFeedback(originalCommand, 'FLASHBANG! 💥');
-            } else if (effectName === 'earthquake') {
-                triggerEarthquake();
-                showCommandFeedback(originalCommand, 'EARTHQUAKE! 🌍');
-            }
-        }
-        
-        // Make handleVisualEffect globally accessible
-        window.handleVisualEffect = handleVisualEffect;
-        
-        // Close menu button
-        visualEffectsMenuClose.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            visualEffectsMenu.classList.remove('open');
-            // Reset position when closed
-            if (!visualEffectsMenu.classList.contains('open')) {
-                visualEffectsMenu.style.right = '-300px';
-                visualEffectsMenu.style.left = 'auto';
-                visualEffectsMenu.style.top = '50%';
-                visualEffectsMenu.style.transform = 'translateY(-50%)';
-            }
-        });
         
         // Close jumpscare menu button
         jumpscareMenuClose.addEventListener('click', (e) => {
@@ -2599,64 +2482,6 @@
         // Make functions globally accessible
         window.triggerJumpscareFromMenu = triggerJumpscareFromMenu;
         window.addCustomJumpscare = addCustomJumpscare;
-        
-        // Make visual effects menu draggable
-        let isEffectsDragging = false;
-        let effectsCurrentX = 0;
-        let effectsCurrentY = 0;
-        let effectsInitialX = 0;
-        let effectsInitialY = 0;
-        
-        visualEffectsMenuHeader.addEventListener('mousedown', effectsDragStart);
-        document.addEventListener('mousemove', effectsDrag);
-        document.addEventListener('mouseup', effectsDragEnd);
-        
-        function effectsDragStart(e) {
-            if (e.target === visualEffectsMenuClose || !visualEffectsMenu.classList.contains('open')) return;
-            const rect = visualEffectsMenu.getBoundingClientRect();
-            effectsInitialX = e.clientX - rect.left;
-            effectsInitialY = e.clientY - rect.top;
-            isEffectsDragging = true;
-            visualEffectsMenu.classList.add('dragging');
-            visualEffectsMenu.style.transition = 'none';
-        }
-        
-        function effectsDrag(e) {
-            if (isEffectsDragging) {
-                e.preventDefault();
-                effectsCurrentX = e.clientX - effectsInitialX;
-                effectsCurrentY = e.clientY - effectsInitialY;
-                
-                // Keep menu within viewport
-                const maxX = window.innerWidth - visualEffectsMenu.offsetWidth;
-                const maxY = window.innerHeight - visualEffectsMenu.offsetHeight;
-                effectsCurrentX = Math.max(0, Math.min(effectsCurrentX, maxX));
-                effectsCurrentY = Math.max(0, Math.min(effectsCurrentY, maxY));
-                
-                visualEffectsMenu.style.right = 'auto';
-                visualEffectsMenu.style.left = `${effectsCurrentX}px`;
-                visualEffectsMenu.style.top = `${effectsCurrentY}px`;
-                visualEffectsMenu.style.transform = 'none'; // Remove translateY when dragging
-            }
-        }
-        
-        function effectsDragEnd(e) {
-            if (isEffectsDragging) {
-                isEffectsDragging = false;
-                visualEffectsMenu.classList.remove('dragging');
-                // Reset to default right-side position if not open
-                if (!visualEffectsMenu.classList.contains('open')) {
-                    visualEffectsMenu.style.right = '-300px';
-                    visualEffectsMenu.style.left = 'auto';
-                    visualEffectsMenu.style.top = '50%';
-                    visualEffectsMenu.style.transform = 'translateY(-50%)';
-                }
-                visualEffectsMenu.style.transition = 'right 0.3s ease';
-            }
-        }
-        
-        // Render visual effects menu on page load
-        renderVisualEffectsMenu();
         
         // Make jumpscare menu draggable
         let isJumpscareDragging = false;
@@ -3684,11 +3509,6 @@
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
-                } else if (command === 'effects' || command === 'vfx') {
-                    resetConfirm = false;
-                    toggleVisualEffectsMenu();
-                    showCommandFeedback(originalCommand, 'Visual effects menu toggled!');
-                    commandInput.value = '';
                 } else if (command === 'jumpscaremenu' || command === 'jumpscare') {
                     resetConfirm = false;
                     if (command === 'jumpscaremenu') {
@@ -4372,10 +4192,6 @@
             actions.push(() => {
                 toggleCommandsMenu();
                 showCommandFeedback('chaos', 'Chaos: Toggled commands menu!');
-            });
-            actions.push(() => {
-                toggleVisualEffectsMenu();
-                showCommandFeedback('chaos', 'Chaos: Toggled effects menu!');
             });
             actions.push(() => {
                 toggleJumpscareMenu();
