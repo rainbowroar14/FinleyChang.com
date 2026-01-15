@@ -1115,27 +1115,10 @@
             color: #58a6ff;
             font-size: 13px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
         
         .chat-message.own-message .chat-message-user {
             color: #3fb950;
-        }
-        
-        .chat-message-avatar {
-            font-size: 18px;
-            display: inline-block;
-        }
-        
-        .chat-message-avatar-img {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            object-fit: cover;
-            display: inline-block;
-            vertical-align: middle;
         }
         
         .chat-message-time {
@@ -2652,17 +2635,16 @@ body.theme-flashcard button:hover {
 <body>
     <!-- Main page with FinHub title -->
     <div class="page" id="mainPage">
-        <div class="home-page">
-            <div class="finhub-title">
-                <!-- Big F made of small letters -->
-                <div class="big-letter letter-f" id="letter-f"></div>
-                <!-- Big i made of small letters -->
-                <div class="big-letter letter-i" id="letter-i"></div>
-                <!-- Big n made of small letters -->
-                <div class="big-letter letter-n" id="letter-n"></div>
-                <!-- Big H made of small letters -->
-                <div class="big-letter letter-h" id="letter-h"></div>
-                <!-- Big u made of small letters -->
+        <div class="finhub-title">
+            <!-- Big F made of small letters -->
+            <div class="big-letter letter-f" id="letter-f"></div>
+            <!-- Big i made of small letters -->
+            <div class="big-letter letter-i" id="letter-i"></div>
+            <!-- Big n made of small letters -->
+            <div class="big-letter letter-n" id="letter-n"></div>
+            <!-- Big H made of small letters -->
+            <div class="big-letter letter-h" id="letter-h"></div>
+            <!-- Big u made of small letters -->
             <div class="big-letter letter-u" id="letter-u"></div>
             <!-- Big b made of small letters -->
             <div class="big-letter letter-b" id="letter-b"></div>
@@ -2670,31 +2652,9 @@ body.theme-flashcard button:hover {
         
         <p class="subtitle">Built with code, powered by Finley</p>
         <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
-        
-        <!-- Customizable Home Elements -->
-        <div class="home-custom-elements" id="homeCustomElements">
-            <!-- Text boxes, pictures, and drawings will be added here -->
-        </div>
-        
-        <!-- Add Element Button -->
-        <div class="home-add-elements" id="homeAddElements">
-            <button class="home-add-btn" onclick="showAddElementMenu()" title="Add custom elements to home page">+ Add Element</button>
-        </div>
-        
         <!-- Canvas for wooperbird goose on main page -->
         <canvas id="wooperbirdCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;"></canvas>
-        </div>
-    
-    <!-- Add Element Menu -->
-    <div class="add-element-menu" id="addElementMenu">
-        <div class="add-element-menu-content">
-            <h3>Add Element to Home</h3>
-            <button class="add-element-option" onclick="addHomeTextBox()">📝 Text Box</button>
-            <button class="add-element-option" onclick="addHomePicture()">🖼️ Picture</button>
-            <button class="add-element-option" onclick="addHomeDrawing()">🎨 Drawing</button>
-            <button class="add-element-close" onclick="closeAddElementMenu()">Cancel</button>
-        </div>
-    </div>
+                </div>
     
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
@@ -2989,33 +2949,11 @@ body.theme-flashcard button:hover {
                     <small><span id="bioCharCount">0</span>/200 characters</small>
                 </div>
                 <div class="edit-field">
-                    <label>Avatar:</label>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-size: 12px;">Upload Image:</label>
-                        <input type="file" id="avatarImageUpload" accept="image/*" style="display: none;">
-                        <button onclick="document.getElementById('avatarImageUpload').click()" style="padding: 8px 15px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">Choose Image</button>
-                        <div id="avatarImagePreview" style="margin-top: 10px;">
-                            <img id="avatarImagePreviewImg" src="" style="max-width: 80px; max-height: 80px; border-radius: 50%; border: 2px solid #30363d; display: none;">
-                        </div>
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-size: 12px;">Or Choose Emoji:</label>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-size: 12px;">Upload Image:</label>
-                            <input type="file" id="avatarImageUpload" accept="image/*" style="display: none;">
-                            <button onclick="document.getElementById('avatarImageUpload').click()" style="padding: 8px 15px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 10px;">Choose Image</button>
-                            <div id="avatarImagePreview" style="margin-top: 10px;">
-                                <img id="avatarImagePreviewImg" src="" style="max-width: 80px; max-height: 80px; border-radius: 50%; border: 2px solid #30363d; display: none;">
-                            </div>
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-size: 12px;">Or Choose Emoji:</label>
-                            <div class="emoji-picker">
-                                <div class="emoji-preview" id="emojiPreview">👤</div>
-                                <div class="emoji-grid" id="emojiGrid">
-                                    <!-- Emojis will be populated here -->
-                                </div>
-                            </div>
+                    <label>Avatar Emoji:</label>
+                    <div class="emoji-picker">
+                        <div class="emoji-preview" id="emojiPreview">👤</div>
+                        <div class="emoji-grid" id="emojiGrid">
+                            <!-- Emojis will be populated here -->
                         </div>
                     </div>
                 </div>
@@ -4066,46 +4004,18 @@ body.theme-flashcard button:hover {
             const bioInput = document.getElementById('editBio');
             const emojiPreview = document.getElementById('emojiPreview');
             const emojiGrid = document.getElementById('emojiGrid');
-            const avatarImagePreview = document.getElementById('avatarImagePreviewImg');
-            const avatarImageUpload = document.getElementById('avatarImageUpload');
             
             if (!modal) return;
             
             const currentUserId = getUserId();
             const currentBio = getUserBio(currentUserId) || '';
             const currentAvatar = getUserAvatar(currentUserId);
-            const currentAvatarImage = getUserAvatarImage(currentUserId);
             
             // Populate fields
             userIdInput.value = currentUserId;
             bioInput.value = currentBio;
             emojiPreview.textContent = currentAvatar;
             updateBioCharCount();
-            
-            // Show avatar image if exists
-            if (currentAvatarImage) {
-                avatarImagePreview.src = currentAvatarImage;
-                avatarImagePreview.style.display = 'block';
-            } else {
-                avatarImagePreview.style.display = 'none';
-            }
-            
-            // Handle image upload
-            if (avatarImageUpload) {
-                avatarImageUpload.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (file && file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            avatarImagePreview.src = event.target.result;
-                            avatarImagePreview.style.display = 'block';
-                            // Clear emoji when image is selected
-                            emojiPreview.textContent = '';
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
-            }
             
             // Populate emoji grid
             emojiGrid.innerHTML = '';
@@ -4143,14 +4053,12 @@ body.theme-flashcard button:hover {
             const userIdInput = document.getElementById('editUserId');
             const bioInput = document.getElementById('editBio');
             const emojiPreview = document.getElementById('emojiPreview');
-            const avatarImagePreview = document.getElementById('avatarImagePreviewImg');
             
             if (!userIdInput || !bioInput || !emojiPreview) return;
             
             const newUserId = userIdInput.value.trim();
             const newBio = bioInput.value.trim();
-            const newAvatar = emojiPreview.textContent || '👤';
-            const newAvatarImage = avatarImagePreview && avatarImagePreview.style.display !== 'none' ? avatarImagePreview.src : null;
+            const newAvatar = emojiPreview.textContent;
             
             // Validate user ID
             if (newUserId.length < 3 || newUserId.length > 20) {
@@ -4173,12 +4081,12 @@ body.theme-flashcard button:hover {
                     showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
                     return;
                 } else if (result === true) {
-                    finishSaving(newUserId, newBio, newAvatar, newAvatarImage);
+                    finishSaving(newUserId, newBio, newAvatar);
                 } else {
                     // Promise result
                     result.then((success) => {
                         if (success) {
-                            finishSaving(newUserId, newBio, newAvatar, newAvatarImage);
+                            finishSaving(newUserId, newBio, newAvatar);
                         } else {
                             showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
                         }
@@ -4186,39 +4094,25 @@ body.theme-flashcard button:hover {
                     return;
                 }
             } else {
-                finishSaving(newUserId, newBio, newAvatar, newAvatarImage);
+                finishSaving(newUserId, newBio, newAvatar);
             }
         }
         
-        function finishSaving(userId, bio, avatar, avatarImage) {
+        function finishSaving(userId, bio, avatar) {
             // Save bio
             setUserBio(userId, bio);
             
             // Save avatar
             setUserAvatar(userId, avatar);
             
-            // Save avatar image if provided
-            if (avatarImage) {
-                setUserAvatarImage(userId, avatarImage);
-            } else {
-                // Clear avatar image if emoji is selected
-                const avatarImages = JSON.parse(localStorage.getItem('userAvatarImages') || '{}');
-                delete avatarImages[userId];
-                localStorage.setItem('userAvatarImages', JSON.stringify(avatarImages));
-            }
-            
             // Sync to Firebase if available
             if (database) {
                 try {
-                    const updateData = {
+                    database.ref(`users/${userId}`).update({
                         bio: bio,
                         avatar: avatar,
                         lastSeen: Date.now()
-                    };
-                    if (avatarImage) {
-                        updateData.avatarImage = avatarImage;
-                    }
-                    database.ref(`users/${userId}`).update(updateData);
+                    });
                 } catch (e) {
                     console.warn('Could not sync profile to Firebase:', e);
                 }
@@ -4245,9 +4139,6 @@ body.theme-flashcard button:hover {
             
             // Load history from localStorage
             loadCommandHistory();
-            
-            // Load home elements
-            loadHomeElements();
             
             // Check terms agreement
             checkTermsAgreement();
@@ -4495,17 +4386,6 @@ body.theme-flashcard button:hover {
             const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
             avatars[userId] = emoji;
             localStorage.setItem('userAvatars', JSON.stringify(avatars));
-        }
-        
-        function getUserAvatarImage(userId) {
-            const avatarImages = JSON.parse(localStorage.getItem('userAvatarImages') || '{}');
-            return avatarImages[userId] || null;
-        }
-        
-        function setUserAvatarImage(userId, imageData) {
-            const avatarImages = JSON.parse(localStorage.getItem('userAvatarImages') || '{}');
-            avatarImages[userId] = imageData;
-            localStorage.setItem('userAvatarImages', JSON.stringify(avatarImages));
         }
         
         // Friends System
@@ -5111,19 +4991,9 @@ body.theme-flashcard button:hover {
             const time = new Date(message.timestamp);
             const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            // Get avatar (emoji or image)
-            const avatar = getUserAvatar(message.userId);
-            const avatarImg = getUserAvatarImage(message.userId);
-            let avatarHtml = '';
-            if (avatarImg) {
-                avatarHtml = `<img src="${avatarImg}" class="chat-message-avatar-img" alt="avatar">`;
-            } else {
-                avatarHtml = `<span class="chat-message-avatar">${avatar}</span>`;
-            }
-            
             messageDiv.innerHTML = `
                 <div class="chat-message-header">
-                    <span class="chat-message-user" onclick="showWhoami('${message.userId}')">${avatarHtml} ${message.userId}</span>
+                    <span class="chat-message-user" onclick="showWhoami('${message.userId}')">${message.userId}</span>
                     <span class="chat-message-time">${timeStr}</span>
                 </div>
                 <div class="chat-message-text">${escapeHtml(message.text)}</div>
