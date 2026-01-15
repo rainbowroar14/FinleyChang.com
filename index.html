@@ -2860,6 +2860,34 @@ body.theme-flashcard button:hover {
         </div>
     </div>
     
+    <!-- Suggestions page -->
+    <div class="page suggestions-page hidden" id="suggestionsPage">
+        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">💡 Suggestions</h1>
+        <p style="color: #8b949e; font-size: 16px; margin-bottom: 30px;">View and create suggestions for the website</p>
+        <div style="max-width: 900px; margin: 0 auto;">
+            <!-- Create suggestion form -->
+            <div style="background: #161b22; border: 2px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+                <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 15px;">Create New Suggestion</h2>
+                <textarea id="suggestion-input" placeholder="Enter your suggestion here..." style="width: 100%; min-height: 100px; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; margin-bottom: 15px; font-family: inherit; resize: vertical;" maxlength="500"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="suggestion-char-count" style="color: #8b949e; font-size: 14px;">0/500 characters</span>
+                    <button onclick="submitSuggestion()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Submit Suggestion</button>
+                </div>
+            </div>
+            
+            <!-- Suggestions list -->
+            <div id="suggestions-list" style="background: #161b22; border: 2px solid #30363d; border-radius: 8px; padding: 20px;">
+                <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 20px;">All Suggestions</h2>
+                <div id="suggestions-content" style="color: #c9d1d9;">
+                    <p style="color: #8b949e; text-align: center; padding: 20px;">Loading suggestions...</p>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
+        </div>
+    </div>
+    
     <!-- Changelog page -->
     <div class="page changelog-page hidden" id="changelogPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">📝 Changelog</h1>
@@ -3297,6 +3325,7 @@ body.theme-flashcard button:hover {
                     { name: 'finley', desc: 'Transform back to FinHub' },
                     { name: 'achievements', desc: 'View achievements' },
                     { name: 'changelog', desc: 'View changelog and updates' },
+                    { name: 'suggest', desc: 'Open suggestions area to view and create suggestions' },
                     { name: 'background', desc: 'Change background' },
                     { name: 'bg', desc: 'Change background' },
                     { name: 'goose', desc: 'Transform to GooseHub' },
@@ -5408,6 +5437,12 @@ body.theme-flashcard button:hover {
                     loadChangelog();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'suggest') {
+                    resetConfirm = false;
+                    showPage('suggestionsPage');
+                    loadSuggestions();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'background' || command === 'bg') {
                     resetConfirm = false;
                     showPage('backgroundPage');
@@ -7096,6 +7131,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🧱</text></svg>") no-repeat center';
             } else if (type === 'chatbot') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🤖</text></svg>") no-repeat center';
+            } else if (type === 'passwordgame') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🔐</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -7151,6 +7188,8 @@ body.theme-flashcard button:hover {
                     openBlockBreakerApp(iconId, name);
                 } else if (type === 'chatbot') {
                     openChatbotApp(iconId, name);
+                } else if (type === 'passwordgame') {
+                    openPasswordGameApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -7412,6 +7451,16 @@ body.theme-flashcard button:hover {
                         <button id="install-chatbot" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🔐</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Password Game</div>
+                            <div style="font-size: 11px; color: #666;">Guess the password - word guessing game</div>
+                        </div>
+                        <button id="install-passwordgame" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
             `;
             
             content.appendChild(storeContent);
@@ -7551,6 +7600,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('chatbot', 'Chatbot', x, y);
                         alert('Chatbot installed successfully!');
+                    };
+                }
+                
+                const installPasswordGameBtn = document.getElementById('install-passwordgame');
+                if (installPasswordGameBtn) {
+                    installPasswordGameBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'passwordgame');
+                        if (alreadyInstalled) {
+                            alert('Password Game is already installed!');
+                            return;
+                        }
+                        
+                        // Add Password Game icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('passwordgame', 'Password Game', x, y);
+                        alert('Password Game installed successfully!');
                     };
                 }
             }, 100);
@@ -7876,6 +7943,10 @@ body.theme-flashcard button:hover {
             }
             if (type === 'chatbot') {
                 openChatbotApp(iconId, name);
+                return;
+            }
+            if (type === 'passwordgame') {
+                openPasswordGameApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -9274,6 +9345,215 @@ body.theme-flashcard button:hover {
             
             // Focus input field
             setTimeout(() => inputField.focus(), 100);
+        }
+        
+        // Password Game app
+        function openPasswordGameApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '400px';
+            window.style.height = '500px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.display = 'flex';
+            content.style.flexDirection = 'column';
+            content.style.height = 'calc(100% - 20px)';
+            content.style.overflow = 'hidden';
+            
+            // Word list for password game
+            const words = ['APPLE', 'BRAVE', 'CLOUD', 'DREAM', 'EARTH', 'FLAME', 'GLASS', 'HEART', 'IMAGE', 'JOKER', 'KNIFE', 'LIGHT', 'MAGIC', 'NIGHT', 'OCEAN', 'PIANO', 'QUICK', 'RIVER', 'STORM', 'TIGER', 'UNITY', 'VOICE', 'WATER', 'YOUTH', 'ZEBRA'];
+            
+            let currentPassword = '';
+            let attempts = 0;
+            const maxAttempts = 6;
+            let gameWon = false;
+            
+            // Game HTML
+            const gameHTML = `
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <button id="passwordgame-new" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
+                    <div style="font-size: 12px; margin-bottom: 5px;">Attempts: <span id="passwordgame-attempts">0</span>/${maxAttempts}</div>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">Guess the 5-letter password!</div>
+                </div>
+                <div id="passwordgame-guesses" style="flex: 1; overflow-y: auto; border: 1px inset #c0c0c0; padding: 10px; margin-bottom: 10px; background: #fff; font-size: 11px; font-family: monospace; min-height: 200px;">
+                    <!-- Guesses will appear here -->
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="passwordgame-input" maxlength="5" style="flex: 1; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px; font-family: monospace; text-transform: uppercase;" placeholder="Enter 5 letters...">
+                    <button id="passwordgame-submit" style="padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; font-weight: bold; cursor: pointer;">Guess</button>
+                </div>
+                <div id="passwordgame-result" style="margin-top: 10px; font-size: 11px; font-weight: bold; min-height: 20px; text-align: center;"></div>
+            `;
+            content.innerHTML = gameHTML;
+            
+            const guessesArea = content.querySelector('#passwordgame-guesses');
+            const inputField = content.querySelector('#passwordgame-input');
+            const submitBtn = content.querySelector('#passwordgame-submit');
+            const newGameBtn = content.querySelector('#passwordgame-new');
+            const attemptsEl = content.querySelector('#passwordgame-attempts');
+            const resultEl = content.querySelector('#passwordgame-result');
+            
+            function startNewGame() {
+                currentPassword = words[Math.floor(Math.random() * words.length)];
+                attempts = 0;
+                gameWon = false;
+                guessesArea.innerHTML = '';
+                resultEl.textContent = '';
+                attemptsEl.textContent = attempts;
+                inputField.value = '';
+                inputField.disabled = false;
+                submitBtn.disabled = false;
+                inputField.focus();
+            }
+            
+            function checkGuess() {
+                const guess = inputField.value.toUpperCase().trim();
+                
+                if (guess.length !== 5) {
+                    resultEl.textContent = 'Please enter exactly 5 letters!';
+                    resultEl.style.color = '#f85149';
+                    return;
+                }
+                
+                if (!/^[A-Z]+$/.test(guess)) {
+                    resultEl.textContent = 'Only letters allowed!';
+                    resultEl.style.color = '#f85149';
+                    return;
+                }
+                
+                attempts++;
+                attemptsEl.textContent = attempts;
+                
+                // Create guess display
+                const guessDiv = document.createElement('div');
+                guessDiv.style.cssText = 'margin-bottom: 5px; padding: 5px; background: #f0f0f0; border: 1px solid #ccc;';
+                
+                let guessHTML = '';
+                let correctCount = 0;
+                
+                for (let i = 0; i < 5; i++) {
+                    const guessLetter = guess[i];
+                    const passwordLetter = currentPassword[i];
+                    let color = '#666';
+                    let bgColor = '#ddd';
+                    
+                    if (guessLetter === passwordLetter) {
+                        color = '#fff';
+                        bgColor = '#238636';
+                        correctCount++;
+                    } else if (currentPassword.includes(guessLetter)) {
+                        color = '#fff';
+                        bgColor = '#f85149';
+                    }
+                    
+                    guessHTML += `<span style="display: inline-block; width: 30px; height: 30px; line-height: 30px; text-align: center; margin: 2px; background: ${bgColor}; color: ${color}; font-weight: bold; border: 1px solid #999;">${guessLetter}</span>`;
+                }
+                
+                guessDiv.innerHTML = guessHTML;
+                guessesArea.appendChild(guessDiv);
+                guessesArea.scrollTop = guessesArea.scrollHeight;
+                
+                // Check win/lose
+                if (correctCount === 5) {
+                    gameWon = true;
+                    resultEl.textContent = '🎉 You won! The password was ' + currentPassword;
+                    resultEl.style.color = '#238636';
+                    inputField.disabled = true;
+                    submitBtn.disabled = true;
+                } else if (attempts >= maxAttempts) {
+                    resultEl.textContent = '❌ Game Over! The password was ' + currentPassword;
+                    resultEl.style.color = '#f85149';
+                    inputField.disabled = true;
+                    submitBtn.disabled = true;
+                } else {
+                    resultEl.textContent = `${correctCount} correct letter(s) in right position`;
+                    resultEl.style.color = '#58a6ff';
+                }
+                
+                inputField.value = '';
+                inputField.focus();
+            }
+            
+            submitBtn.onclick = checkGuess;
+            inputField.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !inputField.disabled) {
+                    checkGuess();
+                }
+            });
+            
+            newGameBtn.onclick = startNewGame;
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'passwordgame',
+                element: window
+            });
+            
+            updateTaskbar();
+            
+            // Start the game
+            startNewGame();
         }
         
         // Make functions globally accessible
@@ -11365,7 +11645,9 @@ body.theme-flashcard button:hover {
                 // Check if Chatbot entry already exists
                 const hasChatbot = entries.some(e => e.title && e.title.includes('Chatbot'));
                 const hasBlockBreakerUpdate = entries.some(e => e.title && e.title.includes('Block Breaker improvements'));
-                if (!hasChatbot || !hasBlockBreakerUpdate) {
+                const hasPasswordGame = entries.some(e => e.title && e.title.includes('Password Game'));
+                const hasSuggestions = entries.some(e => e.title && e.title.includes('Suggestions'));
+                if (!hasChatbot || !hasBlockBreakerUpdate || !hasPasswordGame || !hasSuggestions) {
                     // Add Block Breaker improvements
                     if (!hasBlockBreakerUpdate) {
                         entries.push({
@@ -11382,6 +11664,24 @@ body.theme-flashcard button:hover {
                             title: '🤖 Added Chatbot App to Desktop',
                             description: 'Added a Chatbot app to the Remote Desktop App Store. The chatbot responds to every message with "sorry i dont understand mabey try again later". Install it from the App Store in Remote Desktop, then double-click the Chatbot icon to chat.',
                             userRequest: 'make another one thats called chatbot and every time it responds by saying sorry i dont understand mabey try again later'
+                        });
+                    }
+                    // Add Password Game entry
+                    if (!hasPasswordGame) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🔐 Added Password Game to Desktop',
+                            description: 'Added a Password Game (word guessing game) to the Remote Desktop App Store. Guess the 5-letter password with color-coded feedback. Green means correct letter in correct position, red means letter exists but wrong position. Install it from the App Store in Remote Desktop, then double-click the Password Game icon to play.',
+                            userRequest: 'add the password game to remote desktop'
+                        });
+                    }
+                    // Add Suggestions entry
+                    if (!hasSuggestions) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '💡 Added Suggestions System',
+                            description: 'Added a Suggestions area where users can view and create suggestions for the website. Features include: viewing all suggestions sorted by likes, liking suggestions, creating new suggestions, and real-time updates via Firebase. Access it using the "suggest" command.',
+                            userRequest: 'a Suggestion area where you can like and see other peoples suggestions and suggest stuff by doing the suggest command to open a gui with everyones sugestions and to make your own'
                         });
                     }
                     localStorage.setItem('changelog', JSON.stringify(entries));
@@ -11418,6 +11718,222 @@ body.theme-flashcard button:hover {
         
         // Initialize changelog on page load if it doesn't exist
         getChangelogEntries();
+        
+        // Suggestion system
+        let likedSuggestions = new Set();
+        
+        // Load liked suggestions from localStorage
+        function loadLikedSuggestions() {
+            const saved = localStorage.getItem('likedSuggestions');
+            if (saved) {
+                likedSuggestions = new Set(JSON.parse(saved));
+            }
+        }
+        
+        // Save liked suggestions to localStorage
+        function saveLikedSuggestions() {
+            localStorage.setItem('likedSuggestions', JSON.stringify(Array.from(likedSuggestions)));
+        }
+        
+        // Load suggestions from Firebase or localStorage
+        function loadSuggestions() {
+            const suggestionsContent = document.getElementById('suggestions-content');
+            if (!suggestionsContent) return;
+            
+            suggestionsContent.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading suggestions...</p>';
+            
+            // Update character count
+            const input = document.getElementById('suggestion-input');
+            const charCount = document.getElementById('suggestion-char-count');
+            if (input && charCount) {
+                input.addEventListener('input', () => {
+                    charCount.textContent = input.value.length + '/500 characters';
+                });
+            }
+            
+            loadLikedSuggestions();
+            
+            if (database) {
+                // Load from Firebase with real-time updates
+                database.ref('suggestions').orderByChild('timestamp').on('value', (snapshot) => {
+                    const suggestions = [];
+                    snapshot.forEach((child) => {
+                        const data = child.val();
+                        suggestions.push({
+                            id: child.key,
+                            ...data
+                        });
+                    });
+                    // Sort by likes (descending), then by timestamp (descending)
+                    suggestions.sort((a, b) => {
+                        const likesA = a.likes || 0;
+                        const likesB = b.likes || 0;
+                        if (likesB !== likesA) return likesB - likesA;
+                        return (b.timestamp || 0) - (a.timestamp || 0);
+                    });
+                    renderSuggestions(suggestions);
+                });
+            } else {
+                // Load from localStorage fallback
+                const saved = localStorage.getItem('suggestions');
+                const suggestions = saved ? JSON.parse(saved) : [];
+                renderSuggestions(suggestions);
+            }
+        }
+        
+        // Render suggestions
+        function renderSuggestions(suggestions) {
+            const suggestionsContent = document.getElementById('suggestions-content');
+            if (!suggestionsContent) return;
+            
+            if (suggestions.length === 0) {
+                suggestionsContent.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No suggestions yet. Be the first to suggest something!</p>';
+                return;
+            }
+            
+            let html = '';
+            suggestions.forEach(suggestion => {
+                const isLiked = likedSuggestions.has(suggestion.id);
+                const likes = suggestion.likes || 0;
+                const author = suggestion.author || 'Anonymous';
+                const timestamp = suggestion.timestamp ? new Date(suggestion.timestamp).toLocaleString() : 'Unknown';
+                
+                html += `
+                    <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                            <div style="flex: 1;">
+                                <p style="color: #c9d1d9; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;">${escapeHtml(suggestion.text)}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #30363d;">
+                            <div style="color: #8b949e; font-size: 12px;">
+                                <span>By: ${escapeHtml(author)}</span>
+                                <span style="margin-left: 15px;">${timestamp}</span>
+                            </div>
+                            <button onclick="toggleLikeSuggestion('${suggestion.id}')" style="background: ${isLiked ? '#238636' : '#21262d'}; color: white; border: 1px solid #30363d; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px;">
+                                <span>${isLiked ? '❤️' : '🤍'}</span>
+                                <span>${likes}</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            suggestionsContent.innerHTML = html;
+        }
+        
+        // Submit suggestion
+        function submitSuggestion() {
+            const input = document.getElementById('suggestion-input');
+            if (!input) return;
+            
+            const text = input.value.trim();
+            if (!text) {
+                alert('Please enter a suggestion!');
+                return;
+            }
+            
+            if (text.length > 500) {
+                alert('Suggestion is too long! Maximum 500 characters.');
+                return;
+            }
+            
+            const userId = getUserId();
+            const author = userId || 'Anonymous';
+            const timestamp = Date.now();
+            const suggestion = {
+                text: text,
+                author: author,
+                timestamp: timestamp,
+                likes: 0
+            };
+            
+            if (database) {
+                // Save to Firebase
+                const newSuggestionRef = database.ref('suggestions').push();
+                newSuggestionRef.set(suggestion).then(() => {
+                    input.value = '';
+                    const charCount = document.getElementById('suggestion-char-count');
+                    if (charCount) charCount.textContent = '0/500 characters';
+                    loadSuggestions();
+                }).catch((error) => {
+                    console.error('Error saving suggestion:', error);
+                    alert('Failed to save suggestion. Please try again.');
+                });
+            } else {
+                // Save to localStorage fallback
+                const saved = localStorage.getItem('suggestions');
+                const suggestions = saved ? JSON.parse(saved) : [];
+                const id = 'suggestion_' + timestamp;
+                suggestions.push({
+                    id: id,
+                    ...suggestion
+                });
+                localStorage.setItem('suggestions', JSON.stringify(suggestions));
+                input.value = '';
+                const charCount = document.getElementById('suggestion-char-count');
+                if (charCount) charCount.textContent = '0/500 characters';
+                loadSuggestions();
+            }
+        }
+        
+        // Toggle like on suggestion
+        function toggleLikeSuggestion(suggestionId) {
+            loadLikedSuggestions();
+            
+            if (likedSuggestions.has(suggestionId)) {
+                // Unlike
+                likedSuggestions.delete(suggestionId);
+                updateSuggestionLikes(suggestionId, -1);
+            } else {
+                // Like
+                likedSuggestions.add(suggestionId);
+                updateSuggestionLikes(suggestionId, 1);
+            }
+            
+            saveLikedSuggestions();
+            loadSuggestions();
+        }
+        
+        // Update suggestion likes count
+        function updateSuggestionLikes(suggestionId, delta) {
+            if (database) {
+                // Update in Firebase
+                database.ref(`suggestions/${suggestionId}`).transaction((suggestion) => {
+                    if (suggestion) {
+                        suggestion.likes = (suggestion.likes || 0) + delta;
+                        if (suggestion.likes < 0) suggestion.likes = 0;
+                    }
+                    return suggestion;
+                });
+            } else {
+                // Update in localStorage
+                const saved = localStorage.getItem('suggestions');
+                if (saved) {
+                    const suggestions = JSON.parse(saved);
+                    const index = suggestions.findIndex(s => s.id === suggestionId);
+                    if (index !== -1) {
+                        suggestions[index].likes = (suggestions[index].likes || 0) + delta;
+                        if (suggestions[index].likes < 0) suggestions[index].likes = 0;
+                        localStorage.setItem('suggestions', JSON.stringify(suggestions));
+                    }
+                }
+            }
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Make functions globally accessible
+        window.submitSuggestion = submitSuggestion;
+        window.toggleLikeSuggestion = toggleLikeSuggestion;
+        
+        // Load liked suggestions on page load
+        loadLikedSuggestions();
     </script>
 </body>
 </html>
