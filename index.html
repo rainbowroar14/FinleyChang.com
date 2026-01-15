@@ -2860,6 +2860,20 @@ body.theme-flashcard button:hover {
         </div>
     </div>
     
+    <!-- Changelog page -->
+    <div class="page changelog-page hidden" id="changelogPage">
+        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">📝 Changelog</h1>
+        <p style="color: #8b949e; font-size: 16px; margin-bottom: 30px;">Track of all additions and updates to the website</p>
+        <div style="max-width: 800px; margin: 0 auto; text-align: left;">
+            <div id="changelog-content" style="background: #161b22; border: 2px solid #30363d; border-radius: 8px; padding: 20px; color: #c9d1d9;">
+                <!-- Changelog entries will be displayed here -->
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
+        </div>
+    </div>
+    
     <!-- Background Selection page -->
     <div class="page background-page hidden" id="backgroundPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Background Selection</h1>
@@ -3282,6 +3296,7 @@ body.theme-flashcard button:hover {
                     { name: 'clicker', desc: 'Play clicker game' },
                     { name: 'finley', desc: 'Transform back to FinHub' },
                     { name: 'achievements', desc: 'View achievements' },
+                    { name: 'changelog', desc: 'View changelog and updates' },
                     { name: 'background', desc: 'Change background' },
                     { name: 'bg', desc: 'Change background' },
                     { name: 'goose', desc: 'Transform to GooseHub' },
@@ -5387,6 +5402,12 @@ body.theme-flashcard button:hover {
                     renderAchievements();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'changelog') {
+                    resetConfirm = false;
+                    showPage('changelogPage');
+                    loadChangelog();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'background' || command === 'bg') {
                     resetConfirm = false;
                     showPage('backgroundPage');
@@ -7069,6 +7090,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎮</text></svg>") no-repeat center';
             } else if (type === 'sandboxles') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🏖️</text></svg>") no-repeat center';
+            } else if (type === 'snake') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🐍</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -7118,6 +7141,8 @@ body.theme-flashcard button:hover {
                     openPongApp(iconId, name);
                 } else if (type === 'sandboxles') {
                     openSandboxlesApp(iconId, name);
+                } else if (type === 'snake') {
+                    openSnakeApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -7349,6 +7374,16 @@ body.theme-flashcard button:hover {
                         <button id="install-sandboxles" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🐍</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Snake</div>
+                            <div style="font-size: 11px; color: #666;">Classic snake game - 16x16 grid with 3 red apples</div>
+                        </div>
+                        <button id="install-snake" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
             `;
             
             content.appendChild(storeContent);
@@ -7434,6 +7469,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('sandboxles', 'Sandboxles', x, y);
                         alert('Sandboxles installed successfully!');
+                    };
+                }
+                
+                const installSnakeBtn = document.getElementById('install-snake');
+                if (installSnakeBtn) {
+                    installSnakeBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'snake');
+                        if (alreadyInstalled) {
+                            alert('Snake is already installed!');
+                            return;
+                        }
+                        
+                        // Add Snake icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('snake', 'Snake', x, y);
+                        alert('Snake installed successfully!');
                     };
                 }
             }, 100);
@@ -7747,6 +7800,10 @@ body.theme-flashcard button:hover {
         function openDesktopApp(type, iconId, name) {
             if (type === 'minesweeper') {
                 openMinesweeperApp(iconId, name);
+                return;
+            }
+            if (type === 'snake') {
+                openSnakeApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -8364,6 +8421,302 @@ body.theme-flashcard button:hover {
             });
             
             updateTaskbar();
+        }
+        
+        // Snake app
+        function openSnakeApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '400px';
+            window.style.height = '500px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                if (snakeGameInterval) {
+                    clearInterval(snakeGameInterval);
+                    snakeGameInterval = null;
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.overflow = 'auto';
+            content.style.display = 'flex';
+            content.style.flexDirection = 'column';
+            content.style.alignItems = 'center';
+            
+            // Game HTML
+            const gameHTML = `
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <button id="snake-restart" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
+                    <div style="font-size: 12px; margin-bottom: 10px;">Score: <span id="snake-score">0</span></div>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">Use arrow keys to move</div>
+                </div>
+                <canvas id="snake-canvas" width="256" height="256" style="border: 2px inset #c0c0c0; background: #ffffff; display: block;"></canvas>
+            `;
+            content.innerHTML = gameHTML;
+            
+            const canvas = content.querySelector('#snake-canvas');
+            const ctx = canvas.getContext('2d');
+            const restartBtn = content.querySelector('#snake-restart');
+            const scoreEl = content.querySelector('#snake-score');
+            
+            // Game constants
+            const GRID_SIZE = 16;
+            const CELL_SIZE = 16;
+            const NUM_APPLES = 3;
+            
+            // Game state
+            let snake = [{x: 8, y: 8}];
+            let direction = {x: 1, y: 0};
+            let apples = [];
+            let score = 0;
+            let snakeGameInterval = null;
+            let gameRunning = false;
+            
+            // Generate apples
+            function generateApples() {
+                apples = [];
+                while (apples.length < NUM_APPLES) {
+                    const x = Math.floor(Math.random() * GRID_SIZE);
+                    const y = Math.floor(Math.random() * GRID_SIZE);
+                    // Make sure apple doesn't spawn on snake
+                    const onSnake = snake.some(segment => segment.x === x && segment.y === y);
+                    const onExistingApple = apples.some(apple => apple.x === x && apple.y === y);
+                    if (!onSnake && !onExistingApple) {
+                        apples.push({x, y});
+                    }
+                }
+            }
+            
+            // Draw game
+            function draw() {
+                // Clear canvas
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw grid lines
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= GRID_SIZE; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * CELL_SIZE, 0);
+                    ctx.lineTo(i * CELL_SIZE, canvas.height);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * CELL_SIZE);
+                    ctx.lineTo(canvas.width, i * CELL_SIZE);
+                    ctx.stroke();
+                }
+                
+                // Draw snake (black)
+                ctx.fillStyle = '#000000';
+                snake.forEach(segment => {
+                    ctx.fillRect(segment.x * CELL_SIZE + 1, segment.y * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+                });
+                
+                // Draw apples (red)
+                ctx.fillStyle = '#ff0000';
+                apples.forEach(apple => {
+                    ctx.fillRect(apple.x * CELL_SIZE + 1, apple.y * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+                });
+            }
+            
+            // Game loop
+            function gameLoop() {
+                if (!gameRunning) return;
+                
+                // Move snake
+                const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
+                
+                // Check wall collision
+                if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+                    gameOver();
+                    return;
+                }
+                
+                // Check self collision
+                if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                    gameOver();
+                    return;
+                }
+                
+                snake.unshift(head);
+                
+                // Check apple collision
+                let ateApple = false;
+                for (let i = apples.length - 1; i >= 0; i--) {
+                    if (head.x === apples[i].x && head.y === apples[i].y) {
+                        apples.splice(i, 1);
+                        score++;
+                        scoreEl.textContent = score;
+                        ateApple = true;
+                    }
+                }
+                
+                // If didn't eat apple, remove tail
+                if (!ateApple) {
+                    snake.pop();
+                }
+                
+                // Regenerate apples if needed
+                if (apples.length < NUM_APPLES) {
+                    generateApples();
+                }
+                
+                draw();
+            }
+            
+            function startGame() {
+                if (snakeGameInterval) {
+                    clearInterval(snakeGameInterval);
+                }
+                
+                // Reset game state
+                snake = [{x: 8, y: 8}];
+                direction = {x: 1, y: 0};
+                score = 0;
+                scoreEl.textContent = score;
+                gameRunning = true;
+                
+                generateApples();
+                draw();
+                
+                // Start game loop (update every 150ms)
+                snakeGameInterval = setInterval(gameLoop, 150);
+            }
+            
+            function gameOver() {
+                gameRunning = false;
+                if (snakeGameInterval) {
+                    clearInterval(snakeGameInterval);
+                    snakeGameInterval = null;
+                }
+                alert('Game Over! Score: ' + score);
+                startGame();
+            }
+            
+            // Keyboard controls
+            const handleKeyPress = (e) => {
+                if (!gameRunning) return;
+                
+                // Check if this window still exists and is visible
+                if (!window.parentNode || !canvas.offsetParent) return;
+                
+                switch(e.key) {
+                    case 'ArrowUp':
+                        if (direction.y === 0) {
+                            direction = {x: 0, y: -1};
+                            e.preventDefault();
+                        }
+                        break;
+                    case 'ArrowDown':
+                        if (direction.y === 0) {
+                            direction = {x: 0, y: 1};
+                            e.preventDefault();
+                        }
+                        break;
+                    case 'ArrowLeft':
+                        if (direction.x === 0) {
+                            direction = {x: -1, y: 0};
+                            e.preventDefault();
+                        }
+                        break;
+                    case 'ArrowRight':
+                        if (direction.x === 0) {
+                            direction = {x: 1, y: 0};
+                            e.preventDefault();
+                        }
+                        break;
+                }
+            };
+            
+            // Add keyboard listener
+            document.addEventListener('keydown', handleKeyPress);
+            closeBtn.onclick = () => {
+                document.removeEventListener('keydown', handleKeyPress);
+                if (snakeGameInterval) {
+                    clearInterval(snakeGameInterval);
+                    snakeGameInterval = null;
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            restartBtn.onclick = () => {
+                if (snakeGameInterval) {
+                    clearInterval(snakeGameInterval);
+                }
+                startGame();
+            };
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'snake',
+                element: window
+            });
+            
+            updateTaskbar();
+            
+            // Start the game
+            startGame();
         }
         
         // Make functions globally accessible
@@ -10408,6 +10761,70 @@ body.theme-flashcard button:hover {
                 }
             }, 100);
         };
+        
+        // Changelog system
+        function loadChangelog() {
+            const changelogContent = document.getElementById('changelog-content');
+            if (!changelogContent) return;
+            
+            const changelog = getChangelogEntries();
+            let html = '';
+            
+            // Sort by date (newest first)
+            const sortedChangelog = changelog.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedChangelog.forEach(entry => {
+                html += `
+                    <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #30363d;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h3 style="color: #58a6ff; font-size: 18px; margin: 0;">${entry.title}</h3>
+                            <span style="color: #8b949e; font-size: 12px;">${entry.date}</span>
+                        </div>
+                        <p style="color: #c9d1d9; font-size: 14px; margin: 5px 0;">${entry.description}</p>
+                        ${entry.userRequest ? `<p style="color: #8b949e; font-size: 12px; font-style: italic; margin-top: 5px;">User Request: "${entry.userRequest}"</p>` : ''}
+                    </div>
+                `;
+            });
+            
+            changelogContent.innerHTML = html || '<p style="color: #8b949e;">No changelog entries yet.</p>';
+        }
+        
+        function getChangelogEntries() {
+            const saved = localStorage.getItem('changelog');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            // Initialize with Snake game entry
+            const initialEntry = {
+                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                title: '🐍 Added Snake Game to Desktop',
+                description: 'Added a classic Snake game to the Remote Desktop App Store. The game features a 16x16 grid with a black snake and 3 red apples. Install it from the App Store in Remote Desktop, then double-click the Snake icon to play. Use arrow keys to control the snake.',
+                userRequest: 'Add a classic snake game for the desktop section where it\'s a 16x16 and there is 3 red boxes (apples) and you black'
+            };
+            const entries = [initialEntry];
+            localStorage.setItem('changelog', JSON.stringify(entries));
+            return entries;
+        }
+        
+        function addChangelogEntry(title, description, userRequest = '') {
+            const entries = getChangelogEntries();
+            entries.push({
+                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                title: title,
+                description: description,
+                userRequest: userRequest
+            });
+            localStorage.setItem('changelog', JSON.stringify(entries));
+            
+            // Reload changelog if the page is currently open
+            const changelogPage = document.getElementById('changelogPage');
+            if (changelogPage && !changelogPage.classList.contains('hidden')) {
+                loadChangelog();
+            }
+        }
+        
+        // Initialize changelog on page load if it doesn't exist
+        getChangelogEntries();
     </script>
 </body>
 </html>
