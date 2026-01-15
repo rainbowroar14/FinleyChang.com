@@ -478,6 +478,25 @@
             color: #000000 !important;
         }
         
+        /* Exempt FinHub title from 1995 theme */
+        .theme-1995 .finhub-title,
+        .theme-1995 .finhub-title *,
+        .theme-1995 .big-letter,
+        .theme-1995 .big-letter *,
+        .theme-1995 .small-letter {
+            border: none !important;
+            background: transparent !important;
+        }
+        
+        /* Make FinHub letters visible in 1995 theme */
+        .theme-1995 .big-letter {
+            color: #000000 !important;
+        }
+        
+        .theme-1995 .big-letter .small-letter {
+            color: #000000 !important;
+        }
+        
         .theme-cyberpunk {
             background: #0a0e27 !important;
             color: #ff0080 !important;
@@ -855,21 +874,23 @@
             max-width: 500px;
             max-height: 300px;
             min-width: 300px;
-            z-index: 998;
+            z-index: 997;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             overflow-y: auto;
             overflow-x: hidden;
-            display: flex;
+            display: none;
             flex-direction: column;
+            pointer-events: none;
         }
         
         .command-history.hidden {
-            display: none;
+            display: none !important;
         }
         
         /* Always show history when it has entries - never hide them */
         .command-history:not(:empty):not(.hidden) {
             display: flex !important;
+            pointer-events: auto;
         }
         
         .command-history-entry {
@@ -929,6 +950,7 @@
             gap: 8px;
             min-width: 250px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 999;
         }
         
         .command-bar::before {
@@ -940,23 +962,38 @@
         /* Pet goose styling */
         .pet-goose {
             position: fixed;
-            bottom: 100px;
-            left: 20px;
+            bottom: 20px;
+            right: 20px;
             width: 60px;
             height: 60px;
             font-size: 50px;
             z-index: 99;
-            pointer-events: none;
+            pointer-events: auto;
             user-select: none;
             transition: transform 0.2s;
+            cursor: grab;
+            text-align: center;
+            line-height: 60px;
         }
         
-        .pet-goose:hover {
-            transform: scale(1.1);
+        .pet-goose:active {
+            cursor: grabbing;
         }
         
         .pet-goose.hidden {
             display: none;
+        }
+        
+        .pet-goose.egg {
+            font-size: 40px;
+        }
+        
+        .pet-goose.chick {
+            font-size: 35px;
+        }
+        
+        .pet-goose.goose {
+            font-size: 50px;
         }
         
         .command-input {
@@ -989,15 +1026,18 @@
             transition: right 0.3s ease;
             z-index: 1000;
             overflow-y: auto;
+            visibility: hidden;
         }
         
         .commands-menu.open {
             right: 0;
+            visibility: visible;
         }
         
         .commands-menu.dragging {
-            transform: none;
+            transform: translateY(-50%);
             transition: none;
+            visibility: visible;
         }
         
         .commands-menu-header {
@@ -1082,17 +1122,20 @@
             border-radius: 8px 0 0 8px;
             box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
             transition: right 0.3s ease;
-            z-index: 1000;
+            z-index: 999;
             overflow-y: auto;
+            visibility: hidden;
         }
         
         .visual-effects-menu.open {
             right: 0;
+            visibility: visible;
         }
         
         .visual-effects-menu.dragging {
-            transform: none;
+            transform: translateY(-50%);
             transition: none;
+            visibility: visible;
         }
         
         .visual-effects-menu-header {
@@ -1187,6 +1230,10 @@
                 width: 250px;
                 right: -250px;
             }
+            #jumpscareMenu {
+                width: 250px;
+                right: -250px;
+            }
         }
     </style>
 </head>
@@ -1248,16 +1295,29 @@
     <!-- Paint page -->
     <div class="page sandboxels-page hidden" id="paintPage">
         <canvas id="paintCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; cursor: crosshair;"></canvas>
-        <div style="position: fixed; top: 20px; left: 20px; color: black; font-size: 16px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); z-index: 1000; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 8px;">
-            <div>Brush Size: <span id="paint-brush-size">5</span></div>
+        <div style="position: fixed; top: 20px; left: 20px; color: black; font-size: 16px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); z-index: 1000; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 8px; min-width: 200px;">
+            <div style="margin-bottom: 15px;">
+                <label for="paint-brush-type" style="display: block; margin-bottom: 5px; font-weight: bold;">Brush Type:</label>
+                <select id="paint-brush-type" style="width: 100%; padding: 5px; font-size: 14px; border: 2px solid #333; border-radius: 4px; cursor: pointer;">
+                    <option value="pencil">Pencil</option>
+                    <option value="paintbrush">Paintbrush</option>
+                    <option value="spray">Spray</option>
+                    <option value="marker">Marker</option>
+                    <option value="eraser">Eraser</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="paint-brush-size-slider" style="display: block; margin-bottom: 5px;">Brush Size: <span id="paint-brush-size">5</span></label>
+                <input type="range" id="paint-brush-size-slider" min="1" max="50" value="5" style="width: 100%;">
+            </div>
             <div style="margin-top: 10px;">
                 <label for="paint-color-picker" style="display: block; margin-bottom: 5px;">Color:</label>
                 <input type="color" id="paint-color-picker" value="#000000" style="width: 60px; height: 30px; cursor: pointer; border: 2px solid #333; border-radius: 4px;">
                 <span id="paint-color-display" style="margin-left: 10px;">#000000</span>
             </div>
-            </div>
+        </div>
         <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
-            </div>
+    </div>
         
     <!-- Coinflip page -->
     <div class="page coinflip-page hidden" id="coinflipPage">
@@ -1424,6 +1484,17 @@
         </div>
         <div class="visual-effects-list" id="visualEffectsList">
             <!-- Visual effects buttons will be generated here -->
+        </div>
+    </div>
+    
+    <!-- Jumpscare menu - draggable -->
+    <div class="visual-effects-menu" id="jumpscareMenu" style="top: 60%; transform: translateY(-50%);">
+        <div class="visual-effects-menu-header" id="jumpscareMenuHeader">
+            <h3>Jumpscare Menu</h3>
+            <button class="visual-effects-menu-close" id="jumpscareMenuClose">×</button>
+        </div>
+        <div class="visual-effects-list" id="jumpscareList">
+            <!-- Jumpscare options will be generated here -->
         </div>
     </div>
 
@@ -1701,6 +1772,11 @@
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
                     { name: 'effects', desc: 'Show/hide visual effects menu' },
+                    { name: 'jumpscaremenu', desc: 'Show/hide jumpscare menu' },
+                    { name: 'resetappearance', desc: 'Reset all themes, backgrounds, and visual effects' },
+                ],
+                'Actions': [
+                    { name: 'jumpscare', desc: 'Trigger jumpscare' },
                 ]
             };
             
@@ -1874,15 +1950,162 @@
             return localStorage.getItem('hasPetGoose') === 'true';
         }
         
+        // Pet Goose System with Evolution
+        let petGoose = null; // { stage: 'egg'|'chick'|'goose', x, y, hatchTime, evolveTime }
+        let petGooseDragged = false;
+        let petGooseAnimationId = null;
+        
         function spawnPetGoose() {
-            const petGoose = document.getElementById('petGoose');
+            const petGooseEl = document.getElementById('petGoose');
+            if (!petGooseEl) return;
+            
+            // Load saved state
+            const saved = localStorage.getItem('petGooseState');
+            if (saved) {
+                const data = JSON.parse(saved);
+                petGoose = {
+                    stage: data.stage || 'egg',
+                    x: data.x || window.innerWidth - 80,
+                    y: data.y || window.innerHeight - 80,
+                    hatchTime: data.hatchTime || null,
+                    evolveTime: data.evolveTime || null
+                };
+            } else {
+                // New pet goose - start as egg
+                petGoose = {
+                    stage: 'egg',
+                    x: window.innerWidth - 80,
+                    y: window.innerHeight - 80,
+                    hatchTime: null,
+                    evolveTime: null
+                };
+            }
+            
+            petGooseActive = true;
+            localStorage.setItem('hasPetGoose', 'true');
+            updatePetGooseDisplay();
+            savePetGooseState();
+            
+            // Load feed count
+            const savedFeedCount = localStorage.getItem('gooseFeedCount');
+            if (savedFeedCount) {
+                feedCount = parseInt(savedFeedCount);
+            }
+            
+            // Unlock goose commands
+            unlockCommand('honk');
+            unlockCommand('gooserain');
+            unlockCommand('wooperbird');
+            unlockCommand('horde');
+            unlockCommand('nest');
+            unlockCommand('translate');
+            unlockCommand('detect');
+            unlockCommand('goosecall');
+            unlockCommand('steal');
+            unlockCommand('feed');
+            unlockCommand('hatch');
+            
+            // Setup dragging
+            setupPetGooseDragging();
+            
+            // Check if chick needs to evolve to goose
+            if (petGoose.stage === 'chick' && petGoose.evolveTime) {
+                const timeUntilEvolve = petGoose.evolveTime - Date.now();
+                if (timeUntilEvolve <= 0) {
+                    evolveToGoose();
+                } else {
+                    setTimeout(() => evolveToGoose(), timeUntilEvolve);
+                }
+            }
+        }
+        
+        function updatePetGooseDisplay() {
+            const petGooseEl = document.getElementById('petGoose');
+            if (!petGooseEl || !petGoose) return;
+            
+            petGooseEl.classList.remove('hidden', 'egg', 'chick', 'goose');
+            petGooseEl.classList.add(petGoose.stage);
+            
+            const emojis = {
+                'egg': '🥚',
+                'chick': '🐣',
+                'goose': '🦢'
+            };
+            petGooseEl.textContent = emojis[petGoose.stage] || '🦢';
+            petGooseEl.style.right = (window.innerWidth - petGoose.x) + 'px';
+            petGooseEl.style.bottom = (window.innerHeight - petGoose.y) + 'px';
+        }
+        
+        function hatchPetGoose() {
+            if (!petGoose || petGoose.stage !== 'egg') return;
+            
+            petGoose.stage = 'chick';
+            petGoose.hatchTime = Date.now();
+            petGoose.evolveTime = Date.now() + (2 * 60 * 1000); // 2 minutes from now
+            updatePetGooseDisplay();
+            savePetGooseState();
+            
+            // Auto-evolve after 2 minutes
+            setTimeout(() => {
+                if (petGoose && petGoose.stage === 'chick') {
+                    evolveToGoose();
+                }
+            }, 2 * 60 * 1000);
+        }
+        
+        function evolveToGoose() {
+            if (!petGoose || petGoose.stage !== 'chick') return;
+            
+            petGoose.stage = 'goose';
+            updatePetGooseDisplay();
+            savePetGooseState();
+            showCommandFeedback('auto', 'Your chick grew into a goose! 🦢');
+        }
+        
+        function setupPetGooseDragging() {
+            const petGooseEl = document.getElementById('petGoose');
+            if (!petGooseEl) return;
+            
+            let startX = 0, startY = 0;
+            
+            petGooseEl.onmousedown = (e) => {
+                e.preventDefault();
+                petGooseDragged = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                petGooseEl.style.cursor = 'grabbing';
+            };
+            
+            window.onmousemove = (e) => {
+                if (petGooseDragged && petGoose) {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    petGoose.x = Math.max(0, Math.min(window.innerWidth - 60, petGoose.x - dx));
+                    petGoose.y = Math.max(0, Math.min(window.innerHeight - 60, petGoose.y - dy));
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    updatePetGooseDisplay();
+                }
+            };
+            
+            window.onmouseup = () => {
+                if (petGooseDragged) {
+                    petGooseDragged = false;
+                    petGooseEl.style.cursor = 'grab';
+                    savePetGooseState();
+                }
+            };
+        }
+        
+        function savePetGooseState() {
             if (petGoose) {
-                petGoose.classList.remove('hidden');
-                localStorage.setItem('hasPetGoose', 'true');
-                // Unlock goose commands when pet goose is spawned
-                unlockCommand('honk');
-                unlockCommand('gooserain');
-                unlockCommand('wooperbird');
+                localStorage.setItem('petGooseState', JSON.stringify({
+                    stage: petGoose.stage,
+                    x: petGoose.x,
+                    y: petGoose.y,
+                    hatchTime: petGoose.hatchTime,
+                    evolveTime: petGoose.evolveTime
+                }));
             }
         }
         
@@ -1969,7 +2192,7 @@
             if (titleContainer) {
                 titleContainer.innerHTML = '';
                 ['f', 'i', 'n', 'h', 'u', 'b'].forEach(letter => {
-                    const div = document.createElement('div');
+                const div = document.createElement('div');
                     div.className = `big-letter letter-${letter}`;
                     div.id = `letter-${letter}`;
                     titleContainer.appendChild(div);
@@ -2117,7 +2340,7 @@
                 }
             });
         }
-        
+
         // Function to apply wooper colors (blue and pink)
         function applyWooperColors() {
             const wooperColors = ['#0000ff', '#ff69b4']; // Blue and pink
@@ -2132,11 +2355,13 @@
         }
         
         // Navigation system
+        let currentPage = 'mainPage';
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.add('hidden');
             });
             document.getElementById(pageId).classList.remove('hidden');
+            currentPage = pageId;
         }
         
         // Commands menu functionality
@@ -2146,11 +2371,27 @@
         
         function toggleCommandsMenu() {
             commandsMenu.classList.toggle('open');
+            // Reset position if closing
+            if (!commandsMenu.classList.contains('open')) {
+                commandsMenu.style.right = '-300px';
+                commandsMenu.style.left = 'auto';
+                commandsMenu.style.top = '50%';
+                commandsMenu.style.transform = 'translateY(-50%)';
+            }
         }
         
         // Close menu button
-        commandsMenuClose.addEventListener('click', () => {
+        commandsMenuClose.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             commandsMenu.classList.remove('open');
+            // Reset position when closed
+            if (!commandsMenu.classList.contains('open')) {
+                commandsMenu.style.right = '-300px';
+                commandsMenu.style.left = 'auto';
+                commandsMenu.style.top = '50%';
+                commandsMenu.style.transform = 'translateY(-50%)';
+            }
         });
         
         // Make menu draggable
@@ -2189,6 +2430,7 @@
                 commandsMenu.style.right = 'auto';
                 commandsMenu.style.left = `${currentX}px`;
                 commandsMenu.style.top = `${currentY}px`;
+                commandsMenu.style.transform = 'none'; // Remove translateY when dragging
             }
         }
         
@@ -2196,6 +2438,13 @@
             if (isDragging) {
                 isDragging = false;
                 commandsMenu.classList.remove('dragging');
+                // Reset to default right-side position if not open
+                if (!commandsMenu.classList.contains('open')) {
+                    commandsMenu.style.right = '-300px';
+                    commandsMenu.style.left = 'auto';
+                    commandsMenu.style.top = '50%';
+                    commandsMenu.style.transform = 'translateY(-50%)';
+                }
                 commandsMenu.style.transition = 'right 0.3s ease';
             }
         }
@@ -2207,6 +2456,29 @@
         
         function toggleVisualEffectsMenu() {
             visualEffectsMenu.classList.toggle('open');
+            // Reset position if closing
+            if (!visualEffectsMenu.classList.contains('open')) {
+                visualEffectsMenu.style.right = '-300px';
+                visualEffectsMenu.style.left = 'auto';
+                visualEffectsMenu.style.top = '50%';
+                visualEffectsMenu.style.transform = 'translateY(-50%)';
+            }
+        }
+        
+        // Jumpscare menu functionality
+        const jumpscareMenu = document.getElementById('jumpscareMenu');
+        const jumpscareMenuHeader = document.getElementById('jumpscareMenuHeader');
+        const jumpscareMenuClose = document.getElementById('jumpscareMenuClose');
+        
+        function toggleJumpscareMenu() {
+            jumpscareMenu.classList.toggle('open');
+            // Reset position if closing
+            if (!jumpscareMenu.classList.contains('open')) {
+                jumpscareMenu.style.right = '-300px';
+                jumpscareMenu.style.left = 'auto';
+                jumpscareMenu.style.top = '60%';
+                jumpscareMenu.style.transform = 'translateY(-50%)';
+            }
         }
         
         // Render visual effects buttons
@@ -2222,7 +2494,7 @@
                 { name: 'shake', desc: 'Shake the screen', func: triggerShake },
                 { name: 'upsidedown', desc: 'Flip the page upside down', func: triggerUpsideDown },
                 { name: 'party', desc: 'Disco color cycling', func: triggerParty },
-                { name: 'chaos', desc: 'Randomly trigger 3 effects at once', func: triggerChaos },
+                { name: 'chaos', desc: 'Randomly trigger 3 random commands at once', func: triggerChaos },
                 { name: 'blur', desc: 'Blur filter (toggle)', func: triggerBlur },
                 { name: 'pixelate', desc: 'Pixelate filter', func: triggerPixelate },
                 { name: 'ghost', desc: '20% opacity', func: triggerGhost },
@@ -2297,9 +2569,36 @@
         window.handleVisualEffect = handleVisualEffect;
         
         // Close menu button
-        visualEffectsMenuClose.addEventListener('click', () => {
+        visualEffectsMenuClose.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             visualEffectsMenu.classList.remove('open');
+            // Reset position when closed
+            if (!visualEffectsMenu.classList.contains('open')) {
+                visualEffectsMenu.style.right = '-300px';
+                visualEffectsMenu.style.left = 'auto';
+                visualEffectsMenu.style.top = '50%';
+                visualEffectsMenu.style.transform = 'translateY(-50%)';
+            }
         });
+        
+        // Close jumpscare menu button
+        jumpscareMenuClose.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            jumpscareMenu.classList.remove('open');
+            // Reset position when closed
+            if (!jumpscareMenu.classList.contains('open')) {
+                jumpscareMenu.style.right = '-300px';
+                jumpscareMenu.style.left = 'auto';
+                jumpscareMenu.style.top = '60%';
+                jumpscareMenu.style.transform = 'translateY(-50%)';
+            }
+        });
+        
+        // Make functions globally accessible
+        window.triggerJumpscareFromMenu = triggerJumpscareFromMenu;
+        window.addCustomJumpscare = addCustomJumpscare;
         
         // Make visual effects menu draggable
         let isEffectsDragging = false;
@@ -2337,6 +2636,7 @@
                 visualEffectsMenu.style.right = 'auto';
                 visualEffectsMenu.style.left = `${effectsCurrentX}px`;
                 visualEffectsMenu.style.top = `${effectsCurrentY}px`;
+                visualEffectsMenu.style.transform = 'none'; // Remove translateY when dragging
             }
         }
         
@@ -2344,12 +2644,77 @@
             if (isEffectsDragging) {
                 isEffectsDragging = false;
                 visualEffectsMenu.classList.remove('dragging');
+                // Reset to default right-side position if not open
+                if (!visualEffectsMenu.classList.contains('open')) {
+                    visualEffectsMenu.style.right = '-300px';
+                    visualEffectsMenu.style.left = 'auto';
+                    visualEffectsMenu.style.top = '50%';
+                    visualEffectsMenu.style.transform = 'translateY(-50%)';
+                }
                 visualEffectsMenu.style.transition = 'right 0.3s ease';
             }
         }
         
         // Render visual effects menu on page load
         renderVisualEffectsMenu();
+        
+        // Make jumpscare menu draggable
+        let isJumpscareDragging = false;
+        let jumpscareCurrentX = 0;
+        let jumpscareCurrentY = 0;
+        let jumpscareInitialX = 0;
+        let jumpscareInitialY = 0;
+        
+        jumpscareMenuHeader.addEventListener('mousedown', jumpscareDragStart);
+        document.addEventListener('mousemove', jumpscareDrag);
+        document.addEventListener('mouseup', jumpscareDragEnd);
+        
+        function jumpscareDragStart(e) {
+            if (e.target === jumpscareMenuClose || !jumpscareMenu.classList.contains('open')) return;
+            const rect = jumpscareMenu.getBoundingClientRect();
+            jumpscareInitialX = e.clientX - rect.left;
+            jumpscareInitialY = e.clientY - rect.top;
+            isJumpscareDragging = true;
+            jumpscareMenu.classList.add('dragging');
+            jumpscareMenu.style.transition = 'none';
+        }
+        
+        function jumpscareDrag(e) {
+            if (isJumpscareDragging) {
+                e.preventDefault();
+                jumpscareCurrentX = e.clientX - jumpscareInitialX;
+                jumpscareCurrentY = e.clientY - jumpscareInitialY;
+                
+                // Keep menu within viewport
+                const maxX = window.innerWidth - jumpscareMenu.offsetWidth;
+                const maxY = window.innerHeight - jumpscareMenu.offsetHeight;
+                jumpscareCurrentX = Math.max(0, Math.min(jumpscareCurrentX, maxX));
+                jumpscareCurrentY = Math.max(0, Math.min(jumpscareCurrentY, maxY));
+                
+                jumpscareMenu.style.right = 'auto';
+                jumpscareMenu.style.left = `${jumpscareCurrentX}px`;
+                jumpscareMenu.style.top = `${jumpscareCurrentY}px`;
+                jumpscareMenu.style.transform = 'none'; // Remove translateY when dragging
+            }
+        }
+        
+        function jumpscareDragEnd(e) {
+            if (isJumpscareDragging) {
+                isJumpscareDragging = false;
+                jumpscareMenu.classList.remove('dragging');
+                // Reset to default right-side position if not open
+                if (!jumpscareMenu.classList.contains('open')) {
+                    jumpscareMenu.style.right = '-300px';
+                    jumpscareMenu.style.left = 'auto';
+                    jumpscareMenu.style.top = '60%';
+                    jumpscareMenu.style.transform = 'translateY(-50%)';
+                }
+                jumpscareMenu.style.transition = 'right 0.3s ease';
+            }
+        }
+        
+        // Render jumpscare menu on page load
+        renderJumpscareMenu();
         
         // Clock system
         let clockEnabled = false;
@@ -2894,8 +3259,12 @@
                     commandInput.value = '';
                 } else if (command === 'petgoose') {
                     resetConfirm = false;
-                    spawnPetGoose();
-                    showCommandFeedback(originalCommand, 'Pet goose spawned! 🦢 You can never get rid of him!');
+                    if (!petGooseActive) {
+                        spawnPetGoose();
+                        showCommandFeedback(originalCommand, 'Pet goose egg spawned! 🥚 Use "hatch" to hatch it!');
+                    } else {
+                        showCommandFeedback(originalCommand, 'You already have a pet goose!', true);
+                    }
                     commandInput.value = '';
                 } else if (command === 'funfact') {
                     resetConfirm = false;
@@ -3025,14 +3394,6 @@
                     const fact = facts[Math.floor(Math.random() * facts.length)];
                     showCommandFeedback(originalCommand, `💡 ${fact}`);
                     commandInput.value = '';
-                } else if (command === 'jumpscare') {
-                    resetConfirm = false;
-                    triggerJumpscare();
-                    commandInput.value = '';
-                    commandInput.placeholder = 'BOO! 👻';
-                    setTimeout(() => {
-                        commandInput.placeholder = 'Type a color or "home"...';
-                    }, 2000);
                 } else if (command === 'matrix') {
                     resetConfirm = false;
                     triggerMatrix();
@@ -3220,6 +3581,10 @@
                     triggerEarthquake();
                     showCommandFeedback(originalCommand, 'EARTHQUAKE! 🌍');
                     commandInput.value = '';
+                } else if (command === 'resetappearance' || command === 'resetapp') {
+                    resetConfirm = false;
+                    resetAppearance();
+                    commandInput.value = '';
                 } else if (command.startsWith('say ')) {
                     resetConfirm = false;
                     const text = originalCommand.substring(4).trim();
@@ -3323,6 +3688,19 @@
                     resetConfirm = false;
                     toggleVisualEffectsMenu();
                     showCommandFeedback(originalCommand, 'Visual effects menu toggled!');
+                    commandInput.value = '';
+                } else if (command === 'jumpscaremenu' || command === 'jumpscare') {
+                    resetConfirm = false;
+                    if (command === 'jumpscaremenu') {
+                        toggleJumpscareMenu();
+                        showCommandFeedback(originalCommand, 'Jumpscare menu toggled!');
+                } else {
+                        triggerJumpscare();
+                        commandInput.placeholder = 'BOO! 👻';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
                     commandInput.value = '';
                 } else if (command === 'rainbow') {
                     resetConfirm = false;
@@ -3561,12 +3939,22 @@
         }
         
         // Jumpscare function
-        function triggerJumpscare() {
+        let jumpscareImages = [
+            { name: 'Default', src: 'jumpscare.jpg' },
+            { name: 'Scare 2', src: 'jumpscare2.jpg' },
+            { name: 'Scare 3', src: 'jumpscare3.jpg' },
+        ];
+        let currentJumpscareIndex = 0;
+        
+        function triggerJumpscare(imageSrc = null) {
             // Remove any existing jumpscare overlay
             const existing = document.getElementById('jumpscareOverlay');
             if (existing) {
                 existing.remove();
             }
+            
+            // Use provided image or current selected image
+            const imgSrc = imageSrc || jumpscareImages[currentJumpscareIndex].src;
             
             // Create overlay
             const overlay = document.createElement('div');
@@ -3576,7 +3964,7 @@
             // Create image element
             const img = document.createElement('img');
             img.className = 'jumpscare-image';
-            img.src = 'jumpscare.jpg';
+            img.src = imgSrc;
             img.alt = 'Jumpscare';
             
             // Handle image load and error
@@ -3589,7 +3977,7 @@
             
             img.onerror = function() {
                 // If image fails to load, still show overlay but with error message
-                overlay.innerHTML = '<div style="color: white; font-size: 24px; text-align: center;">Jumpscare image not found!<br>Make sure jumpscare.jpg is in the same folder as index.html</div>';
+                overlay.innerHTML = `<div style="color: white; font-size: 24px; text-align: center;">Jumpscare image not found!<br>Make sure ${imgSrc} is in the same folder as index.html</div>`;
                 overlay.classList.add('active');
             };
             
@@ -3603,6 +3991,66 @@
                     overlay.remove();
                 }, 500);
             }, 1500); // Give extra time for image to load
+        }
+        
+        // Render jumpscare menu
+        function renderJumpscareMenu() {
+            const jumpscareList = document.getElementById('jumpscareList');
+            if (!jumpscareList) return;
+            
+            let html = '';
+            
+            // Current jumpscare selector
+            html += '<div style="padding: 12px 16px; border-bottom: 1px solid #30363d; margin-bottom: 8px;">';
+            html += '<label style="color: #c9d1d9; font-size: 12px; display: block; margin-bottom: 8px;">Select Jumpscare:</label>';
+            html += '<select id="jumpscareSelector" style="width: 100%; padding: 8px; background: #21262d; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9; font-size: 14px; cursor: pointer;">';
+            jumpscareImages.forEach((img, index) => {
+                html += `<option value="${index}" ${index === currentJumpscareIndex ? 'selected' : ''}>${img.name}</option>`;
+            });
+            html += '</select>';
+            html += '</div>';
+            
+            // Trigger button
+            html += '<button class="visual-effect-button" onclick="triggerJumpscareFromMenu()" style="width: 100%; margin-bottom: 8px;">';
+            html += '<div class="visual-effect-name">Trigger Jumpscare</div>';
+            html += '<div class="visual-effect-desc">Test the current jumpscare</div>';
+            html += '</button>';
+            
+            // Add custom image button
+            html += '<div style="padding: 12px 16px; border-top: 1px solid #30363d; margin-top: 8px;">';
+            html += '<label style="color: #c9d1d9; font-size: 12px; display: block; margin-bottom: 8px;">Add Custom Image:</label>';
+            html += '<input type="text" id="customJumpscareInput" placeholder="jumpscare.jpg" style="width: calc(100% - 20px); padding: 8px; background: #21262d; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9; font-size: 14px; margin-bottom: 8px;">';
+            html += '<button class="visual-effect-button" onclick="addCustomJumpscare()" style="width: 100%; padding: 8px 12px; font-size: 12px;">Add & Test</button>';
+            html += '</div>';
+            
+            jumpscareList.innerHTML = html;
+            
+            // Add event listener for selector
+            const selector = document.getElementById('jumpscareSelector');
+            if (selector) {
+                selector.addEventListener('change', (e) => {
+                    currentJumpscareIndex = parseInt(e.target.value);
+                });
+            }
+        }
+        
+        function triggerJumpscareFromMenu() {
+            const selectedSrc = jumpscareImages[currentJumpscareIndex].src;
+            triggerJumpscare(selectedSrc);
+        }
+        
+        function addCustomJumpscare() {
+            const input = document.getElementById('customJumpscareInput');
+            if (!input || !input.value.trim()) return;
+            
+            const newSrc = input.value.trim();
+            const newName = `Custom ${jumpscareImages.length - 3 + 1}`;
+            
+            jumpscareImages.push({ name: newName, src: newSrc });
+            currentJumpscareIndex = jumpscareImages.length - 1;
+            
+            renderJumpscareMenu();
+            triggerJumpscare(newSrc);
         }
         
         // Visual Effects Functions
@@ -3799,7 +4247,7 @@
                     // Restore original background
                     if (originalBg) {
                         document.body.style.background = originalBg;
-                    } else {
+                } else {
                         loadBackgroundPreferences();
                     }
                     return;
@@ -3822,6 +4270,16 @@
             actions.push(() => triggerSpin());
             actions.push(() => triggerShake());
             actions.push(() => triggerConfetti());
+            actions.push(() => triggerMatrix());
+            actions.push(() => triggerInvert());
+            actions.push(() => triggerUpsideDown());
+            actions.push(() => triggerFlashbang());
+            actions.push(() => triggerEarthquake());
+            actions.push(() => triggerBlur());
+            actions.push(() => triggerPixelate());
+            actions.push(() => triggerGhost());
+            actions.push(() => triggerMirror());
+            actions.push(() => triggerParty());
             
             // Color changes (random color from available colors)
             const availableColors = Object.keys(colorPalettes);
@@ -3829,10 +4287,100 @@
                 const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
                 changeAllColors(randomColor);
             });
+            
+            // Navigation commands
             actions.push(() => {
-                const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
-                changeAllColors(randomColor);
-            }); // Add color change twice since it's fun
+                showPage('homePage');
+                showCommandFeedback('chaos', 'Chaos: Navigated to home!');
+            });
+            actions.push(() => {
+                if (currentPage !== 'mainPage') {
+                    showPage('mainPage');
+                    showCommandFeedback('chaos', 'Chaos: Returned to main!');
+                }
+            });
+            
+            // Game commands
+            actions.push(() => {
+                showPage('coinflipPage');
+                resetCoinFlip();
+                showCommandFeedback('chaos', 'Chaos: Coinflip opened!');
+            });
+            actions.push(() => {
+                showPage('clickerPage');
+                updateAllMoneyDisplays();
+                showCommandFeedback('chaos', 'Chaos: Clicker opened!');
+            });
+            actions.push(() => {
+                showPage('minesweeperPage');
+                initMinesweeper();
+                showCommandFeedback('chaos', 'Chaos: Minesweeper opened!');
+            });
+            
+            // Fun commands
+            actions.push(() => {
+                window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+                showCommandFeedback('chaos', 'Chaos: Never gonna give you up! 🎵');
+            });
+            actions.push(() => {
+                const facts = [
+                    "A cloud weighs around a million tonnes.",
+                    "Octopuses have three hearts.",
+                    "Bananas are berries, but strawberries aren't.",
+                    "Honey never spoils.",
+                    "Sharks have been around longer than trees."
+                ];
+                const fact = facts[Math.floor(Math.random() * facts.length)];
+                showCommandFeedback('chaos', `💡 Fun fact: ${fact}`);
+            });
+            actions.push(() => {
+                triggerJumpscare();
+                showCommandFeedback('chaos', 'Chaos: BOO! 👻');
+            });
+            
+            // Theme commands
+            actions.push(() => {
+                applyTheme1995();
+                showCommandFeedback('chaos', 'Chaos: Windows 95 theme! 🪟');
+            });
+            actions.push(() => {
+                applyThemeCyberpunk();
+                showCommandFeedback('chaos', 'Chaos: Cyberpunk theme! 🌆');
+            });
+            actions.push(() => {
+                applyThemeTerminal();
+                showCommandFeedback('chaos', 'Chaos: Terminal theme! 💻');
+            });
+            actions.push(() => {
+                applyThemeCoffee();
+                showCommandFeedback('chaos', 'Chaos: Coffee theme! ☕');
+            });
+            actions.push(() => {
+                applyThemeDark();
+                showCommandFeedback('chaos', 'Chaos: Dark theme! 🌙');
+            });
+            actions.push(() => {
+                applyThemeLight();
+                showCommandFeedback('chaos', 'Chaos: Light theme! ☀️');
+            });
+            actions.push(() => {
+                resetTheme();
+                showCommandFeedback('chaos', 'Chaos: Theme reset!');
+            });
+            
+            // Menu toggles
+            actions.push(() => {
+                toggleCommandsMenu();
+                showCommandFeedback('chaos', 'Chaos: Toggled commands menu!');
+            });
+            actions.push(() => {
+                toggleVisualEffectsMenu();
+                showCommandFeedback('chaos', 'Chaos: Toggled effects menu!');
+            });
+            actions.push(() => {
+                toggleJumpscareMenu();
+                showCommandFeedback('chaos', 'Chaos: Toggled jumpscare menu!');
+            });
             
             // Randomly pick 3 different actions
             const selectedActions = [];
@@ -3846,14 +4394,18 @@
                 }
             }
             
-            // Trigger all 3 actions at once
-            selectedActions.forEach(action => {
-                try {
-                    action();
-                } catch (e) {
-                    console.error('Chaos action error:', e);
-                }
+            // Trigger all 3 actions at once with slight delays for better effect
+            selectedActions.forEach((action, index) => {
+                setTimeout(() => {
+                    try {
+                        action();
+                    } catch (e) {
+                        console.error('Chaos action error:', e);
+                    }
+                }, index * 100); // Stagger by 100ms
             });
+            
+            showCommandFeedback('chaos', `🔥 Chaos activated! Triggered ${selectedActions.length} random commands!`);
         }
         
         // ===== THEME FUNCTIONS =====
@@ -3924,6 +4476,92 @@
             }
         }
         loadTheme();
+        
+        // Reset theme function
+        function resetTheme() {
+            currentTheme = null;
+            document.body.classList.remove('theme-1995', 'theme-cyberpunk', 'theme-terminal', 'theme-coffee', 'theme-dark', 'theme-light');
+            document.body.style.fontFamily = '';
+            document.body.style.background = '';
+            document.body.style.color = '';
+            localStorage.removeItem('currentTheme');
+        }
+        
+        // Reset all appearance (themes, backgrounds, visual effects)
+        function resetAppearance() {
+            // Reset themes
+            resetTheme();
+            
+            // Reset backgrounds
+            document.body.style.background = '#0d1117'; // Default dark background
+            bgMode = 'solid';
+            selectedSolidColor = null;
+            selectedGradientColor1 = null;
+            selectedGradientColor2 = null;
+            localStorage.removeItem('backgroundPrefs');
+            
+            // Reset visual effects
+            // Remove blur
+            blurActive = false;
+            document.body.style.filter = '';
+            
+            // Remove mirror
+            mirrorActive = false;
+            document.body.style.transform = '';
+            
+            // Remove matrix
+            if (matrixCanvas) {
+                matrixCanvas.remove();
+                matrixCanvas = null;
+            }
+            if (matrixInterval) {
+                clearInterval(matrixInterval);
+                matrixInterval = null;
+            }
+            
+            // Stop party mode
+            if (partyInterval) {
+                clearTimeout(partyInterval);
+                partyInterval = null;
+            }
+            
+            // Remove pixelate overlay
+            const pixelateOverlay = document.getElementById('pixelateOverlay');
+            if (pixelateOverlay) {
+                pixelateOverlay.remove();
+            }
+            
+            // Remove ghost overlay
+            const ghostOverlay = document.getElementById('ghostOverlay');
+            if (ghostOverlay) {
+                ghostOverlay.remove();
+            }
+            
+            // Remove any background effect overlays
+            document.querySelectorAll('.bg-effect-overlay').forEach(overlay => {
+                overlay.remove();
+            });
+            
+            // Remove bgEffectOverlay (created by createBgOverlay)
+            const bgEffectOverlay = document.getElementById('bgEffectOverlay');
+            if (bgEffectOverlay) {
+                bgEffectOverlay.remove();
+            }
+            
+            // Remove flashbang overlay
+            const flashbangOverlay = document.getElementById('flashbangOverlay');
+            if (flashbangOverlay) {
+                flashbangOverlay.remove();
+            }
+            
+            // Reset body transform (upside down, etc.)
+            document.body.style.transform = '';
+            
+            // Reset invert
+            document.body.style.filter = '';
+            
+            showCommandFeedback('resetappearance', 'All themes, backgrounds, and visual effects reset!');
+        }
         
         // ===== CALCULATOR =====
         function calculateEquation(equation) {
@@ -4157,9 +4795,9 @@ Declan - Wooper Creator`;
                     const translated = words.map(() => Math.random() > 0.5 ? 'HONK' : 'GEESE').join(' ');
                     if (commandInput.value !== translated) {
                         commandInput.value = translated;
-                    }
-                });
-            } else {
+                        }
+                    });
+                } else {
                 // Remove translate handler (will be removed on next toggle)
                 commandInput.value = '';
             }
@@ -4183,15 +4821,20 @@ Declan - Wooper Creator`;
             blurActive = !blurActive;
             if (blurActive) {
                 document.body.style.filter = 'blur(5px)';
-            } else {
+                    } else {
                 document.body.style.filter = '';
             }
         }
         
         function triggerPixelate() {
-            document.body.style.filter = 'pixelate(8px)';
+            // CSS doesn't support pixelate, use image-rendering and scale down/up
+            const overlay = document.createElement('div');
+            overlay.id = 'pixelateOverlay';
+            overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: inherit; z-index: 10000; pointer-events: none; image-rendering: pixelated; image-rendering: crisp-edges; transform: scale(0.5); transform-origin: top left; width: 200%; height: 200%;';
+            document.body.appendChild(overlay);
+            
             setTimeout(() => {
-                document.body.style.filter = '';
+                overlay.remove();
             }, 3000);
         }
         
@@ -4207,7 +4850,7 @@ Declan - Wooper Creator`;
             mirrorActive = !mirrorActive;
             if (mirrorActive) {
                 document.body.style.transform = 'scaleX(-1)';
-            } else {
+                    } else {
                 document.body.style.transform = '';
             }
         }
@@ -4317,15 +4960,20 @@ Declan - Wooper Creator`;
         let feedCount = 0;
         function feedPetGoose() {
             if (!petGooseActive || !petGoose) return;
+            const savedCount = localStorage.getItem('gooseFeedCount');
+            feedCount = savedCount ? parseInt(savedCount) : 0;
             feedCount++;
             localStorage.setItem('gooseFeedCount', feedCount.toString());
             
             // Visual feedback
-            const feedEffect = document.createElement('div');
-            feedEffect.textContent = '🍞';
-            feedEffect.style.cssText = `position: fixed; font-size: 30px; right: ${petGoose.x}px; bottom: ${window.innerHeight - petGoose.y}px; z-index: 1001; pointer-events: none; animation: floatUp 1s ease-out forwards;`;
-            document.body.appendChild(feedEffect);
-            setTimeout(() => feedEffect.remove(), 1000);
+            const petGooseEl = document.getElementById('petGoose');
+            if (petGooseEl) {
+                const feedEffect = document.createElement('div');
+                feedEffect.textContent = '🍞';
+                feedEffect.style.cssText = `position: fixed; font-size: 30px; right: ${window.innerWidth - petGoose.x}px; bottom: ${window.innerHeight - petGoose.y}px; z-index: 1001; pointer-events: none; animation: floatUp 1s ease-out forwards;`;
+                document.body.appendChild(feedEffect);
+                setTimeout(() => feedEffect.remove(), 1000);
+            }
             
             if (feedCount >= 10) {
                 unlockAchievement(12); // fatgoose achievement
@@ -4348,6 +4996,7 @@ Declan - Wooper Creator`;
             if (wooperbirdGoose) {
                 wooperbirdGoose.muddy = true;
             }
+            // Also update the drawing function to use brown colors
         }
         
         // Background selection system
@@ -4501,7 +5150,7 @@ Declan - Wooper Creator`;
                     applyBtn.style.cursor = 'pointer';
                     applyBtn.style.background = '#238636';
                 }
-                                    } else {
+                } else {
                 // Reset and select first color again
                 selectedGradientColor1 = color;
                 selectedGradientColor2 = null;
@@ -4601,17 +5250,22 @@ Declan - Wooper Creator`;
             wooperbirdCtx.translate(goose.x, goose.y);
             wooperbirdCtx.rotate(goose.rotation);
             
+            // Colors based on muddy state
+            const bodyColor = goose.muddy ? '#8B4513' : '#0000ff'; // Brown if muddy, blue otherwise
+            const strokeColor = goose.muddy ? '#654321' : '#ff69b4'; // Dark brown if muddy, pink otherwise
+            const eyeColor = goose.muddy ? '#654321' : '#ff69b4'; // Dark brown if muddy, pink otherwise
+            
             // Draw goose body (simple oval)
-            wooperbirdCtx.fillStyle = '#0000ff'; // Blue instead of white
+            wooperbirdCtx.fillStyle = bodyColor;
             wooperbirdCtx.beginPath();
             wooperbirdCtx.ellipse(0, 0, goose.size * 0.6, goose.size * 0.4, 0, 0, Math.PI * 2);
             wooperbirdCtx.fill();
-            wooperbirdCtx.strokeStyle = '#ff69b4'; // Pink instead of black
+            wooperbirdCtx.strokeStyle = strokeColor;
             wooperbirdCtx.lineWidth = 2;
             wooperbirdCtx.stroke();
             
             // Draw goose head
-            wooperbirdCtx.fillStyle = '#0000ff'; // Blue instead of white
+            wooperbirdCtx.fillStyle = bodyColor;
             wooperbirdCtx.beginPath();
             wooperbirdCtx.arc(goose.size * 0.5, -goose.size * 0.2, goose.size * 0.3, 0, Math.PI * 2);
             wooperbirdCtx.fill();
@@ -4625,11 +5279,11 @@ Declan - Wooper Creator`;
             wooperbirdCtx.lineTo(goose.size * 0.7, -goose.size * 0.1);
             wooperbirdCtx.closePath();
             wooperbirdCtx.fill();
-            wooperbirdCtx.strokeStyle = '#ff69b4'; // Pink instead of black
+            wooperbirdCtx.strokeStyle = strokeColor;
             wooperbirdCtx.stroke();
             
             // Draw eye
-            wooperbirdCtx.fillStyle = '#ff69b4'; // Pink instead of black
+            wooperbirdCtx.fillStyle = eyeColor;
             wooperbirdCtx.beginPath();
             wooperbirdCtx.arc(goose.size * 0.55, -goose.size * 0.25, 3, 0, Math.PI * 2);
             wooperbirdCtx.fill();
@@ -4919,9 +5573,9 @@ Declan - Wooper Creator`;
             
             // Draw goose head
             ctx.fillStyle = '#FFFFFF';
-                        ctx.beginPath();
+                    ctx.beginPath();
             ctx.arc(goose.size * 0.5, -goose.size * 0.2, goose.size * 0.3, 0, Math.PI * 2);
-            ctx.fill();
+                    ctx.fill();
                         ctx.stroke();
             
             // Draw beak
@@ -4933,7 +5587,7 @@ Declan - Wooper Creator`;
                     ctx.closePath();
                     ctx.fill();
             ctx.strokeStyle = '#000000';
-            ctx.stroke();
+                    ctx.stroke();
             
             // Draw eye
             ctx.fillStyle = '#000000';
@@ -5151,6 +5805,7 @@ Declan - Wooper Creator`;
         let isPainting = false;
         let paintBrushSize = 5;
         let paintColor = '#000000';
+        let paintBrushType = 'pencil'; // 'pencil', 'paintbrush', 'spray', 'marker', 'eraser'
         let lastPaintX = 0;
         let lastPaintY = 0;
         
@@ -5171,6 +5826,24 @@ Declan - Wooper Creator`;
                 colorPicker.addEventListener('input', (e) => {
                     paintColor = e.target.value;
                     if (colorDisplay) colorDisplay.textContent = paintColor;
+                });
+            }
+            
+            // Brush type selector
+            const brushTypeSelect = document.getElementById('paint-brush-type');
+            if (brushTypeSelect) {
+                brushTypeSelect.addEventListener('change', (e) => {
+                    paintBrushType = e.target.value;
+                });
+            }
+            
+            // Brush size slider
+            const brushSizeSlider = document.getElementById('paint-brush-size-slider');
+            const brushSizeDisplay = document.getElementById('paint-brush-size');
+            if (brushSizeSlider) {
+                brushSizeSlider.addEventListener('input', (e) => {
+                    paintBrushSize = parseInt(e.target.value);
+                    if (brushSizeDisplay) brushSizeDisplay.textContent = paintBrushSize;
                 });
             }
             
@@ -5234,21 +5907,119 @@ Declan - Wooper Creator`;
         }
         
         function drawPaintPoint(x, y) {
-            paintCtx.fillStyle = paintColor;
-            paintCtx.beginPath();
-            paintCtx.arc(x, y, paintBrushSize / 2, 0, Math.PI * 2);
-            paintCtx.fill();
+            switch(paintBrushType) {
+                case 'pencil':
+                    paintCtx.fillStyle = paintColor;
+                    paintCtx.beginPath();
+                    paintCtx.arc(x, y, paintBrushSize / 2, 0, Math.PI * 2);
+                    paintCtx.fill();
+                    break;
+                    
+                case 'paintbrush':
+                    paintCtx.fillStyle = paintColor;
+                    paintCtx.globalAlpha = 0.7;
+                    paintCtx.beginPath();
+                    paintCtx.ellipse(x, y, paintBrushSize * 0.8, paintBrushSize * 0.5, Math.atan2(y - lastPaintY, x - lastPaintX), 0, Math.PI * 2);
+                    paintCtx.fill();
+                    paintCtx.globalAlpha = 1.0;
+                    break;
+                    
+                case 'spray':
+                    const sprayDensity = 50;
+                    paintCtx.fillStyle = paintColor;
+                    paintCtx.globalAlpha = 0.3;
+                    for (let i = 0; i < sprayDensity; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = Math.random() * paintBrushSize;
+                        const sprayX = x + Math.cos(angle) * distance;
+                        const sprayY = y + Math.sin(angle) * distance;
+                        paintCtx.fillRect(sprayX, sprayY, 2, 2);
+                    }
+                    paintCtx.globalAlpha = 1.0;
+                    break;
+                    
+                case 'marker':
+                    paintCtx.fillStyle = paintColor;
+                    paintCtx.globalAlpha = 0.6;
+                    paintCtx.beginPath();
+                    paintCtx.arc(x, y, paintBrushSize, 0, Math.PI * 2);
+                    paintCtx.fill();
+                    paintCtx.globalAlpha = 1.0;
+                    break;
+                    
+                case 'eraser':
+                    paintCtx.globalCompositeOperation = 'destination-out';
+                    paintCtx.fillStyle = 'rgba(0,0,0,1)';
+                    paintCtx.beginPath();
+                    paintCtx.arc(x, y, paintBrushSize, 0, Math.PI * 2);
+                    paintCtx.fill();
+                    paintCtx.globalCompositeOperation = 'source-over';
+                    break;
+            }
         }
         
         function drawPaintLine(x1, y1, x2, y2) {
-            paintCtx.strokeStyle = paintColor;
-            paintCtx.lineWidth = paintBrushSize;
-            paintCtx.lineCap = 'round';
-            paintCtx.lineJoin = 'round';
-            paintCtx.beginPath();
-            paintCtx.moveTo(x1, y1);
-            paintCtx.lineTo(x2, y2);
-            paintCtx.stroke();
+            switch(paintBrushType) {
+                case 'pencil':
+                    paintCtx.strokeStyle = paintColor;
+                    paintCtx.lineWidth = paintBrushSize;
+                    paintCtx.lineCap = 'round';
+                    paintCtx.lineJoin = 'round';
+                    paintCtx.beginPath();
+                    paintCtx.moveTo(x1, y1);
+                    paintCtx.lineTo(x2, y2);
+                    paintCtx.stroke();
+                    break;
+                    
+                case 'paintbrush':
+                    paintCtx.strokeStyle = paintColor;
+                    paintCtx.lineWidth = paintBrushSize;
+                    paintCtx.lineCap = 'round';
+                    paintCtx.lineJoin = 'round';
+                    paintCtx.globalAlpha = 0.7;
+                    paintCtx.beginPath();
+                    paintCtx.moveTo(x1, y1);
+                    paintCtx.lineTo(x2, y2);
+                    paintCtx.stroke();
+                    paintCtx.globalAlpha = 1.0;
+                    break;
+                    
+                case 'spray':
+                    const steps = Math.ceil(Math.sqrt((x2-x1)**2 + (y2-y1)**2) / 2);
+                    for (let i = 0; i <= steps; i++) {
+                        const t = i / steps;
+                        const x = x1 + (x2 - x1) * t;
+                        const y = y1 + (y2 - y1) * t;
+                        drawPaintPoint(x, y);
+                    }
+                    break;
+                    
+                case 'marker':
+                    paintCtx.strokeStyle = paintColor;
+                    paintCtx.lineWidth = paintBrushSize * 2;
+                    paintCtx.lineCap = 'round';
+                    paintCtx.lineJoin = 'round';
+                    paintCtx.globalAlpha = 0.5;
+                    paintCtx.beginPath();
+                    paintCtx.moveTo(x1, y1);
+                    paintCtx.lineTo(x2, y2);
+                    paintCtx.stroke();
+                    paintCtx.globalAlpha = 1.0;
+                    break;
+                    
+                case 'eraser':
+                    paintCtx.globalCompositeOperation = 'destination-out';
+                    paintCtx.strokeStyle = 'rgba(0,0,0,1)';
+                    paintCtx.lineWidth = paintBrushSize * 2;
+                    paintCtx.lineCap = 'round';
+                    paintCtx.lineJoin = 'round';
+                    paintCtx.beginPath();
+                    paintCtx.moveTo(x1, y1);
+                    paintCtx.lineTo(x2, y2);
+                    paintCtx.stroke();
+                    paintCtx.globalCompositeOperation = 'source-over';
+                    break;
+            }
         }
         
         // Handle window resize for paint canvas
@@ -5946,6 +6717,7 @@ Declan - Wooper Creator`;
             { id: 9, name: "Upgrade Master", emoji: "⬆️", desc: "Buy 5 upgrades in the shop" },
             { id: 10, name: "Sandbox", emoji: "🏗️", desc: "Open Sandboxels" },
             { id: 11, name: "Commander", emoji: "🎮", desc: "Use 10 different commands" },
+            { id: 12, name: "Fat Goose", emoji: "🐷", desc: "Feed your pet goose 10 times" },
             // Add more achievements with placeholders...
         ];
         
@@ -6100,6 +6872,23 @@ Declan - Wooper Creator`;
                             if (x === 7 || x === 8) {
                                 if (y === 6 || y === 8 || y === 10) p[i] = '#FFD700';
                             }
+                        }
+                    }
+                    return p;
+                })(),
+                12: (() => {
+                    // Fat Goose - round goose
+                    const p = Array(256).fill('#000000');
+                    for (let y = 0; y < 16; y++) {
+                        for (let x = 0; x < 16; x++) {
+                            const i = y * 16 + x;
+                            const dx = x - 8;
+                            const dy = y - 8;
+                            const dist = Math.sqrt(dx*dx + dy*dy);
+                            if (dist <= 7) p[i] = '#FFFFFF';
+                            if (dist <= 6) p[i] = '#FFD700';
+                            if (x >= 6 && x <= 10 && y >= 2 && y <= 4) p[i] = '#FFA500';
+                            if ((x === 7 || x === 9) && y === 3) p[i] = '#000000';
                         }
                     }
                     return p;
