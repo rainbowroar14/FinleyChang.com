@@ -7133,6 +7133,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🤖</text></svg>") no-repeat center';
             } else if (type === 'passwordgame') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🔐</text></svg>") no-repeat center';
+            } else if (type === 'tabletennis') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🏓</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -7190,6 +7192,8 @@ body.theme-flashcard button:hover {
                     openChatbotApp(iconId, name);
                 } else if (type === 'passwordgame') {
                     openPasswordGameApp(iconId, name);
+                } else if (type === 'tabletennis') {
+                    openTableTennisApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -7461,6 +7465,16 @@ body.theme-flashcard button:hover {
                         <button id="install-passwordgame" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🏓</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Table Tennis</div>
+                            <div style="font-size: 11px; color: #666;">Ball comes at you - move mouse left/right to hit it!</div>
+                        </div>
+                        <button id="install-tabletennis" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
             `;
             
             content.appendChild(storeContent);
@@ -7618,6 +7632,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('passwordgame', 'Password Game', x, y);
                         alert('Password Game installed successfully!');
+                    };
+                }
+                
+                const installTableTennisBtn = document.getElementById('install-tabletennis');
+                if (installTableTennisBtn) {
+                    installTableTennisBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'tabletennis');
+                        if (alreadyInstalled) {
+                            alert('Table Tennis is already installed!');
+                            return;
+                        }
+                        
+                        // Add Table Tennis icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('tabletennis', 'Table Tennis', x, y);
+                        alert('Table Tennis installed successfully!');
                     };
                 }
             }, 100);
@@ -7947,6 +7979,10 @@ body.theme-flashcard button:hover {
             }
             if (type === 'passwordgame') {
                 openPasswordGameApp(iconId, name);
+                return;
+            }
+            if (type === 'tabletennis') {
+                openTableTennisApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -8984,9 +9020,13 @@ body.theme-flashcard button:hover {
                     }
                 });
                 
-                // Draw paddle
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(paddleX, canvas.height - 30, PADDLE_WIDTH, PADDLE_HEIGHT);
+                // Draw paddle (more visible, higher up)
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(paddleX, canvas.height - 40, PADDLE_WIDTH, PADDLE_HEIGHT);
+                // Add border to make it more visible
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(paddleX, canvas.height - 40, PADDLE_WIDTH, PADDLE_HEIGHT);
                 
                 // Draw ball (bigger and brighter)
                 ctx.beginPath();
@@ -9015,9 +9055,9 @@ body.theme-flashcard button:hover {
                     ballSpeedY = -ballSpeedY;
                 }
                 
-                // Ball collision with paddle
-                if (ballY + BALL_RADIUS > canvas.height - 30 && 
-                    ballY + BALL_RADIUS < canvas.height - 20 &&
+                // Ball collision with paddle (updated position)
+                if (ballY + BALL_RADIUS > canvas.height - 40 && 
+                    ballY + BALL_RADIUS < canvas.height - 30 &&
                     ballX > paddleX && 
                     ballX < paddleX + PADDLE_WIDTH) {
                     ballSpeedY = -Math.abs(ballSpeedY);
@@ -9724,6 +9764,281 @@ body.theme-flashcard button:hover {
             
             // Start the game
             startNewGame();
+        }
+        
+        // Table Tennis app
+        function openTableTennisApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '500px';
+            window.style.height = '600px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                if (tableTennisGameInterval) {
+                    cancelAnimationFrame(tableTennisGameInterval);
+                    tableTennisGameInterval = null;
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.overflow = 'hidden';
+            content.style.display = 'flex';
+            content.style.flexDirection = 'column';
+            content.style.alignItems = 'center';
+            
+            // Game HTML
+            const gameHTML = `
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <button id="tabletennis-restart" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
+                    <div style="font-size: 12px; margin-bottom: 5px;">Score: <span id="tabletennis-score">0</span></div>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">Move your mouse left/right to hit the ball!</div>
+                </div>
+                <canvas id="tabletennis-canvas" width="460" height="500" style="border: 2px inset #c0c0c0; background: #1a1a1a; display: block; cursor: none;"></canvas>
+            `;
+            content.innerHTML = gameHTML;
+            
+            const canvas = content.querySelector('#tabletennis-canvas');
+            const ctx = canvas.getContext('2d');
+            const restartBtn = content.querySelector('#tabletennis-restart');
+            const scoreEl = content.querySelector('#tabletennis-score');
+            
+            // Game constants
+            const PADDLE_WIDTH = 100;
+            const PADDLE_HEIGHT = 15;
+            const BALL_RADIUS = 10;
+            
+            // Game state
+            let paddleX = canvas.width / 2 - PADDLE_WIDTH / 2;
+            let ballX = canvas.width / 2;
+            let ballY = 50;
+            let ballSpeedX = (Math.random() - 0.5) * 6;
+            let ballSpeedY = 4;
+            let score = 0;
+            let tableTennisGameInterval = null;
+            let gameRunning = false;
+            
+            // Draw game
+            function draw() {
+                // Clear canvas
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw net (center line)
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([10, 10]);
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height / 2);
+                ctx.lineTo(canvas.width, canvas.height / 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Draw paddle (at bottom, bright and visible)
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(paddleX, canvas.height - 30, PADDLE_WIDTH, PADDLE_HEIGHT);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(paddleX, canvas.height - 30, PADDLE_WIDTH, PADDLE_HEIGHT);
+                
+                // Draw ball
+                ctx.beginPath();
+                ctx.arc(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffff00';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.closePath();
+                
+                // Draw cursor indicator on paddle
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(paddleX + PADDLE_WIDTH / 2, canvas.height - 22, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Update game
+            function update() {
+                if (!gameRunning) return;
+                
+                // Move ball
+                ballX += ballSpeedX;
+                ballY += ballSpeedY;
+                
+                // Ball collision with side walls
+                if (ballX + BALL_RADIUS > canvas.width || ballX - BALL_RADIUS < 0) {
+                    ballSpeedX = -ballSpeedX;
+                    ballX = Math.max(BALL_RADIUS, Math.min(canvas.width - BALL_RADIUS, ballX));
+                }
+                
+                // Ball collision with top wall
+                if (ballY - BALL_RADIUS < 0) {
+                    ballSpeedY = -ballSpeedY;
+                    ballY = BALL_RADIUS;
+                }
+                
+                // Ball collision with paddle
+                if (ballY + BALL_RADIUS > canvas.height - 30 && 
+                    ballY + BALL_RADIUS < canvas.height - 15 &&
+                    ballX > paddleX && 
+                    ballX < paddleX + PADDLE_WIDTH) {
+                    ballSpeedY = -Math.abs(ballSpeedY);
+                    // Add spin based on where ball hits paddle
+                    const hitPos = (ballX - paddleX) / PADDLE_WIDTH;
+                    ballSpeedX = (hitPos - 0.5) * 8;
+                    score++;
+                    scoreEl.textContent = score;
+                    // Speed up slightly
+                    ballSpeedY *= 1.05;
+                }
+                
+                // Check if ball fell off bottom (game over)
+                if (ballY > canvas.height) {
+                    gameOver();
+                    return;
+                }
+                
+                // Check if ball hits net (bounce)
+                if (ballY > canvas.height / 2 - 10 && ballY < canvas.height / 2 + 10 && 
+                    ballSpeedY > 0) {
+                    // Ball bounces off net
+                    ballSpeedY = -ballSpeedY;
+                }
+            }
+            
+            // Game loop
+            function gameLoop() {
+                update();
+                draw();
+                if (gameRunning) {
+                    tableTennisGameInterval = requestAnimationFrame(gameLoop);
+                }
+            }
+            
+            function startGame() {
+                if (tableTennisGameInterval) {
+                    cancelAnimationFrame(tableTennisGameInterval);
+                }
+                
+                gameRunning = true;
+                score = 0;
+                scoreEl.textContent = score;
+                paddleX = canvas.width / 2 - PADDLE_WIDTH / 2;
+                ballX = canvas.width / 2;
+                ballY = 50;
+                ballSpeedX = (Math.random() - 0.5) * 6;
+                ballSpeedY = 4;
+                draw();
+                gameLoop();
+            }
+            
+            function gameOver() {
+                gameRunning = false;
+                if (tableTennisGameInterval) {
+                    cancelAnimationFrame(tableTennisGameInterval);
+                    tableTennisGameInterval = null;
+                }
+                alert('Game Over! Final Score: ' + score);
+                startGame();
+            }
+            
+            // Mouse controls - follow mouse X position
+            const handleMouseMove = (e) => {
+                if (!gameRunning || !window.parentNode) return;
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                paddleX = Math.max(0, Math.min(canvas.width - PADDLE_WIDTH, mouseX - PADDLE_WIDTH / 2));
+            };
+            
+            // Add event listeners
+            canvas.addEventListener('mousemove', handleMouseMove);
+            
+            closeBtn.onclick = () => {
+                canvas.removeEventListener('mousemove', handleMouseMove);
+                if (tableTennisGameInterval) {
+                    cancelAnimationFrame(tableTennisGameInterval);
+                    tableTennisGameInterval = null;
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            restartBtn.onclick = () => {
+                if (tableTennisGameInterval) {
+                    cancelAnimationFrame(tableTennisGameInterval);
+                }
+                startGame();
+            };
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'tabletennis',
+                element: window
+            });
+            
+            updateTaskbar();
+            
+            // Start the game
+            startGame();
         }
         
         // Make functions globally accessible
@@ -11845,6 +12160,28 @@ body.theme-flashcard button:hover {
                             description: 'Enhanced the Chatbot with intelligent responses! The chatbot can now handle greetings, questions (what, who, why, how), simple math, jokes, facts, and general conversation. It provides contextually appropriate responses while staying simple and helpful.',
                             userRequest: 'make the chatbot a bit ai but you dont need it to be smart like pretty good though'
                         });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
+                    }
+                    // Check for Block Breaker paddle fix and Table Tennis
+                    const hasPaddleFix = entries.some(e => e.title && e.title.includes('Block Breaker paddle'));
+                    const hasTableTennis = entries.some(e => e.title && e.title.includes('Table Tennis'));
+                    if (!hasPaddleFix || !hasTableTennis) {
+                        if (!hasPaddleFix) {
+                            entries.push({
+                                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                                title: '🔧 Fixed Block Breaker Paddle Visibility',
+                                description: 'Fixed the paddle visibility issue in Block Breaker. The paddle is now positioned higher and has a bright cyan border to make it much more visible. The paddle now has better contrast against the black background.',
+                                userRequest: 'you cant see the paddle thing down below of the block breaker'
+                            });
+                        }
+                        if (!hasTableTennis) {
+                            entries.push({
+                                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                                title: '🏓 Added Table Tennis Game to Desktop',
+                                description: 'Added a Table Tennis game to the Remote Desktop App Store! A ball comes at you from the top, and you move your mouse left/right to hit it back. Features score tracking, a net in the middle, and increasing difficulty. Install it from the App Store in Remote Desktop, then double-click the Table Tennis icon to play.',
+                                userRequest: 'add table tennis game not ping pong where a ball comes at you and you have to move your mouse to it make it long left and right'
+                            });
+                        }
                         localStorage.setItem('changelog', JSON.stringify(entries));
                     }
                     // Add Password Game entry
