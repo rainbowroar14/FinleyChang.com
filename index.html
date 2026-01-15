@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -371,171 +370,6 @@
             }
         }
         
-        /* Visual Effects CSS */
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translate(0, 0); }
-            10%, 30%, 50%, 70%, 90% { transform: translate(-5px, -5px); }
-            20%, 40%, 60%, 80% { transform: translate(5px, 5px); }
-        }
-        
-        /* Background effect overlay (sits behind all content, only affects background) */
-        .bg-effect-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            background: inherit;
-        }
-        
-        /* Ensure all content sits above the background overlay */
-        body > *:not(.bg-effect-overlay) {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .bg-effect-overlay.bg-spin-effect {
-            animation: bgSpin 1s ease-in-out;
-        }
-        
-        .bg-effect-overlay.bg-shake-effect {
-            animation: bgShake 0.5s ease-in-out;
-        }
-        
-        .bg-effect-overlay.bg-invert-effect {
-            animation: bgInvert 0.5s ease-in-out;
-        }
-        
-        .bg-effect-overlay.bg-upsidedown-effect {
-            animation: bgUpsidedown 0.5s ease-in-out;
-        }
-        
-        @keyframes bgSpin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        @keyframes bgShake {
-            0%, 100% { transform: translate(0, 0); }
-            10%, 30%, 50%, 70%, 90% { transform: translate(-5px, -5px); }
-            20%, 40%, 60%, 80% { transform: translate(5px, 5px); }
-        }
-        
-        @keyframes bgInvert {
-            0%, 100% { filter: brightness(1) contrast(1) invert(0); }
-            50% { filter: brightness(1) contrast(1) invert(1); }
-        }
-        
-        @keyframes bgUpsidedown {
-            0%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(-1); }
-        }
-        
-        @keyframes earthquake {
-            0%, 100% { transform: translate(0, 0); }
-            5%, 15%, 25%, 35%, 45%, 55%, 65%, 75%, 85%, 95% { transform: translate(-10px, -10px) rotate(-2deg); }
-            10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90% { transform: translate(10px, 10px) rotate(2deg); }
-        }
-        
-        .earthquake-effect {
-            animation: earthquake 0.1s infinite;
-        }
-        
-        @keyframes floatUp {
-            from {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-        }
-        
-        /* Theme Styles */
-        .theme-1995 {
-            font-family: 'MS Sans Serif', sans-serif !important;
-            background: #C0C0C0 !important;
-        }
-        
-        .theme-1995 * {
-            border: 2px outset #c0c0c0 !important;
-            background: #c0c0c0 !important;
-            color: #000000 !important;
-        }
-        
-        .theme-cyberpunk {
-            background: #0a0e27 !important;
-            color: #ff0080 !important;
-            font-family: 'Courier New', monospace !important;
-            text-shadow: 0 0 10px #ff0080, 0 0 20px #00ffff !important;
-        }
-        
-        .theme-terminal {
-            background: #000000 !important;
-            color: #00ff00 !important;
-            font-family: 'Courier New', monospace !important;
-        }
-        
-        .theme-terminal::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 255, 0, 0.03),
-                rgba(0, 255, 0, 0.03) 2px,
-                transparent 2px,
-                transparent 4px
-            );
-            pointer-events: none;
-            z-index: 9999;
-        }
-        
-        .theme-coffee {
-            background: #8B6F47 !important;
-            color: #D2B48C !important;
-            filter: sepia(100%) !important;
-        }
-        
-        .matrix-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10000;
-            pointer-events: none;
-        }
-        
-        .confetti-particle {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: #ff0000;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10001;
-        }
-        
         /* Shop page styles */
         .shop-page {
             text-align: center;
@@ -841,79 +675,35 @@
             display: none;
         }
         
-        /* Command history display (Minecraft-style chat) */
-        .command-history {
+        /* Command feedback display */
+        .command-feedback {
             position: fixed;
             bottom: 70px;
             left: 20px;
-            background: rgba(13, 17, 23, 0.85);
+            background: rgba(13, 17, 23, 0.95);
             border: 1px solid #30363d;
             border-radius: 6px;
             padding: 8px 12px;
             color: #c9d1d9;
             font-family: 'Courier New', monospace;
             font-size: 12px;
-            max-width: 500px;
-            max-height: 300px;
-            min-width: 300px;
+            max-width: 400px;
             z-index: 998;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
         }
         
-        .command-history.hidden {
+        .command-feedback.hidden {
             display: none;
         }
         
-        /* Always show history when it has entries - never hide them */
-        .command-history:not(:empty):not(.hidden) {
-            display: flex !important;
-        }
-        
-        .command-history-entry {
-            margin-bottom: 4px;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-        
-        .command-history-entry .command-text {
+        .command-feedback .command-text {
             color: #58a6ff;
             font-weight: bold;
         }
         
-        .command-history-entry .feedback-text {
+        .command-feedback .feedback-text {
             color: #8b949e;
             margin-left: 8px;
-        }
-        
-        .command-history-entry.error .command-text {
-            color: #f85149;
-        }
-        
-        .command-history-entry.error .feedback-text {
-            color: #f85149;
-        }
-        
-        /* Scrollbar styling for command history */
-        .command-history::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .command-history::-webkit-scrollbar-track {
-            background: rgba(13, 17, 23, 0.5);
-            border-radius: 3px;
-        }
-        
-        .command-history::-webkit-scrollbar-thumb {
-            background: #30363d;
-            border-radius: 3px;
-        }
-        
-        .command-history::-webkit-scrollbar-thumb:hover {
-            background: #484f58;
         }
         
         /* Command bar in bottom left */
@@ -936,28 +726,6 @@
             content: '>';
             color: #58a6ff;
             font-weight: bold;
-        }
-        
-        /* Pet goose styling */
-        .pet-goose {
-            position: fixed;
-            bottom: 100px;
-            left: 20px;
-            width: 60px;
-            height: 60px;
-            font-size: 50px;
-            z-index: 99;
-            pointer-events: none;
-            user-select: none;
-            transition: transform 0.2s;
-        }
-        
-        .pet-goose:hover {
-            transform: scale(1.1);
-        }
-        
-        .pet-goose.hidden {
-            display: none;
         }
         
         .command-input {
@@ -1069,108 +837,6 @@
             margin-left: 8px;
         }
         
-        /* Visual Effects menu - draggable tab (same style as commands menu) */
-        .visual-effects-menu {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            right: -300px;
-            width: 300px;
-            max-height: 500px;
-            background: rgba(13, 17, 23, 0.98);
-            border: 1px solid #30363d;
-            border-right: none;
-            border-radius: 8px 0 0 8px;
-            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
-            transition: right 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .visual-effects-menu.open {
-            right: 0;
-        }
-        
-        .visual-effects-menu.dragging {
-            transform: none;
-            transition: none;
-        }
-        
-        .visual-effects-menu-header {
-            background: #161b22;
-            padding: 12px 16px;
-            border-bottom: 1px solid #30363d;
-            cursor: move;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-        }
-        
-        .visual-effects-menu-header h3 {
-            color: #c9d1d9;
-            font-size: 16px;
-            margin: 0;
-        }
-        
-        .visual-effects-menu-close {
-            background: none;
-            border: none;
-            color: #8b949e;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .visual-effects-menu-close:hover {
-            color: #c9d1d9;
-        }
-        
-        .visual-effects-list {
-            padding: 16px;
-        }
-        
-        .visual-effect-button {
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            background: #21262d;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            color: #c9d1d9;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-        }
-        
-        .visual-effect-button:hover {
-            background: #30363d;
-            border-color: #58a6ff;
-            color: #58a6ff;
-        }
-        
-        .visual-effect-button:active {
-            transform: scale(0.98);
-        }
-        
-        .visual-effect-name {
-            font-weight: bold;
-            color: #58a6ff;
-        }
-        
-        .visual-effect-desc {
-            font-size: 12px;
-            color: #8b949e;
-            margin-top: 4px;
-        }
-        
         @media (max-width: 768px) {
             .finhub-title {
                 font-size: 48px;
@@ -1181,10 +847,6 @@
                 left: 10px;
             }
             .commands-menu {
-                width: 250px;
-                right: -250px;
-            }
-            .visual-effects-menu {
                 width: 250px;
                 right: -250px;
             }
@@ -1214,9 +876,6 @@
         <!-- Canvas for wooperbird goose on main page -->
         <canvas id="wooperbirdCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;"></canvas>
                 </div>
-        
-        <!-- Pet goose (persistent, bottom left) -->
-        <div id="petGoose" class="pet-goose hidden">🦢</div>
     
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
@@ -1396,9 +1055,9 @@
     <!-- Clock display (top left) -->
     <div class="clock-display hidden" id="clockDisplay"></div>
     
-    <!-- Command history display (Minecraft-style chat) -->
-    <div class="command-history" id="commandHistory">
-        <!-- Command history entries will be added here -->
+    <!-- Command feedback display -->
+    <div class="command-feedback hidden" id="commandFeedback">
+        <span class="command-text"></span><span class="feedback-text"></span>
     </div>
     
     <!-- Command bar in bottom left -->
@@ -1414,17 +1073,6 @@
         </div>
         <div class="commands-list" id="commandsList">
             <!-- Commands will be dynamically generated based on unlocks -->
-        </div>
-    </div>
-    
-    <!-- Visual Effects menu - draggable -->
-    <div class="visual-effects-menu" id="visualEffectsMenu">
-        <div class="visual-effects-menu-header" id="visualEffectsMenuHeader">
-            <h3>Visual Effects</h3>
-            <button class="visual-effects-menu-close" id="visualEffectsMenuClose">×</button>
-        </div>
-        <div class="visual-effects-list" id="visualEffectsList">
-            <!-- Visual effects buttons will be generated here -->
         </div>
     </div>
 
@@ -1637,7 +1285,6 @@
                     { name: 'achievements', desc: 'View achievements' },
                     { name: 'background', desc: 'Change background' },
                     { name: 'bg', desc: 'Change background' },
-                    { name: 'petgoose', desc: 'Get a pet goose (permanent!)' },
                     { name: 'goose', desc: 'Transform to GooseHub' },
                     { name: 'gooserain', desc: 'Make it rain geese!', isGoose: true },
                     { name: 'stones', desc: 'Throw stones!' },
@@ -1664,44 +1311,9 @@
                     { name: 'honk', desc: 'Play honk sound', isGoose: true },
                     { name: 'clock', desc: 'Toggle clock (true/false)' },
                     { name: 'whoami', desc: 'Display user profile' },
-                    { name: 'roll', desc: 'Roll a random number (roll [number])' },
-                    { name: '8ball', desc: 'Magic 8-Ball (8ball [question])' },
-                    { name: 'funfact', desc: 'Get a random fun fact' },
-                    { name: 'changelog', desc: 'Show recent command additions' },
-                    { name: 'rickroll', desc: 'Never gonna give you up...' },
-                    { name: 'calc', desc: 'Calculator (calc [equation])' },
-                    { name: 'math', desc: 'Quick calculator (math [equation])' },
-                    { name: 'timer', desc: 'Countdown timer (timer [seconds])' },
-                    { name: 'fortune', desc: 'Random fortune cookie advice' },
-                    { name: 'joke', desc: 'Random dad/programming joke' },
-                    { name: 'password', desc: 'Generate random password' },
-                    { name: 'ascii', desc: 'ASCII art (ascii [text])' },
-                    { name: 'credits', desc: 'Show credits' },
-                    { name: 'say', desc: 'Text-to-Speech (say [text])' },
-                    { name: 'rps', desc: 'Rock Paper Scissors (rps [rock/paper/scissors])' },
-                    { name: 'neofetch', desc: 'Display system info' },
-                ],
-                'Themes': [
-                    { name: '1995', desc: 'Windows 95 style' },
-                    { name: 'cyberpunk', desc: 'Neon pink/blue glitch style' },
-                    { name: 'terminal', desc: 'CRT green terminal style' },
-                    { name: 'coffee', desc: 'Warm sepia coffee mode' },
-                    { name: 'dark', desc: 'Dark mode' },
-                    { name: 'light', desc: 'Light mode' },
-                ],
-                'Goose Expansion': [
-                    { name: 'horde', desc: 'Geese horde walking across screen', isGoose: true },
-                    { name: 'nest', desc: 'View achievements in nest visual', isGoose: true },
-                    { name: 'translate', desc: 'Translate to Honk/Geese', isGoose: true },
-                    { name: 'detect', desc: 'Goose radar detection', isGoose: true },
-                    { name: 'goosecall', desc: 'Random goose honk or hiss', isGoose: true },
-                    { name: 'steal', desc: 'Pet goose steals command menu', isGoose: true },
-                    { name: 'feed', desc: 'Feed your pet goose', isGoose: true },
-                    { name: 'hatch', desc: 'Hatch the pet goose egg', isGoose: true },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
-                    { name: 'effects', desc: 'Show/hide visual effects menu' },
                 ]
             };
             
@@ -1709,12 +1321,8 @@
             Object.keys(commandDefinitions).forEach(category => {
                 const commands = commandDefinitions[category];
                 const visibleCommands = commands.filter(cmd => {
-                    // Hide goose commands if pet goose doesn't exist
-                    if ((cmd.isGoose || cmd.name === 'goose' || cmd.name === 'gooserain' || cmd.name === 'honk' || cmd.name === 'wooperbird') && !hasPetGoose()) {
-                        return false;
-                    }
-                    // Hide goose commands if not unlocked (for legacy support)
-                    if (cmd.isGoose && !unlockedCommands.has(cmd.name) && !hasPetGoose()) {
+                    // Hide goose commands if not unlocked
+                    if (cmd.isGoose && !unlockedCommands.has(cmd.name)) {
                         return false;
                     }
                     // Hide wooper commands if not unlocked
@@ -1870,29 +1478,6 @@
         let resetConfirm = false; // Track if reset command was just used (needs confirmation)
         let resetUsed = false; // Track if reset has been used (can only use once)
         
-        // Pet goose system (persistent, survives reset)
-        function hasPetGoose() {
-            return localStorage.getItem('hasPetGoose') === 'true';
-        }
-        
-        function spawnPetGoose() {
-            const petGoose = document.getElementById('petGoose');
-            if (petGoose) {
-                petGoose.classList.remove('hidden');
-                localStorage.setItem('hasPetGoose', 'true');
-                // Unlock goose commands when pet goose is spawned
-                unlockCommand('honk');
-                unlockCommand('gooserain');
-                unlockCommand('wooperbird');
-            }
-        }
-        
-        function loadPetGoose() {
-            if (hasPetGoose()) {
-                spawnPetGoose();
-            }
-        }
-        
         // Load global data
         function loadGlobalData() {
             const saved = localStorage.getItem('globalData');
@@ -1913,8 +1498,6 @@
             if (isGooseMode) {
                 transformToGooseMode();
             }
-            // Load pet goose (persistent)
-            loadPetGoose();
         }
         
         // Save global data
@@ -1934,18 +1517,10 @@
             resetUsed = true;
             sessionStorage.setItem('resetUsed', 'true');
             
-            // Save pet goose state before clearing (preserve it)
-            const petGooseExists = hasPetGoose();
-            
             // Clear all localStorage
             localStorage.removeItem('globalData');
             localStorage.removeItem('coinflipData');
             localStorage.removeItem('achievements');
-            
-            // Restore pet goose state (it survives reset!)
-            if (petGooseExists) {
-                localStorage.setItem('hasPetGoose', 'true');
-            }
             
             // Reset all variables
             globalMoney = 0;
@@ -2201,157 +1776,6 @@
             }
         }
         
-        // Visual Effects menu functionality
-        const visualEffectsMenu = document.getElementById('visualEffectsMenu');
-        const visualEffectsMenuHeader = document.getElementById('visualEffectsMenuHeader');
-        const visualEffectsMenuClose = document.getElementById('visualEffectsMenuClose');
-        
-        function toggleVisualEffectsMenu() {
-            visualEffectsMenu.classList.toggle('open');
-        }
-        
-        // Render visual effects buttons
-        function renderVisualEffectsMenu() {
-            const effectsList = document.getElementById('visualEffectsList');
-            if (!effectsList) return;
-            
-            const effects = [
-                { name: 'matrix', desc: 'Matrix falling code effect', func: triggerMatrix },
-                { name: 'confetti', desc: 'Burst of confetti particles', func: triggerConfetti },
-                { name: 'spin', desc: 'Rotate website 360 degrees', func: triggerSpin },
-                { name: 'invert', desc: 'Invert all colors', func: triggerInvert },
-                { name: 'shake', desc: 'Shake the screen', func: triggerShake },
-                { name: 'upsidedown', desc: 'Flip the page upside down', func: triggerUpsideDown },
-                { name: 'party', desc: 'Disco color cycling', func: triggerParty },
-                { name: 'chaos', desc: 'Randomly trigger 3 effects at once', func: triggerChaos },
-                { name: 'blur', desc: 'Blur filter (toggle)', func: triggerBlur },
-                { name: 'pixelate', desc: 'Pixelate filter', func: triggerPixelate },
-                { name: 'ghost', desc: '20% opacity', func: triggerGhost },
-                { name: 'mirror', desc: 'Horizontal flip', func: triggerMirror },
-                { name: 'flashbang', desc: 'White flash + sound', func: triggerFlashbang },
-                { name: 'earthquake', desc: 'Intense shake', func: triggerEarthquake },
-            ];
-            
-            let html = '';
-            effects.forEach(effect => {
-                html += `
-                    <button class="visual-effect-button" onclick="handleVisualEffect('${effect.name}')">
-                        <div class="visual-effect-name">${effect.name}</div>
-                        <div class="visual-effect-desc">${effect.desc}</div>
-                    </button>
-                `;
-            });
-            effectsList.innerHTML = html;
-        }
-        
-        // Handle visual effect button click
-        function handleVisualEffect(effectName) {
-            const originalCommand = effectName;
-            resetConfirm = false;
-            
-            if (effectName === 'matrix') {
-                triggerMatrix();
-                showCommandFeedback(originalCommand, 'Matrix effect activated!');
-            } else if (effectName === 'confetti') {
-                triggerConfetti();
-                showCommandFeedback(originalCommand, 'Confetti burst! 🎉');
-            } else if (effectName === 'spin') {
-                triggerSpin();
-                showCommandFeedback(originalCommand, 'Background spinning!');
-            } else if (effectName === 'invert') {
-                triggerInvert();
-                showCommandFeedback(originalCommand, 'Background inverted!');
-            } else if (effectName === 'shake') {
-                triggerShake();
-                showCommandFeedback(originalCommand, 'Background shaking!');
-            } else if (effectName === 'upsidedown') {
-                triggerUpsideDown();
-                showCommandFeedback(originalCommand, 'Background flipped! 🔄');
-            } else if (effectName === 'party') {
-                triggerParty();
-                showCommandFeedback(originalCommand, 'Party mode! 🎉');
-            } else if (effectName === 'chaos') {
-                triggerChaos();
-                showCommandFeedback(originalCommand, 'CHAOS! 💥✨🎨');
-            } else if (effectName === 'blur') {
-                triggerBlur();
-                showCommandFeedback(originalCommand, blurActive ? 'Blur ON' : 'Blur OFF');
-            } else if (effectName === 'pixelate') {
-                triggerPixelate();
-                showCommandFeedback(originalCommand, 'Pixelated!');
-            } else if (effectName === 'ghost') {
-                triggerGhost();
-                showCommandFeedback(originalCommand, 'Ghost mode! 👻');
-            } else if (effectName === 'mirror') {
-                triggerMirror();
-                showCommandFeedback(originalCommand, mirrorActive ? 'Mirrored! 🔄' : 'Unmirrored!');
-            } else if (effectName === 'flashbang') {
-                triggerFlashbang();
-                showCommandFeedback(originalCommand, 'FLASHBANG! 💥');
-            } else if (effectName === 'earthquake') {
-                triggerEarthquake();
-                showCommandFeedback(originalCommand, 'EARTHQUAKE! 🌍');
-            }
-        }
-        
-        // Make handleVisualEffect globally accessible
-        window.handleVisualEffect = handleVisualEffect;
-        
-        // Close menu button
-        visualEffectsMenuClose.addEventListener('click', () => {
-            visualEffectsMenu.classList.remove('open');
-        });
-        
-        // Make visual effects menu draggable
-        let isEffectsDragging = false;
-        let effectsCurrentX = 0;
-        let effectsCurrentY = 0;
-        let effectsInitialX = 0;
-        let effectsInitialY = 0;
-        
-        visualEffectsMenuHeader.addEventListener('mousedown', effectsDragStart);
-        document.addEventListener('mousemove', effectsDrag);
-        document.addEventListener('mouseup', effectsDragEnd);
-        
-        function effectsDragStart(e) {
-            if (e.target === visualEffectsMenuClose || !visualEffectsMenu.classList.contains('open')) return;
-            const rect = visualEffectsMenu.getBoundingClientRect();
-            effectsInitialX = e.clientX - rect.left;
-            effectsInitialY = e.clientY - rect.top;
-            isEffectsDragging = true;
-            visualEffectsMenu.classList.add('dragging');
-            visualEffectsMenu.style.transition = 'none';
-        }
-        
-        function effectsDrag(e) {
-            if (isEffectsDragging) {
-                e.preventDefault();
-                effectsCurrentX = e.clientX - effectsInitialX;
-                effectsCurrentY = e.clientY - effectsInitialY;
-                
-                // Keep menu within viewport
-                const maxX = window.innerWidth - visualEffectsMenu.offsetWidth;
-                const maxY = window.innerHeight - visualEffectsMenu.offsetHeight;
-                effectsCurrentX = Math.max(0, Math.min(effectsCurrentX, maxX));
-                effectsCurrentY = Math.max(0, Math.min(effectsCurrentY, maxY));
-                
-                visualEffectsMenu.style.right = 'auto';
-                visualEffectsMenu.style.left = `${effectsCurrentX}px`;
-                visualEffectsMenu.style.top = `${effectsCurrentY}px`;
-            }
-        }
-        
-        function effectsDragEnd(e) {
-            if (isEffectsDragging) {
-                isEffectsDragging = false;
-                visualEffectsMenu.classList.remove('dragging');
-                visualEffectsMenu.style.transition = 'right 0.3s ease';
-            }
-        }
-        
-        // Render visual effects menu on page load
-        renderVisualEffectsMenu();
-        
         // Clock system
         let clockEnabled = false;
         let clockInterval = null;
@@ -2407,90 +1831,33 @@
             saveClockSetting();
         }
         
-        // Command history system (Minecraft-style chat)
-        const MAX_HISTORY_ENTRIES = 10; // Show only the last 10 commands
-        let commandHistory = [];
-        
-        function showCommandFeedback(command, feedback, isError = false) {
-            const historyEl = document.getElementById('commandHistory');
-            if (!historyEl) return;
+        // Command feedback helper
+        function showCommandFeedback(command, feedback) {
+            const feedbackEl = document.getElementById('commandFeedback');
+            const commandTextEl = feedbackEl?.querySelector('.command-text');
+            const feedbackTextEl = feedbackEl?.querySelector('.feedback-text');
             
-            // Create new entry
-            const entry = document.createElement('div');
-            entry.className = `command-history-entry ${isError ? 'error' : ''}`;
-            
-            const commandSpan = document.createElement('span');
-            commandSpan.className = 'command-text';
-            commandSpan.textContent = `> ${command}`;
-            
-            const feedbackSpan = document.createElement('span');
-            feedbackSpan.className = 'feedback-text';
-            feedbackSpan.textContent = feedback ? ` ${feedback}` : '';
-            
-            entry.appendChild(commandSpan);
-            entry.appendChild(feedbackSpan);
-            
-            // Add to history
-            commandHistory.push(entry);
-            
-            // Limit history to exactly 10 entries - remove oldest if we exceed
-            while (commandHistory.length > MAX_HISTORY_ENTRIES) {
-                const removed = commandHistory.shift();
-                if (removed && removed.parentNode) {
-                    removed.parentNode.removeChild(removed);
-                }
-            }
-            
-            // Clear and rebuild history display to ensure only 10 are shown
-            historyEl.innerHTML = '';
-            commandHistory.forEach(entry => {
-                historyEl.appendChild(entry);
-            });
-            
-            // Auto-scroll to bottom
-            historyEl.scrollTop = historyEl.scrollHeight;
-            
-            // Always show history when there are entries - never hide it
-            if (commandHistory.length > 0) {
-                historyEl.classList.remove('hidden');
-            }
-        }
-        
-        // Initialize history display - show it if there are already entries
-        function initCommandHistory() {
-            const historyEl = document.getElementById('commandHistory');
-            if (historyEl && commandHistory.length > 0) {
-                historyEl.classList.remove('hidden');
+            if (feedbackEl && commandTextEl && feedbackTextEl) {
+                commandTextEl.textContent = command;
+                feedbackTextEl.textContent = feedback ? ` - ${feedback}` : '';
+                feedbackEl.classList.remove('hidden');
+                
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    feedbackEl.classList.add('hidden');
+                }, 3000);
             }
         }
         
         // Whoami profile
         function showWhoami() {
-            const profile = `You are a curious explorer, a digital architect, and a master of your own domain. Keep building!`;
-            return profile;
-        }
-        
-        // Changelog system - tracks recent command additions
-        const changelog = [
-            { command: 'petgoose', description: 'Get a permanent pet goose', date: 'Latest' },
-            { command: 'upsidedown', description: 'Flip the page upside down', date: 'Recent' },
-            { command: 'Secret6767', description: 'Unlock all commands', date: 'Recent' },
-            { command: 'rickroll', description: 'Never gonna give you up...', date: 'Recent' },
-            { command: 'funfact', description: 'Get a random fun fact', date: 'Recent' },
-            { command: 'roll [number]', description: 'Roll a random number', date: 'Recent' },
-            { command: '8ball [question]', description: 'Magic 8-Ball answers', date: 'Recent' },
-            { command: 'clock true/false', description: 'Toggle military time clock', date: 'Recent' },
-            { command: 'whoami', description: 'Display user profile', date: 'Recent' },
-        ];
-        
-        function showChangelog() {
-            // Get the last 5 entries
-            const recentChanges = changelog.slice(0, 5);
-            let changelogText = '📋 Recent Commands Added:\n\n';
-            recentChanges.forEach((entry, index) => {
-                changelogText += `${index + 1}. ${entry.command}\n   └─ ${entry.description}\n\n`;
-            });
-            return changelogText.trim();
+            const profile = `User: Finley Chang | Location: Florida | Status: Building cool stuff | Favorite Command: goose 🦢`;
+            showCommandFeedback('whoami', profile);
+            commandInput.value = '';
+            commandInput.placeholder = 'Profile displayed!';
+            setTimeout(() => {
+                commandInput.placeholder = 'Type a color or "home"...';
+            }, 2000);
         }
         
         // Load clock setting on page load
@@ -2500,8 +1867,7 @@
         const commandInput = document.getElementById('commandInput');
         commandInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                const originalCommand = commandInput.value.trim();
-                const command = originalCommand.toLowerCase().trim();
+                const command = commandInput.value.toLowerCase().trim();
                 const hasColorPalette = colorPalettes.hasOwnProperty(command);
                 
                 // Handle navigation commands
@@ -2815,217 +2181,6 @@
                     initPanicMenu();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
-                } else if (command.startsWith('clock ')) {
-                    resetConfirm = false;
-                    const arg = originalCommand.substring(6).trim().toLowerCase();
-                    if (arg === 'true') {
-                        clockEnabled = true;
-                        showClock();
-                        saveClockSetting();
-                        showCommandFeedback(originalCommand, 'Clock enabled! ⏰');
-                    } else if (arg === 'false') {
-                        clockEnabled = false;
-                        hideClock();
-                        saveClockSetting();
-                        showCommandFeedback(originalCommand, 'Clock disabled.');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Invalid argument. Use "clock true" or "clock false".', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'whoami') {
-                    resetConfirm = false;
-                    const profile = showWhoami();
-                    showCommandFeedback(originalCommand, profile);
-                    commandInput.value = '';
-                } else if (command.startsWith('roll ')) {
-                    resetConfirm = false;
-                    const arg = originalCommand.substring(5).trim();
-                    const maxNum = parseInt(arg);
-                    if (isNaN(maxNum) || maxNum < 1 || maxNum > 1000000) {
-                        showCommandFeedback(originalCommand, 'Invalid number. Use a number between 1 and 1000000.', true);
-                    } else {
-                        const rolled = Math.floor(Math.random() * maxNum) + 1;
-                        showCommandFeedback(originalCommand, `Rolled: ${rolled}`);
-                    }
-                    commandInput.value = '';
-                } else if (command.startsWith('8ball ') || command.startsWith('8-ball ')) {
-                    resetConfirm = false;
-                    const responses = [
-                        'It is certain.',
-                        'It is decidedly so.',
-                        'Without a doubt.',
-                        'Yes definitely.',
-                        'You may rely on it.',
-                        'As I see it, yes.',
-                        'Most likely.',
-                        'Outlook good.',
-                        'Yes.',
-                        'Signs point to yes.',
-                        'Reply hazy, try again.',
-                        'Ask again later.',
-                        'Better not tell you now.',
-                        'Cannot predict now.',
-                        'Concentrate and ask again.',
-                        "Don't count on it.",
-                        'My reply is no.',
-                        'My sources say no.',
-                        'Outlook not so good.',
-                        'Very doubtful.'
-                    ];
-                    const answer = responses[Math.floor(Math.random() * responses.length)];
-                    showCommandFeedback(originalCommand, `🎱 ${answer}`);
-                    commandInput.value = '';
-                } else if (command === 'changelog') {
-                    resetConfirm = false;
-                    const changelogText = showChangelog();
-                    showCommandFeedback(originalCommand, changelogText);
-                    commandInput.value = '';
-                } else if (command === 'rickroll') {
-                    resetConfirm = false;
-                    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
-                    showCommandFeedback(originalCommand, 'Never gonna give you up! 🎵');
-                    commandInput.value = '';
-                } else if (command === 'secret6767') {
-                    resetConfirm = false;
-                    // Unlock all commands
-                    unlockCommand('honk');
-                    unlockCommand('gooserain');
-                    unlockCommand('wooperbird');
-                    showCommandFeedback(originalCommand, 'All commands unlocked! 🔓✨');
-                    commandInput.value = '';
-                } else if (command === 'petgoose') {
-                    resetConfirm = false;
-                    spawnPetGoose();
-                    showCommandFeedback(originalCommand, 'Pet goose spawned! 🦢 You can never get rid of him!');
-                    commandInput.value = '';
-                } else if (command === 'funfact') {
-                    resetConfirm = false;
-                    const facts = [
-                        "A cloud weighs around a million tonnes. A cloud typically has a volume of around 1km3 and a density of around 1.003kg per m3 – that's a density that's around 0.4 per cent lower than the air surrounding it (this is how they are able to float).",
-                        "Giraffes are 30 times more likely to get hit by lightning than people. True, there are only five well-documented fatal lightning strikes on giraffes between 1996 and 2010. But due to the population of the species being just 140,000 during this time, it makes for about 0.003 lightning deaths per thousand giraffes each year. This is 30 times the equivalent fatality rate for humans.",
-                        "Identical twins don't have the same fingerprints. You can't blame your crimes on your twin, after all. This is because environmental factors during development in the womb (umbilical cord length, position in the womb, and the rate of finger growth) affect your fingerprint.",
-                        "Earth's rotation is changing speed. It's actually slowing. This means that, on average, the length of a day increases by around 1.8 seconds per century. 600 million years ago a day lasted just 21 hours.",
-                        "Earlobes have no biological purpose. While they are rich in nerve endings and may play a role in social bonding, many scientists argue that earlobes don't have any true biological purpose.",
-                        "Your brain is constantly eating itself. This process is called phagocytosis, where cells envelop and consume smaller cells or molecules to remove them from the system. Don't worry! Phagocytosis isn't harmful, but actually helps preserve your grey matter.",
-                        "The largest piece of fossilised dinosaur poo discovered is over 30cm long and over two litres in volume. Believed to be a Tyrannosaurus rex turd, the fossilised dung (also named a 'coprolite') is helping scientists better understand what the dinosaur ate.",
-                        "Mars isn't actually round. Unlike any other rocky planet in the Solar System, Mars is actually shaped like a rugby ball, but with different sizes along all three axes.",
-                        "There's no such thing as zero-calorie foods. Even low-calorie foods, such as celery and watercress, contain more energy than the body needs to process them.",
-                        "The Universe's average colour is called 'Cosmic latte'. In a 2002 study, astronomers found that the light coming from galaxies averaged into a beige colour that's close to white.",
-                        "Animals can experience time differently from humans. To smaller animals, the world around them moves more slowly compared to humans. Salamanders and lizards, for example, experience time more slowly than cats and dogs. This is because the perception of time depends on how quickly the brain can process incoming information.",
-                        "Water might not be wet. This is because most scientists define wetness as a liquid's ability to maintain contact with a solid surface, meaning that water itself is not wet, but can make other objects wet.",
-                        "Most people stroke cats the wrong way. Research shows they often just tolerate it for the food and attention. The safest spots? Under the chin, cheeks and base of the ears. The worst? Their belly and the base of their tail – touch there and you're more likely to annoy them than bond with them.",
-                        "A chicken once lived for 18 months without a head. Mike the chicken's incredible feat was recorded back in the 1940s in the USA. He survived as his jugular vein and most of his brainstem were left mostly intact, ensuring just enough brain function remained for survival. In the majority of cases, a headless chicken dies in a matter of minutes.",
-                        "The raw ingredients of a human body would cost over £116,000. But if you're prepared to do the refining yourself, a body could cost a lot less – under £100 in fact.",
-                        "All the world's bacteria stacked on top of each other would stretch for 10 billion light-years. Together, Earth's 0.001mm-long microbes could wrap around the Milky Way over 20,000 times.",
-                        "Wearing a tie can reduce blood flow to the brain by 7.5 per cent. A study in 2018 found that wearing a necktie can reduce the blood flow to your brain by up to 7.5 per cent, which can make you feel dizzy, nauseous and cause headaches. They can also increase the pressure in your eyes if on too tight and are great at carrying germs.",
-                        "The fear of long words is called Hippopotomonstrosesquippedaliophobia. The 36-letter word was first used by the Roman poet Horace in the first century BCE to criticise those writers with an unreasonable penchant for long words. It was American poet Aimee Nezheukumatathil, possibly afraid of their own surname, who coined the term how we know it in 2000.",
-                        "The world's oldest dog lived to 29.5 years old. While the median age a dog reaches tends to be about 10-15 years, one Australian cattle dog, 'Bluey', survived to the ripe old age of 29.5.",
-                        "The world's oldest cat lived to 38 years and three days old. Creme Puff was the oldest cat to ever live.",
-                        "The Sun makes a sound but we can't hear it. In the form of pressure waves, the Sun does make a sound. The wavelength of the pressure waves from the Sun is measured in hundreds of miles, however, meaning they are far beyond the range of human hearing.",
-                        "Mount Everest isn't the tallest mountain on Earth. Mauna Kea and Mauna Loa in Hawaii, the twin volcanoes, are taller than Mount Everest as 4.2km of their height is submerged underwater. The twin volcanoes measure a staggering 10.2km in total, compared to Everest's paltry 8.8km.",
-                        "Our solar system has a wall. The heliopause – the region of space in which solar wind isn't hot enough to push back the wind of particles coming from distant stars – is often considered the 'boundary wall' of the Solar System and interstellar space.",
-                        "Octopuses don't actually have tentacles. They have eight limbs, but they're arms (for most species). Technically, when talking about cephalopods (octopuses, squids etc), scientists define tentacles as limbs with suckers at their end. Octopus arms have suckers down most of their length.",
-                        "Most maps of the world are wrong. On most maps, the Mercator projection – first developed in 1569 – is still used. This method is wildly inaccurate and makes Alaska appear as large as Brazil and Greenland 14 times larger than it actually is. For a map to be completely accurate, it would need to be life-size and round, not flat.",
-                        "NASA genuinely faked part of the Moon landing. While Neil Armstrong's first steps on the lunar surface were categorically not faked, the astronaut quarantine protocol when the astronauts arrived back on Earth was largely just one big show.",
-                        "Comets smell like rotten eggs. A comet smells like rotten eggs, urine, burning matches, and… almonds. Traces of hydrogen sulphide, ammonia, sulphur dioxide, and hydrogen cyanide were all found in the makeup of the comet 67P/Churyumove-Gerasimenko. Promotional postcards were even commissioned in 2016 carrying the pungent scent of a comet.",
-                        "Earth's poles are moving. This magnetic reversal of the North and South Pole has happened 171 times in the past 71 million years. We're overdue a flip. It could come soon, as the North Pole is moving at around 55 kilometres per year, an increase over the 15km per year up until 1990.",
-                        "You can actually die laughing. And a number of people have, typically due to intense laughter causing a heart attack or suffocation. Comedy shows should come with a warning.",
-                        "Chainsaws were first invented for childbirth. It was developed in Scotland in the late 18th Century to help aid and speed up the process of symphysiotomy (widening the pubic cartilage) and removal of disease-laden bone during childbirth. It wasn't until the start of the 20th Century that we started using chainsaws for woodchopping.",
-                        "Ants don't have lungs. They instead breathe through spiracles, nine or ten tiny openings, depending on the species.",
-                        "You don't actually lose most of your heat through your head. Your face, head and chest are more sensitive to temperature changes, but this myth isn't entirely true. In reality, covering any part of the body helps prevent heat loss in the same way.",
-                        "The T.rex likely had feathers. Scientists in China discovered Early Cretaceous period tyrannosaur skeletons that were covered in feathers. If the ancestors of the T. rex had feathers, the T. rex probably did, too.",
-                        "Football teams wearing red kits play better. The colour of your clothes can affect how you're perceived by others and change how you feel. A review of football matches in the last 55 years, for example, showed that teams wearing a red kit consistently played better in home matches than teams in any other colour.",
-                        "When you cut a worm in two, it regenerates. That said, this only works if it's cut widthways – and not all will. Earthworms can regrow their tails, and the planarian flatworm can regrow its whole body from a tiny sliver of tissue.",
-                        "Wind turbines kill between 10,000 and 100,000 birds each year in the UK. Interestingly, painting one of the blades of a wind turbine black can reduce bird deaths by 70 per cent.",
-                        "Snails have teeth. Between 1,000 and 12,000 teeth, to be precise. They aren't like ours, though, so don't be thinking about snails with ridiculous toothy grins. You'll find the snail's tiny 'teeth' all over its file-like tongue.",
-                        "Sound can be minus decibels. The quietest place on Earth is Microsoft's anechoic chamber in Redmond, WA, USA, at -20.6 decibels. These anechoic chambers are built out of heavy concrete and brick and are mounted on springs to stop vibrations from getting in through the floor.",
-                        "A horse normally has more than one horsepower. A study in 1993 showed that the maximum power a horse can produce is 18,000W, around 24 horsepower.",
-                        "Your signature could reveal personality traits. A study in 2016 purports that among men, a larger signature correlates with higher social bravado and, among women, a bigger signature correlates with narcissistic traits.",
-                        "One in 18 people have a third nipple. Known as polythelia, the third nipple is caused by a mutation in inactive genes.",
-                        "Bananas are radioactive. Due to being rich in potassium, every banana is actually slightly radioactive thanks to containing the natural isotope potassium-40. Interestingly, your body contains around 16mg of potassium-40, meaning you're around 280 times more radioactive than a banana already. Any excess potassium-40 you gain from a banana is excreted out within a few hours.",
-                        "There's no such thing as a straight line. Zoom in close enough to anything and you'll spot irregularities. Even a laser light beam is slightly curved.",
-                        "Deaf people are known to use sign language in their sleep. A case study of a 71-year-old man with rapid eye movement disorder and a severe hearing impairment showed him using fluent sign language in his sleep, with researchers able to get an idea of what he was dreaming about thanks to those signs.",
-                        "Finland is the happiest country on Earth. According to the World Happiness Report, it has been for six years in a row. It's not really surprising, given that Finland is the home of Santa Claus, reindeer and one sauna for every 1.59 people.",
-                        "Hippos can't swim. Hippos really do have big bones, so big and dense, in fact, that they're barely buoyant at all. They don't swim and instead perform a slow-motion gallop on the riverbed or on the sea floor. In fact, hippos can even sleep underwater, thanks to a built-in reflex that allows them to bob up, take a breath, and sink back down without waking.",
-                        "The Moon looks upside down in the Southern Hemisphere. Compared to the Northern Hemisphere, anyway. This means that the 'Man in the Moon' is upside down in the Southern Hemisphere and looks more like a rabbit.",
-                        "You can yo-yo in space. In 2012, NASA astronaut Don Pettit took a yo-yo on board the International Space Station and demonstrated several tricks. It works because a yo-yo mainly relies on the laws of conservation of angular momentum to perform tricks, which, provided you keep the string taut, apply in microgravity too.",
-                        "Not only plants photosynthesise. Algae (which are not plants) and some other organisms – including sea slugs and pea aphids – contain chlorophyll and can also take sunlight and turn it into an energy source.",
-                        "You can be heavily pregnant and not realise. Cryptic pregnancies aren't that uncommon, with 1 in 500 not recognised until at least halfway through and 1 in 2,500 not known until labour starts.",
-                        "Bacteria on your skin cause your itches. Specifically, bacteria known as Staphylococcus aureus can release a chemical that activates a protein in our nerves. This sends a signal from our skin to our brains, which our brain perceives as an itch.",
-                        "Polar bears aren't actually white. Surprisingly, underneath all their white fur, polar bears actually have jet-black skin.",
-                        "Starfish don't have bodies. Along with other echinoderms (think sea urchins and sand dollars), their entire bodies are technically classed as heads.",
-                        "Somebody has been constipated for 45 days. In 2013, an unfortunate Indian woman had to undergo surgical removal of a faecal mass as large as a football.",
-                        "You travel 2.5 million km a day around the Sun without realising. The Earth's orbit travels around 2.5 million kilometres with respect to the Sun's centre, and around 19 million km with respect to the centre of the Milky Way.",
-                        "Fish form orderly queues in emergencies. When evacuating through narrow spaces in sketchy situations, schools of neon tetra fish queue so that they don't collide or clog up the line. Scientists interpreted this behaviour as showing that fish can respect social rules even in emergency situations, unlike us humans.",
-                        "There are more bacterial cells in your body than human cells. The average human is around 56 per cent bacteria. This was discovered in a 2016 study and is far less than the earlier estimates of 90 per cent. As bacteria are so light, however, by weight, each person is over 99.7 per cent human.",
-                        "Most ginger cats are male. There are roughly three ginger male cats to one ginger female. This is because the ginger gene is found on the X chromosome, meaning female cats would require two copies of the gene to become ginger whilst males only need one.",
-                        "Your nails grow faster in hot summer. This is probably due to increased blood supply to the fingertips. It could also be because you're less stressed while on holiday so less likely to gnaw away at 'em.",
-                        "The Bermuda Triangle is no more hazardous than any other busy ocean route. The mystery of this patch of sea gained legendary status in the 20th century, but the number of incidents in the Bermuda Triangle isn't significantly higher than in any other part of the ocean.",
-                        "Insects can fly up to 3.25km above sea level, at least. Alpine bumblebees have been found living as high up as 3.25km above sea level and could even fly in lab conditions that replicate the air density and oxygen levels at 9km – that's just higher than Mount Everest.",
-                        "There's a planet mostly made from diamond. Called 55 Cancri e, it's around twice the size of Earth and some 40 light-years away from us within the Cancer constellation.",
-                        "In the deep sea, male anglerfish don't just mate – they fuse. The tiny males bite onto a much larger female and gradually dissolve into her body, leaving behind little more than a living sack of sperm she can use whenever she wants to lay eggs.",
-                        "There's a condition in which your body can brew alcohol. Auto-brewery syndrome is a very rare condition which occurs when certain bacteria and yeasts in the gut break down carbohydrates into ethanol.",
-                        "It's possible for two lucid dreamers to communicate mid-dream. Inter-brain neural synchronisation has been observed between people who are both asleep.",
-                        "It's surprisingly easy to escape quicksand. Quicksand's density is higher than that of the human body, making it impossible to sink completely. To escape quicksand, sit or lie back, try to keep your arms up and out of the quicksand, and slowly wiggle your legs side-to-side or back-and-forth.",
-                        "A penguin can reach depths of 550m in one dive. Typically, emperor penguins (the deepest-diving penguins) plunge to 100-200m, but the deepest penguin dive on record was more than 550m.",
-                        "Animals can be allergic to humans. Animals can be allergic to our dead skin cells – dander. These allergic reactions can be just like ours, too, including breathing difficulties and skin irritation.",
-                        "Being bored is actually a 'high arousal state' physiologically. This is because when you're bored your heart rate increases.",
-                        "Our immune systems can detect bad bacteria from good. The immune system detects pathogen patterns through receptors and will mount an attack. Simultaneously, it will cooperate with microbes and beneficial bacteria.",
-                        "Platypuses sweat milk. This is because it doesn't have teats. Milk appears as sweat on a platypus, but it's an aquatic mammal so it doesn't actually sweat at all.",
-                        "LEGO bricks withstand compression better than concrete. An ordinary plastic LEGO brick is able to support the weight of 375,000 other bricks before it fails. This, theoretically, would let you build a tower nearing 3.5km in height. Scaling this up to house-size bricks, however, would cost far too much.",
-                        "Martial artists who smile before the start of a match are more likely to lose. This could be as a smile can convey fear or submissiveness.",
-                        "It's almost impossible to get too much sugar from fresh fruit. While the sugar in fruit is mostly fructose and glucose (fructose is what's converted into fat in your body), you can't get too much sugar from fresh fruit. Fresh fruit contains a lot of fibre and water which slows down your digestion and makes you feel full.",
-                        "You don't like the sound of your own voice because of the bones in your head. This may be because the bones in our head make our voice sound deeper.",
-                        "A rainbow on Venus is called a glory. Appearing as a series of coloured concentric rings, these are caused by the interference of light waves within droplets, rather than the reflection, refraction and dispersion of light that makes a rainbow.",
-                        "Protons look like peanuts, rugby balls, bagels, and spheres. Protons come in all different shapes and sizes, with their appearance changing based on the speed of smaller particles within them: Quarks.",
-                        "Mirrors facing each other don't produce infinite reflections. Each reflection will be darker than the last and eventually fade into invisibility. Mirrors absorb a fraction of the energy of the light striking them. The total number of reflections mirrors can produce? A few hundred.",
-                        "There might be a cure for 'evil'. Well, a cure for psychopathy, anyway. Psychologists argue that aspects of psychopathy can be 'cured' by cognitive behavioural therapy, which is said to reduce violent offences by those with the condition. Preliminary research suggests that computer-based cognitive training could help a psychopath experience empathy and regret, too.",
-                        "All mammals get goosebumps. When your hair stands on end, tiny muscles contract at each hair's base which distorts the skin to create goosebumps. This process is called piloerection and is present in all mammals. Hair or fur is used to trap an insulating air layer.",
-                        "Football players spit so much because exercise increases the amount of protein in saliva. When you exercise, the amount of protein secreted into the saliva increases. A protein mucus named MUC5B makes your saliva thicker when you're exercising which makes it more difficult to swallow so we tend to spit more. It may occur during exercise because we breathe through our mouths more. MUC5B could activate to stop our mouths from drying out, therefore.",
-                        "Some animals display autistic-like traits. Autistic traits in animals include a tendency toward repetitive behaviour and atypical social habits.",
-                        "The biggest butterfly in the world has a 31cm wingspan. It belongs to the Queen Alexandra's Birdwing butterfly, which you can find in the forests of the Oro Province, in the east of Papua New Guinea.",
-                        "You remember more dreams when you sleep badly. Research suggests that if you sleep badly and wake up multiple times throughout the night you will be more likely to recall the content of any dreams you had. You are also more likely to remember a dream when woken from one.",
-                        "You could sweat when you're anxious to alert others. One theory suggests we've evolved to sweat whilst anxious to alert the brains of other people around us so they are primed for whatever it is that's making us anxious. Brain scans have revealed that when you sniff the sweat of a panic-induced person, regions of the brain that handle emotional and social signals light up. When you're anxious your sympathetic nervous system releases hormones including adrenaline, which activates your sweat glands.",
-                        "A lightning bolt is five times hotter than the surface of the Sun. The charge carried by a bolt of lightning is so intense that it has a temperature of 30,000°C (54,000°F).",
-                        "The longest anyone has held their breath underwater is over 24.5 minutes. The world record for breath-holding underwater was achieved by Croatian Budimir Šobat on 27 March 2021, who held his breath for a total of 24 minutes and 37 seconds. On average, a human can hold their breath between 30-90 seconds.",
-                        "The Moon is shrinking. But only very slightly – by about 50m (164ft) in radius over the last several hundred million years. Mysterious seismic activity, known as moonquakes, could be to blame.",
-                        "Dogs tilt their heads when you speak to them to better pinpoint familiar words. Your dog is tilting its head when you speak to it to pinpoint where noises are coming from more quickly. This is done to listen out more accurately for familiar words such as 'walkies' and helps them to better understand the tone of your voice. If a dog doesn't tilt its head that often (as those with shorter muzzles might), it's because it relies less on sound and more on sight.",
-                        "If the Earth doubled in size, trees would immediately fall over. This is because surface gravity would be doubled. It would also mean dog-size and larger animals would not be able to run without breaking a leg.",
-                        "Mercury, not Venus, is the closest planet to Earth on average. On average, Mercury is 1.04 astronomical units (AU) away from Earth compared to the 1.14 AU average distance between Earth and Venus. One AU is equal to the average distance between the Earth and the Sun. Venus still comes closest to Earth as part of its orbit around the Sun, however.",
-                        "Flamingoes aren't born pink. They actually come into the world with grey/white feathers and only develop a pinkish hue after starting a diet of brine shrimp and blue-green algae.",
-                        "You can smell ants. Many species of ants release strong-smelling chemicals when they're angry, threatened or being squished. Trap-jaw ants release a chocolatey smell when annoyed, while citronella ants earn their name from the lemony odour they give off.",
-                        "People who eat whatever they want and stay slim have a slow metabolism, not fast. A skinny person tends to have less muscle mass than others, meaning their basal metabolic rate (BMR) is lower than those of a high muscle mass – this gives them a slow metabolism, not a fast one.",
-                        "There's a scientist who willingly let insects sting him to find out which hurt the most. Justin Schmidt turned his own body into a research tool to create the Schmidt Pain Scale – and discovered the South American bullet ant delivers the most excruciating sting of all, describing it as like being shot.",
-                        "Earth is 4.54 billion years old. Using radiometric dating, scientists have discovered that the Earth is 4.54 billion years old (give or take 50 million years). This makes our planet half the age of the Milky Way Galaxy (11-13 billion years old) and around a third of the age of the Universe (10-15 billion years old).",
-                        "It's actually fine to drink alcohol on (most) antibiotics. It's unlikely that drinking alcohol in moderation will cause a big problem if you're taking a common antibiotic (although there are exceptions, particularly metronidazole).",
-                        "Electrons might live forever. Scientists have estimated the minimum lifetime of the electron is about 6.6 × 1028 years – this is 66,000 'yottayears'. Since this is about 5 quintillion times the age of the Universe, even if electrons don't live forever, they may as well do!",
-                        "Beavers don't actually live in dams. Technically, beavers live in a lodge that they build behind a dam, within a deep pool of water.",
-                        "The average dinosaur lifespan was surprisingly small. The Tyrannosaurus rex, for example, reached full size between 16-22 years old and lived up until 27-33. The largest dinosaurs such as the Brontosaurus and Diplodocus tended to live up to between 39-53 years old, maybe reaching the heights of 70.",
-                        "Someone left a family photo on the Moon. When Apollo 16 astronaut Charles Duke landed on the Moon in 1972, he decided to leave behind a photo of him, his two sons and his wife. The photo remains on the Moon to this day.",
-                        "It rains methane on Saturn's largest moon. Titan is the only moon in our Solar System with a dense atmosphere and the only body except Earth with liquid rivers, lakes and seas fed by rainfall. This rainfall isn't water, though; it's liquid methane.",
-                        "Giraffes hum to communicate with each other. It's thought that the low-frequency humming could be a form of 'contact call' between individuals who have been separated from their herd, helping them to find each other in the dark. Some researchers think they sleep talk too.",
-                        "Glass sponges can live for 15,000 years. This makes them one of the longest-living organisms on Earth. The immortal jellyfish, however, could theoretically live forever (but scientists aren't sure)",
-                        "You have a 50 per cent chance of sharing a birthday with a friend. In any group of 23 people, two people will share a birthday, according to the maths. To find the probability of everyone in the group having a unique birthday, multiply all 23 probabilities together, giving 0.493. So the probability of a shared birthday is 1 - 0.493 = 0.507, or 50.7 per cent.",
-                        "Murder rates rise in summer. Ever feel angry or in a bad mood when the weather is hot? Well, you're not alone. Violent crime goes up in hotter weather, and in the US, murder rates reportedly rise by 2.7 per cent over the summer.",
-                        "'New car smell' is a mix of over 200 chemicals. These include the sickly-sweet, toxic hydrocarbons benzene and toluene.",
-                        "'Sea level' isn't actually level. As the strength of the force generated by the Earth's spin is strongest at the equator, the average sea level bulges outward there, putting it further from the centre of the Earth than at the poles. Differences in the strength of the Earth's gravity at different points also cause variation.",
-                        "You inhale 50 potentially harmful bacteria every time you breathe. Thankfully, your immune system is working hard all the time, so virtually all of these are promptly destroyed without you feeling a thing. Phew.",
-                        "You can see stars as they were 4,000 years ago with the naked eye. Without a telescope, all the stars we can see lie within about 4,000 light-years of us. That means at most you're seeing stars as they were 4,000 years ago, around when the pyramids were being built in Egypt.",
-                        "Plants came before seeds. According to the fossil record, early plants resembled moss and reproduced with single-celled spores. Multicellular seeds didn't evolve for another 150 million years.",
-                        "Our dead cells are eaten by other cells in our body. Don't worry; it's meant to happen. When cells inside your body die, they're scavenged by phagocytes – white blood cells whose job it is to digest other cells.",
-                        "Smells can pass through liquid. Please don't try smelling underwater (your nose will not appreciate it), but smell does protrude through liquid.",
-                        "Bats aren't blind. Despite the famous idiom, bats can indeed see, but they still use their even more famous echolocation to find prey.",
-                        "Hibernating animals don't dream. Sleep is a more physiologically 'active' state than hibernation, which requires animals to substantially reduce all activities to conserve energy. There's simply not enough brain activity while an animal is hibernating to enable dreaming. The only exception to this rule is the fat-tailed lemur.",
-                        "Pine trees can tell if it's about to rain. Next time you see a pine cone, take a close look. If it's closed, that's because the air is humid, which can indicate rain is on its way.",
-                        "You can't fold a piece of A4 paper more than eight times. As the number of layers doubles each time, the paper rapidly gets too thick and too small to fold. The current world paper-folding record belongs to California high school student Britney Gallivan, who in 2002 managed to fold a 1.2km-long piece of tissue paper 12 times.",
-                        "The sharpest teeth in history didn't belong to sharks or even dinosaurs. They came from conodonts – tiny eel-like creatures that lived 500 to 200 million years ago. Their tooth tips were just two micrometres wide, about 1/20th the width of a human hair, making them the sharpest ever measured.",
-                        "Laughing came before language. How do we know? Some researchers tickled baby apes, which, beyond being adorable, showed that they share the same structure as ours and likely arose in our common ancestors millions of years ago. Language came about much later.",
-                        "The fastest jet in the world can fly almost 10 times the speed of sound (11,854km/h). The fastest jet is NASA's X-43 experimental plane, three of which were built in total. The design meant that they had to be dropped from a Boeing B-52 in order to fly.",
-                        "Your brain burns 400-500 calories a day. That's about a fifth of your total energy requirements. Most of this is concerned with the largely automatic process of controlling your muscles and processing sensory input, although some studies show solving tricky problems increases your brain's metabolic requirements too."
-                    ];
-                    const fact = facts[Math.floor(Math.random() * facts.length)];
-                    showCommandFeedback(originalCommand, `💡 ${fact}`);
-                    commandInput.value = '';
                 } else if (command === 'jumpscare') {
                     resetConfirm = false;
                     triggerJumpscare();
@@ -3034,264 +2189,6 @@
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
-                } else if (command === 'matrix') {
-                    resetConfirm = false;
-                    triggerMatrix();
-                    showCommandFeedback(originalCommand, 'Matrix effect activated!');
-                    commandInput.value = '';
-                } else if (command === 'confetti') {
-                    resetConfirm = false;
-                    triggerConfetti();
-                    showCommandFeedback(originalCommand, 'Confetti burst! 🎉');
-                    commandInput.value = '';
-                } else if (command === 'spin') {
-                    resetConfirm = false;
-                    triggerSpin();
-                    showCommandFeedback(originalCommand, 'Background spinning!');
-                    commandInput.value = '';
-                } else if (command === 'invert') {
-                    resetConfirm = false;
-                    triggerInvert();
-                    showCommandFeedback(originalCommand, 'Background inverted!');
-                    commandInput.value = '';
-                } else if (command === 'shake') {
-                    resetConfirm = false;
-                    triggerShake();
-                    showCommandFeedback(originalCommand, 'Background shaking!');
-                    commandInput.value = '';
-                } else if (command === 'upsidedown') {
-                    resetConfirm = false;
-                    triggerUpsideDown();
-                    showCommandFeedback(originalCommand, 'Background flipped! 🔄');
-                    commandInput.value = '';
-                } else if (command === 'party') {
-                    resetConfirm = false;
-                    triggerParty();
-                    showCommandFeedback(originalCommand, 'Party mode! 🎉');
-                    commandInput.value = '';
-                } else if (command === 'chaos') {
-                    resetConfirm = false;
-                    triggerChaos();
-                    showCommandFeedback(originalCommand, 'CHAOS! 💥✨🎨');
-                    commandInput.value = '';
-                } else if (command === '1995') {
-                    resetConfirm = false;
-                    applyTheme1995();
-                    showCommandFeedback(originalCommand, 'Windows 95 mode activated! 🪟');
-                    commandInput.value = '';
-                } else if (command === 'cyberpunk') {
-                    resetConfirm = false;
-                    applyThemeCyberpunk();
-                    showCommandFeedback(originalCommand, 'Cyberpunk mode activated! 🌆');
-                    commandInput.value = '';
-                } else if (command === 'terminal') {
-                    resetConfirm = false;
-                    applyThemeTerminal();
-                    showCommandFeedback(originalCommand, 'Terminal mode activated! 💻');
-                    commandInput.value = '';
-                } else if (command === 'coffee') {
-                    resetConfirm = false;
-                    applyThemeCoffee();
-                    showCommandFeedback(originalCommand, 'Coffee mode activated! ☕');
-                    commandInput.value = '';
-                } else if (command === 'dark') {
-                    resetConfirm = false;
-                    applyThemeDark();
-                    showCommandFeedback(originalCommand, 'Dark mode activated! 🌙');
-                    commandInput.value = '';
-                } else if (command === 'light') {
-                    resetConfirm = false;
-                    applyThemeLight();
-                    showCommandFeedback(originalCommand, 'Light mode activated! ☀️');
-                    commandInput.value = '';
-                } else if (command.startsWith('calc ')) {
-                    resetConfirm = false;
-                    const equation = originalCommand.substring(5).trim();
-                    const result = calculateEquation(equation);
-                    showCommandFeedback(originalCommand, `= ${result}`);
-                    commandInput.value = '';
-                } else if (command.startsWith('timer ')) {
-                    resetConfirm = false;
-                    const seconds = parseInt(originalCommand.substring(6).trim());
-                    if (seconds > 0 && seconds <= 3600) {
-                        startTimer(seconds);
-                        showCommandFeedback(originalCommand, `Timer started for ${seconds} seconds`);
-                    } else {
-                        showCommandFeedback(originalCommand, 'Invalid timer duration (1-3600 seconds)', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'fortune') {
-                    resetConfirm = false;
-                    const fortune = getFortune();
-                    showCommandFeedback(originalCommand, fortune);
-                    commandInput.value = '';
-                } else if (command === 'joke') {
-                    resetConfirm = false;
-                    const joke = getJoke();
-                    showCommandFeedback(originalCommand, joke);
-                    commandInput.value = '';
-                } else if (command === 'password') {
-                    resetConfirm = false;
-                    const password = generatePassword();
-                    showCommandFeedback(originalCommand, `Generated password: ${password}`);
-                    commandInput.value = '';
-                } else if (command.startsWith('ascii ')) {
-                    resetConfirm = false;
-                    const text = originalCommand.substring(6).trim();
-                    if (text.length > 0 && text.length <= 20) {
-                        const asciiArt = generateASCII(text);
-                        // Show ASCII art in a special way (using white-space: pre)
-                        const asciiDisplay = document.createElement('div');
-                        asciiDisplay.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(13, 17, 23, 0.98); border: 2px solid #30363d; padding: 20px; color: #c9d1d9; font-family: monospace; font-size: 12px; white-space: pre; z-index: 10000; max-width: 90vw; max-height: 90vh; overflow: auto;';
-                        asciiDisplay.textContent = asciiArt;
-                        document.body.appendChild(asciiDisplay);
-                        setTimeout(() => asciiDisplay.remove(), 5000);
-                        showCommandFeedback(originalCommand, 'ASCII art displayed!');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Text must be 1-20 characters', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'credits') {
-                    resetConfirm = false;
-                    showCredits();
-                    commandInput.value = '';
-                } else if (command === 'horde') {
-                    resetConfirm = false;
-                    if (petGooseActive || unlockedCommands.has('horde')) {
-                        startGeeseHorde();
-                        showCommandFeedback(originalCommand, 'Geese horde activated! 🦢🦢🦢');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'nest') {
-                    resetConfirm = false;
-                    if (petGooseActive || unlockedCommands.has('nest')) {
-                        showNest();
-                        showCommandFeedback(originalCommand, 'Viewing your nest! 🪺');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'translate') {
-                    resetConfirm = false;
-                    if (petGooseActive || unlockedCommands.has('translate')) {
-                        toggleGooseTranslate();
-                        showCommandFeedback(originalCommand, gooseTranslateActive ? 'Goose translate ON! 🦢' : 'Goose translate OFF');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'detect') {
-                    resetConfirm = false;
-                    if (petGooseActive || unlockedCommands.has('detect')) {
-                        detectGooseLevel();
-                        showCommandFeedback(originalCommand, '🦢 Goose Level: 100% 🦢');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'blur') {
-                    resetConfirm = false;
-                    triggerBlur();
-                    showCommandFeedback(originalCommand, blurActive ? 'Blur ON' : 'Blur OFF');
-                    commandInput.value = '';
-                } else if (command === 'pixelate') {
-                    resetConfirm = false;
-                    triggerPixelate();
-                    showCommandFeedback(originalCommand, 'Pixelated!');
-                    commandInput.value = '';
-                } else if (command === 'ghost') {
-                    resetConfirm = false;
-                    triggerGhost();
-                    showCommandFeedback(originalCommand, 'Ghost mode! 👻');
-                    commandInput.value = '';
-                } else if (command === 'mirror') {
-                    resetConfirm = false;
-                    triggerMirror();
-                    showCommandFeedback(originalCommand, mirrorActive ? 'Mirrored! 🔄' : 'Unmirrored!');
-                    commandInput.value = '';
-                } else if (command === 'flashbang') {
-                    resetConfirm = false;
-                    triggerFlashbang();
-                    showCommandFeedback(originalCommand, 'FLASHBANG! 💥');
-                    commandInput.value = '';
-                } else if (command === 'earthquake') {
-                    resetConfirm = false;
-                    triggerEarthquake();
-                    showCommandFeedback(originalCommand, 'EARTHQUAKE! 🌍');
-                    commandInput.value = '';
-                } else if (command.startsWith('say ')) {
-                    resetConfirm = false;
-                    const text = originalCommand.substring(4).trim();
-                    if (text.length > 0) {
-                        sayText(text);
-                        showCommandFeedback(originalCommand, `Saying: "${text}"`);
-                    } else {
-                        showCommandFeedback(originalCommand, 'Please provide text to say', true);
-                    }
-                    commandInput.value = '';
-                } else if (command.startsWith('rps ')) {
-                    resetConfirm = false;
-                    const choice = originalCommand.substring(4).trim().toLowerCase();
-                    if (['rock', 'paper', 'scissors'].includes(choice)) {
-                        const result = playRockPaperScissors(choice);
-                        showCommandFeedback(originalCommand, result);
-                    } else {
-                        showCommandFeedback(originalCommand, 'Invalid choice. Use: rock, paper, or scissors', true);
-                    }
-                    commandInput.value = '';
-                } else if (command.startsWith('math ')) {
-                    resetConfirm = false;
-                    const equation = originalCommand.substring(5).trim();
-                    const result = calculateEquation(equation);
-                    showCommandFeedback(originalCommand, `= ${result}`);
-                    commandInput.value = '';
-                } else if (command === 'neofetch') {
-                    resetConfirm = false;
-                    showNeofetch();
-                    commandInput.value = '';
-                } else if (command === 'goosecall') {
-                    resetConfirm = false;
-                    if (petGooseActive || unlockedCommands.has('goosecall')) {
-                        gooseCall();
-                        showCommandFeedback(originalCommand, '🦢 HONK! 🦢');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'steal') {
-                    resetConfirm = false;
-                    if (petGooseActive || unlockedCommands.has('steal')) {
-                        stealCommandMenu();
-                        showCommandFeedback(originalCommand, 'The goose stole the menu! 🦢');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'feed') {
-                    resetConfirm = false;
-                    if (petGooseActive || unlockedCommands.has('feed')) {
-                        feedPetGoose();
-                        showCommandFeedback(originalCommand, 'Fed the goose! 🍞');
-                    } else {
-                        showCommandFeedback(originalCommand, 'Unlock the pet goose first!', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'hatch') {
-                    resetConfirm = false;
-                    if (petGoose && petGoose.stage === 'egg') {
-                        hatchPetGoose();
-                        showCommandFeedback(originalCommand, 'The egg hatched! 🐣');
-                    } else {
-                        showCommandFeedback(originalCommand, 'No egg to hatch!', true);
-                    }
-                    commandInput.value = '';
-                } else if (command === 'mud') {
-                    resetConfirm = false;
-                    applyMudToWooper();
-                    showCommandFeedback(originalCommand, 'Wooper turned brown! 🟤');
-                    commandInput.value = '';
                 } else if (command === '67') {
                     resetConfirm = false;
                     // Get current count
@@ -3320,11 +2217,6 @@
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
-                } else if (command === 'effects' || command === 'vfx') {
-                    resetConfirm = false;
-                    toggleVisualEffectsMenu();
-                    showCommandFeedback(originalCommand, 'Visual effects menu toggled!');
-                    commandInput.value = '';
                 } else if (command === 'rainbow') {
                     resetConfirm = false;
                     applyRainbowColors();
@@ -3430,7 +2322,7 @@
             if (cell.mineCount > 0) {
                 cell.el.innerHTML = cell.mineCount;
                 cell.el.classList.add(`number-${cell.mineCount}`);
-                } else {
+                    } else {
                 for (let dr = -1; dr <= 1; dr++) {
                     for (let dc = -1; dc <= 1; dc++) {
                         revealCell(r + dr, c + dc);
@@ -3498,7 +2390,7 @@
             if (win) {
                 messageEl.innerHTML = '🎉 YOU WIN! 🎉';
                 messageEl.style.color = 'green';
-                } else {
+                    } else {
                 messageEl.innerHTML = '💣 GAME OVER! 💣';
                 messageEl.style.color = 'red';
                 board.flat().forEach(cell => {
@@ -3577,778 +2469,26 @@
             // Create image element
             const img = document.createElement('img');
             img.className = 'jumpscare-image';
-            img.src = 'jumpscare.jpg';
+            // Note: You'll need to add your image file to the project and set the src
+            // For now, using a placeholder - replace with your image path/URL
+            img.src = 'jumpscare.jpg'; // Change this to your image file path or URL
             img.alt = 'Jumpscare';
-            
-            // Handle image load and error
-            img.onload = function() {
-                // Image loaded successfully, trigger animation
-                setTimeout(() => {
-                    overlay.classList.add('active');
-                }, 10);
-            };
-            
-            img.onerror = function() {
-                // If image fails to load, still show overlay but with error message
-                overlay.innerHTML = '<div style="color: white; font-size: 24px; text-align: center;">Jumpscare image not found!<br>Make sure jumpscare.jpg is in the same folder as index.html</div>';
-                overlay.classList.add('active');
-            };
             
             overlay.appendChild(img);
             document.body.appendChild(overlay);
             
-            // Remove overlay after animation completes (with delay for image load)
+            // Trigger animation by adding active class
+            setTimeout(() => {
+                overlay.classList.add('active');
+            }, 10);
+            
+            // Remove overlay after animation completes
             setTimeout(() => {
                 overlay.classList.remove('active');
                 setTimeout(() => {
                     overlay.remove();
                 }, 500);
-            }, 1500); // Give extra time for image to load
-        }
-        
-        // Visual Effects Functions
-        let matrixCanvas = null;
-        let matrixCtx = null;
-        let matrixInterval = null;
-        let matrixChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
-        let matrixColumns = [];
-        
-        function triggerMatrix() {
-            // Remove existing matrix if any
-            if (matrixCanvas) {
-                matrixCanvas.remove();
-                if (matrixInterval) clearInterval(matrixInterval);
-            }
-            
-            // Set black background
-            const originalBg = document.body.style.background;
-            document.body.style.background = '#000000';
-            
-            // Create canvas overlay
-            matrixCanvas = document.createElement('canvas');
-            matrixCanvas.className = 'matrix-canvas';
-            matrixCanvas.width = window.innerWidth;
-            matrixCanvas.height = window.innerHeight;
-            matrixCtx = matrixCanvas.getContext('2d');
-            document.body.appendChild(matrixCanvas);
-            
-            // Initialize columns
-            const fontSize = 14;
-            const columns = Math.floor(window.innerWidth / fontSize);
-            matrixColumns = [];
-            for (let i = 0; i < columns; i++) {
-                matrixColumns[i] = Math.random() * window.innerHeight;
-            }
-            
-            // Draw matrix effect
-            function drawMatrix() {
-                matrixCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                matrixCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-                
-                matrixCtx.fillStyle = '#00ff00';
-                matrixCtx.font = fontSize + 'px monospace';
-                
-                for (let i = 0; i < columns; i++) {
-                    const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-                    const x = i * fontSize;
-                    const y = matrixColumns[i] * fontSize;
-                    
-                    matrixCtx.fillText(text, x, y);
-                    
-                    if (y > window.innerHeight && Math.random() > 0.975) {
-                        matrixColumns[i] = 0;
-                    }
-                    
-                    matrixColumns[i]++;
-                }
-            }
-            
-            matrixInterval = setInterval(drawMatrix, 50);
-            
-            // Stop after 10 seconds
-            setTimeout(() => {
-                if (matrixCanvas) {
-                    matrixCanvas.remove();
-                    matrixCanvas = null;
-                }
-                if (matrixInterval) {
-                    clearInterval(matrixInterval);
-                    matrixInterval = null;
-                }
-                document.body.style.background = originalBg;
-            }, 10000);
-        }
-        
-        function triggerConfetti() {
-            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080'];
-            const particleCount = 100;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'confetti-particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = '-10px';
-                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.width = (Math.random() * 10 + 5) + 'px';
-                particle.style.height = particle.style.width;
-                document.body.appendChild(particle);
-                
-                const angle = (Math.random() - 0.5) * Math.PI * 0.5;
-                const velocity = Math.random() * 5 + 5;
-                const vx = Math.cos(angle) * velocity;
-                const vy = Math.sin(angle) * velocity + 5;
-                let x = parseFloat(particle.style.left) / 100 * window.innerWidth;
-                let y = -10;
-                
-                const animate = () => {
-                    y += vy;
-                    x += vx;
-                    particle.style.left = (x / window.innerWidth * 100) + '%';
-                    particle.style.top = y + 'px';
-                    
-                    if (y < window.innerHeight + 50) {
-                        requestAnimationFrame(animate);
-                            } else {
-                        particle.remove();
-                    }
-                };
-                
-                requestAnimationFrame(animate);
-            }
-        }
-        
-        // Background effect overlay helper
-        function createBgOverlay(className, duration) {
-            // Remove any existing overlay
-            const existing = document.getElementById('bgEffectOverlay');
-            if (existing) existing.remove();
-            
-            // Create overlay div
-            const overlay = document.createElement('div');
-            overlay.id = 'bgEffectOverlay';
-            overlay.className = 'bg-effect-overlay ' + className;
-            
-            // Copy current background from body (try computed style first, then inline style, then fallback)
-            const computedStyle = window.getComputedStyle(document.body);
-            const bodyBg = computedStyle.background || computedStyle.backgroundColor || 
-                          document.body.style.background || document.body.style.backgroundColor || 
-                          '#0d1117';
-            overlay.style.background = bodyBg;
-            
-            // If background is empty or transparent, use fallback
-            if (!bodyBg || bodyBg === 'rgba(0, 0, 0, 0)' || bodyBg === 'transparent') {
-                overlay.style.background = '#0d1117';
-            }
-            
-            document.body.insertBefore(overlay, document.body.firstChild);
-            
-            // Remove after animation
-            setTimeout(() => {
-                if (overlay.parentNode) {
-                    overlay.remove();
-                }
-            }, duration);
-        }
-        
-        function triggerSpin() {
-            createBgOverlay('bg-spin-effect', 1000);
-        }
-        
-        function triggerInvert() {
-            createBgOverlay('bg-invert-effect', 500);
-        }
-        
-        function triggerShake() {
-            createBgOverlay('bg-shake-effect', 500);
-        }
-        
-        function triggerUpsideDown() {
-            createBgOverlay('bg-upsidedown-effect', 500);
-        }
-        
-        let partyInterval = null;
-        const partyColors = ['black', 'red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
-        const colorMap = {
-            'black': '#000000',
-            'red': '#ff0000',
-            'blue': '#0000ff',
-            'green': '#00ff00',
-            'yellow': '#ffff00',
-            'purple': '#800080',
-            'orange': '#ffa500',
-            'pink': '#ff69b4',
-            'cyan': '#00ffff'
-        };
-        
-        function triggerParty() {
-            // Stop any existing party mode
-            if (partyInterval) {
-                clearTimeout(partyInterval);
-                partyInterval = null;
-            }
-            
-            // Save original background
-            const originalBg = document.body.style.background || window.getComputedStyle(document.body).background;
-            
-            // Cycle through colors quickly (1 second total, ~9 colors = ~110ms per color)
-            let partyColorIndex = 0;
-            const cycleCount = 9; // Cycle through all colors once
-            const cycleDuration = 110;
-            
-            function cyclePartyColors() {
-                if (partyColorIndex >= cycleCount) {
-                    // Restore original background
-                    if (originalBg) {
-                        document.body.style.background = originalBg;
-                    } else {
-                        loadBackgroundPreferences();
-                    }
-                    return;
-                }
-                
-                const colorName = partyColors[partyColorIndex % partyColors.length];
-                document.body.style.background = colorMap[colorName];
-                partyColorIndex++;
-                partyInterval = setTimeout(cyclePartyColors, cycleDuration);
-            }
-            
-            cyclePartyColors();
-        }
-        
-        function triggerChaos() {
-            // Pool of possible chaos actions
-            const actions = [];
-            
-            // Visual effects
-            actions.push(() => triggerSpin());
-            actions.push(() => triggerShake());
-            actions.push(() => triggerConfetti());
-            
-            // Color changes (random color from available colors)
-            const availableColors = Object.keys(colorPalettes);
-            actions.push(() => {
-                const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
-                changeAllColors(randomColor);
-            });
-            actions.push(() => {
-                const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
-                changeAllColors(randomColor);
-            }); // Add color change twice since it's fun
-            
-            // Randomly pick 3 different actions
-            const selectedActions = [];
-            const usedIndices = new Set();
-            
-            while (selectedActions.length < 3 && selectedActions.length < actions.length) {
-                const randomIndex = Math.floor(Math.random() * actions.length);
-                if (!usedIndices.has(randomIndex)) {
-                    usedIndices.add(randomIndex);
-                    selectedActions.push(actions[randomIndex]);
-                }
-            }
-            
-            // Trigger all 3 actions at once
-            selectedActions.forEach(action => {
-                try {
-                    action();
-                } catch (e) {
-                    console.error('Chaos action error:', e);
-                }
-            });
-        }
-        
-        // ===== THEME FUNCTIONS =====
-        let currentTheme = null;
-        
-        function applyTheme1995() {
-            currentTheme = '1995';
-            document.body.classList.add('theme-1995');
-            document.body.style.fontFamily = 'MS Sans Serif, sans-serif';
-            document.body.style.background = '#C0C0C0';
-            document.body.style.color = '#000000';
-            localStorage.setItem('currentTheme', '1995');
-        }
-        
-        function applyThemeCyberpunk() {
-            currentTheme = 'cyberpunk';
-            document.body.classList.add('theme-cyberpunk');
-            document.body.style.background = '#0a0e27';
-            document.body.style.color = '#ff0080';
-            localStorage.setItem('currentTheme', 'cyberpunk');
-        }
-        
-        function applyThemeTerminal() {
-            currentTheme = 'terminal';
-            document.body.classList.add('theme-terminal');
-            document.body.style.background = '#000000';
-            document.body.style.color = '#00ff00';
-            localStorage.setItem('currentTheme', 'terminal');
-        }
-        
-        function applyThemeCoffee() {
-            currentTheme = 'coffee';
-            document.body.classList.add('theme-coffee');
-            document.body.style.background = '#8B6F47';
-            document.body.style.color = '#D2B48C';
-            localStorage.setItem('currentTheme', 'coffee');
-        }
-        
-        function applyThemeDark() {
-            currentTheme = 'dark';
-            document.body.classList.remove('theme-1995', 'theme-cyberpunk', 'theme-terminal', 'theme-coffee', 'theme-light');
-            document.body.style.background = '#0d1117';
-            document.body.style.color = '#c9d1d9';
-            localStorage.setItem('currentTheme', 'dark');
-        }
-        
-        function applyThemeLight() {
-            currentTheme = 'light';
-            document.body.classList.remove('theme-1995', 'theme-cyberpunk', 'theme-terminal', 'theme-coffee');
-            document.body.classList.add('theme-light');
-            document.body.style.background = '#ffffff';
-            document.body.style.color = '#000000';
-            localStorage.setItem('currentTheme', 'light');
-        }
-        
-        // Load theme on page load
-        function loadTheme() {
-            const saved = localStorage.getItem('currentTheme');
-            if (saved) {
-                switch(saved) {
-                    case '1995': applyTheme1995(); break;
-                    case 'cyberpunk': applyThemeCyberpunk(); break;
-                    case 'terminal': applyThemeTerminal(); break;
-                    case 'coffee': applyThemeCoffee(); break;
-                    case 'light': applyThemeLight(); break;
-                    default: applyThemeDark();
-                }
-            }
-        }
-        loadTheme();
-        
-        // ===== CALCULATOR =====
-        function calculateEquation(equation) {
-            try {
-                // Sanitize: only allow numbers, operators, parentheses, and spaces
-                const sanitized = equation.replace(/[^0-9+\-*/().\s]/g, '');
-                const result = Function('"use strict"; return (' + sanitized + ')')();
-                return isNaN(result) ? 'Invalid equation' : result;
-            } catch (e) {
-                return 'Invalid equation';
-            }
-        }
-        
-        // ===== TIMER =====
-        let timerInterval = null;
-        let timerDisplay = null;
-        
-        function startTimer(seconds) {
-            // Remove existing timer
-            if (timerDisplay) timerDisplay.remove();
-            if (timerInterval) clearInterval(timerInterval);
-            
-            // Create timer display
-            timerDisplay = document.createElement('div');
-            timerDisplay.id = 'timerDisplay';
-            timerDisplay.style.cssText = 'position: fixed; top: 80px; left: 20px; background: rgba(13, 17, 23, 0.95); border: 1px solid #30363d; border-radius: 6px; padding: 10px 15px; color: #c9d1d9; font-family: monospace; font-size: 20px; z-index: 999;';
-            document.body.appendChild(timerDisplay);
-            
-            let timeLeft = seconds;
-            timerDisplay.textContent = `Timer: ${timeLeft}s`;
-            
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = `Timer: ${timeLeft}s`;
-                
-                if (timeLeft <= 0) {
-                    timerDisplay.textContent = 'Timer: DONE!';
-                    timerDisplay.style.color = '#3fb950';
-                    clearInterval(timerInterval);
-                    setTimeout(() => {
-                        if (timerDisplay) timerDisplay.remove();
-                        timerDisplay = null;
-                        timerInterval = null;
-                    }, 3000);
-                }
-            }, 1000);
-        }
-        
-        // ===== FORTUNE =====
-        function getFortune() {
-            const fortunes = [
-                "A smile is your passport into the hearts of others.",
-                "A lifetime of happiness lies ahead of you.",
-                "A light heart carries you through all the hard times.",
-                "Adventure can be real happiness.",
-                "Believe in yourself and others will too.",
-                "Change is happening in your life, so go with the flow!",
-                "Determination is what you need now.",
-                "Every exit is an entrance to new opportunities.",
-                "Follow the middle path. Neither extreme will make you happy.",
-                "Good news will come to you by mail.",
-                "If you wish to see the best in others, show the best of yourself.",
-                "It is better to be an optimist and proven a fool than to be a pessimist and be proven right.",
-                "Judge each day not by the harvest you reap but by the seeds you plant.",
-                "Keep your face to the sunshine and you will never see shadows.",
-                "Listen to everyone. Ideas come from everywhere.",
-                "Never give up. You're not a failure if you don't give up.",
-                "Opportunity knocks at the strangest times.",
-                "Practice makes perfect, but nobody's perfect, so why practice?",
-                "Simplicity and clarity should be your theme in dress.",
-                "The best time to start something is now.",
-                "The harder you work, the luckier you get.",
-                "You will overcome the troubles that are on your mind.",
-                "Your kindness will lead you to success.",
-                "You're thinking about doing something. You should do it.",
-            ];
-            return fortunes[Math.floor(Math.random() * fortunes.length)];
-        }
-        
-        // ===== JOKE =====
-        function getJoke() {
-            const jokes = [
-                "Why don't scientists trust atoms? Because they make up everything!",
-                "I told my wife she was drawing her eyebrows too high. She looked surprised.",
-                "Why don't eggs tell jokes? They'd crack each other up!",
-                "What do you call a fake noodle? An impasta!",
-                "How do you organize a space party? You planet!",
-                "Why did the scarecrow win an award? He was outstanding in his field!",
-                "I'm reading a book about anti-gravity. It's impossible to put down!",
-                "How does a penguin build its house? Igloos it together!",
-                "Why don't programmers like nature? It has too many bugs.",
-                "A SQL query walks into a bar, walks up to two tables and asks: 'Can I join you?'",
-                "Why do Java developers wear glasses? Because they can't C#!",
-                "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
-                "There are only 10 kinds of people in the world: those who know binary and those who don't.",
-                "Why did the programmer quit his job? He didn't get arrays!",
-                "['hip','hip'] // (hip hip array!)",
-                "What's the object-oriented way to become wealthy? Inheritance.",
-                "Why did the programmer get stuck in the shower? He followed the bottle instructions: Lather. Rinse. Repeat.",
-            ];
-            return jokes[Math.floor(Math.random() * jokes.length)];
-        }
-        
-        // ===== PASSWORD GENERATOR =====
-        function generatePassword() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-            let password = '';
-            for (let i = 0; i < 16; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return password;
-        }
-        
-        // ===== ASCII ART =====
-        const asciiFont = {
-            'A': ['  /\\  ', ' /  \\ ', '/____\\', '|    |', '|____|'],
-            'B': [' ____ ', '|  _ \\', '| |_) |', '|  _ <', '|____/'],
-            'C': ['  ____ ', ' / ___|', '| |    ', '| |___ ', ' \\____|'],
-            'D': [' ____  ', '|  _ \\ ', '| | | |', '| |_| |', '|____/ '],
-            'E': [' _____ ', '| ____|', '| |_   ', '|  _|  ', '|_____|'],
-            'F': [' _____ ', '| ____|', '| |_   ', '|  _|  ', '| |    '],
-            'G': ['  ____ ', ' / ___|', '| |  _ ', '| |_| |', ' \\____|'],
-            'H': [' _   _ ', '| | | |', '| |_| |', '|  _  |', '|_| |_|'],
-            'I': [' _____ ', '|_   _|', '  | |  ', '  | |  ', '  |_|  '],
-            'J': ['     _ ', '    | |', '    | |', ' _  | |', '|_| |_|'],
-            'K': [' _  __', '| |/ /', '| \' / ', '| . \\ ', '|_|\\_\\'],
-            'L': [' _     ', '| |    ', '| |    ', '| |___ ', '|_____|'],
-            'M': [' __  __ ', '|  \\/  |', '| |\\/| |', '| |  | |', '|_|  |_|'],
-            'N': [' _   _ ', '| \\ | |', '|  \\| |', '| |\\  |', '|_| \\_|'],
-            'O': ['  ___  ', ' / _ \\ ', '| | | |', '| |_| |', ' \\___/ '],
-            'P': [' ____  ', '|  _ \\ ', '| |_) |', '|  __/ ', '|_|    '],
-            'Q': ['  ___  ', ' / _ \\ ', '| | | |', '| |\\ \\ ', ' \\_\\ \\_'],
-            'R': [' ____  ', '|  _ \\ ', '| |_) |', '|    / ', '|_|\\_\\ '],
-            'S': [' ____  ', '|  __| ', '|  __| ', '| |___ ', '|_____|'],
-            'T': [' _____ ', '|_   _|', '  | |  ', '  | |  ', '  |_|  '],
-            'U': [' _   _ ', '| | | |', '| | | |', '| |_| |', ' \\___/ '],
-            'V': ['__     __', '\\ \\   / /', ' \\ \\ / / ', '  \\ V /  ', '   \\_/   '],
-            'W': ['__        __', '\\ \\      / /', ' \\ \\ /\\ / / ', '  \\ V  V /  ', '   \\_/\\_/   '],
-            'X': ['__  __', '\\ \\/ /', ' \\  / ', ' /  \\ ', '/_/\\_\\'],
-            'Y': ['__   __', '\\ \\ / /', ' \\ V / ', '  | |  ', '  |_|  '],
-            'Z': [' _____', '/__  /', '  / / ', ' / /__', '/_____|'],
-            ' ': [' ', ' ', ' ', ' ', ' '],
-            '0': ['  ___  ', ' / _ \\ ', '| | | |', '| |_| |', ' \\___/ '],
-            '1': ['  _  ', ' / | ', '| |  ', '| |  ', '|_|  '],
-            '2': [' ____  ', '|_  _| ', '  | |  ', ' / /   ', '/____| '],
-            '3': [' _____ ', '|_   _|', '  | |  ', '  | |  ', '  |_|  '],
-            '4': [' _  _  ', '| || | ', '| || |_', '|__   _|', '   |_|  '],
-            '5': [' _____ ', '| ____|', '|  __| ', '| |___ ', '|_____|'],
-            '6': ['  ___  ', ' / ___|', '| |    ', '| |___ ', ' \\____|'],
-            '7': [' _____ ', '|_   _|', '  | |  ', ' / /   ', '/_/    '],
-            '8': ['  ___  ', ' | _ \\ ', ' | |_) |', ' |  _ < ', ' |_| \\_\\'],
-            '9': ['  ___  ', ' | _ \\ ', ' | |_) |', ' |  _ < ', '  |_|\\_\\'],
-        };
-        
-        function generateASCII(text) {
-            const lines = ['', '', '', '', ''];
-            for (let char of text) {
-                const upper = char.toUpperCase();
-                const letter = asciiFont[upper] || asciiFont[' '];
-                for (let i = 0; i < 5; i++) {
-                    lines[i] += (letter[i] || ' ') + ' ';
-                }
-            }
-            return lines.join('\n');
-        }
-        
-        // ===== CREDITS =====
-        function showCredits() {
-            const credits = `CREDITS
-        
-Finley Chang - Creator
-Tyler Bayne - Goose Creator
-Declan - Wooper Creator`;
-            showCommandFeedback('credits', credits);
-        }
-        
-        // ===== GOOSE EXPANSION =====
-        let geeseHordeActive = false;
-        let geeseHordeInterval = null;
-        let gooseTranslateActive = false;
-        
-        function startGeeseHorde() {
-            if (geeseHordeActive) return;
-            geeseHordeActive = true;
-            
-            // Spawn geese walking across screen
-            geeseHordeInterval = setInterval(() => {
-                const goose = document.createElement('div');
-                goose.textContent = '🦢';
-                goose.style.cssText = `position: fixed; font-size: 40px; top: ${Math.random() * (window.innerHeight - 100)}px; left: -50px; z-index: 500; pointer-events: none;`;
-                document.body.appendChild(goose);
-                
-                let x = -50;
-                const speed = Math.random() * 2 + 1;
-                const animate = () => {
-                    x += speed;
-                    goose.style.left = x + 'px';
-                    if (x < window.innerWidth + 50) {
-                        requestAnimationFrame(animate);
-                    } else {
-                        goose.remove();
-                    }
-                };
-                animate();
-            }, 300);
-            
-            // Stop after 30 seconds
-            setTimeout(() => {
-                clearInterval(geeseHordeInterval);
-                geeseHordeActive = false;
-            }, 30000);
-        }
-        
-        function showNest() {
-            // Show achievements in a nest visual (use achievements page but style as nest)
-            showPage('achievementsPage');
-        }
-        
-        function toggleGooseTranslate() {
-            gooseTranslateActive = !gooseTranslateActive;
-            // Store original input handler
-            if (!window.originalCommandHandler) {
-                window.originalCommandHandler = commandInput.value;
-            }
-            
-            if (gooseTranslateActive) {
-                // Replace all input with HONK/GEESE
-                commandInput.addEventListener('input', function gooseTranslateHandler(e) {
-                    const current = commandInput.value;
-                    const words = current.split(/\s+/);
-                    const translated = words.map(() => Math.random() > 0.5 ? 'HONK' : 'GEESE').join(' ');
-                    if (commandInput.value !== translated) {
-                        commandInput.value = translated;
-                    }
-                });
-            } else {
-                // Remove translate handler (will be removed on next toggle)
-                commandInput.value = '';
-            }
-        }
-        
-        function detectGooseLevel() {
-            // Visual "radar" effect
-            const radar = document.createElement('div');
-            radar.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: #00ff00; padding: 30px; border: 3px solid #00ff00; font-family: monospace; font-size: 24px; z-index: 10000; text-align: center;';
-            radar.innerHTML = '🦢<br>GOOSE LEVEL: 100%<br>🦢';
-            document.body.appendChild(radar);
-            
-            setTimeout(() => {
-                radar.remove();
-            }, 3000);
-        }
-        
-        // ===== NEW VISUAL EFFECTS =====
-        let blurActive = false;
-        function triggerBlur() {
-            blurActive = !blurActive;
-            if (blurActive) {
-                document.body.style.filter = 'blur(5px)';
-            } else {
-                document.body.style.filter = '';
-            }
-        }
-        
-        function triggerPixelate() {
-            document.body.style.filter = 'pixelate(8px)';
-            setTimeout(() => {
-                document.body.style.filter = '';
-            }, 3000);
-        }
-        
-        function triggerGhost() {
-            document.body.style.opacity = '0.2';
-            setTimeout(() => {
-                document.body.style.opacity = '1';
-            }, 3000);
-        }
-        
-        let mirrorActive = false;
-        function triggerMirror() {
-            mirrorActive = !mirrorActive;
-            if (mirrorActive) {
-                document.body.style.transform = 'scaleX(-1)';
-            } else {
-                document.body.style.transform = '';
-            }
-        }
-        
-        function triggerFlashbang() {
-            const flash = document.createElement('div');
-            flash.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 99999; pointer-events: none;';
-            document.body.appendChild(flash);
-            
-            // High-pitched ringing sound using Web Audio API
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.frequency.value = 2000; // High pitch
-            oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 1);
-            
-            setTimeout(() => {
-                flash.remove();
-            }, 1000);
-        }
-        
-        function triggerEarthquake() {
-            document.body.classList.add('earthquake-effect');
-            setTimeout(() => {
-                document.body.classList.remove('earthquake-effect');
-            }, 2000);
-        }
-        
-        // ===== UTILITY FUNCTIONS =====
-        function sayText(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 1;
-                utterance.pitch = 1;
-                speechSynthesis.speak(utterance);
-            } else {
-                showCommandFeedback('say', 'Text-to-Speech not supported in this browser', true);
-            }
-        }
-        
-        function playRockPaperScissors(playerChoice) {
-            const choices = ['rock', 'paper', 'scissors'];
-            const computerChoice = choices[Math.floor(Math.random() * choices.length)];
-            
-            const results = {
-                'rock': { 'rock': 'Tie! Both chose rock', 'paper': 'You lose! Paper covers rock', 'scissors': 'You win! Rock crushes scissors' },
-                'paper': { 'rock': 'You win! Paper covers rock', 'paper': 'Tie! Both chose paper', 'scissors': 'You lose! Scissors cut paper' },
-                'scissors': { 'rock': 'You lose! Rock crushes scissors', 'paper': 'You win! Scissors cut paper', 'scissors': 'Tie! Both chose scissors' }
-            };
-            
-            return `You: ${playerChoice} | Computer: ${computerChoice}\n${results[playerChoice][computerChoice]}`;
-        }
-        
-        function showNeofetch() {
-            const browser = navigator.userAgent.includes('Chrome') ? 'Chrome' : 
-                           navigator.userAgent.includes('Firefox') ? 'Firefox' : 
-                           navigator.userAgent.includes('Safari') ? 'Safari' : 'Unknown';
-            const os = navigator.platform;
-            const gooseStatus = petGooseActive ? (petGoose?.stage || 'goose') : 'None';
-            
-            const neofetch = `
-╔═══════════════════════════════╗
-║      FINHUB v1.0              ║
-╠═══════════════════════════════╣
-║ Browser: ${browser.padEnd(20)} ║
-║ OS:      ${os.padEnd(20)} ║
-║ Goose:   ${gooseStatus.padEnd(20)} ║
-╚═══════════════════════════════╝`;
-            
-            const neofetchDisplay = document.createElement('div');
-            neofetchDisplay.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(13, 17, 23, 0.98); border: 2px solid #30363d; padding: 20px; color: #c9d1d9; font-family: monospace; font-size: 14px; white-space: pre; z-index: 10000;';
-            neofetchDisplay.textContent = neofetch;
-            document.body.appendChild(neofetchDisplay);
-            setTimeout(() => neofetchDisplay.remove(), 5000);
-        }
-        
-        // ===== GOOSE/WOOPER FUNCTIONS =====
-        function gooseCall() {
-            // Random honk or hiss
-            const sounds = ['honk', 'hiss'];
-            const sound = sounds[Math.floor(Math.random() * sounds.length)];
-            
-            if (sound === 'honk') {
-                playHonk();
-            } else {
-                // Hiss sound (higher frequency)
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                oscillator.frequency.value = 3000;
-                oscillator.type = 'sawtooth';
-                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + 0.3);
-            }
-        }
-        
-        let feedCount = 0;
-        function feedPetGoose() {
-            if (!petGooseActive || !petGoose) return;
-            feedCount++;
-            localStorage.setItem('gooseFeedCount', feedCount.toString());
-            
-            // Visual feedback
-            const feedEffect = document.createElement('div');
-            feedEffect.textContent = '🍞';
-            feedEffect.style.cssText = `position: fixed; font-size: 30px; right: ${petGoose.x}px; bottom: ${window.innerHeight - petGoose.y}px; z-index: 1001; pointer-events: none; animation: floatUp 1s ease-out forwards;`;
-            document.body.appendChild(feedEffect);
-            setTimeout(() => feedEffect.remove(), 1000);
-            
-            if (feedCount >= 10) {
-                unlockAchievement(12); // fatgoose achievement
-                showCommandFeedback('feed', 'The goose is getting fat! 🐷 Achievement unlocked!');
-            }
-        }
-        
-        function stealCommandMenu() {
-            const menu = document.getElementById('commandsMenu');
-            if (!menu) return;
-            
-            menu.style.display = 'none';
-            setTimeout(() => {
-                menu.style.display = '';
-            }, 5000);
-        }
-        
-        function applyMudToWooper() {
-            // Change wooperbird goose colors to brown
-            if (wooperbirdGoose) {
-                wooperbirdGoose.muddy = true;
-            }
+            }, 1300); // 300ms pop + 800ms delay + 500ms fade
         }
         
         // Background selection system
@@ -4502,7 +2642,7 @@ Declan - Wooper Creator`;
                     applyBtn.style.cursor = 'pointer';
                     applyBtn.style.background = '#238636';
                 }
-                                    } else {
+                        } else {
                 // Reset and select first color again
                 selectedGradientColor1 = color;
                 selectedGradientColor2 = null;
@@ -4603,16 +2743,16 @@ Declan - Wooper Creator`;
             wooperbirdCtx.rotate(goose.rotation);
             
             // Draw goose body (simple oval)
-            wooperbirdCtx.fillStyle = '#0000ff'; // Blue instead of white
+            wooperbirdCtx.fillStyle = '#FFFFFF';
             wooperbirdCtx.beginPath();
             wooperbirdCtx.ellipse(0, 0, goose.size * 0.6, goose.size * 0.4, 0, 0, Math.PI * 2);
             wooperbirdCtx.fill();
-            wooperbirdCtx.strokeStyle = '#ff69b4'; // Pink instead of black
+            wooperbirdCtx.strokeStyle = '#000000';
             wooperbirdCtx.lineWidth = 2;
             wooperbirdCtx.stroke();
             
             // Draw goose head
-            wooperbirdCtx.fillStyle = '#0000ff'; // Blue instead of white
+            wooperbirdCtx.fillStyle = '#FFFFFF';
             wooperbirdCtx.beginPath();
             wooperbirdCtx.arc(goose.size * 0.5, -goose.size * 0.2, goose.size * 0.3, 0, Math.PI * 2);
             wooperbirdCtx.fill();
@@ -4626,11 +2766,11 @@ Declan - Wooper Creator`;
             wooperbirdCtx.lineTo(goose.size * 0.7, -goose.size * 0.1);
             wooperbirdCtx.closePath();
             wooperbirdCtx.fill();
-            wooperbirdCtx.strokeStyle = '#ff69b4'; // Pink instead of black
+            wooperbirdCtx.strokeStyle = '#000000';
             wooperbirdCtx.stroke();
             
             // Draw eye
-            wooperbirdCtx.fillStyle = '#ff69b4'; // Pink instead of black
+            wooperbirdCtx.fillStyle = '#000000';
             wooperbirdCtx.beginPath();
             wooperbirdCtx.arc(goose.size * 0.55, -goose.size * 0.25, 3, 0, Math.PI * 2);
             wooperbirdCtx.fill();
