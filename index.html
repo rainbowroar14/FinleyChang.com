@@ -7092,6 +7092,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🏖️</text></svg>") no-repeat center';
             } else if (type === 'snake') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🐍</text></svg>") no-repeat center';
+            } else if (type === 'blockbreaker') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🧱</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -7143,6 +7145,8 @@ body.theme-flashcard button:hover {
                     openSandboxlesApp(iconId, name);
                 } else if (type === 'snake') {
                     openSnakeApp(iconId, name);
+                } else if (type === 'blockbreaker') {
+                    openBlockBreakerApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -7384,6 +7388,16 @@ body.theme-flashcard button:hover {
                         <button id="install-snake" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🧱</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Block Breaker</div>
+                            <div style="font-size: 11px; color: #666;">Classic brick breaker game - break all the blocks!</div>
+                        </div>
+                        <button id="install-blockbreaker" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
             `;
             
             content.appendChild(storeContent);
@@ -7487,6 +7501,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('snake', 'Snake', x, y);
                         alert('Snake installed successfully!');
+                    };
+                }
+                
+                const installBlockBreakerBtn = document.getElementById('install-blockbreaker');
+                if (installBlockBreakerBtn) {
+                    installBlockBreakerBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'blockbreaker');
+                        if (alreadyInstalled) {
+                            alert('Block Breaker is already installed!');
+                            return;
+                        }
+                        
+                        // Add Block Breaker icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('blockbreaker', 'Block Breaker', x, y);
+                        alert('Block Breaker installed successfully!');
                     };
                 }
             }, 100);
@@ -7804,6 +7836,10 @@ body.theme-flashcard button:hover {
             }
             if (type === 'snake') {
                 openSnakeApp(iconId, name);
+                return;
+            }
+            if (type === 'blockbreaker') {
+                openBlockBreakerApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -8710,6 +8746,337 @@ body.theme-flashcard button:hover {
                 iconId: iconId,
                 name: name,
                 type: 'snake',
+                element: window
+            });
+            
+            updateTaskbar();
+            
+            // Start the game
+            startGame();
+        }
+        
+        // Block Breaker app
+        function openBlockBreakerApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '450px';
+            window.style.height = '550px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                if (blockBreakerGameInterval) {
+                    cancelAnimationFrame(blockBreakerGameInterval);
+                    blockBreakerGameInterval = null;
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.overflow = 'hidden';
+            content.style.display = 'flex';
+            content.style.flexDirection = 'column';
+            content.style.alignItems = 'center';
+            
+            // Game HTML
+            const gameHTML = `
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <button id="blockbreaker-restart" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
+                    <div style="font-size: 12px; margin-bottom: 5px;">Score: <span id="blockbreaker-score">0</span></div>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 5px;">Lives: <span id="blockbreaker-lives">3</span></div>
+                    <div style="font-size: 10px; color: #666;">Use mouse or arrow keys to move paddle</div>
+                </div>
+                <canvas id="blockbreaker-canvas" width="400" height="450" style="border: 2px inset #c0c0c0; background: #000; display: block;"></canvas>
+            `;
+            content.innerHTML = gameHTML;
+            
+            const canvas = content.querySelector('#blockbreaker-canvas');
+            const ctx = canvas.getContext('2d');
+            const restartBtn = content.querySelector('#blockbreaker-restart');
+            const scoreEl = content.querySelector('#blockbreaker-score');
+            const livesEl = content.querySelector('#blockbreaker-lives');
+            
+            // Game constants
+            const PADDLE_WIDTH = 80;
+            const PADDLE_HEIGHT = 10;
+            const BALL_RADIUS = 8;
+            const BLOCK_ROWS = 5;
+            const BLOCK_COLS = 8;
+            const BLOCK_WIDTH = 45;
+            const BLOCK_HEIGHT = 20;
+            const BLOCK_PADDING = 5;
+            const BLOCK_OFFSET_TOP = 30;
+            const BLOCK_OFFSET_LEFT = 15;
+            
+            // Game state
+            let paddleX = (canvas.width - PADDLE_WIDTH) / 2;
+            let ballX = canvas.width / 2;
+            let ballY = canvas.height - 50;
+            let ballSpeedX = 4;
+            let ballSpeedY = -4;
+            let score = 0;
+            let lives = 3;
+            let blocks = [];
+            let blockBreakerGameInterval = null;
+            let gameRunning = false;
+            
+            // Create blocks
+            function createBlocks() {
+                blocks = [];
+                const colors = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff'];
+                for (let row = 0; row < BLOCK_ROWS; row++) {
+                    for (let col = 0; col < BLOCK_COLS; col++) {
+                        blocks.push({
+                            x: BLOCK_OFFSET_LEFT + col * (BLOCK_WIDTH + BLOCK_PADDING),
+                            y: BLOCK_OFFSET_TOP + row * (BLOCK_HEIGHT + BLOCK_PADDING),
+                            color: colors[row],
+                            visible: true
+                        });
+                    }
+                }
+            }
+            
+            // Draw game
+            function draw() {
+                // Clear canvas
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw blocks
+                blocks.forEach(block => {
+                    if (block.visible) {
+                        ctx.fillStyle = block.color;
+                        ctx.fillRect(block.x, block.y, BLOCK_WIDTH, BLOCK_HEIGHT);
+                        ctx.strokeStyle = '#fff';
+                        ctx.strokeRect(block.x, block.y, BLOCK_WIDTH, BLOCK_HEIGHT);
+                    }
+                });
+                
+                // Draw paddle
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(paddleX, canvas.height - 30, PADDLE_WIDTH, PADDLE_HEIGHT);
+                
+                // Draw ball
+                ctx.beginPath();
+                ctx.arc(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                ctx.closePath();
+            }
+            
+            // Update game
+            function update() {
+                if (!gameRunning) return;
+                
+                // Move ball
+                ballX += ballSpeedX;
+                ballY += ballSpeedY;
+                
+                // Ball collision with walls
+                if (ballX + BALL_RADIUS > canvas.width || ballX - BALL_RADIUS < 0) {
+                    ballSpeedX = -ballSpeedX;
+                }
+                if (ballY - BALL_RADIUS < 0) {
+                    ballSpeedY = -ballSpeedY;
+                }
+                
+                // Ball collision with paddle
+                if (ballY + BALL_RADIUS > canvas.height - 30 && 
+                    ballY + BALL_RADIUS < canvas.height - 20 &&
+                    ballX > paddleX && 
+                    ballX < paddleX + PADDLE_WIDTH) {
+                    ballSpeedY = -Math.abs(ballSpeedY);
+                    // Add spin based on where ball hits paddle
+                    const hitPos = (ballX - paddleX) / PADDLE_WIDTH;
+                    ballSpeedX = (hitPos - 0.5) * 8;
+                }
+                
+                // Ball collision with blocks
+                blocks.forEach(block => {
+                    if (block.visible) {
+                        if (ballX + BALL_RADIUS > block.x &&
+                            ballX - BALL_RADIUS < block.x + BLOCK_WIDTH &&
+                            ballY + BALL_RADIUS > block.y &&
+                            ballY - BALL_RADIUS < block.y + BLOCK_HEIGHT) {
+                            block.visible = false;
+                            ballSpeedY = -ballSpeedY;
+                            score += 10;
+                            scoreEl.textContent = score;
+                        }
+                    }
+                });
+                
+                // Check if ball fell off bottom
+                if (ballY > canvas.height) {
+                    lives--;
+                    livesEl.textContent = lives;
+                    if (lives <= 0) {
+                        gameOver();
+                        return;
+                    }
+                    resetBall();
+                }
+                
+                // Check win condition
+                const blocksLeft = blocks.filter(b => b.visible).length;
+                if (blocksLeft === 0) {
+                    gameRunning = false;
+                    if (blockBreakerGameInterval) {
+                        cancelAnimationFrame(blockBreakerGameInterval);
+                    }
+                    alert('You Win! Score: ' + score);
+                    startGame();
+                }
+            }
+            
+            // Game loop
+            function gameLoop() {
+                update();
+                draw();
+                if (gameRunning) {
+                    blockBreakerGameInterval = requestAnimationFrame(gameLoop);
+                }
+            }
+            
+            function resetBall() {
+                ballX = canvas.width / 2;
+                ballY = canvas.height - 50;
+                ballSpeedX = 4 * (Math.random() > 0.5 ? 1 : -1);
+                ballSpeedY = -4;
+            }
+            
+            function startGame() {
+                if (blockBreakerGameInterval) {
+                    cancelAnimationFrame(blockBreakerGameInterval);
+                }
+                
+                gameRunning = true;
+                score = 0;
+                lives = 3;
+                scoreEl.textContent = score;
+                livesEl.textContent = lives;
+                paddleX = (canvas.width - PADDLE_WIDTH) / 2;
+                createBlocks();
+                resetBall();
+                draw();
+                gameLoop();
+            }
+            
+            function gameOver() {
+                gameRunning = false;
+                if (blockBreakerGameInterval) {
+                    cancelAnimationFrame(blockBreakerGameInterval);
+                    blockBreakerGameInterval = null;
+                }
+                alert('Game Over! Final Score: ' + score);
+                startGame();
+            }
+            
+            // Mouse controls
+            const handleMouseMove = (e) => {
+                if (!gameRunning || !window.parentNode) return;
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                paddleX = Math.max(0, Math.min(canvas.width - PADDLE_WIDTH, mouseX - PADDLE_WIDTH / 2));
+            };
+            
+            // Keyboard controls
+            const handleKeyPress = (e) => {
+                if (!gameRunning || !window.parentNode) return;
+                
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        paddleX = Math.max(0, paddleX - 10);
+                        e.preventDefault();
+                        break;
+                    case 'ArrowRight':
+                        paddleX = Math.min(canvas.width - PADDLE_WIDTH, paddleX + 10);
+                        e.preventDefault();
+                        break;
+                }
+            };
+            
+            // Add event listeners
+            canvas.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('keydown', handleKeyPress);
+            
+            closeBtn.onclick = () => {
+                canvas.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('keydown', handleKeyPress);
+                if (blockBreakerGameInterval) {
+                    cancelAnimationFrame(blockBreakerGameInterval);
+                    blockBreakerGameInterval = null;
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            restartBtn.onclick = () => {
+                if (blockBreakerGameInterval) {
+                    cancelAnimationFrame(blockBreakerGameInterval);
+                }
+                startGame();
+            };
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'blockbreaker',
                 element: window
             });
             
@@ -10792,18 +11159,30 @@ body.theme-flashcard button:hover {
         function getChangelogEntries() {
             const saved = localStorage.getItem('changelog');
             if (saved) {
-                return JSON.parse(saved);
+                const entries = JSON.parse(saved);
+                // Check if Block Breaker entry already exists
+                const hasBlockBreaker = entries.some(e => e.title && e.title.includes('Block Breaker'));
+                if (!hasBlockBreaker) {
+                    // Add Block Breaker entry
+                    entries.push({
+                        date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                        title: '🧱 Added Block Breaker Game to Desktop',
+                        description: 'Added a classic Block Breaker (Breakout) game to the Remote Desktop App Store. Break all the blocks using the paddle to bounce the ball. Features 5 rows of colored blocks, 3 lives, and score tracking. Install it from the App Store in Remote Desktop, then double-click the Block Breaker icon to play. Use mouse or arrow keys to control the paddle.',
+                        userRequest: 'add block breaker as a app'
+                    });
+                    localStorage.setItem('changelog', JSON.stringify(entries));
+                }
+                return entries;
             }
             // Initialize with Snake game entry
-            const initialEntry = {
+            const initialEntries = [{
                 date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
                 title: '🐍 Added Snake Game to Desktop',
                 description: 'Added a classic Snake game to the Remote Desktop App Store. The game features a 16x16 grid with a black snake and 3 red apples. Install it from the App Store in Remote Desktop, then double-click the Snake icon to play. Use arrow keys to control the snake.',
                 userRequest: 'Add a classic snake game for the desktop section where it\'s a 16x16 and there is 3 red boxes (apples) and you black'
-            };
-            const entries = [initialEntry];
-            localStorage.setItem('changelog', JSON.stringify(entries));
-            return entries;
+            }];
+            localStorage.setItem('changelog', JSON.stringify(initialEntries));
+            return initialEntries;
         }
         
         function addChangelogEntry(title, description, userRequest = '') {
