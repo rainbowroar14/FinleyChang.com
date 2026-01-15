@@ -1592,6 +1592,48 @@ body.theme-ocean button {
 body.theme-ocean button:hover {
     box-shadow: 0 0 20px rgba(74, 144, 226, 0.6) !important;
 }
+
+/* Ocean theme fish */
+.ocean-fish {
+    position: fixed;
+    pointer-events: none;
+    z-index: 2;
+    font-size: 30px;
+    animation: fishSwim 15s linear infinite;
+}
+
+@keyframes fishSwim {
+    0% {
+        transform: translateX(-100px) translateY(0) scaleX(1);
+    }
+    49% {
+        transform: translateX(calc(100vw + 100px)) translateY(0) scaleX(1);
+    }
+    50% {
+        transform: translateX(calc(100vw + 100px)) translateY(0) scaleX(-1);
+    }
+    99% {
+        transform: translateX(-100px) translateY(0) scaleX(-1);
+    }
+    100% {
+        transform: translateX(-100px) translateY(0) scaleX(1);
+    }
+}
+
+.ocean-fish.small {
+    font-size: 20px;
+    animation-duration: 12s;
+}
+
+.ocean-fish.medium {
+    font-size: 30px;
+    animation-duration: 15s;
+}
+
+.ocean-fish.large {
+    font-size: 40px;
+    animation-duration: 18s;
+}
     </style>
 </head>
 <body>
@@ -1791,6 +1833,9 @@ body.theme-ocean button:hover {
     <!-- Background Selection page -->
     <div class="page background-page hidden" id="backgroundPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Background Selection</h1>
+        <div id="bg-theme-warning" style="display: none; padding: 15px; margin-bottom: 20px; background: #f85149; color: white; border-radius: 8px; font-size: 16px; max-width: 600px;">
+            <strong>⚠️ Background colors only work on Dark or Light theme.</strong> Switch to one of those themes to use custom backgrounds.
+        </div>
         <div style="margin-bottom: 30px;">
             <button id="bg-solid-btn" onclick="setBgMode('solid')" style="padding: 10px 20px; margin: 5px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer;">Solid Color</button>
             <button id="bg-gradient-btn" onclick="setBgMode('gradient')" style="padding: 10px 20px; margin: 5px; font-size: 16px; font-weight: bold; background: #30363d; color: white; border: none; border-radius: 6px; cursor: pointer;">Gradient (2 Colors)</button>
@@ -2098,6 +2143,7 @@ body.theme-ocean button:hover {
                     { name: 'theme paper', desc: 'Paper notebook with grid lines' },
                     { name: 'theme space', desc: 'Space theme with interactive stars' },
                     { name: 'theme ocean', desc: 'Ocean theme with wave animation' },
+                    { name: 'stars', desc: 'Spawn more stars (space theme only)' },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
@@ -2746,12 +2792,15 @@ body.theme-ocean button:hover {
         // Whoami profile
         function showWhoami() {
             const profile = `User: Finley Chang | Location: Florida | Status: Building cool stuff | Favorite Command: goose 🦢`;
-            showCommandFeedback('whoami', profile);
-            commandInput.value = '';
-            commandInput.placeholder = 'Profile displayed!';
-            setTimeout(() => {
-                commandInput.placeholder = 'Type a color or "home"...';
-            }, 2000);
+            showCommandFeedback('whoami', profile, true);
+            const commandInput = document.getElementById('commandInput');
+            if (commandInput) {
+                commandInput.value = '';
+                commandInput.placeholder = 'Profile displayed!';
+                setTimeout(() => {
+                    commandInput.placeholder = 'Type a color or "home"...';
+                }, 2000);
+            }
         }
         
         // Load clock setting on page load
@@ -3129,6 +3178,31 @@ body.theme-ocean button:hover {
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
+                } else if (command === 'clock') {
+                    resetConfirm = false;
+                    if (clockEnabled) {
+                        hideClock();
+                        showCommandFeedback('clock', 'Clock disabled', true);
+                    } else {
+                        showClock();
+                        showCommandFeedback('clock', 'Clock enabled', true);
+                    }
+                    commandInput.value = '';
+                    commandInput.placeholder = `Clock: ${clockEnabled ? 'enabled' : 'disabled'}`;
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'whoami') {
+                    resetConfirm = false;
+                    showWhoami();
+                } else if (command === 'stars') {
+                    resetConfirm = false;
+                    spawnMoreStars(50);
+                    commandInput.value = '';
+                    commandInput.placeholder = 'More stars spawned!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
                 } else if (command.startsWith('theme ')) {
                     resetConfirm = false;
                     const themeName = command.substring(6).trim().toLowerCase();
@@ -3448,13 +3522,17 @@ body.theme-ocean button:hover {
             if (saved) {
                 const prefs = JSON.parse(saved);
                 bgMode = prefs.mode || 'solid';
-                if (prefs.mode === 'solid' && prefs.color) {
-                    document.body.style.background = prefs.color;
-                    selectedSolidColor = prefs.color;
-                } else if (prefs.mode === 'gradient' && prefs.color1 && prefs.color2) {
-                    document.body.style.background = `linear-gradient(to bottom, ${prefs.color1}, ${prefs.color2})`;
-                    selectedGradientColor1 = prefs.color1;
-                    selectedGradientColor2 = prefs.color2;
+                // Only apply if on dark or light theme
+                if (currentTheme === 'dark' || currentTheme === 'light') {
+                    if (prefs.mode === 'solid' && prefs.color) {
+                        applyBackgroundColor(prefs.color);
+                        selectedSolidColor = prefs.color;
+                    } else if (prefs.mode === 'gradient' && prefs.color1 && prefs.color2) {
+                        const gradient = `linear-gradient(to bottom, ${prefs.color1}, ${prefs.color2})`;
+                        applyBackgroundColor(gradient);
+                        selectedGradientColor1 = prefs.color1;
+                        selectedGradientColor2 = prefs.color2;
+                    }
                 }
             }
         }
@@ -3472,6 +3550,16 @@ body.theme-ocean button:hover {
         
         // Initialize background page
         function initBackground() {
+            // Show/hide warning based on current theme
+            const warningEl = document.getElementById('bg-theme-warning');
+            if (warningEl) {
+                if (currentTheme === 'dark' || currentTheme === 'light') {
+                    warningEl.style.display = 'none';
+                } else {
+                    warningEl.style.display = 'block';
+                }
+            }
+            
             // Load saved preferences
             const saved = localStorage.getItem('backgroundPrefs');
             if (saved) {
@@ -3538,11 +3626,19 @@ body.theme-ocean button:hover {
         
         // Apply solid background
         function applySolidBackground(colorName) {
+            // Only allow colors on dark and light themes
+            if (currentTheme !== 'dark' && currentTheme !== 'light') {
+                showCommandFeedback('background', 'Background colors only work on dark or light theme', false);
+                return;
+            }
+            
             const color = bgColorMap[colorName];
             if (color) {
-                document.body.style.background = color;
+                // Apply with !important using a style element
+                applyBackgroundColor(color);
                 selectedSolidColor = color;
                 saveBackgroundPreferences();
+                showCommandFeedback('background', `Background changed to ${colorName}`, true);
             }
         }
         
@@ -3600,14 +3696,42 @@ body.theme-ocean button:hover {
         
         // Apply gradient background
         function applyGradientBackground() {
+            // Only allow colors on dark and light themes
+            if (currentTheme !== 'dark' && currentTheme !== 'light') {
+                showCommandFeedback('background', 'Background colors only work on dark or light theme', false);
+                return;
+            }
+            
             if (selectedGradientColor1 && selectedGradientColor2) {
-                document.body.style.background = `linear-gradient(to bottom, ${selectedGradientColor1}, ${selectedGradientColor2})`;
+                const gradient = `linear-gradient(to bottom, ${selectedGradientColor1}, ${selectedGradientColor2})`;
+                applyBackgroundColor(gradient);
                 saveBackgroundPreferences();
+                showCommandFeedback('background', 'Gradient background applied', true);
             }
         }
         
-        // Load background on page load
-        loadBackgroundPreferences();
+        // Helper function to apply background color with !important
+        let customBgStyleEl = null;
+        function applyBackgroundColor(colorOrGradient) {
+            // Remove existing custom background style
+            if (customBgStyleEl) {
+                customBgStyleEl.remove();
+            }
+            
+            // Create new style element with !important
+            customBgStyleEl = document.createElement('style');
+            customBgStyleEl.id = 'custom-background-style';
+            customBgStyleEl.textContent = `body.theme-dark, body.theme-light { background: ${colorOrGradient} !important; } body.theme-dark .page, body.theme-light .page { background: ${colorOrGradient} !important; }`;
+            document.head.appendChild(customBgStyleEl);
+        }
+        
+        // Remove custom background when switching themes
+        function removeCustomBackground() {
+            if (customBgStyleEl) {
+                customBgStyleEl.remove();
+                customBgStyleEl = null;
+            }
+        }
         
         // Theme System
         const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean'];
@@ -3647,9 +3771,32 @@ body.theme-ocean button:hover {
                 return;
             }
             
+            // Handle custom backgrounds
+            const wasDarkOrLight = (currentTheme === 'dark' || currentTheme === 'light');
+            const willBeDarkOrLight = (themeName === 'dark' || themeName === 'light');
+            
+            // Remove custom background if switching away from dark/light
+            if (wasDarkOrLight && !willBeDarkOrLight) {
+                removeCustomBackground();
+            }
+            
             // Add new theme class
             document.body.classList.add(`theme-${themeName}`);
             currentTheme = themeName;
+            
+            // Reapply custom background if switching to dark/light and one exists
+            if (willBeDarkOrLight) {
+                const saved = localStorage.getItem('backgroundPrefs');
+                if (saved) {
+                    const prefs = JSON.parse(saved);
+                    if (prefs.mode === 'solid' && prefs.color) {
+                        applyBackgroundColor(prefs.color);
+                    } else if (prefs.mode === 'gradient' && prefs.color1 && prefs.color2) {
+                        const gradient = `linear-gradient(to bottom, ${prefs.color1}, ${prefs.color2})`;
+                        applyBackgroundColor(gradient);
+                    }
+                }
+            }
             
             if (save) {
                 saveTheme(themeName);
@@ -3802,6 +3949,11 @@ body.theme-ocean button:hover {
         // Load theme on page load
         loadTheme();
         
+        // Load background preferences after theme is loaded
+        setTimeout(() => {
+            loadBackgroundPreferences();
+        }, 50);
+        
         // Setup matrix handler on page load if matrix theme is active
         setTimeout(() => {
             setupMatrixKeyHandler();
@@ -3917,6 +4069,254 @@ body.theme-ocean button:hover {
                     star.dataset.x = x;
                     star.dataset.y = y;
                 });
+            }
+        });
+        
+        // Function to spawn more stars (for "stars" command)
+        function spawnMoreStars(count = 50) {
+            if (!document.body.classList.contains('theme-space')) {
+                showCommandFeedback('stars', 'Stars command only works in space theme', false);
+                return;
+            }
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'space-star';
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                star.style.left = x + 'px';
+                star.style.top = y + 'px';
+                star.style.width = (Math.random() * 2 + 1) + 'px';
+                star.style.height = star.style.width;
+                star.dataset.x = x;
+                star.dataset.y = y;
+                document.body.appendChild(star);
+                spaceStars.push(star);
+            }
+            
+            showCommandFeedback('stars', `Spawned ${count} more stars!`, true);
+        }
+        
+        // Ocean theme - animated fish
+        let oceanFish = [];
+        
+        function createOceanFish() {
+            // Remove existing fish
+            cleanupOceanFish();
+            
+            if (!document.body.classList.contains('theme-ocean')) return;
+            
+            // Create fish
+            const fishEmojis = ['🐟', '🐠', '🐡', '🦈'];
+            const fishCount = 5;
+            
+            for (let i = 0; i < fishCount; i++) {
+                const fish = document.createElement('div');
+                fish.className = 'ocean-fish';
+                const size = ['small', 'medium', 'large'][Math.floor(Math.random() * 3)];
+                fish.classList.add(size);
+                fish.textContent = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
+                fish.style.top = (Math.random() * 80 + 10) + '%'; // Random vertical position
+                fish.style.animationDelay = (Math.random() * 5) + 's'; // Stagger animations
+                document.body.appendChild(fish);
+                oceanFish.push(fish);
+            }
+        }
+        
+        function cleanupOceanFish() {
+            oceanFish.forEach(fish => fish.remove());
+            oceanFish = [];
+        }
+        
+        function setupOceanTheme() {
+            if (document.body.classList.contains('theme-ocean')) {
+                createOceanFish();
+            } else {
+                cleanupOceanFish();
+            }
+        }
+        
+        // Paper theme - drawing functionality
+        let paperCanvas = null;
+        let paperCtx = null;
+        let isPaperDrawing = false;
+        let lastPaperX = 0;
+        let lastPaperY = 0;
+        let paperColor = '#000000';
+        let paperBrushSize = 3;
+        
+        function initPaperDrawing() {
+            // Check if canvas already exists
+            if (document.getElementById('paper-drawing-canvas')) {
+                paperCanvas = document.getElementById('paper-drawing-canvas');
+                paperCtx = paperCanvas.getContext('2d');
+                return;
+            }
+            
+            if (!document.body.classList.contains('theme-paper')) return;
+            
+            // Create canvas for drawing
+            paperCanvas = document.createElement('canvas');
+            paperCanvas.id = 'paper-drawing-canvas';
+            paperCanvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; z-index: 5; background: transparent;';
+            paperCanvas.width = window.innerWidth;
+            paperCanvas.height = window.innerHeight;
+            paperCtx = paperCanvas.getContext('2d');
+            paperCtx.strokeStyle = paperColor;
+            paperCtx.lineWidth = paperBrushSize;
+            paperCtx.lineCap = 'round';
+            paperCtx.lineJoin = 'round';
+            document.body.appendChild(paperCanvas);
+            
+            // Drawing events
+            paperCanvas.addEventListener('mousedown', handlePaperMouseDown);
+            paperCanvas.addEventListener('mousemove', handlePaperMouseMove);
+            paperCanvas.addEventListener('mouseup', handlePaperMouseUp);
+            paperCanvas.addEventListener('mouseleave', handlePaperMouseUp);
+            paperCanvas.addEventListener('touchstart', handlePaperTouchStart, { passive: false });
+            paperCanvas.addEventListener('touchmove', handlePaperTouchMove, { passive: false });
+            paperCanvas.addEventListener('touchend', handlePaperTouchEnd);
+        }
+        
+        function handlePaperMouseDown(e) {
+            isPaperDrawing = true;
+            const rect = paperCanvas.getBoundingClientRect();
+            lastPaperX = e.clientX - rect.left;
+            lastPaperY = e.clientY - rect.top;
+            drawPaperPoint(lastPaperX, lastPaperY);
+        }
+        
+        function handlePaperMouseMove(e) {
+            if (!isPaperDrawing) return;
+            const rect = paperCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            drawPaperLine(lastPaperX, lastPaperY, x, y);
+            lastPaperX = x;
+            lastPaperY = y;
+        }
+        
+        function handlePaperMouseUp() {
+            isPaperDrawing = false;
+        }
+        
+        function handlePaperTouchStart(e) {
+            e.preventDefault();
+            isPaperDrawing = true;
+            const touch = e.touches[0];
+            const rect = paperCanvas.getBoundingClientRect();
+            lastPaperX = touch.clientX - rect.left;
+            lastPaperY = touch.clientY - rect.top;
+            drawPaperPoint(lastPaperX, lastPaperY);
+        }
+        
+        function handlePaperTouchMove(e) {
+            e.preventDefault();
+            if (!isPaperDrawing) return;
+            const touch = e.touches[0];
+            const rect = paperCanvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            drawPaperLine(lastPaperX, lastPaperY, x, y);
+            lastPaperX = x;
+            lastPaperY = y;
+        }
+        
+        function handlePaperTouchEnd(e) {
+            e.preventDefault();
+            isPaperDrawing = false;
+        }
+        
+        function drawPaperPoint(x, y) {
+            if (!paperCtx) return;
+            paperCtx.fillStyle = paperColor;
+            paperCtx.beginPath();
+            paperCtx.arc(x, y, paperBrushSize / 2, 0, Math.PI * 2);
+            paperCtx.fill();
+        }
+        
+        function drawPaperLine(x1, y1, x2, y2) {
+            if (!paperCtx) return;
+            paperCtx.strokeStyle = paperColor;
+            paperCtx.lineWidth = paperBrushSize;
+            paperCtx.beginPath();
+            paperCtx.moveTo(x1, y1);
+            paperCtx.lineTo(x2, y2);
+            paperCtx.stroke();
+        }
+        
+        function cleanupPaperDrawing() {
+            if (paperCanvas) {
+                paperCanvas.remove();
+                paperCanvas = null;
+                paperCtx = null;
+            }
+        }
+        
+        function setupPaperTheme() {
+            if (document.body.classList.contains('theme-paper')) {
+                setTimeout(() => {
+                    initPaperDrawing();
+                }, 100);
+            } else {
+                cleanupPaperDrawing();
+            }
+        }
+        
+        // Update applyTheme to handle ocean and paper themes (consolidating all wrappers)
+        const originalApplyTheme4 = applyTheme;
+        applyTheme = function(themeName, save = true) {
+            // Cleanup if switching away from matrix
+            if (document.body.classList.contains('theme-matrix') && themeName !== 'matrix') {
+                cleanupMatrixColumns();
+            }
+            
+            // Cleanup if switching away from space
+            if (document.body.classList.contains('theme-space') && themeName !== 'space') {
+                cleanupSpaceStars();
+            }
+            
+            // Cleanup if switching away from ocean
+            if (document.body.classList.contains('theme-ocean') && themeName !== 'ocean') {
+                cleanupOceanFish();
+            }
+            
+            // Cleanup if switching away from paper
+            if (document.body.classList.contains('theme-paper') && themeName !== 'paper') {
+                cleanupPaperDrawing();
+            }
+            
+            originalApplyTheme4(themeName, save);
+            
+            // Setup matrix handler if switching to matrix
+            setupMatrixKeyHandler();
+            
+            // Setup space theme if switching to it
+            setupSpaceTheme();
+            
+            // Setup ocean theme if switching to it
+            setupOceanTheme();
+            
+            // Setup paper theme if switching to it
+            setupPaperTheme();
+        };
+        
+        // Update window.applyTheme to use the consolidated version
+        window.applyTheme = applyTheme;
+        
+        // Setup ocean and paper themes on page load if active
+        setTimeout(() => {
+            setupOceanTheme();
+            setupPaperTheme();
+        }, 150);
+        
+        // Handle window resize for paper canvas
+        window.addEventListener('resize', () => {
+            if (paperCanvas && document.body.classList.contains('theme-paper')) {
+                const imageData = paperCtx.getImageData(0, 0, paperCanvas.width, paperCanvas.height);
+                paperCanvas.width = window.innerWidth;
+                paperCanvas.height = window.innerHeight;
+                paperCtx.putImageData(imageData, 0, 0);
             }
         });
         
