@@ -3027,6 +3027,16 @@ body.theme-flashcard button:hover {
                 page.classList.add('hidden');
             });
             document.getElementById(pageId).classList.remove('hidden');
+            
+            // Show/hide command bar based on page
+            const commandBar = document.querySelector('.command-bar');
+            if (commandBar) {
+                if (pageId === 'remoteDesktopPage') {
+                    commandBar.style.display = 'none';
+                } else {
+                    commandBar.style.display = 'flex';
+                }
+            }
         }
         
         // Commands menu functionality
@@ -5062,6 +5072,12 @@ body.theme-flashcard button:hover {
             
             if (!desktop || !iconsContainer) return;
             
+            // Hide command bar when on desktop
+            const commandBar = document.querySelector('.command-bar');
+            if (commandBar) {
+                commandBar.style.display = 'none';
+            }
+            
             // Add default icons
             addDesktopIcon('paper', 'Paper', 10, 10);
             addDesktopIcon('paint', 'Paint', 10, 100);
@@ -5436,20 +5452,43 @@ body.theme-flashcard button:hover {
             if (type === 'paper') {
                 const paperContent = document.createElement('div');
                 paperContent.className = 'paper-app-content';
-                paperContent.contentEditable = true;
+                paperContent.setAttribute('contenteditable', 'true');
+                paperContent.style.outline = 'none';
+                paperContent.style.minHeight = '100%';
                 paperContent.textContent = 'Start typing...';
+                
+                // Load saved content if exists
+                const savedContent = localStorage.getItem(`paper-${iconId}`);
+                if (savedContent) {
+                    paperContent.textContent = savedContent;
+                }
+                
                 paperContent.onfocus = function() {
                     if (this.textContent === 'Start typing...') {
                         this.textContent = '';
                     }
                 };
+                
                 paperContent.onblur = function() {
+                    // Save content
+                    if (this.textContent.trim() !== 'Start typing...') {
+                        localStorage.setItem(`paper-${iconId}`, this.textContent);
+                    }
                     if (this.textContent.trim() === '') {
                         this.textContent = 'Start typing...';
                     }
                 };
+                
+                // Auto-save on input
+                paperContent.addEventListener('input', function() {
+                    if (this.textContent !== 'Start typing...') {
+                        localStorage.setItem(`paper-${iconId}`, this.textContent);
+                    }
+                });
+                
                 content.appendChild(paperContent);
             } else if (type === 'paint') {
+                const paintId = `paint-${iconId}`;
                 const toolbar = document.createElement('div');
                 toolbar.className = 'paint-app-toolbar';
                 
@@ -5470,6 +5509,7 @@ body.theme-flashcard button:hover {
                 
                 const canvas = document.createElement('canvas');
                 canvas.className = 'paint-app-canvas';
+                canvas.id = paintId;
                 canvas.width = 580;
                 canvas.height = 340;
                 
@@ -5477,9 +5517,24 @@ body.theme-flashcard button:hover {
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
+                // Load saved drawing if exists
+                const savedDrawing = localStorage.getItem(`paint-${iconId}`);
+                if (savedDrawing) {
+                    const img = new Image();
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = savedDrawing;
+                }
+                
                 let isDrawing = false;
                 let lastX = 0;
                 let lastY = 0;
+                
+                function savePaint() {
+                    const dataURL = canvas.toDataURL();
+                    localStorage.setItem(`paint-${iconId}`, dataURL);
+                }
                 
                 canvas.addEventListener('mousedown', (e) => {
                     isDrawing = true;
@@ -5504,14 +5559,19 @@ body.theme-flashcard button:hover {
                     
                     lastX = x;
                     lastY = y;
+                    
+                    // Auto-save while drawing
+                    savePaint();
                 });
                 
                 canvas.addEventListener('mouseup', () => {
                     isDrawing = false;
+                    savePaint();
                 });
                 
                 canvas.addEventListener('mouseleave', () => {
                     isDrawing = false;
+                    savePaint();
                 });
                 
                 // Make sure canvas is properly sized and visible
