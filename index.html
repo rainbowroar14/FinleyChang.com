@@ -3643,14 +3643,6 @@ body.theme-miku .visit-counter-number {
             [1,1,1,1,1,0,0]
         ];
         
-        // Create all letters
-        createLetterPattern('f', fPattern);
-        createLetterPattern('i', iPattern);
-        createLetterPattern('n', nPattern);
-        createLetterPattern('h', hPattern);
-        createLetterPattern('u', uPattern);
-        createLetterPattern('b', bPattern);
-        
         // Global money system - shared across all tabs
         let globalMoney = 0;
         let unlockedColors = new Set(); // Colors are unlocked by default (not used anymore but keeping for compatibility)
@@ -4518,6 +4510,23 @@ body.theme-miku .visit-counter-number {
             
             // Update visit counter
             updateVisitCounter();
+            
+            // Create FinHub letter patterns
+            createLetterPattern('f', fPattern);
+            createLetterPattern('i', iPattern);
+            createLetterPattern('n', nPattern);
+            createLetterPattern('h', hPattern);
+            createLetterPattern('u', uPattern);
+            createLetterPattern('b', bPattern);
+            
+            // Load global data
+            loadGlobalData();
+            loadCoinflipData();
+            
+            // Check if blocked on page load
+            if (checkBlocked()) {
+                // Already showing limbo page
+            }
         });
         
         // Load command history from localStorage
@@ -5097,35 +5106,6 @@ body.theme-miku .visit-counter-number {
                 }
                 localStorage.setItem(`privateChat_${chatId}`, JSON.stringify(messages));
                 addPrivateMessageToUI(message, true);
-            }
-        }
-        
-        // Visit Counter
-        function updateVisitCounter() {
-            const counter = document.getElementById('visitCounterNumber');
-            if (!counter) return;
-            
-            if (database) {
-                const visitsRef = database.ref('siteStats/visits');
-                visitsRef.transaction((current) => {
-                    return (current || 0) + 1;
-                }, (error, committed, snapshot) => {
-                    if (!error && committed && snapshot) {
-                        counter.textContent = snapshot.val().toLocaleString();
-                    }
-                });
-                
-                // Listen for updates
-                visitsRef.on('value', (snapshot) => {
-                    const visits = snapshot.val() || 0;
-                    counter.textContent = visits.toLocaleString();
-                });
-            } else {
-                // Fallback to localStorage
-                let visits = parseInt(localStorage.getItem('siteVisits') || '0');
-                visits++;
-                localStorage.setItem('siteVisits', visits.toString());
-                counter.textContent = visits.toLocaleString();
             }
         }
         
@@ -10657,10 +10637,6 @@ body.theme-miku .visit-counter-number {
                 });
             }
         });
-        
-        // Initialize global data on page load
-        loadGlobalData();
-        loadCoinflipData();
         
         // Check if blocked on page load
         if (checkBlocked()) {
