@@ -5402,32 +5402,38 @@ body.theme-miku .visit-counter-number {
         // Load clock setting on page load
         loadClockSetting();
         
-        // Command input handler
-        const commandInput = document.getElementById('commandInput');
-        
-        // Semicolon key to focus command bar (works even when paper app is active)
-        document.addEventListener('keydown', (e) => {
-            // Only trigger if semicolon is pressed and not already typing in command input
-            if (e.key === ';' && document.activeElement !== commandInput) {
-                const activeEl = document.activeElement;
-                
-                // Block semicolon only if in a regular input/textarea (not contentEditable like paper app)
-                const isRegularInput = activeEl && (
-                    (activeEl.tagName === 'INPUT' && activeEl.id !== 'commandInput') || 
-                    activeEl.tagName === 'TEXTAREA'
-                );
-                
-                // Allow semicolon from anywhere except regular inputs/textareas
-                // This includes paper app (contentEditable) and other places
-                if (!isRegularInput) {
-                    e.preventDefault();
-                    commandInput.focus();
-                    commandInput.select(); // Select any existing text
-                }
+        // Command input handler - wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const commandInput = document.getElementById('commandInput');
+            
+            if (!commandInput) {
+                console.error('Command input element not found!');
+                return;
             }
-        });
-        
-        commandInput.addEventListener('keydown', (e) => {
+            
+            // Semicolon key to focus command bar (works even when paper app is active)
+            document.addEventListener('keydown', (e) => {
+                // Only trigger if semicolon is pressed and not already typing in command input
+                if (e.key === ';' && document.activeElement !== commandInput) {
+                    const activeEl = document.activeElement;
+                    
+                    // Block semicolon only if in a regular input/textarea (not contentEditable like paper app)
+                    const isRegularInput = activeEl && (
+                        (activeEl.tagName === 'INPUT' && activeEl.id !== 'commandInput') || 
+                        activeEl.tagName === 'TEXTAREA'
+                    );
+                    
+                    // Allow semicolon from anywhere except regular inputs/textareas
+                    // This includes paper app (contentEditable) and other places
+                    if (!isRegularInput) {
+                        e.preventDefault();
+                        commandInput.focus();
+                        commandInput.select(); // Select any existing text
+                    }
+                }
+            });
+            
+            commandInput.addEventListener('keydown', (e) => {
             // Disable commands when on remote desktop
             const remoteDesktopPage = document.getElementById('remoteDesktopPage');
             if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
@@ -5947,7 +5953,8 @@ body.theme-miku .visit-counter-number {
                     }, 2000);
                 }
             }
-        });
+            });
+        }); // End DOMContentLoaded for command input
         
         // Minesweeper game code
         const GRID_SIZE = 10;
