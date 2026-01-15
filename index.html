@@ -851,6 +851,339 @@
                 right: -250px;
             }
         }
+
+/* Theme System Styles */
+body.theme-1995 {
+    font-family: 'MS Sans Serif', 'MS Sans Serif', sans-serif;
+    background: #c0c0c0 !important;
+    color: #000000;
+}
+
+body.theme-1995 .command-bar,
+body.theme-1995 .clock-display,
+body.theme-1995 .command-feedback,
+body.theme-1995 .commands-menu {
+    background: #c0c0c0 !important;
+    border: 2px outset #c0c0c0 !important;
+    box-shadow: inset -1px -1px 0px 0px #808080, inset 1px 1px 0px 0px #ffffff !important;
+}
+
+body.theme-1995 .command-input {
+    background: #ffffff !important;
+    border: 1px inset #c0c0c0 !important;
+    color: #000000 !important;
+}
+
+body.theme-1995 .page {
+    background: #c0c0c0 !important;
+}
+
+body.theme-1995 .home-page h1,
+body.theme-1995 .subtitle,
+body.theme-1995 .letters-source {
+    color: #000000 !important;
+}
+
+body.theme-1995 button {
+    background: #c0c0c0 !important;
+    border: 2px outset #c0c0c0 !important;
+    color: #000000 !important;
+    font-family: 'MS Sans Serif', sans-serif !important;
+}
+
+body.theme-1995 button:active {
+    border: 2px inset #c0c0c0 !important;
+}
+
+body.theme-cyberpunk {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    background: #0a0a0f !important;
+    color: #ff00ff;
+    position: relative;
+}
+
+body.theme-cyberpunk::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 50%, transparent 50%),
+        linear-gradient(rgba(255, 0, 255, 0.03) 50%, transparent 50%);
+    background-size: 4px 4px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+body.theme-cyberpunk * {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+body.theme-cyberpunk .command-bar,
+body.theme-cyberpunk .clock-display,
+body.theme-cyberpunk .command-feedback,
+body.theme-cyberpunk .commands-menu {
+    background: rgba(10, 10, 15, 0.95) !important;
+    border: 2px solid #00ffff !important;
+    box-shadow: 0 0 20px #00ffff, inset 0 0 20px rgba(0, 255, 255, 0.1) !important;
+    color: #ff00ff !important;
+}
+
+body.theme-cyberpunk .command-input {
+    background: rgba(10, 10, 15, 0.8) !important;
+    border: 1px solid #ff00ff !important;
+    color: #00ffff !important;
+    text-shadow: 0 0 5px #00ffff !important;
+}
+
+body.theme-cyberpunk .command-bar::before {
+    color: #ff00ff !important;
+    text-shadow: 0 0 10px #ff00ff !important;
+}
+
+body.theme-cyberpunk .page {
+    background: #0a0a0f !important;
+}
+
+body.theme-cyberpunk .home-page h1 {
+    color: #ff00ff !important;
+    text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff !important;
+}
+
+body.theme-cyberpunk .subtitle {
+    color: #00ffff !important;
+    text-shadow: 0 0 10px #00ffff !important;
+}
+
+body.theme-cyberpunk button {
+    background: rgba(10, 10, 15, 0.9) !important;
+    border: 2px solid #ff00ff !important;
+    color: #00ffff !important;
+    text-shadow: 0 0 10px #00ffff !important;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5) !important;
+}
+
+body.theme-cyberpunk button:hover {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8) !important;
+    border-color: #00ffff !important;
+}
+
+@keyframes glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+}
+
+body.theme-cyberpunk .finhub-title {
+    animation: glitch 0.3s infinite;
+}
+
+body.theme-terminal {
+    font-family: 'Courier New', monospace;
+    background: #000000 !important;
+    color: #00ff00;
+    position: relative;
+}
+
+body.theme-terminal::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 0, 0.03),
+        rgba(0, 255, 0, 0.03) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 1;
+    animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100vh); }
+}
+
+body.theme-terminal .command-bar,
+body.theme-terminal .clock-display,
+body.theme-terminal .command-feedback,
+body.theme-terminal .commands-menu {
+    background: rgba(0, 0, 0, 0.95) !important;
+    border: 1px solid #00ff00 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5), inset 0 0 10px rgba(0, 255, 0, 0.1) !important;
+    color: #00ff00 !important;
+    text-shadow: 0 0 5px #00ff00 !important;
+}
+
+body.theme-terminal .command-input {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid #00ff00 !important;
+    color: #00ff00 !important;
+    text-shadow: 0 0 5px #00ff00 !important;
+}
+
+body.theme-terminal .command-bar::before {
+    color: #00ff00 !important;
+    text-shadow: 0 0 5px #00ff00 !important;
+}
+
+body.theme-terminal .page {
+    background: #000000 !important;
+}
+
+body.theme-terminal .home-page h1,
+body.theme-terminal .subtitle,
+body.theme-terminal .letters-source {
+    color: #00ff00 !important;
+    text-shadow: 0 0 10px #00ff00 !important;
+}
+
+body.theme-terminal button {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: 1px solid #00ff00 !important;
+    color: #00ff00 !important;
+    text-shadow: 0 0 5px #00ff00 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3) !important;
+}
+
+body.theme-terminal button:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.6) !important;
+}
+
+body.theme-coffee {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #3e2723 !important;
+    color: #d7ccc8;
+    filter: sepia(30%) saturate(80%);
+}
+
+body.theme-coffee .command-bar,
+body.theme-coffee .clock-display,
+body.theme-coffee .command-feedback,
+body.theme-coffee .commands-menu {
+    background: rgba(94, 53, 45, 0.95) !important;
+    border: 1px solid #8d6e63 !important;
+    color: #d7ccc8 !important;
+}
+
+body.theme-coffee .command-input {
+    background: rgba(94, 53, 45, 0.8) !important;
+    border: 1px solid #8d6e63 !important;
+    color: #d7ccc8 !important;
+}
+
+body.theme-coffee .page {
+    background: #3e2723 !important;
+}
+
+body.theme-coffee .home-page h1,
+body.theme-coffee .subtitle,
+body.theme-coffee .letters-source {
+    color: #d7ccc8 !important;
+}
+
+body.theme-coffee button {
+    background: #5d4037 !important;
+    border: 1px solid #8d6e63 !important;
+    color: #d7ccc8 !important;
+}
+
+body.theme-coffee button:hover {
+    background: #6d4c41 !important;
+}
+
+body.theme-light {
+    background: #ffffff !important;
+    color: #000000;
+}
+
+body.theme-light .command-bar,
+body.theme-light .clock-display,
+body.theme-light .command-feedback,
+body.theme-light .commands-menu {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid #e0e0e0 !important;
+    color: #000000 !important;
+}
+
+body.theme-light .command-input {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #e0e0e0 !important;
+    color: #000000 !important;
+}
+
+body.theme-light .command-bar::before {
+    color: #0066cc !important;
+}
+
+body.theme-light .page {
+    background: #ffffff !important;
+}
+
+body.theme-light .home-page h1,
+body.theme-light .subtitle,
+body.theme-light .letters-source {
+    color: #000000 !important;
+}
+
+body.theme-light button {
+    background: #f5f5f5 !important;
+    border: 1px solid #e0e0e0 !important;
+    color: #000000 !important;
+}
+
+body.theme-light button:hover {
+    background: #e8e8e8 !important;
+}
+
+body.theme-dark {
+    background: #0d1117 !important;
+    color: #c9d1d9;
+}
+
+body.theme-dark .command-bar,
+body.theme-dark .clock-display,
+body.theme-dark .command-feedback,
+body.theme-dark .commands-menu {
+    background: rgba(13, 17, 23, 0.95) !important;
+    border: 1px solid #30363d !important;
+    color: #c9d1d9 !important;
+}
+
+body.theme-dark .command-input {
+    background: transparent !important;
+    border: none !important;
+    color: #c9d1d9 !important;
+}
+
+body.theme-dark .command-bar::before {
+    color: #58a6ff !important;
+}
+
+body.theme-dark .page {
+    background: #0d1117 !important;
+}
+
+body.theme-dark .home-page h1,
+body.theme-dark .subtitle,
+body.theme-dark .letters-source {
+    color: #c9d1d9 !important;
+}
+
+body.theme-dark button {
+    background: #238636 !important;
+    border: none !important;
+    color: #ffffff !important;
+}
     </style>
 </head>
 <body>
@@ -1311,6 +1644,14 @@
                     { name: 'honk', desc: 'Play honk sound', isGoose: true },
                     { name: 'clock', desc: 'Toggle clock (true/false)' },
                     { name: 'whoami', desc: 'Display user profile' },
+                ],
+                'Themes': [
+                    { name: 'theme 1995', desc: 'Windows 95 grey boxed look' },
+                    { name: 'theme cyberpunk', desc: 'Neon pink/blue with glitch font' },
+                    { name: 'theme terminal', desc: 'CRT green with scanlines' },
+                    { name: 'theme coffee', desc: 'Warm brown/cream sepia mode' },
+                    { name: 'theme dark', desc: 'Dark mode (default)' },
+                    { name: 'theme light', desc: 'Light mode' },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
@@ -2217,6 +2558,15 @@
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
+                } else if (command.startsWith('theme ')) {
+                    resetConfirm = false;
+                    const themeName = command.substring(6).trim().toLowerCase();
+                    applyTheme(themeName);
+                    commandInput.value = '';
+                    commandInput.placeholder = `Theme changed to ${themeName}!`;
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
                 } else if (command === 'rainbow') {
                     resetConfirm = false;
                     applyRainbowColors();
@@ -2684,6 +3034,60 @@
         
         // Load background on page load
         loadBackgroundPreferences();
+        
+        // Theme System
+        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light'];
+        let currentTheme = 'dark'; // Default theme
+        
+        // Load saved theme
+        function loadTheme() {
+            const saved = localStorage.getItem('selectedTheme');
+            if (saved && availableThemes.includes(saved)) {
+                currentTheme = saved;
+                applyTheme(saved, false); // false = don't save (already loaded)
+            } else {
+                applyTheme('dark', false); // Apply default without saving
+            }
+        }
+        
+        // Save theme preference
+        function saveTheme(themeName) {
+            localStorage.setItem('selectedTheme', themeName);
+        }
+        
+        // Apply theme
+        function applyTheme(themeName, save = true) {
+            // Remove all theme classes
+            document.body.classList.remove(...availableThemes.map(t => `theme-${t}`));
+            
+            // Validate theme name
+            if (!availableThemes.includes(themeName)) {
+                const commandInput = document.getElementById('commandInput');
+                if (commandInput) {
+                    commandInput.placeholder = `Invalid theme: ${themeName}. Available: ${availableThemes.join(', ')}`;
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 3000);
+                }
+                return;
+            }
+            
+            // Add new theme class
+            document.body.classList.add(`theme-${themeName}`);
+            currentTheme = themeName;
+            
+            if (save) {
+                saveTheme(themeName);
+            }
+            
+            showCommandFeedback('theme', `Theme changed to ${themeName}!`);
+        }
+        
+        // Make applyTheme globally accessible
+        window.applyTheme = applyTheme;
+        
+        // Load theme on page load
+        loadTheme();
         
         // Wooperbird goose on main page
         let wooperbirdCanvas, wooperbirdCtx;
