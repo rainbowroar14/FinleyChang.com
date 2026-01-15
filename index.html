@@ -5066,6 +5066,42 @@ body.theme-flashcard button:hover {
         let iconCounter = 0;
         let windowZIndex = 100;
         
+        function saveDesktopState() {
+            const state = {
+                icons: desktopIcons.map(icon => ({
+                    type: icon.type,
+                    name: icon.name,
+                    x: icon.x,
+                    y: icon.y,
+                    id: icon.id
+                })),
+                iconCounter: iconCounter
+            };
+            localStorage.setItem('desktopState', JSON.stringify(state));
+        }
+        
+        function loadDesktopState() {
+            const saved = localStorage.getItem('desktopState');
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    if (state.icons && state.icons.length > 0) {
+                        // Restore icon counter
+                        iconCounter = state.iconCounter || 0;
+                        
+                        // Restore icons
+                        state.icons.forEach(iconData => {
+                            addDesktopIcon(iconData.type, iconData.name, iconData.x, iconData.y, iconData.id);
+                        });
+                        return true; // State loaded
+                    }
+                } catch (e) {
+                    console.error('Error loading desktop state:', e);
+                }
+            }
+            return false; // No state to load
+        }
+        
         function initRemoteDesktop() {
             const desktop = document.getElementById('remoteDesktop');
             const iconsContainer = document.getElementById('desktopIcons');
@@ -5078,10 +5114,16 @@ body.theme-flashcard button:hover {
                 commandBar.style.display = 'none';
             }
             
-            // Add default icons
-            addDesktopIcon('paper', 'Paper', 10, 10);
-            addDesktopIcon('paint', 'Paint', 10, 100);
-            addDesktopIcon('computer', 'Computer', 10, 190);
+            // Load saved desktop state, or add default icons
+            const stateLoaded = loadDesktopState();
+            if (!stateLoaded) {
+                // Add default icons only if no saved state
+                addDesktopIcon('paper', 'Paper', 10, 10);
+                addDesktopIcon('paint', 'Paint', 10, 100);
+                addDesktopIcon('computer', 'Computer', 10, 190);
+                addDesktopIcon('appstore', 'App Store', 10, 280);
+                saveDesktopState();
+            }
             
             // Desktop right-click
             desktop.addEventListener('contextmenu', (e) => {
@@ -5141,6 +5183,12 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎨</text></svg>") no-repeat center';
             } else if (type === 'computer') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>💻</text></svg>") no-repeat center';
+            } else if (type === 'appstore') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🏪</text></svg>") no-repeat center';
+            } else if (type === 'minesweeper') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>💣</text></svg>") no-repeat center';
+            } else if (type === 'pong') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎮</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -5184,7 +5232,11 @@ body.theme-flashcard button:hover {
                     clickTimer = null;
                 }
                 // Actually open the app
-                if (type !== 'computer') {
+                if (type === 'appstore') {
+                    openAppStore();
+                } else if (type === 'pong') {
+                    openPongApp(iconId, name);
+                } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
             });
@@ -5238,6 +5290,7 @@ body.theme-flashcard button:hover {
                         if (iconData) {
                             iconData.x = parseFloat(icon.style.left);
                             iconData.y = parseFloat(icon.style.top);
+                            saveDesktopState(); // Save after moving
                         }
                     }
                 }
@@ -5269,6 +5322,12 @@ body.theme-flashcard button:hover {
                 x: x,
                 y: y
             });
+            
+            // Save desktop state after adding icon
+            saveDesktopState();
+            
+            // Save desktop state after adding icon
+            saveDesktopState();
         }
         
         function selectIcon(iconId) {
@@ -5335,9 +5394,381 @@ body.theme-flashcard button:hover {
             }
         }
         
+        // App Store
+        function openAppStore() {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '150px';
+            window.style.top = '100px';
+            window.style.width = '500px';
+            window.style.height = '400px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = 'App Store';
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                window.remove();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '20px';
+            content.style.overflow = 'auto';
+            
+            // App Store content
+            const storeContent = document.createElement('div');
+            storeContent.innerHTML = `
+                <h2 style="font-size: 16px; margin-bottom: 15px; font-weight: bold;">Available Apps</h2>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">💣</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Minesweeper</div>
+                            <div style="font-size: 11px; color: #666;">Classic minesweeper game</div>
+                        </div>
+                        <button id="install-minesweeper" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🎮</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Pong</div>
+                            <div style="font-size: 11px; color: #666;">Classic Pong game</div>
+                        </div>
+                        <button id="install-pong" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
+            `;
+            
+            content.appendChild(storeContent);
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            // Install buttons
+            setTimeout(() => {
+                const installMinesweeperBtn = document.getElementById('install-minesweeper');
+                if (installMinesweeperBtn) {
+                    installMinesweeperBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'minesweeper');
+                        if (alreadyInstalled) {
+                            alert('Minesweeper is already installed!');
+                            return;
+                        }
+                        
+                        // Add Minesweeper icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('minesweeper', 'Minesweeper', x, y);
+                        alert('Minesweeper installed successfully!');
+                    };
+                }
+                
+                const installPongBtn = document.getElementById('install-pong');
+                if (installPongBtn) {
+                    installPongBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'pong');
+                        if (alreadyInstalled) {
+                            alert('Pong is already installed!');
+                            return;
+                        }
+                        
+                        // Add Pong icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('pong', 'Pong', x, y);
+                        alert('Pong installed successfully!');
+                    };
+                }
+            }, 100);
+        }
+        
+        // Minesweeper app
+        function openMinesweeperApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '400px';
+            window.style.height = '450px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.overflow = 'auto';
+            
+            // Create simple minesweeper game
+            const gameHTML = `
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <button id="minesweeper-restart" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
+                    <div style="font-size: 12px; margin-bottom: 10px;">Mines: <span id="mines-count">10</span></div>
+                </div>
+                <div id="minesweeper-grid" style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; max-width: 360px; margin: 0 auto;"></div>
+            `;
+            content.innerHTML = gameHTML;
+            
+            // Initialize minesweeper
+            const gridEl = content.querySelector('#minesweeper-grid');
+            const restartBtn = content.querySelector('#minesweeper-restart');
+            const minesCountEl = content.querySelector('#mines-count');
+            
+            let minesweeperBoard = [];
+            let revealed = [];
+            let flagged = [];
+            let gameOver = false;
+            const GRID_SIZE = 10;
+            const NUM_MINES = 10;
+            
+            function createMinesweeperBoard() {
+                minesweeperBoard = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
+                revealed = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(false));
+                flagged = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(false));
+                gameOver = false;
+                
+                // Place mines
+                let minesPlaced = 0;
+                while (minesPlaced < NUM_MINES) {
+                    const row = Math.floor(Math.random() * GRID_SIZE);
+                    const col = Math.floor(Math.random() * GRID_SIZE);
+                    if (minesweeperBoard[row][col] !== -1) {
+                        minesweeperBoard[row][col] = -1;
+                        minesPlaced++;
+                    }
+                }
+                
+                // Calculate numbers
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        if (minesweeperBoard[row][col] !== -1) {
+                            let count = 0;
+                            for (let dr = -1; dr <= 1; dr++) {
+                                for (let dc = -1; dc <= 1; dc++) {
+                                    const nr = row + dr;
+                                    const nc = col + dc;
+                                    if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+                                        if (minesweeperBoard[nr][nc] === -1) count++;
+                                    }
+                                }
+                            }
+                            minesweeperBoard[row][col] = count;
+                        }
+                    }
+                }
+                
+                renderMinesweeper();
+            }
+            
+            function renderMinesweeper() {
+                gridEl.innerHTML = '';
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        const cell = document.createElement('button');
+                        cell.style.cssText = 'width: 30px; height: 30px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 12px; cursor: pointer; font-weight: bold;';
+                        
+                        if (revealed[row][col]) {
+                            cell.style.background = '#d4d0c8';
+                            cell.style.border = '1px inset #c0c0c0';
+                            if (minesweeperBoard[row][col] === -1) {
+                                cell.textContent = '💣';
+                                cell.style.background = '#ff0000';
+                            } else if (minesweeperBoard[row][col] > 0) {
+                                cell.textContent = minesweeperBoard[row][col];
+                                const colors = ['', '#0000ff', '#008000', '#ff0000', '#000080', '#800000', '#008080', '#000000', '#808080'];
+                                cell.style.color = colors[minesweeperBoard[row][col]] || '#000000';
+                            }
+                        } else if (flagged[row][col]) {
+                            cell.textContent = '🚩';
+                        }
+                        
+                        cell.onclick = () => {
+                            if (gameOver || flagged[row][col]) return;
+                            revealCell(row, col);
+                        };
+                        
+                        cell.oncontextmenu = (e) => {
+                            e.preventDefault();
+                            if (gameOver || revealed[row][col]) return;
+                            flagged[row][col] = !flagged[row][col];
+                            renderMinesweeper();
+                            updateMinesCount();
+                        };
+                        
+                        gridEl.appendChild(cell);
+                    }
+                }
+            }
+            
+            function revealCell(row, col) {
+                if (revealed[row][col] || flagged[row][col] || gameOver) return;
+                
+                revealed[row][col] = true;
+                
+                if (minesweeperBoard[row][col] === -1) {
+                    gameOver = true;
+                    alert('Game Over!');
+                    renderMinesweeper();
+                    return;
+                }
+                
+                if (minesweeperBoard[row][col] === 0) {
+                    // Reveal adjacent cells
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            const nr = row + dr;
+                            const nc = col + dc;
+                            if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE && !revealed[nr][nc]) {
+                                revealCell(nr, nc);
+                            }
+                        }
+                    }
+                }
+                
+                renderMinesweeper();
+                checkWin();
+            }
+            
+            function checkWin() {
+                let revealedCount = 0;
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        if (revealed[row][col]) revealedCount++;
+                    }
+                }
+                if (revealedCount === GRID_SIZE * GRID_SIZE - NUM_MINES) {
+                    gameOver = true;
+                    alert('You Win!');
+                }
+            }
+            
+            function updateMinesCount() {
+                let flagCount = 0;
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        if (flagged[row][col]) flagCount++;
+                    }
+                }
+                minesCountEl.textContent = NUM_MINES - flagCount;
+            }
+            
+            restartBtn.onclick = createMinesweeperBoard;
+            createMinesweeperBoard();
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'minesweeper',
+                element: window
+            });
+            
+            updateTaskbar();
+        }
+        
         // Make functions globally accessible
         window.powerOffDesktop = powerOffDesktop;
         window.openSelectedIcon = openSelectedIcon;
+        window.openAppStore = openAppStore;
         
         function addDesktopApp(type) {
             hideContextMenus();
@@ -5372,6 +5803,7 @@ body.theme-flashcard button:hover {
                     label.textContent = newName;
                     icon.name = newName;
                     label.removeEventListener('blur', onBlur);
+                    saveDesktopState(); // Save after renaming
                 });
                 
                 label.addEventListener('keydown', function onKeyDown(e) {
@@ -5403,6 +5835,10 @@ body.theme-flashcard button:hover {
         }
         
         function openDesktopApp(type, iconId, name) {
+            if (type === 'minesweeper') {
+                openMinesweeperApp(iconId, name);
+                return;
+            }
             windowZIndex++;
             const window = document.createElement('div');
             window.className = 'win95-window';
@@ -5434,7 +5870,34 @@ body.theme-flashcard button:hover {
             const closeBtn = document.createElement('button');
             closeBtn.className = 'win95-window-button';
             closeBtn.textContent = '×';
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            
+            // Set up close button to save before closing
             closeBtn.onclick = () => {
+                // Save paint/paper before closing
+                if (type === 'paint') {
+                    const canvas = content.querySelector('canvas');
+                    if (canvas) {
+                        try {
+                            const dataURL = canvas.toDataURL('image/png');
+                            localStorage.setItem(`paint-${iconId}`, dataURL);
+                        } catch (e) {
+                            console.error('Error saving paint on close:', e);
+                        }
+                    }
+                } else if (type === 'paper') {
+                    const paperContent = content.querySelector('.paper-app-content');
+                    if (paperContent && paperContent.textContent !== 'Start typing...') {
+                        localStorage.setItem(`paper-${iconId}`, paperContent.textContent);
+                        const savedColor = paperContent.style.color || '#000000';
+                        const savedFont = paperContent.style.fontFamily || 'Courier New, monospace';
+                        localStorage.setItem(`paper-color-${iconId}`, savedColor);
+                        localStorage.setItem(`paper-font-${iconId}`, savedFont);
+                    }
+                }
                 window.remove();
                 desktopWindows = desktopWindows.filter(w => w.element !== window);
                 updateTaskbar();
@@ -5445,23 +5908,81 @@ body.theme-flashcard button:hover {
             header.appendChild(title);
             header.appendChild(controls);
             
-            // Content
-            const content = document.createElement('div');
-            content.className = 'win95-window-content';
-            
             if (type === 'paper') {
+                // Toolbar
+                const toolbar = document.createElement('div');
+                toolbar.className = 'paint-app-toolbar';
+                toolbar.style.marginBottom = '0';
+                
+                // Color picker
+                const colorLabel = document.createElement('label');
+                colorLabel.textContent = 'Color: ';
+                colorLabel.style.fontSize = '11px';
+                colorLabel.style.marginRight = '5px';
+                
+                const colorPicker = document.createElement('input');
+                colorPicker.type = 'color';
+                colorPicker.className = 'paint-app-color-picker';
+                colorPicker.value = '#000000';
+                colorPicker.style.marginRight = '10px';
+                
+                // Font selector
+                const fontLabel = document.createElement('label');
+                fontLabel.textContent = 'Font: ';
+                fontLabel.style.fontSize = '11px';
+                fontLabel.style.marginRight = '5px';
+                
+                const fontSelector = document.createElement('select');
+                fontSelector.style.cssText = 'background: #c0c0c0; border: 1px inset #c0c0c0; padding: 2px 4px; font-size: 11px; margin-right: 10px;';
+                fontSelector.innerHTML = `
+                    <option value="Arial">Arial</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                    <option value="Impact">Impact</option>
+                    <option value="Trebuchet MS">Trebuchet MS</option>
+                `;
+                
+                toolbar.appendChild(colorLabel);
+                toolbar.appendChild(colorPicker);
+                toolbar.appendChild(fontLabel);
+                toolbar.appendChild(fontSelector);
+                
                 const paperContent = document.createElement('div');
                 paperContent.className = 'paper-app-content';
                 paperContent.setAttribute('contenteditable', 'true');
                 paperContent.style.outline = 'none';
-                paperContent.style.minHeight = '100%';
+                paperContent.style.minHeight = 'calc(100% - 30px)';
+                paperContent.style.color = '#000000'; // Default black text
+                paperContent.style.fontFamily = 'Courier New, monospace';
                 paperContent.textContent = 'Start typing...';
                 
-                // Load saved content if exists
+                // Load saved content and preferences
                 const savedContent = localStorage.getItem(`paper-${iconId}`);
+                const savedColor = localStorage.getItem(`paper-color-${iconId}`) || '#000000';
+                const savedFont = localStorage.getItem(`paper-font-${iconId}`) || 'Courier New';
+                
                 if (savedContent) {
                     paperContent.textContent = savedContent;
                 }
+                paperContent.style.color = savedColor;
+                paperContent.style.fontFamily = savedFont;
+                colorPicker.value = savedColor;
+                fontSelector.value = savedFont;
+                
+                // Update color
+                colorPicker.addEventListener('input', (e) => {
+                    paperContent.style.color = e.target.value;
+                    localStorage.setItem(`paper-color-${iconId}`, e.target.value);
+                });
+                
+                // Update font
+                fontSelector.addEventListener('change', (e) => {
+                    paperContent.style.fontFamily = e.target.value;
+                    localStorage.setItem(`paper-font-${iconId}`, e.target.value);
+                });
                 
                 paperContent.onfocus = function() {
                     if (this.textContent === 'Start typing...') {
@@ -5486,6 +6007,7 @@ body.theme-flashcard button:hover {
                     }
                 });
                 
+                content.appendChild(toolbar);
                 content.appendChild(paperContent);
             } else if (type === 'paint') {
                 const paintId = `paint-${iconId}`;
@@ -5517,23 +6039,42 @@ body.theme-flashcard button:hover {
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Load saved drawing if exists
-                const savedDrawing = localStorage.getItem(`paint-${iconId}`);
-                if (savedDrawing) {
-                    const img = new Image();
-                    img.onload = () => {
-                        ctx.drawImage(img, 0, 0);
-                    };
-                    img.src = savedDrawing;
-                }
+                // Load saved drawing if exists - use setTimeout to ensure canvas is ready
+                setTimeout(() => {
+                    const savedDrawing = localStorage.getItem(`paint-${iconId}`);
+                    if (savedDrawing && savedDrawing.startsWith('data:image')) {
+                        const img = new Image();
+                        img.onload = () => {
+                            // Clear and redraw white background first
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            // Then draw the saved image
+                            ctx.drawImage(img, 0, 0);
+                        };
+                        img.onerror = () => {
+                            // If image fails to load, keep white background
+                            console.log('Failed to load saved paint drawing for', iconId);
+                        };
+                        img.src = savedDrawing;
+                    } else {
+                        // No saved drawing, ensure white background
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+                }, 100);
                 
                 let isDrawing = false;
                 let lastX = 0;
                 let lastY = 0;
                 
                 function savePaint() {
-                    const dataURL = canvas.toDataURL();
-                    localStorage.setItem(`paint-${iconId}`, dataURL);
+                    try {
+                        const dataURL = canvas.toDataURL('image/png');
+                        localStorage.setItem(`paint-${iconId}`, dataURL);
+                    } catch (e) {
+                        console.error('Error saving paint:', e);
+                    }
                 }
                 
                 canvas.addEventListener('mousedown', (e) => {
@@ -5560,17 +6101,32 @@ body.theme-flashcard button:hover {
                     lastX = x;
                     lastY = y;
                     
-                    // Auto-save while drawing
-                    savePaint();
+                    // Auto-save while drawing (debounced to avoid too frequent saves)
+                    if (!savePaint.timeout) {
+                        savePaint.timeout = setTimeout(() => {
+                            savePaint();
+                            savePaint.timeout = null;
+                        }, 200); // Save every 200ms while drawing
+                    }
                 });
                 
                 canvas.addEventListener('mouseup', () => {
                     isDrawing = false;
+                    // Clear any pending save and save immediately
+                    if (savePaint.timeout) {
+                        clearTimeout(savePaint.timeout);
+                        savePaint.timeout = null;
+                    }
                     savePaint();
                 });
                 
                 canvas.addEventListener('mouseleave', () => {
                     isDrawing = false;
+                    // Clear any pending save and save immediately
+                    if (savePaint.timeout) {
+                        clearTimeout(savePaint.timeout);
+                        savePaint.timeout = null;
+                    }
                     savePaint();
                 });
                 
@@ -5643,6 +6199,94 @@ body.theme-flashcard button:hover {
                     taskbarApps.appendChild(btn);
                 }
             });
+        }
+        
+        // Pong app
+        function openPongApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '600px';
+            window.style.height = '400px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content - embed pong iframe
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '0';
+            content.style.overflow = 'hidden';
+            content.style.height = '100%';
+            
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.src = 'https://www.ponggame.org/';
+            
+            content.appendChild(iframe);
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'pong',
+                element: window
+            });
+            
+            updateTaskbar();
         }
         
         // Make functions globally accessible
