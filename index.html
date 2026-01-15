@@ -1932,6 +1932,35 @@ body.theme-flashcard button:hover {
         </div>
         <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
     </div>
+    
+    <!-- Remote Desktop page -->
+    <div class="page remote-desktop-page hidden" id="remoteDesktopPage">
+        <div id="remoteDesktop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #008080; font-family: 'MS Sans Serif', Arial, sans-serif; overflow: hidden;">
+            <!-- Desktop Icons Container -->
+            <div id="desktopIcons" style="position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 40px); padding: 10px;">
+                <!-- Icons will be added here dynamically -->
+            </div>
+            
+            <!-- Taskbar -->
+            <div id="taskbar" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background: #c0c0c0; border-top: 2px solid #ffffff; display: flex; align-items: center; padding: 0 4px; z-index: 1000;">
+                <button id="startButton" style="height: 32px; padding: 0 12px; background: #c0c0c0; border: 2px outset #c0c0c0; font-family: 'MS Sans Serif', Arial, sans-serif; font-size: 11px; font-weight: bold; cursor: pointer; margin-right: 4px;">Start</button>
+                <div id="taskbarApps" style="flex: 1; display: flex; align-items: center; gap: 2px;"></div>
+            </div>
+            
+            <!-- Context Menu -->
+            <div id="desktopContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                <div class="context-menu-item" data-action="add-paper" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">New Paper</div>
+                <div class="context-menu-item" data-action="add-paint" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">New Paint</div>
+            </div>
+            
+            <!-- Icon Context Menu -->
+            <div id="iconContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                <div class="context-menu-item" data-action="open" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Open</div>
+                <div class="context-menu-item" data-action="rename" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Rename</div>
+                <div class="context-menu-item" data-action="delete" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Delete</div>
+            </div>
+        </div>
+    </div>
         
     <!-- Coinflip page -->
     <div class="page coinflip-page hidden" id="coinflipPage">
@@ -4656,6 +4685,9 @@ body.theme-flashcard button:hover {
                 cleanupFlashcards();
             }
         }
+        
+        // Make createFlashcard globally accessible
+        window.createFlashcard = createFlashcard;
         
         // Update applyTheme to handle ocean and paper themes (consolidating all wrappers)
         const originalApplyTheme4 = applyTheme;
