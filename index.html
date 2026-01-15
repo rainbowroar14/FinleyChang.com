@@ -706,6 +706,110 @@
             margin-left: 8px;
         }
         
+        .command-feedback.success {
+            border-color: #3fb950;
+        }
+        
+        .command-feedback.success .command-text {
+            color: #3fb950;
+        }
+        
+        .command-feedback.error {
+            border-color: #f85149;
+        }
+        
+        .command-feedback.error .command-text,
+        .command-feedback.error .feedback-text {
+            color: #f85149;
+        }
+        
+        /* Command History Display */
+        .command-history {
+            position: fixed;
+            bottom: 110px;
+            left: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px 12px;
+            max-width: 500px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 997;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            display: none;
+        }
+        
+        .command-history.visible {
+            display: block;
+        }
+        
+        .command-history-header {
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #30363d;
+            font-size: 12px;
+        }
+        
+        .command-history-entry {
+            margin-bottom: 6px;
+            padding: 4px 0;
+            line-height: 1.4;
+        }
+        
+        .command-history-entry .command-text {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        
+        .command-history-entry .feedback-text {
+            color: #8b949e;
+            margin-left: 8px;
+        }
+        
+        .command-history-entry.success .command-text,
+        .command-history-entry.success .feedback-text {
+            color: #3fb950;
+        }
+        
+        .command-history-entry.error .command-text,
+        .command-history-entry.error .feedback-text {
+            color: #f85149;
+        }
+        
+        .command-history-toggle {
+            position: fixed;
+            bottom: 70px;
+            left: 420px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: #8b949e;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            cursor: pointer;
+            z-index: 996;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            user-select: none;
+        }
+        
+        .command-history-toggle:hover {
+            color: #c9d1d9;
+            border-color: #58a6ff;
+        }
+        
+        @media (max-width: 768px) {
+            .command-history-toggle {
+                left: 20px;
+                bottom: 110px;
+            }
+        }
+        
         /* Command bar in bottom left */
         .command-bar {
             position: fixed;
@@ -1059,6 +1163,87 @@ body.theme-terminal button:hover {
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.6) !important;
 }
 
+body.theme-matrix {
+    font-family: 'Courier New', monospace;
+    background: #000000 !important;
+    color: #00ff41;
+    position: relative;
+    overflow: hidden;
+}
+
+body.theme-matrix .command-bar,
+body.theme-matrix .clock-display,
+body.theme-matrix .command-feedback,
+body.theme-matrix .commands-menu {
+    background: rgba(0, 0, 0, 0.95) !important;
+    border: 1px solid #00ff41 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5), inset 0 0 10px rgba(0, 255, 65, 0.1) !important;
+    color: #00ff41 !important;
+    text-shadow: 0 0 5px #00ff41 !important;
+}
+
+body.theme-matrix .command-input {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid #00ff41 !important;
+    color: #00ff41 !important;
+    text-shadow: 0 0 5px #00ff41 !important;
+}
+
+body.theme-matrix .command-bar::before {
+    color: #00ff41 !important;
+    text-shadow: 0 0 5px #00ff41 !important;
+}
+
+body.theme-matrix .page {
+    background: #000000 !important;
+}
+
+body.theme-matrix .home-page h1,
+body.theme-matrix .subtitle,
+body.theme-matrix .letters-source {
+    color: #00ff41 !important;
+    text-shadow: 0 0 10px #00ff41 !important;
+}
+
+body.theme-matrix button {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: 1px solid #00ff41 !important;
+    color: #00ff41 !important;
+    text-shadow: 0 0 5px #00ff41 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;
+}
+
+body.theme-matrix button:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.6) !important;
+}
+
+/* Matrix falling characters */
+.matrix-column {
+    position: fixed;
+    top: -50px;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    color: #00ff41;
+    text-shadow: 0 0 5px #00ff41;
+    pointer-events: none;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+}
+
+.matrix-column .char {
+    display: block;
+    opacity: 1;
+    height: 18px;
+    text-align: center;
+}
+
+.matrix-column .char.fade {
+    opacity: 0.3;
+}
+
 body.theme-coffee {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: #3e2723 !important;
@@ -1393,6 +1578,15 @@ body.theme-dark button {
         <span class="command-text"></span><span class="feedback-text"></span>
     </div>
     
+    <!-- Command history toggle -->
+    <div class="command-history-toggle" id="commandHistoryToggle" title="Click to toggle command history">📜 History</div>
+    
+    <!-- Command history display -->
+    <div class="command-history" id="commandHistory">
+        <div class="command-history-header">Command History (Last 10)</div>
+        <div id="commandHistoryEntries"></div>
+    </div>
+    
     <!-- Command bar in bottom left -->
     <div class="command-bar">
         <input type="text" class="command-input" id="commandInput" placeholder="Type a color or 'home'..." autocomplete="off">
@@ -1652,6 +1846,7 @@ body.theme-dark button {
                     { name: 'theme coffee', desc: 'Warm brown/cream sepia mode' },
                     { name: 'theme dark', desc: 'Dark mode (default)' },
                     { name: 'theme light', desc: 'Light mode' },
+                    { name: 'theme matrix', desc: 'Matrix style - press keys to create falling columns' },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
@@ -2172,22 +2367,129 @@ body.theme-dark button {
             saveClockSetting();
         }
         
-        // Command feedback helper
-        function showCommandFeedback(command, feedback) {
+        // Command history storage (last 10 commands)
+        let commandHistory = [];
+        const MAX_HISTORY = 10;
+        
+        // Command feedback helper with history
+        function showCommandFeedback(command, feedback, isSuccess = true) {
             const feedbackEl = document.getElementById('commandFeedback');
             const commandTextEl = feedbackEl?.querySelector('.command-text');
             const feedbackTextEl = feedbackEl?.querySelector('.feedback-text');
             
+            // Remove previous success/error classes
+            feedbackEl.classList.remove('success', 'error');
+            
             if (feedbackEl && commandTextEl && feedbackTextEl) {
-                commandTextEl.textContent = command;
-                feedbackTextEl.textContent = feedback ? ` - ${feedback}` : '';
+                commandTextEl.textContent = `> ${command}`;
+                feedbackTextEl.textContent = feedback ? ` ${feedback}` : '';
+                
+                // Add success/error styling
+                if (isSuccess) {
+                    feedbackEl.classList.add('success');
+                } else {
+                    feedbackEl.classList.add('error');
+                }
+                
                 feedbackEl.classList.remove('hidden');
+                
+                // Store in history
+                addToHistory(command, feedback, isSuccess);
                 
                 // Auto-hide after 3 seconds
                 setTimeout(() => {
                     feedbackEl.classList.add('hidden');
                 }, 3000);
             }
+        }
+        
+        // Add command to history
+        function addToHistory(command, feedback, isSuccess) {
+            // Add to beginning of array
+            commandHistory.unshift({
+                command: command,
+                feedback: feedback || (isSuccess ? 'Success' : 'Error'),
+                success: isSuccess,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            // Keep only last 10
+            if (commandHistory.length > MAX_HISTORY) {
+                commandHistory.pop();
+            }
+            
+            // Save to localStorage
+            saveCommandHistory();
+            
+            // Update history display
+            renderCommandHistory();
+        }
+        
+        // Render command history
+        function renderCommandHistory() {
+            const historyEntries = document.getElementById('commandHistoryEntries');
+            if (!historyEntries) return;
+            
+            if (commandHistory.length === 0) {
+                historyEntries.innerHTML = '<div style="color: #6e7681; font-style: italic;">No commands yet...</div>';
+                return;
+            }
+            
+            let html = '';
+            commandHistory.forEach(entry => {
+                const statusClass = entry.success ? 'success' : 'error';
+                html += `
+                    <div class="command-history-entry ${statusClass}">
+                        <span class="command-text">> ${entry.command}</span>
+                        <span class="feedback-text">${entry.feedback}</span>
+                        <span style="color: #6e7681; margin-left: 8px; font-size: 10px;">(${entry.timestamp})</span>
+                    </div>
+                `;
+            });
+            
+            historyEntries.innerHTML = html;
+        }
+        
+        // Toggle command history visibility
+        function toggleCommandHistory() {
+            const historyEl = document.getElementById('commandHistory');
+            if (historyEl) {
+                historyEl.classList.toggle('visible');
+            }
+        }
+        
+        // Initialize command history toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('commandHistoryToggle');
+            if (toggle) {
+                toggle.addEventListener('click', toggleCommandHistory);
+            }
+            
+            // Load history from localStorage
+            loadCommandHistory();
+        });
+        
+        // Load command history from localStorage
+        function loadCommandHistory() {
+            const saved = localStorage.getItem('commandHistory');
+            if (saved) {
+                try {
+                    commandHistory = JSON.parse(saved);
+                    // Ensure we only keep last 10
+                    if (commandHistory.length > MAX_HISTORY) {
+                        commandHistory = commandHistory.slice(0, MAX_HISTORY);
+                    }
+                    renderCommandHistory();
+                } catch (e) {
+                    console.error('Error loading command history:', e);
+                    commandHistory = [];
+                }
+            }
+        }
+        
+        // Save command history to localStorage
+        function saveCommandHistory() {
+            localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
         }
         
         // Whoami profile
@@ -2240,33 +2542,39 @@ body.theme-dark button {
                 } else if (command === 'home') {
                     resetConfirm = false; // Clear reset confirmation if other command is used
                     showPage('homePage');
+                    showCommandFeedback('home', 'Navigated to home page', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'back') {
                     resetConfirm = false; // Clear reset confirmation if other command is used
                     showPage('mainPage');
+                    showCommandFeedback('back', 'Returned to main page', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type a color or "home"...';
                 } else if (command === 'sweeper') {
                     resetConfirm = false;
                     showPage('minesweeperPage');
                     initMinesweeper();
+                    showCommandFeedback('sweeper', 'Minesweeper game opened', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'pong') {
                     resetConfirm = false;
                     showPage('pongPage');
+                    showCommandFeedback('pong', 'Pong game opened', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'sandboxles') {
                     resetConfirm = false;
                     showPage('sandboxelsPage');
+                    showCommandFeedback('sandboxles', 'Sandboxels opened', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'paint') {
                     resetConfirm = false;
                     showPage('paintPage');
                     initPaint();
+                    showCommandFeedback('paint', 'Paint game opened', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'snake') {
@@ -2459,12 +2767,14 @@ body.theme-dark button {
                     resetConfirm = false; // Clear reset confirmation if other command is used
                     if (unlockedCommands.has('honk')) {
                         playHonkSound();
+                        showCommandFeedback('honk', 'HONK! 🦢', true);
                         commandInput.value = '';
                         commandInput.placeholder = 'HONK! 🦢';
                         setTimeout(() => {
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
                                     } else {
+                        showCommandFeedback('honk', 'Command not unlocked yet! Use "goose" first.', false);
                         commandInput.value = '';
                         commandInput.placeholder = 'Honk command not unlocked yet! Use "goose" first.';
                         setTimeout(() => {
@@ -2476,9 +2786,11 @@ body.theme-dark button {
                     if (unlockedCommands.has('gooserain')) {
                         showPage('gooserainPage');
                         initGooseRain();
+                        showCommandFeedback('gooserain', 'Goose rain activated!', true);
                         commandInput.value = '';
                         commandInput.placeholder = 'Type "back" to return';
                     } else {
+                        showCommandFeedback('gooserain', 'Command not unlocked yet! Use "goose" first.', false);
                         commandInput.value = '';
                         commandInput.placeholder = 'Goose rain not unlocked yet! Use "goose" first.';
                         setTimeout(() => {
@@ -2504,12 +2816,14 @@ body.theme-dark button {
                     resetConfirm = false;
                     if (unlockedCommands.has('wooperbird')) {
                         spawnWooperbirdGoose();
+                        showCommandFeedback('wooperbird', 'WooperBird dropped! 🐦', true);
                         commandInput.value = '';
                         commandInput.placeholder = 'WooperBird dropped! 🐦';
                         setTimeout(() => {
                             commandInput.placeholder = 'Type a color or "home"...';
                         }, 2000);
                     } else {
+                        showCommandFeedback('wooperbird', 'Command not unlocked yet! Use "wooper" first.', false);
                         commandInput.value = '';
                         commandInput.placeholder = 'WooperBird not unlocked yet! Use "wooper" first.';
                         setTimeout(() => {
@@ -2570,6 +2884,7 @@ body.theme-dark button {
                 } else if (command === 'rainbow') {
                     resetConfirm = false;
                     applyRainbowColors();
+                    showCommandFeedback('rainbow', 'Rainbow colors applied!', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Rainbow colors applied!';
                     setTimeout(() => {
@@ -2578,6 +2893,7 @@ body.theme-dark button {
                 } else if (hasColorPalette) {
                     resetConfirm = false;
                     changeAllColors(command);
+                    showCommandFeedback(command, `Changed to ${command}!`, true);
                     commandInput.value = '';
                     commandInput.placeholder = `Changed to ${command}!`;
                     setTimeout(() => {
@@ -2585,6 +2901,7 @@ body.theme-dark button {
                     }, 2000);
                 } else {
                     resetConfirm = false; // Clear reset confirmation if invalid command
+                    showCommandFeedback(command, 'Command not found. Try: cmds, home, back, or a color name...', false);
                     commandInput.value = '';
                     commandInput.placeholder = 'Command not found. Try: cmds, home, back, or a color name...';
                     setTimeout(() => {
@@ -3036,7 +3353,7 @@ body.theme-dark button {
         loadBackgroundPreferences();
         
         // Theme System
-        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light'];
+        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix'];
         let currentTheme = 'dark'; // Default theme
         
         // Load saved theme
@@ -3062,6 +3379,7 @@ body.theme-dark button {
             
             // Validate theme name
             if (!availableThemes.includes(themeName)) {
+                showCommandFeedback(`theme ${themeName}`, `Invalid theme. Available: ${availableThemes.join(', ')}`, false);
                 const commandInput = document.getElementById('commandInput');
                 if (commandInput) {
                     commandInput.placeholder = `Invalid theme: ${themeName}. Available: ${availableThemes.join(', ')}`;
@@ -3080,14 +3398,157 @@ body.theme-dark button {
                 saveTheme(themeName);
             }
             
-            showCommandFeedback('theme', `Theme changed to ${themeName}!`);
+            showCommandFeedback(`theme ${themeName}`, `Theme changed to ${themeName}!`, true);
         }
         
-        // Make applyTheme globally accessible
+        // Note: applyTheme will be wrapped below, so we'll set window.applyTheme after wrapping
+        
+        // Matrix theme keypress handler
+        let matrixColumns = [];
+        const matrixSpecialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+        
+        function createMatrixColumn(key, x) {
+            if (!document.body.classList.contains('theme-matrix')) return;
+            
+            // Don't create columns for command input
+            const commandInput = document.getElementById('commandInput');
+            if (commandInput && document.activeElement === commandInput) return;
+            
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = x + 'px';
+            column.style.display = 'flex';
+            column.style.flexDirection = 'column';
+            
+            // Start with the pressed key
+            const startChar = document.createElement('span');
+            startChar.className = 'char';
+            startChar.textContent = key;
+            column.appendChild(startChar);
+            
+            // Add random special characters
+            for (let i = 0; i < 30; i++) {
+                const char = document.createElement('span');
+                char.className = 'char';
+                char.textContent = matrixSpecialChars[Math.floor(Math.random() * matrixSpecialChars.length)];
+                if (i > 20) {
+                    char.classList.add('fade');
+                }
+                column.appendChild(char);
+            }
+            
+            document.body.appendChild(column);
+            matrixColumns.push(column);
+            
+            // Animate falling
+            let position = -50;
+            const speed = 2 + Math.random() * 3; // Random speed between 2-5
+            const animate = () => {
+                position += speed;
+                column.style.top = position + 'px';
+                
+                // Remove when off screen
+                if (position > window.innerHeight + 100) {
+                    column.remove();
+                    const index = matrixColumns.indexOf(column);
+                    if (index > -1) {
+                        matrixColumns.splice(index, 1);
+                    }
+                } else {
+                    requestAnimationFrame(animate);
+                }
+            };
+            
+            animate();
+        }
+        
+        // Matrix theme keypress listener
+        let matrixKeyHandler = null;
+        
+        function setupMatrixKeyHandler() {
+            // Remove existing handler if any
+            if (matrixKeyHandler) {
+                document.removeEventListener('keydown', matrixKeyHandler);
+                matrixKeyHandler = null;
+            }
+            
+            // Only add handler if matrix theme is active
+            if (document.body.classList.contains('theme-matrix')) {
+                matrixKeyHandler = (e) => {
+                    // Don't trigger on command input
+                    const commandInput = document.getElementById('commandInput');
+                    if (commandInput && document.activeElement === commandInput) return;
+                    
+                    // Don't trigger on special keys (Ctrl, Alt, etc.)
+                    if (e.ctrlKey || e.altKey || e.metaKey) return;
+                    
+                    // Get the key character
+                    let key = e.key;
+                    
+                    // Handle special keys
+                    if (key.length > 1) {
+                        // Map special keys to symbols
+                        const specialKeyMap = {
+                            'Enter': '↵',
+                            ' ': ' ',
+                            'Space': ' ',
+                            'Tab': '→',
+                            'Escape': '⎋',
+                            'Backspace': '⌫',
+                            'Delete': '⌦',
+                            'ArrowUp': '↑',
+                            'ArrowDown': '↓',
+                            'ArrowLeft': '←',
+                            'ArrowRight': '→'
+                        };
+                        
+                        if (specialKeyMap[key]) {
+                            key = specialKeyMap[key];
+                        } else {
+                            // Skip other special keys
+                            return;
+                        }
+                    }
+                    
+                    // Create column at random x position
+                    const x = Math.random() * (window.innerWidth - 50);
+                    createMatrixColumn(key, x);
+                };
+                
+                document.addEventListener('keydown', matrixKeyHandler);
+            }
+        }
+        
+        // Clean up matrix columns when switching themes
+        function cleanupMatrixColumns() {
+            matrixColumns.forEach(column => column.remove());
+            matrixColumns = [];
+        }
+        
+        // Update applyTheme to setup/remove matrix handler and cleanup
+        const originalApplyTheme = applyTheme;
+        applyTheme = function(themeName, save = true) {
+            // Cleanup if switching away from matrix
+            if (document.body.classList.contains('theme-matrix') && themeName !== 'matrix') {
+                cleanupMatrixColumns();
+            }
+            
+            originalApplyTheme(themeName, save);
+            
+            // Setup matrix handler if switching to matrix
+            setupMatrixKeyHandler();
+        };
+        
+        // Make wrapped applyTheme globally accessible
         window.applyTheme = applyTheme;
         
         // Load theme on page load
         loadTheme();
+        
+        // Setup matrix handler on page load if matrix theme is active
+        setTimeout(() => {
+            setupMatrixKeyHandler();
+        }, 100);
         
         // Wooperbird goose on main page
         let wooperbirdCanvas, wooperbirdCtx;
