@@ -2836,31 +2836,9 @@ body.theme-miku .visit-counter-number {
         
         <p class="subtitle">Built with code, powered by Finley</p>
         <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
-        
-        <!-- Customizable Home Elements -->
-        <div class="home-custom-elements" id="homeCustomElements">
-            <!-- Text boxes, pictures, and drawings will be added here -->
-        </div>
-        
-        <!-- Add Element Button -->
-        <div class="home-add-elements" id="homeAddElements">
-            <button class="home-add-btn" onclick="showAddElementMenu()" title="Add custom elements to home page">+ Add Element</button>
-        </div>
-        
         <!-- Canvas for wooperbird goose on main page -->
         <canvas id="wooperbirdCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;"></canvas>
         </div>
-    
-    <!-- Add Element Menu -->
-    <div class="add-element-menu" id="addElementMenu">
-        <div class="add-element-menu-content">
-            <h3>Add Element to Home</h3>
-            <button class="add-element-option" onclick="addHomeTextBox()">📝 Text Box</button>
-            <button class="add-element-option" onclick="addHomePicture()">🖼️ Picture</button>
-            <button class="add-element-option" onclick="addHomeDrawing()">🎨 Drawing</button>
-            <button class="add-element-close" onclick="closeAddElementMenu()">Cancel</button>
-        </div>
-    </div>
     
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
@@ -3966,13 +3944,6 @@ body.theme-miku .visit-counter-number {
             // Update money displays on page change
             updateAllMoneyDisplays();
             
-            // Load home elements if showing main page
-            if (pageId === 'mainPage') {
-                if (typeof loadHomeElements === 'function') {
-                    loadHomeElements();
-                }
-            }
-            
             // Achievement tracking
             if (pageId === 'homePage' || pageId === 'mainPage') {
                 if (typeof unlockAchievement === 'function') {
@@ -4457,9 +4428,6 @@ body.theme-miku .visit-counter-number {
             
             // Load history from localStorage
             loadCommandHistory();
-            
-            // Load home elements
-            loadHomeElements();
             
             // Check terms agreement
             checkTermsAgreement();
