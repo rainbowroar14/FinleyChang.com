@@ -1841,6 +1841,196 @@ body.theme-flashcard button:hover {
 .flashcard-close:hover {
     background: #d73a49;
 }
+
+/* Remote Desktop - Windows 95 style */
+.desktop-icon {
+    width: 80px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px;
+    margin: 4px;
+    position: relative;
+}
+
+.desktop-icon:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+}
+
+.desktop-icon.selected {
+    background: rgba(0, 0, 128, 0.3);
+    border: 1px dashed #000080;
+    border-radius: 2px;
+}
+
+.desktop-icon-icon {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 4px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.desktop-icon-label {
+    font-size: 11px;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    word-break: break-word;
+    line-height: 1.2;
+}
+
+.context-menu {
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+}
+
+.context-menu-item {
+    padding: 4px 20px;
+    cursor: pointer;
+    font-size: 11px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    width: 100%;
+}
+
+.context-menu-item:hover {
+    background: #000080;
+    color: #fff;
+}
+
+.context-menu.hidden {
+    display: none;
+}
+
+/* Windows 95 style windows */
+.win95-window {
+    position: fixed;
+    background: #c0c0c0;
+    border: 2px outset #c0c0c0;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    z-index: 100;
+    min-width: 300px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.win95-window-header {
+    background: #000080;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    user-select: none;
+}
+
+.win95-window-title {
+    flex: 1;
+}
+
+.win95-window-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.win95-window-button {
+    width: 16px;
+    height: 14px;
+    background: #c0c0c0;
+    border: 1px outset #c0c0c0;
+    cursor: pointer;
+    font-size: 10px;
+    line-height: 12px;
+    text-align: center;
+    padding: 0;
+}
+
+.win95-window-button:hover {
+    background: #d4d0c8;
+}
+
+.win95-window-button:active {
+    border: 1px inset #c0c0c0;
+}
+
+.win95-window-content {
+    flex: 1;
+    background: #c0c0c0;
+    padding: 8px;
+    overflow: auto;
+    border: 2px inset #c0c0c0;
+}
+
+.win95-window.minimized {
+    display: none;
+}
+
+/* Paper app window */
+.paper-app-content {
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    border: 1px inset #c0c0c0;
+    outline: none;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Paint app window */
+.paint-app-content {
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    border: 1px inset #c0c0c0;
+    position: relative;
+}
+
+.paint-app-canvas {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    display: block;
+}
+
+.paint-app-toolbar {
+    background: #c0c0c0;
+    border-bottom: 1px solid #808080;
+    padding: 4px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.paint-app-color-picker {
+    width: 30px;
+    height: 20px;
+    border: 1px inset #c0c0c0;
+    cursor: pointer;
+}
+
+.paint-app-brush-size {
+    width: 60px;
+    height: 20px;
+    border: 1px inset #c0c0c0;
+    font-size: 11px;
+    padding: 0 4px;
+}
+
+/* Trash can drag over effect */
+.trash-can-drag-over {
+    background: rgba(255, 0, 0, 0.3) !important;
+    border: 2px dashed #ff0000 !important;
+}
     </style>
 </head>
 <body>
@@ -2098,6 +2288,44 @@ body.theme-flashcard button:hover {
         </div>
     </div>
     
+    <!-- Remote Desktop page -->
+    <div class="page remote-desktop-page hidden" id="remoteDesktopPage">
+        <div id="remoteDesktop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #008080; font-family: 'MS Sans Serif', Arial, sans-serif; overflow: hidden;">
+            <!-- Desktop icons container -->
+            <div id="desktopIcons" style="position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 40px); padding: 10px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 20px;">
+                <!-- Icons will be added here dynamically -->
+            </div>
+            
+            <!-- Taskbar -->
+            <div id="taskbar" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background: #c0c0c0; border-top: 2px solid #ffffff; display: flex; align-items: center; padding: 0 4px; z-index: 1000; box-shadow: 0 -2px 4px rgba(0,0,0,0.3);">
+                <div style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; margin: 2px; cursor: pointer; font-size: 11px; font-weight: bold; user-select: none;" onclick="showPage('mainPage')">
+                    Start
+                </div>
+                <div id="taskbarApps" style="flex: 1; display: flex; gap: 2px; padding: 0 4px;">
+                    <!-- Taskbar buttons will be added here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right-click context menu -->
+        <div id="desktopContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+            <div class="context-menu-item" onclick="addDesktopApp('paper')" style="padding: 4px 20px; cursor: pointer; font-size: 11px; background: transparent; border: none; text-align: left; width: 100%;">New Paper</div>
+            <div class="context-menu-item" onclick="addDesktopApp('paint')" style="padding: 4px 20px; cursor: pointer; font-size: 11px; background: transparent; border: none; text-align: left; width: 100%;">New Paint</div>
+        </div>
+        
+        <!-- Icon right-click menu -->
+        <div id="iconContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+            <div class="context-menu-item" onclick="renameDesktopIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; background: transparent; border: none; text-align: left; width: 100%;">Rename</div>
+            <div class="context-menu-item" onclick="deleteDesktopIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; background: transparent; border: none; text-align: left; width: 100%;">Delete</div>
+        </div>
+        
+        <!-- Trash can -->
+        <div id="trashCan" class="desktop-icon" style="position: absolute; bottom: 50px; right: 10px; width: 80px; text-align: center; cursor: pointer; user-select: none;" draggable="false">
+            <div style="width: 32px; height: 32px; margin: 0 auto 4px; background: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect x=%228%22 y=%228%22 width=%2216%22 height=%2216%22 fill=%22%23000%22/><rect x=%2210%22 y=%2210%22 width=%2212%22 height=%222%22 fill=%22%23000%22/><rect x=%2212%22 y=%2212%22 width=%228%22 height=%222%22 fill=%22%23fff%22/></svg>') no-repeat center; background-size: contain;"></div>
+            <div style="font-size: 11px; color: #fff; text-shadow: 1px 1px 1px #000;">Trash</div>
+        </div>
+    </div>
+    
     <!-- Clock display (top left) -->
     <div class="clock-display hidden" id="clockDisplay"></div>
     
@@ -2334,6 +2562,8 @@ body.theme-flashcard button:hover {
                     { name: 'sandboxles', desc: 'Open Sandboxels' },
                     { name: 'paint', desc: 'Open Paint game' },
                     { name: 'drawing board', desc: 'Open collaborative drawing board' },
+                    { name: 'remote desktop', desc: 'Open Windows 95 style desktop' },
+                    { name: 'desktop', desc: 'Open Windows 95 style desktop' },
                     { name: 'snake', desc: 'Play Google Snake' },
                     { name: 'coinflip', desc: 'Flip a coin' },
                     { name: 'clicker', desc: 'Play clicker game' },
@@ -3050,6 +3280,29 @@ body.theme-flashcard button:hover {
         
         // Command input handler
         const commandInput = document.getElementById('commandInput');
+        
+        // Semicolon key to focus command bar (works even when paper app is active)
+        document.addEventListener('keydown', (e) => {
+            // Only trigger if semicolon is pressed and not already typing in command input
+            if (e.key === ';' && document.activeElement !== commandInput) {
+                const activeEl = document.activeElement;
+                
+                // Block semicolon only if in a regular input/textarea (not contentEditable like paper app)
+                const isRegularInput = activeEl && (
+                    (activeEl.tagName === 'INPUT' && activeEl.id !== 'commandInput') || 
+                    activeEl.tagName === 'TEXTAREA'
+                );
+                
+                // Allow semicolon from anywhere except regular inputs/textareas
+                // This includes paper app (contentEditable) and other places
+                if (!isRegularInput) {
+                    e.preventDefault();
+                    commandInput.focus();
+                    commandInput.select(); // Select any existing text
+                }
+            }
+        });
+        
         commandInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const command = commandInput.value.toLowerCase().trim();
@@ -3123,6 +3376,15 @@ body.theme-flashcard button:hover {
                     resetConfirm = false;
                     showPage('drawingBoardPage');
                     showCommandFeedback('drawing board', 'Collaborative drawing board opened', true);
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'remote desktop' || command === 'remotedesktop' || command === 'desktop') {
+                    resetConfirm = false;
+                    showPage('remoteDesktopPage');
+                    setTimeout(() => {
+                        initRemoteDesktop();
+                    }, 100);
+                    showCommandFeedback('remote desktop', 'Remote desktop opened', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'snake') {
@@ -4688,6 +4950,500 @@ body.theme-flashcard button:hover {
         
         // Make createFlashcard globally accessible
         window.createFlashcard = createFlashcard;
+        
+        // Remote Desktop System
+        let desktopIcons = [];
+        let desktopWindows = [];
+        let selectedIcon = null;
+        let iconCounter = 0;
+        let windowZIndex = 100;
+        
+        function initRemoteDesktop() {
+            const desktop = document.getElementById('remoteDesktop');
+            const iconsContainer = document.getElementById('desktopIcons');
+            
+            if (!desktop || !iconsContainer) return;
+            
+            // Add default icons
+            addDesktopIcon('paper', 'Paper', 10, 10);
+            addDesktopIcon('paint', 'Paint', 10, 100);
+            
+            // Desktop right-click
+            desktop.addEventListener('contextmenu', (e) => {
+                if (e.target.closest('.desktop-icon') || e.target.closest('.win95-window')) {
+                    return; // Don't show menu on icons or windows
+                }
+                e.preventDefault();
+                showDesktopContextMenu(e.clientX, e.clientY);
+            });
+            
+            // Click to close context menus
+            desktop.addEventListener('click', () => {
+                hideContextMenus();
+            });
+            
+            // Trash can drag and drop
+            const trashCan = document.getElementById('trashCan');
+            if (trashCan) {
+                trashCan.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    trashCan.classList.add('trash-can-drag-over');
+                });
+                
+                trashCan.addEventListener('dragleave', () => {
+                    trashCan.classList.remove('trash-can-drag-over');
+                });
+                
+                trashCan.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    trashCan.classList.remove('trash-can-drag-over');
+                    const iconId = e.dataTransfer.getData('text/plain');
+                    deleteDesktopIconById(iconId);
+                });
+            }
+        }
+        
+        function addDesktopIcon(type, name, x, y) {
+            iconCounter++;
+            const iconId = `icon-${iconCounter}`;
+            const iconsContainer = document.getElementById('desktopIcons');
+            if (!iconsContainer) return;
+            
+            const icon = document.createElement('div');
+            icon.className = 'desktop-icon';
+            icon.id = iconId;
+            icon.style.position = 'absolute';
+            icon.style.left = x + 'px';
+            icon.style.top = y + 'px';
+            icon.draggable = true;
+            
+            // Icon image
+            const iconImg = document.createElement('div');
+            iconImg.className = 'desktop-icon-icon';
+            if (type === 'paper') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>📄</text></svg>") no-repeat center';
+            } else if (type === 'paint') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎨</text></svg>") no-repeat center';
+            }
+            iconImg.style.backgroundSize = 'contain';
+            
+            // Icon label
+            const label = document.createElement('div');
+            label.className = 'desktop-icon-label';
+            label.textContent = name;
+            label.contentEditable = false;
+            
+            icon.appendChild(iconImg);
+            icon.appendChild(label);
+            
+            // Right-click menu
+            icon.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                selectedIcon = iconId;
+                showIconContextMenu(e.clientX, e.clientY);
+            });
+            
+            // Click to select
+            let clickTimer = null;
+            icon.addEventListener('click', (e) => {
+                if (e.detail === 1) { // Single click
+                    clickTimer = setTimeout(() => {
+                        selectIcon(iconId);
+                    }, 200); // Delay to detect double-click
+                }
+            });
+            
+            // Double-click to open (clear single click timer)
+            icon.addEventListener('dblclick', (e) => {
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                }
+            });
+            
+            // Drag and drop - allow dragging to reposition or to trash
+            let isDraggingIcon = false;
+            let dragStartX = 0;
+            let dragStartY = 0;
+            let dragStartTime = 0;
+            
+            icon.addEventListener('mousedown', (e) => {
+                if (e.button === 0) { // Left mouse button
+                    dragStartX = e.clientX;
+                    dragStartY = e.clientY;
+                    dragStartTime = Date.now();
+                    isDraggingIcon = false; // Will be set to true if mouse moves
+                }
+            });
+            
+            icon.addEventListener('mousemove', (e) => {
+                if (dragStartTime > 0) {
+                    const moveDistance = Math.abs(e.clientX - dragStartX) + Math.abs(e.clientY - dragStartY);
+                    if (moveDistance > 5) { // Start dragging after 5px movement
+                        isDraggingIcon = true;
+                        if (clickTimer) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                        }
+                    }
+                }
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDraggingIcon && icon.parentNode) {
+                    const iconsContainer = document.getElementById('desktopIcons');
+                    if (iconsContainer) {
+                        const containerRect = iconsContainer.getBoundingClientRect();
+                        const iconRect = icon.getBoundingClientRect();
+                        const newX = e.clientX - containerRect.left - (iconRect.width / 2);
+                        const newY = e.clientY - containerRect.top - (iconRect.height / 2);
+                        
+                        // Keep within bounds
+                        const maxX = iconsContainer.offsetWidth - icon.offsetWidth;
+                        const maxY = iconsContainer.offsetHeight - icon.offsetHeight;
+                        
+                        icon.style.left = Math.max(0, Math.min(maxX, newX)) + 'px';
+                        icon.style.top = Math.max(0, Math.min(maxY, newY)) + 'px';
+                        
+                        // Update stored position
+                        const iconData = desktopIcons.find(i => i.id === iconId);
+                        if (iconData) {
+                            iconData.x = parseFloat(icon.style.left);
+                            iconData.y = parseFloat(icon.style.top);
+                        }
+                    }
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDraggingIcon = false;
+                dragStartTime = 0;
+            });
+            
+            // Also support HTML5 drag for trash can
+            icon.draggable = true;
+            icon.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', iconId);
+                icon.style.opacity = '0.5';
+            });
+            
+            icon.addEventListener('dragend', () => {
+                icon.style.opacity = '1';
+            });
+            
+            iconsContainer.appendChild(icon);
+            
+            desktopIcons.push({
+                id: iconId,
+                type: type,
+                name: name,
+                element: icon,
+                x: x,
+                y: y
+            });
+        }
+        
+        function selectIcon(iconId) {
+            // Deselect all
+            desktopIcons.forEach(icon => {
+                icon.element.classList.remove('selected');
+            });
+            
+            // Select this one
+            const icon = desktopIcons.find(i => i.id === iconId);
+            if (icon) {
+                icon.element.classList.add('selected');
+                selectedIcon = iconId;
+            }
+        }
+        
+        function showDesktopContextMenu(x, y) {
+            const menu = document.getElementById('desktopContextMenu');
+            if (menu) {
+                menu.style.left = x + 'px';
+                menu.style.top = y + 'px';
+                menu.classList.remove('hidden');
+            }
+        }
+        
+        function showIconContextMenu(x, y) {
+            const menu = document.getElementById('iconContextMenu');
+            if (menu) {
+                menu.style.left = x + 'px';
+                menu.style.top = y + 'px';
+                menu.classList.remove('hidden');
+            }
+        }
+        
+        function hideContextMenus() {
+            const desktopMenu = document.getElementById('desktopContextMenu');
+            const iconMenu = document.getElementById('iconContextMenu');
+            if (desktopMenu) desktopMenu.classList.add('hidden');
+            if (iconMenu) iconMenu.classList.add('hidden');
+        }
+        
+        function addDesktopApp(type) {
+            hideContextMenus();
+            const x = Math.random() * 200 + 50;
+            const y = Math.random() * 200 + 50;
+            const name = type === 'paper' ? `Paper ${iconCounter + 1}` : `Paint ${iconCounter + 1}`;
+            addDesktopIcon(type, name, x, y);
+        }
+        
+        function renameDesktopIcon() {
+            hideContextMenus();
+            if (!selectedIcon) return;
+            
+            const icon = desktopIcons.find(i => i.id === selectedIcon);
+            if (!icon) return;
+            
+            const label = icon.element.querySelector('.desktop-icon-label');
+            if (label) {
+                const oldName = label.textContent;
+                label.contentEditable = true;
+                label.focus();
+                
+                const range = document.createRange();
+                range.selectNodeContents(label);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                
+                label.addEventListener('blur', function onBlur() {
+                    label.contentEditable = false;
+                    const newName = label.textContent.trim() || oldName;
+                    label.textContent = newName;
+                    icon.name = newName;
+                    label.removeEventListener('blur', onBlur);
+                });
+                
+                label.addEventListener('keydown', function onKeyDown(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        label.blur();
+                    }
+                    if (e.key === 'Escape') {
+                        label.textContent = oldName;
+                        label.blur();
+                    }
+                });
+            }
+        }
+        
+        function deleteDesktopIcon() {
+            hideContextMenus();
+            if (!selectedIcon) return;
+            deleteDesktopIconById(selectedIcon);
+        }
+        
+        function deleteDesktopIconById(iconId) {
+            const icon = desktopIcons.find(i => i.id === iconId);
+            if (icon) {
+                icon.element.remove();
+                desktopIcons = desktopIcons.filter(i => i.id !== iconId);
+                selectedIcon = null;
+            }
+        }
+        
+        function openDesktopApp(type, iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '600px';
+            window.style.height = '400px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const minimizeBtn = document.createElement('button');
+            minimizeBtn.className = 'win95-window-button';
+            minimizeBtn.textContent = '_';
+            minimizeBtn.onclick = () => {
+                window.classList.toggle('minimized');
+                updateTaskbar();
+            };
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(minimizeBtn);
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            
+            if (type === 'paper') {
+                const paperContent = document.createElement('div');
+                paperContent.className = 'paper-app-content';
+                paperContent.contentEditable = true;
+                paperContent.textContent = 'Start typing...';
+                paperContent.onfocus = function() {
+                    if (this.textContent === 'Start typing...') {
+                        this.textContent = '';
+                    }
+                };
+                paperContent.onblur = function() {
+                    if (this.textContent.trim() === '') {
+                        this.textContent = 'Start typing...';
+                    }
+                };
+                content.appendChild(paperContent);
+            } else if (type === 'paint') {
+                const toolbar = document.createElement('div');
+                toolbar.className = 'paint-app-toolbar';
+                
+                const colorPicker = document.createElement('input');
+                colorPicker.type = 'color';
+                colorPicker.className = 'paint-app-color-picker';
+                colorPicker.value = '#000000';
+                
+                const brushSize = document.createElement('input');
+                brushSize.type = 'range';
+                brushSize.className = 'paint-app-brush-size';
+                brushSize.min = '1';
+                brushSize.max = '50';
+                brushSize.value = '5';
+                
+                toolbar.appendChild(colorPicker);
+                toolbar.appendChild(brushSize);
+                
+                const canvas = document.createElement('canvas');
+                canvas.className = 'paint-app-canvas';
+                canvas.width = 580;
+                canvas.height = 340;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                let isDrawing = false;
+                let lastX = 0;
+                let lastY = 0;
+                
+                canvas.addEventListener('mousedown', (e) => {
+                    isDrawing = true;
+                    const rect = canvas.getBoundingClientRect();
+                    lastX = e.clientX - rect.left;
+                    lastY = e.clientY - rect.top;
+                });
+                
+                canvas.addEventListener('mousemove', (e) => {
+                    if (!isDrawing) return;
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    ctx.strokeStyle = colorPicker.value;
+                    ctx.lineWidth = brushSize.value;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                    
+                    lastX = x;
+                    lastY = y;
+                });
+                
+                canvas.addEventListener('mouseup', () => {
+                    isDrawing = false;
+                });
+                
+                canvas.addEventListener('mouseleave', () => {
+                    isDrawing = false;
+                });
+                
+                content.appendChild(toolbar);
+                content.appendChild(canvas);
+            }
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                initialX = e.clientX - window.offsetLeft;
+                initialY = e.clientY - window.offsetTop;
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    window.style.left = currentX + 'px';
+                    window.style.top = currentY + 'px';
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: type,
+                element: window
+            });
+            
+            updateTaskbar();
+        }
+        
+        function updateTaskbar() {
+            const taskbarApps = document.getElementById('taskbarApps');
+            if (!taskbarApps) return;
+            
+            taskbarApps.innerHTML = '';
+            desktopWindows.forEach((win, index) => {
+                if (!win.element.classList.contains('minimized')) {
+                    const btn = document.createElement('div');
+                    btn.style.cssText = 'background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; margin: 2px; cursor: pointer; font-size: 11px; font-weight: bold; user-select: none;';
+                    btn.textContent = win.name;
+                    btn.onclick = () => {
+                        win.element.style.zIndex = ++windowZIndex;
+                        win.element.classList.remove('minimized');
+                        updateTaskbar();
+                    };
+                    taskbarApps.appendChild(btn);
+                }
+            });
+        }
+        
+        // Make functions globally accessible
+        window.addDesktopApp = addDesktopApp;
+        window.renameDesktopIcon = renameDesktopIcon;
+        window.deleteDesktopIcon = deleteDesktopIcon;
         
         // Update applyTheme to handle ocean and paper themes (consolidating all wrappers)
         const originalApplyTheme4 = applyTheme;
