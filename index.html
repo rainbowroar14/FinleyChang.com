@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinHub - Finley Chang</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -744,6 +747,167 @@
         
         .command-history.visible {
             display: block;
+        }
+        
+        /* Chat Page Styles */
+        .chat-container {
+            width: 90%;
+            max-width: 900px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h2 {
+            color: #c9d1d9;
+            font-size: 20px;
+            margin: 0;
+        }
+        
+        .online-users {
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px;
+            min-width: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .online-users-title {
+            color: #58a6ff;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .online-user-item {
+            padding: 6px 8px;
+            margin: 4px 0;
+            background: rgba(48, 54, 61, 0.5);
+            border-radius: 4px;
+            cursor: pointer;
+            color: #c9d1d9;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .online-user-item:hover {
+            background: rgba(48, 54, 61, 0.8);
+        }
+        
+        .online-user-item .user-id {
+            font-weight: bold;
+            color: #58a6ff;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #0d1117;
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: rgba(22, 27, 34, 0.8);
+            border-left: 3px solid #58a6ff;
+            border-radius: 6px;
+        }
+        
+        .chat-message.own-message {
+            border-left-color: #3fb950;
+            background: rgba(13, 17, 23, 0.9);
+        }
+        
+        .chat-message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .chat-message-user {
+            font-weight: bold;
+            color: #58a6ff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .chat-message.own-message .chat-message-user {
+            color: #3fb950;
+        }
+        
+        .chat-message-time {
+            color: #8b949e;
+            font-size: 11px;
+        }
+        
+        .chat-message-text {
+            color: #c9d1d9;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 15px 20px;
+            background: #161b22;
+            border-top: 1px solid #30363d;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 10px 15px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+        
+        .chat-send-btn {
+            padding: 10px 20px;
+            background: #238636;
+            border: 1px solid #2ea043;
+            border-radius: 6px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .chat-send-btn:hover {
+            background: #2ea043;
+        }
+        
+        .chat-send-btn:disabled {
+            background: #30363d;
+            border-color: #30363d;
+            cursor: not-allowed;
         }
         
         .command-history-header {
@@ -2339,6 +2503,24 @@ body.theme-flashcard button:hover {
         <span class="command-text"></span><span class="feedback-text"></span>
     </div>
     
+    <!-- Chat Page -->
+    <div class="page hidden" id="chatPage">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>💬 Online Chat</h2>
+                <div class="online-users" id="onlineUsers">
+                    <div class="online-users-title">👥 Online Users</div>
+                    <div id="onlineUsersList"></div>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="500">
+                <button class="chat-send-btn" id="chatSendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Command history toggle -->
     <div class="command-history-toggle" id="commandHistoryToggle" title="Click to toggle command history">📜 History</div>
     
@@ -3280,6 +3462,33 @@ body.theme-flashcard button:hover {
             localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
         }
         
+        // Firebase Configuration (You'll need to replace with your own Firebase config)
+        // For now, using a demo config - users should replace this with their own Firebase project
+        const firebaseConfig = {
+            apiKey: "AIzaSyDemoKey_ReplaceWithYourOwn",
+            authDomain: "finhub-chat.firebaseapp.com",
+            databaseURL: "https://finhub-chat-default-rtdb.firebaseio.com/",
+            projectId: "finhub-chat",
+            storageBucket: "finhub-chat.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
+        
+        // Initialize Firebase (only if not already initialized)
+        let firebaseApp, database;
+        try {
+            if (!firebase.apps || firebase.apps.length === 0) {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+            } else {
+                firebaseApp = firebase.app();
+                database = firebase.database();
+            }
+        } catch (e) {
+            console.warn('Firebase not available, using localStorage fallback:', e);
+            database = null;
+        }
+        
         // User Profile System
         function getUserId() {
             let userId = localStorage.getItem('userId');
@@ -3311,26 +3520,49 @@ body.theme-flashcard button:hover {
             const currentUserId = getUserId();
             const userId = targetUserId || currentUserId;
             
-            let profile;
-            if (userId === currentUserId) {
-                // Show own profile
-                const bio = getUserBio(userId);
-                if (bio) {
-                    profile = `ID: ${userId} | Bio: ${bio}`;
-                } else {
-                    profile = `ID: ${userId} | Bio: (No bio set. Use "iam [your bio]" to set one)`;
-                }
+            // Try to get profile from Firebase first (for online users)
+            if (database && userId !== currentUserId) {
+                database.ref(`users/${userId}`).once('value', (snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        const bio = userData.bio || getUserBio(userId);
+                        const isOnline = userData.online || (Date.now() - (userData.lastSeen || 0) < 60000);
+                        const status = isOnline ? '🟢 Online' : '⚫ Offline';
+                        const profile = `ID: ${userId} | ${status} | Bio: ${bio || '(No bio set)'}`;
+                        showCommandFeedback('whoami', profile, true);
+                    } else {
+                        // Fallback to localStorage
+                        const bio = getUserBio(userId);
+                        if (bio) {
+                            showCommandFeedback('whoami', `ID: ${userId} | Bio: ${bio}`, true);
+                        } else {
+                            showCommandFeedback('whoami', `ID: ${userId} | Bio: (User not found or has no bio)`, false);
+                        }
+                    }
+                });
             } else {
-                // Show other user's profile
-                const bio = getUserBio(userId);
-                if (bio) {
-                    profile = `ID: ${userId} | Bio: ${bio}`;
+                // Use localStorage
+                let profile;
+                if (userId === currentUserId) {
+                    // Show own profile
+                    const bio = getUserBio(userId);
+                    if (bio) {
+                        profile = `ID: ${userId} | Bio: ${bio}`;
+                    } else {
+                        profile = `ID: ${userId} | Bio: (No bio set. Use "iam [your bio]" to set one)`;
+                    }
                 } else {
-                    profile = `ID: ${userId} | Bio: (User not found or has no bio)`;
+                    // Show other user's profile
+                    const bio = getUserBio(userId);
+                    if (bio) {
+                        profile = `ID: ${userId} | Bio: ${bio}`;
+                    } else {
+                        profile = `ID: ${userId} | Bio: (User not found or has no bio)`;
+                    }
                 }
+                showCommandFeedback('whoami', profile, true);
             }
             
-            showCommandFeedback('whoami', profile, true);
             const commandInput = document.getElementById('commandInput');
             if (commandInput) {
                 commandInput.value = '';
@@ -3349,6 +3581,19 @@ body.theme-flashcard button:hover {
             
             const userId = getUserId();
             setUserBio(userId, bioText.trim());
+            
+            // Sync bio to Firebase if available
+            if (database) {
+                try {
+                    database.ref(`users/${userId}`).update({
+                        bio: bioText.trim(),
+                        lastSeen: Date.now()
+                    });
+                } catch (e) {
+                    console.warn('Could not sync bio to Firebase:', e);
+                }
+            }
+            
             showCommandFeedback('iam', `Bio updated! Your ID is: ${userId}`, true);
             
             const commandInput = document.getElementById('commandInput');
@@ -3360,6 +3605,175 @@ body.theme-flashcard button:hover {
                 }, 3000);
             }
         }
+        
+        // Chat System
+        let chatListeners = [];
+        let onlineUsersListeners = [];
+        
+        function initChat() {
+            if (!database) {
+                console.warn('Firebase not available - chat will use localStorage only');
+                return;
+            }
+            
+            const userId = getUserId();
+            const userBio = getUserBio(userId);
+            
+            // Mark user as online
+            const userRef = database.ref(`users/${userId}`);
+            userRef.set({
+                id: userId,
+                bio: userBio || '',
+                online: true,
+                lastSeen: Date.now()
+            });
+            
+            // Remove online status when page unloads
+            window.addEventListener('beforeunload', () => {
+                userRef.update({ online: false, lastSeen: Date.now() });
+            });
+        }
+        
+        function loadChatMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            if (!messagesContainer) return;
+            
+            if (database) {
+                // Load from Firebase
+                const messagesRef = database.ref('messages').limitToLast(50);
+                messagesRef.on('value', (snapshot) => {
+                    const messages = snapshot.val() || {};
+                    messagesContainer.innerHTML = '';
+                    
+                    const currentUserId = getUserId();
+                    const messagesArray = Object.entries(messages)
+                        .map(([id, msg]) => ({ id, ...msg }))
+                        .sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    messagesArray.forEach(msg => {
+                        addMessageToUI(msg, msg.userId === currentUserId);
+                    });
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                });
+            } else {
+                // Fallback to localStorage
+                const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+                messagesContainer.innerHTML = '';
+                const currentUserId = getUserId();
+                messages.forEach(msg => {
+                    addMessageToUI(msg, msg.userId === currentUserId);
+                });
+            }
+        }
+        
+        function addMessageToUI(message, isOwn = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            if (!messagesContainer) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isOwn ? 'own-message' : ''}`;
+            
+            const time = new Date(message.timestamp);
+            const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="chat-message-header">
+                    <span class="chat-message-user" onclick="showWhoami('${message.userId}')">${message.userId}</span>
+                    <span class="chat-message-time">${timeStr}</span>
+                </div>
+                <div class="chat-message-text">${escapeHtml(message.text)}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function sendChatMessage(text) {
+            if (!text || !text.trim()) return;
+            
+            const userId = getUserId();
+            const message = {
+                userId: userId,
+                text: text.trim(),
+                timestamp: Date.now()
+            };
+            
+            if (database) {
+                // Send to Firebase
+                database.ref('messages').push(message);
+            } else {
+                // Fallback to localStorage
+                const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+                messages.push(message);
+                // Keep only last 100 messages
+                if (messages.length > 100) {
+                    messages.shift();
+                }
+                localStorage.setItem('chatMessages', JSON.stringify(messages));
+                addMessageToUI(message, true);
+            }
+        }
+        
+        function loadOnlineUsers() {
+            const usersList = document.getElementById('onlineUsersList');
+            if (!usersList) return;
+            
+            if (database) {
+                const usersRef = database.ref('users');
+                usersRef.on('value', (snapshot) => {
+                    const users = snapshot.val() || {};
+                    const currentTime = Date.now();
+                    const onlineThreshold = 60000; // 1 minute
+                    
+                    usersList.innerHTML = '';
+                    
+                    Object.entries(users).forEach(([id, user]) => {
+                        const isOnline = user.online || (currentTime - (user.lastSeen || 0) < onlineThreshold);
+                        if (isOnline) {
+                            const userDiv = document.createElement('div');
+                            userDiv.className = 'online-user-item';
+                            userDiv.innerHTML = `<span class="user-id">${id}</span>${user.bio ? `: ${user.bio.substring(0, 30)}` : ''}`;
+                            userDiv.onclick = () => showWhoami(id);
+                            usersList.appendChild(userDiv);
+                        }
+                    });
+                });
+            } else {
+                // Fallback: show local users
+                usersList.innerHTML = '<div class="online-user-item"><span class="user-id">' + getUserId() + '</span> (Local only)</div>';
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Initialize chat when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initChat();
+            
+            const chatInput = document.getElementById('chatInput');
+            const chatSendBtn = document.getElementById('chatSendBtn');
+            
+            if (chatInput && chatSendBtn) {
+                chatSendBtn.onclick = () => {
+                    const text = chatInput.value;
+                    if (text.trim()) {
+                        sendChatMessage(text);
+                        chatInput.value = '';
+                    }
+                };
+                
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        chatSendBtn.click();
+                    }
+                });
+            }
+        });
         
         // Load clock setting on page load
         loadClockSetting();
@@ -3801,6 +4215,12 @@ body.theme-flashcard button:hover {
                     resetConfirm = false;
                     const targetId = command.substring(7).trim();
                     showWhoami(targetId);
+                } else if (command === 'chat') {
+                    resetConfirm = false;
+                    showPage('chatPage');
+                    loadChatMessages();
+                    loadOnlineUsers();
+                    showCommandFeedback('chat', 'Chat opened!', true);
                 } else if (command === 'whoami') {
                     resetConfirm = false;
                     showWhoami();
@@ -4942,7 +5362,43 @@ body.theme-flashcard button:hover {
         let flashcards = [];
         let flashcardCounter = 0;
         
-        function createFlashcard(x = null, y = null) {
+        function saveFlashcards() {
+            const flashcardData = flashcards.map(flashcard => {
+                const header = flashcard.querySelector('.flashcard-header');
+                const content = flashcard.querySelector('.flashcard-content');
+                return {
+                    id: flashcard.id,
+                    x: parseInt(flashcard.style.left) || 0,
+                    y: parseInt(flashcard.style.top) || 0,
+                    headerText: header ? header.textContent : '',
+                    contentText: content ? (content.textContent === 'Click to write...' ? '' : content.textContent) : ''
+                };
+            });
+            localStorage.setItem('flashcards', JSON.stringify(flashcardData));
+            localStorage.setItem('flashcardCounter', flashcardCounter.toString());
+        }
+        
+        function loadFlashcards() {
+            const savedFlashcards = localStorage.getItem('flashcards');
+            const savedCounter = localStorage.getItem('flashcardCounter');
+            
+            if (savedCounter) {
+                flashcardCounter = parseInt(savedCounter) || 0;
+            }
+            
+            if (savedFlashcards) {
+                try {
+                    const flashcardData = JSON.parse(savedFlashcards);
+                    flashcardData.forEach(data => {
+                        createFlashcard(data.x, data.y, data.id, data.headerText, data.contentText);
+                    });
+                } catch (e) {
+                    console.error('Error loading flashcards:', e);
+                }
+            }
+        }
+        
+        function createFlashcard(x = null, y = null, id = null, headerText = null, contentText = null) {
             if (!document.body.classList.contains('theme-flashcard')) {
                 showCommandFeedback('flashcard', 'Flashcards only work in flashcard theme', false);
                 return;
@@ -4950,8 +5406,17 @@ body.theme-flashcard button:hover {
             
             const flashcard = document.createElement('div');
             flashcard.className = 'flashcard';
-            flashcardCounter++;
-            flashcard.id = `flashcard-${flashcardCounter}`;
+            
+            if (id) {
+                flashcard.id = id;
+                const idNum = parseInt(id.replace('flashcard-', ''));
+                if (idNum > flashcardCounter) {
+                    flashcardCounter = idNum;
+                }
+            } else {
+                flashcardCounter++;
+                flashcard.id = `flashcard-${flashcardCounter}`;
+            }
             
             // Position
             if (x === null || y === null) {
@@ -4964,8 +5429,16 @@ body.theme-flashcard button:hover {
             // Header
             const header = document.createElement('div');
             header.className = 'flashcard-header';
-            header.textContent = `Flashcard ${flashcardCounter}`;
+            header.textContent = headerText || `Flashcard ${flashcardCounter}`;
             header.contentEditable = true;
+            
+            // Save on header edit
+            header.addEventListener('input', () => {
+                saveFlashcards();
+            });
+            header.addEventListener('blur', () => {
+                saveFlashcards();
+            });
             
             // Close button
             const closeBtn = document.createElement('button');
@@ -4974,13 +5447,18 @@ body.theme-flashcard button:hover {
             closeBtn.onclick = () => {
                 flashcard.remove();
                 flashcards = flashcards.filter(f => f !== flashcard);
+                saveFlashcards();
             };
             
             // Content area
             const content = document.createElement('div');
             content.className = 'flashcard-content';
             content.contentEditable = true;
-            content.textContent = 'Click to write...';
+            if (contentText !== null && contentText !== '') {
+                content.textContent = contentText;
+            } else {
+                content.textContent = 'Click to write...';
+            }
             content.onfocus = function() {
                 if (this.textContent === 'Click to write...') {
                     this.textContent = '';
@@ -4990,7 +5468,13 @@ body.theme-flashcard button:hover {
                 if (this.textContent.trim() === '') {
                     this.textContent = 'Click to write...';
                 }
+                saveFlashcards();
             };
+            
+            // Save on content edit
+            content.addEventListener('input', () => {
+                saveFlashcards();
+            });
             
             flashcard.appendChild(closeBtn);
             flashcard.appendChild(header);
@@ -5033,23 +5517,31 @@ body.theme-flashcard button:hover {
                 if (isDragging) {
                     isDragging = false;
                     flashcard.classList.remove('dragging');
+                    saveFlashcards(); // Save position after dragging
                 }
             });
             
-            showCommandFeedback('flashcard', `Created flashcard ${flashcardCounter}`, true);
+            if (!id) {
+                saveFlashcards();
+                showCommandFeedback('flashcard', `Created flashcard ${flashcardCounter}`, true);
+            }
         }
         
         function cleanupFlashcards() {
             flashcards.forEach(flashcard => flashcard.remove());
             flashcards = [];
-            flashcardCounter = 0;
+            // Don't reset counter, keep it for continuity
         }
         
         function setupFlashcardTheme() {
             if (document.body.classList.contains('theme-flashcard')) {
-                // Create a default flashcard
+                // Load saved flashcards
                 setTimeout(() => {
-                    createFlashcard();
+                    loadFlashcards();
+                    // If no saved flashcards, create a default one
+                    if (flashcards.length === 0) {
+                        createFlashcard();
+                    }
                 }, 100);
             } else {
                 cleanupFlashcards();
