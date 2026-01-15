@@ -5414,21 +5414,21 @@ body.theme-miku .visit-counter-number {
             });
             
             commandInput.addEventListener('keydown', (e) => {
-            // Disable commands when on remote desktop
-            const remoteDesktopPage = document.getElementById('remoteDesktopPage');
-            if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
-                // Allow semicolon to work, but block other commands
-                if (e.key !== ';' && e.key !== 'Enter') {
-                    return;
+                // Disable commands when on remote desktop
+                const remoteDesktopPage = document.getElementById('remoteDesktopPage');
+                if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
+                    // Allow semicolon to work, but block other commands
+                    if (e.key !== ';' && e.key !== 'Enter') {
+                        return;
+                    }
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        showCommandFeedback('command', 'Commands disabled on desktop. Use ; to exit.', false);
+                        return;
+                    }
                 }
+                
                 if (e.key === 'Enter') {
-                    e.preventDefault();
-                    showCommandFeedback('command', 'Commands disabled on desktop. Use ; to exit.', false);
-                    return;
-                }
-            }
-            
-            if (e.key === 'Enter') {
                 const command = commandInput.value.toLowerCase().trim();
                 const hasColorPalette = colorPalettes.hasOwnProperty(command);
                 
