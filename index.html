@@ -1634,6 +1634,213 @@ body.theme-ocean button:hover {
     font-size: 40px;
     animation-duration: 18s;
 }
+
+body.theme-clouds {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #B0E0E6 100%) !important;
+    color: #2c3e50;
+    position: relative;
+    overflow: hidden;
+}
+
+body.theme-clouds .command-bar,
+body.theme-clouds .clock-display,
+body.theme-clouds .command-feedback,
+body.theme-clouds .commands-menu {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid #b0c4de !important;
+    color: #2c3e50 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-clouds .command-input {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #b0c4de !important;
+    color: #2c3e50 !important;
+}
+
+body.theme-clouds .command-bar::before {
+    color: #4682B4 !important;
+}
+
+body.theme-clouds .page {
+    background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #B0E0E6 100%) !important;
+}
+
+body.theme-clouds .home-page h1,
+body.theme-clouds .subtitle,
+body.theme-clouds .letters-source {
+    color: #2c3e50 !important;
+    text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+}
+
+body.theme-clouds button {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #b0c4de !important;
+    color: #2c3e50 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-clouds button:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Clouds theme - animated clouds */
+.cloud {
+    position: fixed;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.7;
+    animation: cloudFloat 20s linear infinite;
+}
+
+@keyframes cloudFloat {
+    0% {
+        transform: translateX(-200px) translateY(0);
+    }
+    100% {
+        transform: translateX(calc(100vw + 200px)) translateY(0);
+    }
+}
+
+.cloud::before,
+.cloud::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+}
+
+.cloud::before {
+    width: 50px;
+    height: 50px;
+    top: -25px;
+    left: 10px;
+}
+
+.cloud::after {
+    width: 60px;
+    height: 60px;
+    top: -35px;
+    right: 10px;
+}
+
+body.theme-flashcard {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: #f5f5dc !important;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,.05) 31px, rgba(0,0,0,.05) 32px);
+    color: #2c2c2c;
+    position: relative;
+}
+
+body.theme-flashcard .command-bar,
+body.theme-flashcard .clock-display,
+body.theme-flashcard .command-feedback,
+body.theme-flashcard .commands-menu {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 2px solid #8b7355 !important;
+    color: #2c2c2c !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-flashcard .command-input {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 2px solid #8b7355 !important;
+    color: #2c2c2c !important;
+}
+
+body.theme-flashcard .command-bar::before {
+    color: #8b4513 !important;
+}
+
+body.theme-flashcard .page {
+    background: #f5f5dc !important;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,.05) 31px, rgba(0,0,0,.05) 32px);
+}
+
+body.theme-flashcard .home-page h1,
+body.theme-flashcard .subtitle,
+body.theme-flashcard .letters-source {
+    color: #2c2c2c !important;
+}
+
+body.theme-flashcard button {
+    background: #fffef7 !important;
+    border: 2px solid #8b7355 !important;
+    color: #2c2c2c !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.theme-flashcard button:hover {
+    background: #f5f5dc !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Flashcard theme - interactive flashcards */
+.flashcard {
+    position: fixed;
+    width: 300px;
+    height: 200px;
+    background: #fffef7;
+    border: 3px solid #8b7355;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    cursor: pointer;
+    z-index: 10;
+    font-family: 'Georgia', serif;
+    font-size: 18px;
+    color: #2c2c2c;
+    overflow: hidden;
+    resize: both;
+    min-width: 200px;
+    min-height: 150px;
+}
+
+.flashcard.dragging {
+    opacity: 0.8;
+    z-index: 1000;
+}
+
+.flashcard-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #8b7355;
+    user-select: none;
+    cursor: move;
+}
+
+.flashcard-content {
+    min-height: 100px;
+    outline: none;
+    overflow-y: auto;
+}
+
+.flashcard-close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: #f85149;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    z-index: 11;
+}
+
+.flashcard-close:hover {
+    background: #d73a49;
+}
     </style>
 </head>
 <body>
@@ -2143,10 +2350,16 @@ body.theme-ocean button:hover {
                     { name: 'theme paper', desc: 'Paper notebook with grid lines' },
                     { name: 'theme space', desc: 'Space theme with interactive stars' },
                     { name: 'theme ocean', desc: 'Ocean theme with wave animation' },
+                    { name: 'theme clouds', desc: 'Clouds theme with animated clouds' },
+                    { name: 'theme flashcard', desc: 'Flashcard theme with writable flashcards' },
                     { name: 'stars', desc: 'Spawn more stars (space theme only)' },
+                    { name: 'flashcard', desc: 'Create a new flashcard (flashcard theme only)' },
+                    { name: 'fc', desc: 'Create a new flashcard (flashcard theme only)' },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
+                    { name: 'clock', desc: 'Toggle clock (true/false)' },
+                    { name: 'whoami', desc: 'Display user profile' },
                 ]
             };
             
@@ -3180,15 +3393,16 @@ body.theme-ocean button:hover {
                     }, 2000);
                 } else if (command === 'clock') {
                     resetConfirm = false;
+                    const wasEnabled = clockEnabled;
                     if (clockEnabled) {
                         hideClock();
-                        showCommandFeedback('clock', 'Clock disabled', true);
+                        showCommandFeedback('clock', `Clock: ${wasEnabled} → false`, true);
                     } else {
                         showClock();
-                        showCommandFeedback('clock', 'Clock enabled', true);
+                        showCommandFeedback('clock', `Clock: ${wasEnabled} → true`, true);
                     }
                     commandInput.value = '';
-                    commandInput.placeholder = `Clock: ${clockEnabled ? 'enabled' : 'disabled'}`;
+                    commandInput.placeholder = `Clock: ${clockEnabled}`;
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
@@ -3200,6 +3414,14 @@ body.theme-ocean button:hover {
                     spawnMoreStars(50);
                     commandInput.value = '';
                     commandInput.placeholder = 'More stars spawned!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'flashcard' || command === 'fc') {
+                    resetConfirm = false;
+                    createFlashcard();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Flashcard created!';
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
@@ -3734,7 +3956,7 @@ body.theme-ocean button:hover {
         }
         
         // Theme System
-        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean'];
+        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean', 'clouds', 'flashcard'];
         let currentTheme = 'dark'; // Default theme
         
         // Load saved theme
@@ -4263,6 +4485,178 @@ body.theme-ocean button:hover {
             }
         }
         
+        // Clouds theme - animated clouds
+        let cloudElements = [];
+        let cloudInterval = null;
+        
+        function createCloud() {
+            if (!document.body.classList.contains('theme-clouds')) return;
+            
+            const cloud = document.createElement('div');
+            cloud.className = 'cloud';
+            const size = 60 + Math.random() * 80; // Random size between 60-140px
+            cloud.style.width = size + 'px';
+            cloud.style.height = size * 0.6 + 'px';
+            cloud.style.top = (Math.random() * 60 + 10) + '%'; // Random vertical position
+            cloud.style.left = '-200px';
+            cloud.style.animationDuration = (15 + Math.random() * 10) + 's'; // Random speed
+            cloud.style.animationDelay = (Math.random() * 5) + 's';
+            document.body.appendChild(cloud);
+            cloudElements.push(cloud);
+            
+            // Remove cloud after animation
+            setTimeout(() => {
+                if (cloud.parentNode) {
+                    cloud.remove();
+                    cloudElements = cloudElements.filter(c => c !== cloud);
+                }
+            }, 30000);
+        }
+        
+        function cleanupClouds() {
+            cloudElements.forEach(cloud => cloud.remove());
+            cloudElements = [];
+            if (cloudInterval) {
+                clearInterval(cloudInterval);
+                cloudInterval = null;
+            }
+        }
+        
+        function setupCloudsTheme() {
+            if (document.body.classList.contains('theme-clouds')) {
+                // Create initial clouds
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => createCloud(), i * 2000);
+                }
+                // Create new clouds periodically
+                cloudInterval = setInterval(() => {
+                    if (cloudElements.length < 8) {
+                        createCloud();
+                    }
+                }, 5000);
+            } else {
+                cleanupClouds();
+            }
+        }
+        
+        // Flashcard theme - interactive flashcards
+        let flashcards = [];
+        let flashcardCounter = 0;
+        
+        function createFlashcard(x = null, y = null) {
+            if (!document.body.classList.contains('theme-flashcard')) {
+                showCommandFeedback('flashcard', 'Flashcards only work in flashcard theme', false);
+                return;
+            }
+            
+            const flashcard = document.createElement('div');
+            flashcard.className = 'flashcard';
+            flashcardCounter++;
+            flashcard.id = `flashcard-${flashcardCounter}`;
+            
+            // Position
+            if (x === null || y === null) {
+                x = window.innerWidth / 2 - 150;
+                y = window.innerHeight / 2 - 100;
+            }
+            flashcard.style.left = x + 'px';
+            flashcard.style.top = y + 'px';
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'flashcard-header';
+            header.textContent = `Flashcard ${flashcardCounter}`;
+            header.contentEditable = true;
+            
+            // Close button
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'flashcard-close';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                flashcard.remove();
+                flashcards = flashcards.filter(f => f !== flashcard);
+            };
+            
+            // Content area
+            const content = document.createElement('div');
+            content.className = 'flashcard-content';
+            content.contentEditable = true;
+            content.textContent = 'Click to write...';
+            content.onfocus = function() {
+                if (this.textContent === 'Click to write...') {
+                    this.textContent = '';
+                }
+            };
+            content.onblur = function() {
+                if (this.textContent.trim() === '') {
+                    this.textContent = 'Click to write...';
+                }
+            };
+            
+            flashcard.appendChild(closeBtn);
+            flashcard.appendChild(header);
+            flashcard.appendChild(content);
+            document.body.appendChild(flashcard);
+            flashcards.push(flashcard);
+            
+            // Make draggable
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            
+            header.addEventListener('mousedown', (e) => {
+                if (e.target === header || e.target === closeBtn) {
+                    isDragging = true;
+                    flashcard.classList.add('dragging');
+                    initialX = e.clientX - flashcard.offsetLeft;
+                    initialY = e.clientY - flashcard.offsetTop;
+                }
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    
+                    // Keep within bounds
+                    currentX = Math.max(0, Math.min(window.innerWidth - flashcard.offsetWidth, currentX));
+                    currentY = Math.max(0, Math.min(window.innerHeight - flashcard.offsetHeight, currentY));
+                    
+                    flashcard.style.left = currentX + 'px';
+                    flashcard.style.top = currentY + 'px';
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    flashcard.classList.remove('dragging');
+                }
+            });
+            
+            showCommandFeedback('flashcard', `Created flashcard ${flashcardCounter}`, true);
+        }
+        
+        function cleanupFlashcards() {
+            flashcards.forEach(flashcard => flashcard.remove());
+            flashcards = [];
+            flashcardCounter = 0;
+        }
+        
+        function setupFlashcardTheme() {
+            if (document.body.classList.contains('theme-flashcard')) {
+                // Create a default flashcard
+                setTimeout(() => {
+                    createFlashcard();
+                }, 100);
+            } else {
+                cleanupFlashcards();
+            }
+        }
+        
         // Update applyTheme to handle ocean and paper themes (consolidating all wrappers)
         const originalApplyTheme4 = applyTheme;
         applyTheme = function(themeName, save = true) {
@@ -4286,6 +4680,16 @@ body.theme-ocean button:hover {
                 cleanupPaperDrawing();
             }
             
+            // Cleanup if switching away from clouds
+            if (document.body.classList.contains('theme-clouds') && themeName !== 'clouds') {
+                cleanupClouds();
+            }
+            
+            // Cleanup if switching away from flashcard
+            if (document.body.classList.contains('theme-flashcard') && themeName !== 'flashcard') {
+                cleanupFlashcards();
+            }
+            
             originalApplyTheme4(themeName, save);
             
             // Setup matrix handler if switching to matrix
@@ -4299,6 +4703,12 @@ body.theme-ocean button:hover {
             
             // Setup paper theme if switching to it
             setupPaperTheme();
+            
+            // Setup clouds theme if switching to it
+            setupCloudsTheme();
+            
+            // Setup flashcard theme if switching to it
+            setupFlashcardTheme();
         };
         
         // Update window.applyTheme to use the consolidated version
@@ -4308,6 +4718,8 @@ body.theme-ocean button:hover {
         setTimeout(() => {
             setupOceanTheme();
             setupPaperTheme();
+            setupCloudsTheme();
+            setupFlashcardTheme();
         }, 150);
         
         // Handle window resize for paper canvas
