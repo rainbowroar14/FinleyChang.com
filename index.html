@@ -1178,6 +1178,173 @@
             cursor: not-allowed;
         }
         
+        .chat-back-btn {
+            padding: 8px 15px;
+            background: #30363d;
+            border: 1px solid #484f58;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .chat-back-btn:hover {
+            background: #484f58;
+        }
+        
+        /* Friends Modal */
+        .friends-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .friends-modal.show {
+            display: flex;
+        }
+        
+        .friends-modal-content {
+            background: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #c9d1d9;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .friends-modal-content h2 {
+            color: #58a6ff;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .friends-list {
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .friend-item {
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .friend-item:hover {
+            background: rgba(22, 27, 34, 0.9);
+            border-color: #58a6ff;
+            transform: translateX(5px);
+        }
+        
+        .friend-avatar {
+            font-size: 32px;
+        }
+        
+        .friend-info {
+            flex: 1;
+        }
+        
+        .friend-name {
+            font-weight: bold;
+            color: #58a6ff;
+            font-size: 14px;
+        }
+        
+        .friend-bio {
+            color: #8b949e;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        
+        .friends-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .friends-close-btn {
+            padding: 10px 25px;
+            background: #30363d;
+            border: none;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .friends-close-btn:hover {
+            background: #484f58;
+        }
+        
+        /* Visit Counter */
+        .visit-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 2px solid #58a6ff;
+            border-radius: 12px;
+            padding: 15px 20px;
+            z-index: 998;
+            box-shadow: 0 4px 20px rgba(88, 166, 255, 0.3);
+            text-align: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 20px rgba(88, 166, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 30px rgba(88, 166, 255, 0.6), 0 0 40px rgba(88, 166, 255, 0.3);
+            }
+        }
+        
+        .visit-counter-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(88, 166, 255, 0.8), 0 0 30px rgba(88, 166, 255, 0.4);
+            }
+        }
+        
+        .visit-counter-label {
+            font-size: 11px;
+            color: #8b949e;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
         .command-history-header {
             color: #58a6ff;
             font-weight: bold;
@@ -2846,6 +3013,40 @@ body.theme-flashcard button:hover {
         </div>
     </div>
     
+    <!-- Friends List Modal -->
+    <div class="friends-modal" id="friendsModal">
+        <div class="friends-modal-content">
+            <h2>👥 My Friends</h2>
+            <div class="friends-list" id="friendsList">
+                <!-- Friends will be populated here -->
+            </div>
+            <div class="friends-buttons">
+                <button class="friends-close-btn" id="friendsCloseBtn">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Private Chat Page -->
+    <div class="page hidden" id="privateChatPage">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2 id="privateChatTitle">💬 Private Chat</h2>
+                <button class="chat-back-btn" id="privateChatBackBtn">← Back to Friends</button>
+            </div>
+            <div class="chat-messages" id="privateChatMessages"></div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="privateChatInput" placeholder="Type a message..." maxlength="500">
+                <button class="chat-send-btn" id="privateChatSendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Visit Counter -->
+    <div class="visit-counter" id="visitCounter">
+        <div class="visit-counter-number" id="visitCounterNumber">0</div>
+        <div class="visit-counter-label">Total Visits</div>
+    </div>
+    
     <!-- Command history toggle -->
     <div class="command-history-toggle" id="commandHistoryToggle" title="Click to toggle command history">📜 History</div>
     
@@ -3976,6 +4177,58 @@ body.theme-flashcard button:hover {
                     }
                 });
             }
+            
+            // Friends modal
+            const friendsCloseBtn = document.getElementById('friendsCloseBtn');
+            if (friendsCloseBtn) {
+                friendsCloseBtn.addEventListener('click', closeFriendsList);
+            }
+            
+            const friendsModal = document.getElementById('friendsModal');
+            if (friendsModal) {
+                friendsModal.addEventListener('click', (e) => {
+                    if (e.target === friendsModal) {
+                        closeFriendsList();
+                    }
+                });
+            }
+            
+            // Private chat
+            const privateChatBackBtn = document.getElementById('privateChatBackBtn');
+            if (privateChatBackBtn) {
+                privateChatBackBtn.addEventListener('click', () => {
+                    showPage('mainPage');
+                    openFriendsList();
+                });
+            }
+            
+            const privateChatSendBtn = document.getElementById('privateChatSendBtn');
+            const privateChatInput = document.getElementById('privateChatInput');
+            
+            if (privateChatSendBtn && privateChatInput) {
+                privateChatSendBtn.onclick = () => {
+                    if (currentPrivateChatWith) {
+                        const text = privateChatInput.value;
+                        if (text.trim()) {
+                            sendPrivateMessage(text, currentPrivateChatWith);
+                            privateChatInput.value = '';
+                        }
+                    }
+                };
+                
+                privateChatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && currentPrivateChatWith) {
+                        const text = privateChatInput.value;
+                        if (text.trim()) {
+                            sendPrivateMessage(text, currentPrivateChatWith);
+                            privateChatInput.value = '';
+                        }
+                    }
+                });
+            }
+            
+            // Update visit counter
+            updateVisitCounter();
         });
         
         // Load command history from localStorage
@@ -4135,8 +4388,445 @@ body.theme-flashcard button:hover {
             localStorage.setItem('userAvatars', JSON.stringify(avatars));
         }
         
+        // Friends System
+        function getFriends() {
+            const friends = JSON.parse(localStorage.getItem('friends') || '[]');
+            return friends;
+        }
+        
+        function addFriend(friendId) {
+            const friends = getFriends();
+            if (!friends.includes(friendId)) {
+                friends.push(friendId);
+                localStorage.setItem('friends', JSON.stringify(friends));
+                
+                // Sync to Firebase if available
+                if (database) {
+                    try {
+                        const userId = getUserId();
+                        database.ref(`users/${userId}/friends`).set(friends);
+                    } catch (e) {
+                        console.warn('Could not sync friends to Firebase:', e);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        function removeFriend(friendId) {
+            const friends = getFriends();
+            const index = friends.indexOf(friendId);
+            if (index > -1) {
+                friends.splice(index, 1);
+                localStorage.setItem('friends', JSON.stringify(friends));
+                
+                // Sync to Firebase if available
+                if (database) {
+                    try {
+                        const userId = getUserId();
+                        database.ref(`users/${userId}/friends`).set(friends);
+                    } catch (e) {
+                        console.warn('Could not sync friends to Firebase:', e);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        function isFriend(userId) {
+            const friends = getFriends();
+            return friends.includes(userId);
+        }
+        
+        function openFriendsList() {
+            const modal = document.getElementById('friendsModal');
+            const friendsList = document.getElementById('friendsList');
+            
+            if (!modal || !friendsList) return;
+            
+            const friends = getFriends();
+            
+            if (friends.length === 0) {
+                friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [id]" to add someone!</div>';
+            } else {
+                friendsList.innerHTML = '';
+                friends.forEach(friendId => {
+                    const friendItem = document.createElement('div');
+                    friendItem.className = 'friend-item';
+                    
+                    const avatar = getUserAvatar(friendId);
+                    const bio = getUserBio(friendId) || 'No bio';
+                    
+                    friendItem.innerHTML = `
+                        <div class="friend-avatar">${avatar}</div>
+                        <div class="friend-info">
+                            <div class="friend-name">${friendId}</div>
+                            <div class="friend-bio">${bio.substring(0, 50)}${bio.length > 50 ? '...' : ''}</div>
+                        </div>
+                    `;
+                    
+                    friendItem.onclick = () => {
+                        openPrivateChat(friendId);
+                        closeFriendsList();
+                    };
+                    
+                    friendsList.appendChild(friendItem);
+                });
+            }
+            
+            modal.classList.add('show');
+        }
+        
+        function closeFriendsList() {
+            const modal = document.getElementById('friendsModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+        
+        function openPrivateChat(friendId) {
+            currentPrivateChatWith = friendId;
+            const title = document.getElementById('privateChatTitle');
+            const avatar = getUserAvatar(friendId);
+            if (title) {
+                title.textContent = `💬 Private Chat with ${avatar} ${friendId}`;
+            }
+            showPage('privateChatPage');
+            loadPrivateChatMessages(friendId);
+        }
+        
+        function loadPrivateChatMessages(friendId) {
+            const messagesContainer = document.getElementById('privateChatMessages');
+            if (!messagesContainer) return;
+            
+            const currentUserId = getUserId();
+            const chatId = [currentUserId, friendId].sort().join('_');
+            
+            if (database) {
+                const messagesRef = database.ref(`privateChats/${chatId}/messages`).limitToLast(50);
+                messagesRef.on('value', (snapshot) => {
+                    const messages = snapshot.val() || {};
+                    messagesContainer.innerHTML = '';
+                    
+                    const messagesArray = Object.entries(messages)
+                        .map(([id, msg]) => ({ id, ...msg }))
+                        .sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    messagesArray.forEach(msg => {
+                        addPrivateMessageToUI(msg, msg.userId === currentUserId);
+                    });
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                });
+            } else {
+                // Fallback to localStorage
+                const messages = JSON.parse(localStorage.getItem(`privateChat_${chatId}`) || '[]');
+                messagesContainer.innerHTML = '';
+                messages.forEach(msg => {
+                    addPrivateMessageToUI(msg, msg.userId === currentUserId);
+                });
+            }
+        }
+        
+        function addPrivateMessageToUI(message, isOwn = false) {
+            const messagesContainer = document.getElementById('privateChatMessages');
+            if (!messagesContainer) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isOwn ? 'own-message' : ''}`;
+            
+            const time = new Date(message.timestamp);
+            const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const avatar = getUserAvatar(message.userId);
+            
+            messageDiv.innerHTML = `
+                <div class="chat-message-header">
+                    <span class="chat-message-user">${avatar} ${message.userId}</span>
+                    <span class="chat-message-time">${timeStr}</span>
+                </div>
+                <div class="chat-message-text">${escapeHtml(message.text)}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function sendPrivateMessage(text, friendId) {
+            if (!text || !text.trim()) return;
+            
+            const currentUserId = getUserId();
+            const chatId = [currentUserId, friendId].sort().join('_');
+            const message = {
+                userId: currentUserId,
+                text: text.trim(),
+                timestamp: Date.now()
+            };
+            
+            if (database) {
+                database.ref(`privateChats/${chatId}/messages`).push(message);
+            } else {
+                const messages = JSON.parse(localStorage.getItem(`privateChat_${chatId}`) || '[]');
+                messages.push(message);
+                if (messages.length > 100) {
+                    messages.shift();
+                }
+                localStorage.setItem(`privateChat_${chatId}`, JSON.stringify(messages));
+                addPrivateMessageToUI(message, true);
+            }
+        }
+        
+        // Visit Counter
+        function updateVisitCounter() {
+            const counter = document.getElementById('visitCounterNumber');
+            if (!counter) return;
+            
+            if (database) {
+                const visitsRef = database.ref('siteStats/visits');
+                visitsRef.transaction((current) => {
+                    return (current || 0) + 1;
+                }, (error, committed, snapshot) => {
+                    if (!error && committed && snapshot) {
+                        counter.textContent = snapshot.val().toLocaleString();
+                    }
+                });
+                
+                // Listen for updates
+                visitsRef.on('value', (snapshot) => {
+                    const visits = snapshot.val() || 0;
+                    counter.textContent = visits.toLocaleString();
+                });
+            } else {
+                // Fallback to localStorage
+                let visits = parseInt(localStorage.getItem('siteVisits') || '0');
+                visits++;
+                localStorage.setItem('siteVisits', visits.toString());
+                counter.textContent = visits.toLocaleString();
+            }
+        }
+        
         function getAllUserBios() {
             return JSON.parse(localStorage.getItem('userBios') || '{}');
+        }
+        
+        // Friends System
+        let currentPrivateChatWith = null;
+        function getFriends() {
+            const friends = JSON.parse(localStorage.getItem('friends') || '[]');
+            return friends;
+        }
+        
+        function addFriend(friendId) {
+            const friends = getFriends();
+            if (!friends.includes(friendId)) {
+                friends.push(friendId);
+                localStorage.setItem('friends', JSON.stringify(friends));
+                
+                // Sync to Firebase if available
+                if (database) {
+                    try {
+                        const userId = getUserId();
+                        database.ref(`users/${userId}/friends`).set(friends);
+                    } catch (e) {
+                        console.warn('Could not sync friends to Firebase:', e);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        function removeFriend(friendId) {
+            const friends = getFriends();
+            const index = friends.indexOf(friendId);
+            if (index > -1) {
+                friends.splice(index, 1);
+                localStorage.setItem('friends', JSON.stringify(friends));
+                
+                // Sync to Firebase if available
+                if (database) {
+                    try {
+                        const userId = getUserId();
+                        database.ref(`users/${userId}/friends`).set(friends);
+                    } catch (e) {
+                        console.warn('Could not sync friends to Firebase:', e);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        function isFriend(userId) {
+            const friends = getFriends();
+            return friends.includes(userId);
+        }
+        
+        function openFriendsList() {
+            const modal = document.getElementById('friendsModal');
+            const friendsList = document.getElementById('friendsList');
+            
+            if (!modal || !friendsList) return;
+            
+            const friends = getFriends();
+            
+            if (friends.length === 0) {
+                friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [id]" to add someone!</div>';
+            } else {
+                friendsList.innerHTML = '';
+                friends.forEach(friendId => {
+                    const friendItem = document.createElement('div');
+                    friendItem.className = 'friend-item';
+                    
+                    const avatar = getUserAvatar(friendId);
+                    const bio = getUserBio(friendId) || 'No bio';
+                    
+                    friendItem.innerHTML = `
+                        <div class="friend-avatar">${avatar}</div>
+                        <div class="friend-info">
+                            <div class="friend-name">${friendId}</div>
+                            <div class="friend-bio">${bio.substring(0, 50)}${bio.length > 50 ? '...' : ''}</div>
+                        </div>
+                    `;
+                    
+                    friendItem.onclick = () => {
+                        openPrivateChat(friendId);
+                        closeFriendsList();
+                    };
+                    
+                    friendsList.appendChild(friendItem);
+                });
+            }
+            
+            modal.classList.add('show');
+        }
+        
+        function closeFriendsList() {
+            const modal = document.getElementById('friendsModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+        
+        function openPrivateChat(friendId) {
+            currentPrivateChatWith = friendId;
+            const title = document.getElementById('privateChatTitle');
+            const avatar = getUserAvatar(friendId);
+            if (title) {
+                title.textContent = `💬 Private Chat with ${avatar} ${friendId}`;
+            }
+            showPage('privateChatPage');
+            loadPrivateChatMessages(friendId);
+        }
+        
+        function loadPrivateChatMessages(friendId) {
+            const messagesContainer = document.getElementById('privateChatMessages');
+            if (!messagesContainer) return;
+            
+            const currentUserId = getUserId();
+            const chatId = [currentUserId, friendId].sort().join('_');
+            
+            if (database) {
+                const messagesRef = database.ref(`privateChats/${chatId}/messages`).limitToLast(50);
+                messagesRef.on('value', (snapshot) => {
+                    const messages = snapshot.val() || {};
+                    messagesContainer.innerHTML = '';
+                    
+                    const messagesArray = Object.entries(messages)
+                        .map(([id, msg]) => ({ id, ...msg }))
+                        .sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    messagesArray.forEach(msg => {
+                        addPrivateMessageToUI(msg, msg.userId === currentUserId);
+                    });
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                });
+            } else {
+                // Fallback to localStorage
+                const messages = JSON.parse(localStorage.getItem(`privateChat_${chatId}`) || '[]');
+                messagesContainer.innerHTML = '';
+                messages.forEach(msg => {
+                    addPrivateMessageToUI(msg, msg.userId === currentUserId);
+                });
+            }
+        }
+        
+        function addPrivateMessageToUI(message, isOwn = false) {
+            const messagesContainer = document.getElementById('privateChatMessages');
+            if (!messagesContainer) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isOwn ? 'own-message' : ''}`;
+            
+            const time = new Date(message.timestamp);
+            const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const avatar = getUserAvatar(message.userId);
+            
+            messageDiv.innerHTML = `
+                <div class="chat-message-header">
+                    <span class="chat-message-user">${avatar} ${message.userId}</span>
+                    <span class="chat-message-time">${timeStr}</span>
+                </div>
+                <div class="chat-message-text">${escapeHtml(message.text)}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function sendPrivateMessage(text, friendId) {
+            if (!text || !text.trim()) return;
+            
+            const currentUserId = getUserId();
+            const chatId = [currentUserId, friendId].sort().join('_');
+            const message = {
+                userId: currentUserId,
+                text: text.trim(),
+                timestamp: Date.now()
+            };
+            
+            if (database) {
+                database.ref(`privateChats/${chatId}/messages`).push(message);
+            } else {
+                const messages = JSON.parse(localStorage.getItem(`privateChat_${chatId}`) || '[]');
+                messages.push(message);
+                if (messages.length > 100) {
+                    messages.shift();
+                }
+                localStorage.setItem(`privateChat_${chatId}`, JSON.stringify(messages));
+                addPrivateMessageToUI(message, true);
+            }
+        }
+        
+        // Visit Counter
+        function updateVisitCounter() {
+            const counter = document.getElementById('visitCounterNumber');
+            if (!counter) return;
+            
+            if (database) {
+                const visitsRef = database.ref('siteStats/visits');
+                visitsRef.transaction((current) => {
+                    return (current || 0) + 1;
+                }, (error, committed, snapshot) => {
+                    if (!error && committed && snapshot) {
+                        counter.textContent = snapshot.val().toLocaleString();
+                    }
+                });
+                
+                // Listen for updates
+                visitsRef.on('value', (snapshot) => {
+                    const visits = snapshot.val() || 0;
+                    counter.textContent = visits.toLocaleString();
+                });
+            } else {
+                // Fallback to localStorage
+                let visits = parseInt(localStorage.getItem('siteVisits') || '0');
+                visits++;
+                localStorage.setItem('siteVisits', visits.toString());
+                counter.textContent = visits.toLocaleString();
+            }
         }
         
         // Whoami profile
@@ -4842,12 +5532,37 @@ body.theme-flashcard button:hover {
                 } else if (command === 'edit') {
                     resetConfirm = false;
                     openEditMenu();
+                } else if (command.startsWith('friend ')) {
+                    resetConfirm = false;
+                    const friendId = command.substring(7).trim();
+                    if (!friendId) {
+                        showCommandFeedback('friend', 'Please provide a user ID. Usage: friend [user id]', false);
+                    } else if (friendId === getUserId()) {
+                        showCommandFeedback('friend', 'You cannot add yourself as a friend!', false);
+                    } else {
+                        if (addFriend(friendId)) {
+                            showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
+                        } else {
+                            showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                        }
+                    }
+                } else if (command === 'friends') {
+                    resetConfirm = false;
+                    openFriendsList();
                 } else if (command === 'chat') {
                     resetConfirm = false;
-                    showPage('chatPage');
-                    loadChatMessages();
-                    loadOnlineUsers();
-                    showCommandFeedback('chat', 'Chat opened!', true);
+                    const chatPage = document.getElementById('chatPage');
+                    if (chatPage && !chatPage.classList.contains('hidden')) {
+                        // Chat is open, close it
+                        showPage('mainPage');
+                        showCommandFeedback('chat', 'Chat closed!', true);
+                    } else {
+                        // Chat is closed, open it
+                        showPage('chatPage');
+                        loadChatMessages();
+                        loadOnlineUsers();
+                        showCommandFeedback('chat', 'Chat opened!', true);
+                    }
                 } else if (command === 'whoami') {
                     resetConfirm = false;
                     showWhoami();
