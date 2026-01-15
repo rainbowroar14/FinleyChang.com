@@ -3462,31 +3462,38 @@ body.theme-flashcard button:hover {
             localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
         }
         
-        // Firebase Configuration (You'll need to replace with your own Firebase config)
-        // For now, using a demo config - users should replace this with their own Firebase project
+        // Firebase Configuration
+        // Your Firebase config for online chat and profile sharing
         const firebaseConfig = {
-            apiKey: "AIzaSyDemoKey_ReplaceWithYourOwn",
-            authDomain: "finhub-chat.firebaseapp.com",
-            databaseURL: "https://finhub-chat-default-rtdb.firebaseio.com/",
-            projectId: "finhub-chat",
-            storageBucket: "finhub-chat.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef"
+            apiKey: "AIzaSyB_jv2W9Hvt0QFJlVN4ZcdrT1mtwP-fWFE",
+            authDomain: "finhub-41eaf.firebaseapp.com",
+            databaseURL: "https://finhub-41eaf-default-rtdb.firebaseio.com",
+            projectId: "finhub-41eaf",
+            storageBucket: "finhub-41eaf.firebasestorage.app",
+            messagingSenderId: "96393027883",
+            appId: "1:96393027883:web:4db59a7a6d020c7eba256e",
+            measurementId: "G-GDEJMDDEG6"
         };
         
-        // Initialize Firebase (only if not already initialized)
+        // Initialize Firebase (only if config is provided)
         let firebaseApp, database;
-        try {
-            if (!firebase.apps || firebase.apps.length === 0) {
-                firebaseApp = firebase.initializeApp(firebaseConfig);
-                database = firebase.database();
-            } else {
-                firebaseApp = firebase.app();
-                database = firebase.database();
+        if (firebaseConfig && typeof firebase !== 'undefined') {
+            try {
+                if (!firebase.apps || firebase.apps.length === 0) {
+                    firebaseApp = firebase.initializeApp(firebaseConfig);
+                    database = firebase.database();
+                    console.log('✅ Firebase connected - Online features enabled!');
+                } else {
+                    firebaseApp = firebase.app();
+                    database = firebase.database();
+                }
+            } catch (e) {
+                console.warn('⚠️ Firebase initialization failed, using localStorage fallback:', e);
+                database = null;
             }
-        } catch (e) {
-            console.warn('Firebase not available, using localStorage fallback:', e);
+        } else {
             database = null;
+            console.log('ℹ️ Running in offline mode (localStorage). To enable online chat, configure Firebase.');
         }
         
         // User Profile System
