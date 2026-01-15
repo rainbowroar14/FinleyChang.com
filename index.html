@@ -9196,6 +9196,173 @@ body.theme-flashcard button:hover {
             startGame();
         }
         
+        // Chatbot AI response generator
+        function generateBotResponse(message) {
+            const msg = message.toLowerCase().trim();
+            
+            // Greetings
+            if (msg.match(/^(hi|hello|hey|greetings|sup|what's up|howdy)/)) {
+                const greetings = ['Hello! How can I help you?', 'Hi there! What can I do for you?', 'Hey! Nice to meet you!', 'Hello! How are you doing?'];
+                return greetings[Math.floor(Math.random() * greetings.length)];
+            }
+            
+            // How are you
+            if (msg.match(/how are you|how's it going|how do you feel/)) {
+                const responses = ['I\'m doing great, thanks for asking!', 'I\'m doing well! How about you?', 'I\'m good! Thanks!', 'Pretty good! What about you?'];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // What is / what are questions
+            if (msg.match(/^what (is|are) (.+)\?*$/)) {
+                const match = msg.match(/^what (is|are) (.+)\?*$/);
+                const thing = match[2];
+                if (thing.includes('your name') || thing.includes('you called')) {
+                    return 'I\'m just a chatbot! You can call me Chatbot.';
+                }
+                if (thing.includes('time')) {
+                    return `The current time is ${new Date().toLocaleTimeString()}.`;
+                }
+                if (thing.includes('date')) {
+                    return `Today is ${new Date().toLocaleDateString()}.`;
+                }
+                if (thing.includes('weather')) {
+                    return 'I don\'t have access to weather data, but I hope it\'s nice where you are!';
+                }
+                return `I\'m not entirely sure what "${thing}" is. Could you tell me more about it?`;
+            }
+            
+            // Who questions
+            if (msg.match(/^who (is|are) (.+)\?*$/)) {
+                const match = msg.match(/^who (is|are) (.+)\?*$/);
+                const person = match[2];
+                if (person.includes('you') || person.includes('chatbot')) {
+                    return 'I\'m a helpful chatbot! I try to answer questions and have conversations.';
+                }
+                return `I don\'t know much about "${person}". Could you tell me more?`;
+            }
+            
+            // Why questions
+            if (msg.match(/^why (.+)\?*$/)) {
+                const match = msg.match(/^why (.+)\?*$/);
+                const thing = match[1];
+                if (thing.includes('sky') && thing.includes('blue')) {
+                    return 'The sky appears blue because of how light scatters in the atmosphere!';
+                }
+                return `That\'s an interesting question about "${thing}". I\'m not entirely sure, but I\'d love to learn more!`;
+            }
+            
+            // How questions
+            if (msg.match(/^how (.+)\?*$/)) {
+                const match = msg.match(/^how (.+)\?*$/);
+                const thing = match[1];
+                if (thing.includes('work') || thing.includes('do')) {
+                    return 'I work by analyzing your messages and trying to provide helpful responses!';
+                }
+                if (thing.includes('old')) {
+                    return 'I was just created, so I\'m very new!';
+                }
+                return `I\'m not sure how "${thing}" works exactly. Could you explain it to me?`;
+            }
+            
+            // Yes/No questions
+            if (msg.match(/\?$/) && (msg.includes('can you') || msg.includes('do you') || msg.includes('are you') || msg.includes('will you'))) {
+                if (msg.includes('help')) {
+                    return 'Yes, I\'d be happy to help! What do you need?';
+                }
+                if (msg.includes('understand')) {
+                    return 'I try my best to understand! Sometimes I might not get everything, but I do my best.';
+                }
+                if (msg.includes('smart') || msg.includes('intelligent')) {
+                    return 'I try to be helpful! I\'m still learning, but I do my best.';
+                }
+                const yesNo = Math.random() > 0.5;
+                return yesNo ? 'Yes, I think so!' : 'Hmm, I\'m not entirely sure about that.';
+            }
+            
+            // Commands/requests
+            if (msg.match(/^(tell me|explain|describe|give me)/)) {
+                const match = msg.match(/^(tell me|explain|describe|give me) (.+)/);
+                if (match) {
+                    const thing = match[2];
+                    if (thing.includes('joke')) {
+                        const jokes = [
+                            'Why don\'t scientists trust atoms? Because they make up everything!',
+                            'Why did the scarecrow win an award? He was outstanding in his field!',
+                            'What do you call a fake noodle? An impasta!',
+                            'Why don\'t eggs tell jokes? They\'d crack each other up!'
+                        ];
+                        return jokes[Math.floor(Math.random() * jokes.length)];
+                    }
+                    if (thing.includes('fact')) {
+                        const facts = [
+                            'Octopuses have three hearts!',
+                            'A group of flamingos is called a flamboyance!',
+                            'Honey never spoils - archaeologists have found 3000-year-old honey that\'s still edible!',
+                            'Bananas are berries, but strawberries aren\'t!'
+                        ];
+                        return facts[Math.floor(Math.random() * facts.length)];
+                    }
+                    return `I\'d love to tell you about "${thing}", but I might not know everything about it. What specifically would you like to know?`;
+                }
+            }
+            
+            // Thank you
+            if (msg.match(/^(thanks|thank you|ty|thx)/)) {
+                const responses = ['You\'re welcome!', 'Happy to help!', 'No problem!', 'Anytime!'];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Goodbye
+            if (msg.match(/^(bye|goodbye|see you|later|cya|farewell)/)) {
+                const responses = ['Goodbye! Have a great day!', 'See you later!', 'Bye! Take care!', 'Farewell!'];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Compliments
+            if (msg.match(/(you're|you are) (cool|awesome|great|amazing|smart|nice|good)/)) {
+                return 'Aww, thank you! That\'s very kind of you to say!';
+            }
+            
+            // Questions about the chatbot itself
+            if (msg.includes('what can you do') || msg.includes('what do you do')) {
+                return 'I can chat with you, answer questions, tell jokes, share facts, and try to be helpful! What would you like to know?';
+            }
+            
+            // Math (simple)
+            const mathMatch = msg.match(/(\d+)\s*([+\-*/])\s*(\d+)/);
+            if (mathMatch) {
+                const num1 = parseInt(mathMatch[1]);
+                const op = mathMatch[2];
+                const num2 = parseInt(mathMatch[3]);
+                let result;
+                if (op === '+') result = num1 + num2;
+                else if (op === '-') result = num1 - num2;
+                else if (op === '*') result = num1 * num2;
+                else if (op === '/') result = num2 !== 0 ? num1 / num2 : 'undefined (division by zero)';
+                return `That equals ${result}!`;
+            }
+            
+            // Default responses for unknown queries
+            const defaultResponses = [
+                'That\'s interesting! Tell me more.',
+                'I see. Can you elaborate on that?',
+                'Hmm, I\'m not entirely sure about that. Could you rephrase?',
+                'That\'s a good point! What else would you like to talk about?',
+                'I understand. Is there anything specific you\'d like to know?',
+                'Interesting! I\'d love to learn more about that.',
+                'That\'s something to think about! What do you think?',
+                'I\'m not completely sure, but I\'m here to help if you have other questions!'
+            ];
+            
+            // If message is very short, use shorter responses
+            if (msg.length < 10) {
+                const shortResponses = ['Okay!', 'Got it!', 'I see!', 'Sure!', 'Alright!'];
+                return shortResponses[Math.floor(Math.random() * shortResponses.length)];
+            }
+            
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+        
         // Chatbot app
         function openChatbotApp(iconId, name) {
             windowZIndex++;
@@ -9282,11 +9449,14 @@ body.theme-flashcard button:hover {
                 // Scroll to bottom
                 messagesArea.scrollTop = messagesArea.scrollHeight;
                 
+                // Generate AI response
+                const botResponse = generateBotResponse(message);
+                
                 // Add bot response after a short delay
                 setTimeout(() => {
                     const botMsg = document.createElement('div');
                     botMsg.style.cssText = 'margin-bottom: 10px; color: #000;';
-                    botMsg.textContent = 'Chatbot: sorry i dont understand mabey try again later';
+                    botMsg.textContent = `Chatbot: ${botResponse}`;
                     messagesArea.appendChild(botMsg);
                     messagesArea.scrollTop = messagesArea.scrollHeight;
                 }, 300);
@@ -11665,6 +11835,17 @@ body.theme-flashcard button:hover {
                             description: 'Added a Chatbot app to the Remote Desktop App Store. The chatbot responds to every message with "sorry i dont understand mabey try again later". Install it from the App Store in Remote Desktop, then double-click the Chatbot icon to chat.',
                             userRequest: 'make another one thats called chatbot and every time it responds by saying sorry i dont understand mabey try again later'
                         });
+                    }
+                    // Check for Chatbot AI update
+                    const hasChatbotAI = entries.some(e => e.title && e.title.includes('Chatbot AI'));
+                    if (!hasChatbotAI) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🧠 Improved Chatbot with AI Responses',
+                            description: 'Enhanced the Chatbot with intelligent responses! The chatbot can now handle greetings, questions (what, who, why, how), simple math, jokes, facts, and general conversation. It provides contextually appropriate responses while staying simple and helpful.',
+                            userRequest: 'make the chatbot a bit ai but you dont need it to be smart like pretty good though'
+                        });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
                     }
                     // Add Password Game entry
                     if (!hasPasswordGame) {
