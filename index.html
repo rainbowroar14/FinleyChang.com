@@ -2145,9 +2145,14 @@ body.theme-flashcard button:hover {
             
             <!-- Icon Context Menu -->
             <div id="iconContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                <div class="context-menu-item" data-action="open" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Open</div>
-                <div class="context-menu-item" data-action="rename" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Rename</div>
-                <div class="context-menu-item" data-action="delete" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Delete</div>
+                <div class="context-menu-item" onclick="openSelectedIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Open</div>
+                <div class="context-menu-item" onclick="renameDesktopIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Rename</div>
+                <div class="context-menu-item" onclick="deleteDesktopIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Delete</div>
+            </div>
+            
+            <!-- Computer Context Menu -->
+            <div id="computerContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                <div class="context-menu-item" onclick="powerOffDesktop()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Power Off</div>
             </div>
         </div>
     </div>
@@ -3375,6 +3380,20 @@ body.theme-flashcard button:hover {
         });
         
         commandInput.addEventListener('keydown', (e) => {
+            // Disable commands when on remote desktop
+            const remoteDesktopPage = document.getElementById('remoteDesktopPage');
+            if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
+                // Allow semicolon to work, but block other commands
+                if (e.key !== ';' && e.key !== 'Enter') {
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    showCommandFeedback('command', 'Commands disabled on desktop. Use ; to exit.', false);
+                    return;
+                }
+            }
+            
             if (e.key === 'Enter') {
                 const command = commandInput.value.toLowerCase().trim();
                 const hasColorPalette = colorPalettes.hasOwnProperty(command);
@@ -5046,6 +5065,7 @@ body.theme-flashcard button:hover {
             // Add default icons
             addDesktopIcon('paper', 'Paper', 10, 10);
             addDesktopIcon('paint', 'Paint', 10, 100);
+            addDesktopIcon('computer', 'Computer', 10, 190);
             
             // Desktop right-click
             desktop.addEventListener('contextmenu', (e) => {
@@ -5103,6 +5123,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>📄</text></svg>") no-repeat center';
             } else if (type === 'paint') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎨</text></svg>") no-repeat center';
+            } else if (type === 'computer') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>💻</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -5120,7 +5142,11 @@ body.theme-flashcard button:hover {
                 e.preventDefault();
                 e.stopPropagation();
                 selectedIcon = iconId;
-                showIconContextMenu(e.clientX, e.clientY);
+                if (type === 'computer') {
+                    showComputerContextMenu(e.clientX, e.clientY);
+                } else {
+                    showIconContextMenu(e.clientX, e.clientY);
+                }
             });
             
             // Click to select
@@ -5135,9 +5161,15 @@ body.theme-flashcard button:hover {
             
             // Double-click to open (clear single click timer)
             icon.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 if (clickTimer) {
                     clearTimeout(clickTimer);
                     clickTimer = null;
+                }
+                // Actually open the app
+                if (type !== 'computer') {
+                    openDesktopApp(type, iconId, name);
                 }
             });
             
@@ -5258,9 +5290,38 @@ body.theme-flashcard button:hover {
         function hideContextMenus() {
             const desktopMenu = document.getElementById('desktopContextMenu');
             const iconMenu = document.getElementById('iconContextMenu');
+            const computerMenu = document.getElementById('computerContextMenu');
             if (desktopMenu) desktopMenu.classList.add('hidden');
             if (iconMenu) iconMenu.classList.add('hidden');
+            if (computerMenu) computerMenu.classList.add('hidden');
         }
+        
+        function showComputerContextMenu(x, y) {
+            const menu = document.getElementById('computerContextMenu');
+            if (menu) {
+                menu.style.left = x + 'px';
+                menu.style.top = y + 'px';
+                menu.classList.remove('hidden');
+            }
+        }
+        
+        function powerOffDesktop() {
+            hideContextMenus();
+            showPage('mainPage');
+        }
+        
+        function openSelectedIcon() {
+            hideContextMenus();
+            if (!selectedIcon) return;
+            const icon = desktopIcons.find(i => i.id === selectedIcon);
+            if (icon && icon.type !== 'computer') {
+                openDesktopApp(icon.type, icon.id, icon.name);
+            }
+        }
+        
+        // Make functions globally accessible
+        window.powerOffDesktop = powerOffDesktop;
+        window.openSelectedIcon = openSelectedIcon;
         
         function addDesktopApp(type) {
             hideContextMenus();
@@ -5452,6 +5513,11 @@ body.theme-flashcard button:hover {
                 canvas.addEventListener('mouseleave', () => {
                     isDrawing = false;
                 });
+                
+                // Make sure canvas is properly sized and visible
+                canvas.style.display = 'block';
+                canvas.style.width = '100%';
+                canvas.style.height = 'auto';
                 
                 content.appendChild(toolbar);
                 content.appendChild(canvas);
