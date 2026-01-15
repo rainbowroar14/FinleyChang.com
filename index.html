@@ -726,6 +726,96 @@
             color: #f85149;
         }
         
+        /* Terms and Agreements Modal */
+        .terms-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .terms-modal.show {
+            display: flex;
+        }
+        
+        .terms-modal-content {
+            background: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #c9d1d9;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .terms-modal-content h2 {
+            color: #58a6ff;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .terms-text {
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+        
+        .terms-text p {
+            margin-bottom: 15px;
+        }
+        
+        .terms-text ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        
+        .terms-text li {
+            margin-bottom: 10px;
+        }
+        
+        .terms-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        .terms-agree-btn,
+        .terms-disagree-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .terms-agree-btn {
+            background: #238636;
+            color: white;
+        }
+        
+        .terms-agree-btn:hover {
+            background: #2ea043;
+        }
+        
+        .terms-disagree-btn {
+            background: #30363d;
+            color: #c9d1d9;
+        }
+        
+        .terms-disagree-btn:hover {
+            background: #484f58;
+        }
+        
         /* Command History Display */
         .command-history {
             position: fixed;
@@ -2498,6 +2588,31 @@ body.theme-flashcard button:hover {
     <!-- Clock display (top left) -->
     <div class="clock-display hidden" id="clockDisplay"></div>
     
+    <!-- Terms and Agreements Modal -->
+    <div class="terms-modal" id="termsModal">
+        <div class="terms-modal-content">
+            <h2>📋 Terms and Agreements</h2>
+            <div class="terms-text">
+                <p><strong>Welcome to FinHub!</strong></p>
+                <p>By using this website, you agree to the following terms:</p>
+                <ul>
+                    <li><strong>Be Respectful:</strong> No inappropriate content, harassment, or offensive language</li>
+                    <li><strong>No Inappropriate Drawings:</strong> Keep drawings appropriate and respectful</li>
+                    <li><strong>No Bad Words:</strong> Keep chat clean and friendly</li>
+                    <li><strong>Respect Others:</strong> Be kind to other users</li>
+                    <li><strong>No Spam:</strong> Don't spam messages or flood the chat</li>
+                    <li><strong>Privacy:</strong> Don't share personal information</li>
+                </ul>
+                <p><strong>Violations may result in being banned from the service.</strong></p>
+                <p>By clicking "I Agree", you acknowledge that you have read and agree to these terms.</p>
+            </div>
+            <div class="terms-buttons">
+                <button class="terms-agree-btn" id="termsAgreeBtn">I Agree</button>
+                <button class="terms-disagree-btn" id="termsDisagreeBtn">I Disagree</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Command feedback display -->
     <div class="command-feedback hidden" id="commandFeedback">
         <span class="command-text"></span><span class="feedback-text"></span>
@@ -3428,6 +3543,47 @@ body.theme-flashcard button:hover {
             }
         }
         
+        // Terms and Agreements
+        function checkTermsAgreement() {
+            // Only show on finleychang.com, not localhost
+            const hostname = window.location.hostname;
+            if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.')) {
+                return; // Don't show on localhost
+            }
+            
+            const termsAccepted = localStorage.getItem('termsAccepted');
+            const termsVersion = localStorage.getItem('termsVersion') || '1.0';
+            const currentTermsVersion = '1.0'; // Update this when you change terms
+            
+            if (!termsAccepted || termsVersion !== currentTermsVersion) {
+                showTermsModal();
+            }
+        }
+        
+        function showTermsModal() {
+            const modal = document.getElementById('termsModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+        
+        function hideTermsModal() {
+            const modal = document.getElementById('termsModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+        
+        function acceptTerms() {
+            localStorage.setItem('termsAccepted', 'true');
+            localStorage.setItem('termsVersion', '1.0');
+            hideTermsModal();
+        }
+        
+        function rejectTerms() {
+            alert('You must accept the terms to use this website.');
+        }
+        
         // Initialize command history toggle
         document.addEventListener('DOMContentLoaded', () => {
             const toggle = document.getElementById('commandHistoryToggle');
@@ -3437,6 +3593,19 @@ body.theme-flashcard button:hover {
             
             // Load history from localStorage
             loadCommandHistory();
+            
+            // Check terms agreement
+            checkTermsAgreement();
+            
+            // Terms modal buttons
+            const agreeBtn = document.getElementById('termsAgreeBtn');
+            const disagreeBtn = document.getElementById('termsDisagreeBtn');
+            if (agreeBtn) {
+                agreeBtn.addEventListener('click', acceptTerms);
+            }
+            if (disagreeBtn) {
+                disagreeBtn.addEventListener('click', rejectTerms);
+            }
         });
         
         // Load command history from localStorage
@@ -3505,6 +3674,73 @@ body.theme-flashcard button:hover {
                 localStorage.setItem('userId', userId);
             }
             return userId;
+        }
+        
+        function setUserId(newUserId) {
+            if (!newUserId || newUserId.trim() === '') {
+                return false;
+            }
+            
+            // Validate user ID format (alphanumeric, underscore, dash, 3-20 chars)
+            const validIdPattern = /^[a-zA-Z0-9_-]{3,20}$/;
+            if (!validIdPattern.test(newUserId.trim())) {
+                return false;
+            }
+            
+            const oldUserId = getUserId();
+            const newUserIdTrimmed = newUserId.trim();
+            
+            // Don't allow changing to someone else's ID if they exist in Firebase
+            if (database) {
+                return new Promise((resolve) => {
+                    database.ref(`users/${newUserIdTrimmed}`).once('value', (snapshot) => {
+                        if (snapshot.exists() && newUserIdTrimmed !== oldUserId) {
+                            resolve(false); // ID already taken
+                        } else {
+                            // Update localStorage
+                            localStorage.setItem('userId', newUserIdTrimmed);
+                            
+                            // Migrate bio if exists
+                            const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
+                            if (bios[oldUserId]) {
+                                bios[newUserIdTrimmed] = bios[oldUserId];
+                                delete bios[oldUserId];
+                                localStorage.setItem('userBios', JSON.stringify(bios));
+                            }
+                            
+                            // Update Firebase if connected
+                            const userRef = database.ref(`users/${oldUserId}`);
+                            userRef.once('value', (oldSnapshot) => {
+                                const oldData = oldSnapshot.val();
+                                if (oldData) {
+                                    // Move data to new ID
+                                    database.ref(`users/${newUserIdTrimmed}`).set({
+                                        ...oldData,
+                                        id: newUserIdTrimmed
+                                    });
+                                    // Remove old ID
+                                    userRef.remove();
+                                }
+                            });
+                            
+                            resolve(true);
+                        }
+                    });
+                });
+            } else {
+                // Just update localStorage if no Firebase
+                localStorage.setItem('userId', newUserIdTrimmed);
+                
+                // Migrate bio
+                const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
+                if (bios[oldUserId]) {
+                    bios[newUserIdTrimmed] = bios[oldUserId];
+                    delete bios[oldUserId];
+                    localStorage.setItem('userBios', JSON.stringify(bios));
+                }
+                
+                return true;
+            }
         }
         
         function getUserBio(userId) {
@@ -4231,6 +4467,50 @@ body.theme-flashcard button:hover {
                 } else if (command === 'whoami') {
                     resetConfirm = false;
                     showWhoami();
+                } else if (command.startsWith('setid ') || command.startsWith('setuserid ')) {
+                    resetConfirm = false;
+                    const newId = command.startsWith('setid ') ? command.substring(6).trim() : command.substring(10).trim();
+                    if (!newId) {
+                        showCommandFeedback('setid', 'Please provide a user ID. Usage: setid [your new id]', false);
+                    } else {
+                        const result = setUserId(newId);
+                        if (result === false) {
+                            showCommandFeedback('setid', 'Invalid ID or ID already taken. Use 3-20 characters (letters, numbers, _, -)', false);
+                        } else if (result === true) {
+                            showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
+                        } else {
+                            // Promise result
+                            result.then((success) => {
+                                if (success) {
+                                    showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
+                                } else {
+                                    showCommandFeedback('setid', 'ID already taken by another user. Choose a different ID.', false);
+                                }
+                            });
+                        }
+                    }
+                } else if (command.startsWith('setid ') || command.startsWith('setuserid ')) {
+                    resetConfirm = false;
+                    const newId = command.startsWith('setid ') ? command.substring(6).trim() : command.substring(10).trim();
+                    if (!newId) {
+                        showCommandFeedback('setid', 'Please provide a user ID. Usage: setid [your new id]', false);
+                    } else {
+                        const result = setUserId(newId);
+                        if (result === false) {
+                            showCommandFeedback('setid', 'Invalid ID or ID already taken. Use 3-20 characters (letters, numbers, _, -)', false);
+                        } else if (result === true) {
+                            showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
+                        } else {
+                            // Promise result
+                            result.then((success) => {
+                                if (success) {
+                                    showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
+                                } else {
+                                    showCommandFeedback('setid', 'ID already taken by another user. Choose a different ID.', false);
+                                }
+                            });
+                        }
+                    }
                 } else if (command.startsWith('iam ')) {
                     resetConfirm = false;
                     const bioText = command.substring(4).trim();
