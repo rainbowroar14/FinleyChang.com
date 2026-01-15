@@ -1369,6 +1369,229 @@ body.theme-dark button {
     border: none !important;
     color: #ffffff !important;
 }
+
+body.theme-paper {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: #f5f5dc !important;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,.05) 31px, rgba(0,0,0,.05) 32px),
+        repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,.05) 31px, rgba(0,0,0,.05) 32px);
+    color: #2c2c2c;
+}
+
+body.theme-paper .command-bar,
+body.theme-paper .clock-display,
+body.theme-paper .command-feedback,
+body.theme-paper .commands-menu {
+    background: rgba(245, 245, 220, 0.95) !important;
+    border: 1px solid #d4a574 !important;
+    color: #2c2c2c !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-paper .command-input {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid #d4a574 !important;
+    color: #2c2c2c !important;
+}
+
+body.theme-paper .command-bar::before {
+    color: #8b4513 !important;
+}
+
+body.theme-paper .page {
+    background: #f5f5dc !important;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,.05) 31px, rgba(0,0,0,.05) 32px),
+        repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,.05) 31px, rgba(0,0,0,.05) 32px);
+}
+
+body.theme-paper .home-page h1,
+body.theme-paper .subtitle,
+body.theme-paper .letters-source {
+    color: #2c2c2c !important;
+}
+
+body.theme-paper button {
+    background: #faf0e6 !important;
+    border: 1px solid #d4a574 !important;
+    color: #2c2c2c !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-paper button:hover {
+    background: #f5e6d3 !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.theme-space {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #000428 !important;
+    background-image: 
+        radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+body.theme-space::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+        radial-gradient(2px 2px at 60% 70%, #fff, transparent),
+        radial-gradient(1px 1px at 50% 50%, #fff, transparent),
+        radial-gradient(1px 1px at 80% 10%, #fff, transparent),
+        radial-gradient(2px 2px at 90% 40%, #fff, transparent),
+        radial-gradient(1px 1px at 33% 60%, #fff, transparent),
+        radial-gradient(1px 1px at 70% 80%, #fff, transparent);
+    background-size: 200% 200%;
+    background-position: 0% 0%;
+    pointer-events: none;
+    z-index: 1;
+    animation: starfield 20s linear infinite;
+}
+
+@keyframes starfield {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+body.theme-space .command-bar,
+body.theme-space .clock-display,
+body.theme-space .command-feedback,
+body.theme-space .commands-menu {
+    background: rgba(0, 4, 40, 0.95) !important;
+    border: 1px solid #4a90e2 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.3) !important;
+}
+
+body.theme-space .command-input {
+    background: rgba(0, 4, 40, 0.8) !important;
+    border: 1px solid #4a90e2 !important;
+    color: #ffffff !important;
+}
+
+body.theme-space .command-bar::before {
+    color: #4a90e2 !important;
+}
+
+body.theme-space .page {
+    background: #000428 !important;
+    background-image: 
+        radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+}
+
+body.theme-space .home-page h1,
+body.theme-space .subtitle,
+body.theme-space .letters-source {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(74, 144, 226, 0.5) !important;
+}
+
+body.theme-space button {
+    background: rgba(0, 4, 40, 0.9) !important;
+    border: 1px solid #4a90e2 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.3) !important;
+}
+
+body.theme-space button:hover {
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.6) !important;
+}
+
+/* Space theme stars that react to cursor */
+.space-star {
+    position: fixed;
+    width: 2px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    box-shadow: 0 0 2px #fff;
+    transition: transform 0.1s ease-out;
+}
+
+body.theme-ocean {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(to bottom, #87CEEB 0%, #4682B4 50%, #1e3a5f 100%) !important;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+body.theme-ocean::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.03) 2px,
+            rgba(255, 255, 255, 0.03) 4px
+        );
+    pointer-events: none;
+    z-index: 1;
+    animation: oceanWave 3s ease-in-out infinite;
+}
+
+@keyframes oceanWave {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+body.theme-ocean .command-bar,
+body.theme-ocean .clock-display,
+body.theme-ocean .command-feedback,
+body.theme-ocean .commands-menu {
+    background: rgba(30, 58, 95, 0.95) !important;
+    border: 1px solid #4a90e2 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.3) !important;
+}
+
+body.theme-ocean .command-input {
+    background: rgba(30, 58, 95, 0.8) !important;
+    border: 1px solid #4a90e2 !important;
+    color: #ffffff !important;
+}
+
+body.theme-ocean .command-bar::before {
+    color: #87ceeb !important;
+}
+
+body.theme-ocean .page {
+    background: linear-gradient(to bottom, #87CEEB 0%, #4682B4 50%, #1e3a5f 100%) !important;
+}
+
+body.theme-ocean .home-page h1,
+body.theme-ocean .subtitle,
+body.theme-ocean .letters-source {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.theme-ocean button {
+    background: rgba(30, 58, 95, 0.9) !important;
+    border: 1px solid #4a90e2 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.3) !important;
+}
+
+body.theme-ocean button:hover {
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.6) !important;
+}
     </style>
 </head>
 <body>
@@ -1436,6 +1659,30 @@ body.theme-dark button {
             </div>
         <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
             </div>
+        
+    <!-- Collaborative Drawing Board page -->
+    <div class="page sandboxels-page hidden" id="drawingBoardPage">
+        <canvas id="drawingBoardCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; cursor: crosshair;"></canvas>
+        <div style="position: fixed; top: 20px; left: 20px; color: black; font-size: 16px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); z-index: 1000; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 8px; min-width: 250px;">
+            <div style="margin-bottom: 10px;">
+                <strong>Collaborative Drawing Board</strong>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <div>Brush Size: <span id="drawing-brush-size">5</span></div>
+                <input type="range" id="drawing-brush-size-slider" min="1" max="50" value="5" style="width: 100%; margin-top: 5px;">
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="drawing-color-picker" style="display: block; margin-bottom: 5px;">Color:</label>
+                <input type="color" id="drawing-color-picker" value="#000000" style="width: 60px; height: 30px; cursor: pointer; border: 2px solid #333; border-radius: 4px;">
+                <span id="drawing-color-display" style="margin-left: 10px;">#000000</span>
+            </div>
+            <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #ccc;">
+                <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Active Users: <span id="drawing-user-count">1</span></div>
+                <button onclick="clearDrawingBoard()" style="padding: 8px 15px; font-size: 14px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 5px;">Clear Canvas</button>
+            </div>
+        </div>
+        <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
+    </div>
         
     <!-- Coinflip page -->
     <div class="page coinflip-page hidden" id="coinflipPage">
@@ -1805,6 +2052,7 @@ body.theme-dark button {
                     { name: 'pong', desc: 'Play Pong' },
                     { name: 'sandboxles', desc: 'Open Sandboxels' },
                     { name: 'paint', desc: 'Open Paint game' },
+                    { name: 'drawing board', desc: 'Open collaborative drawing board' },
                     { name: 'snake', desc: 'Play Google Snake' },
                     { name: 'coinflip', desc: 'Flip a coin' },
                     { name: 'clicker', desc: 'Play clicker game' },
@@ -1847,6 +2095,9 @@ body.theme-dark button {
                     { name: 'theme dark', desc: 'Dark mode (default)' },
                     { name: 'theme light', desc: 'Light mode' },
                     { name: 'theme matrix', desc: 'Matrix style - press keys to create falling columns' },
+                    { name: 'theme paper', desc: 'Paper notebook with grid lines' },
+                    { name: 'theme space', desc: 'Space theme with interactive stars' },
+                    { name: 'theme ocean', desc: 'Ocean theme with wave animation' },
                 ],
                 'Menu': [
                     { name: 'cmds', desc: 'Show/hide this menu' },
@@ -2575,6 +2826,12 @@ body.theme-dark button {
                     showPage('paintPage');
                     initPaint();
                     showCommandFeedback('paint', 'Paint game opened', true);
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'drawing board' || command === 'drawingboard' || command === 'collab') {
+                    resetConfirm = false;
+                    showPage('drawingBoardPage');
+                    showCommandFeedback('drawing board', 'Collaborative drawing board opened', true);
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'snake') {
@@ -3353,7 +3610,7 @@ body.theme-dark button {
         loadBackgroundPreferences();
         
         // Theme System
-        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix'];
+        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean'];
         let currentTheme = 'dark'; // Default theme
         
         // Load saved theme
@@ -3442,7 +3699,7 @@ body.theme-dark button {
             
             // Animate falling
             let position = -50;
-            const speed = 2 + Math.random() * 3; // Random speed between 2-5
+            const speed = 0.5 + Math.random() * 1; // Random speed between 0.5-1.5 (slower)
             const animate = () => {
                 position += speed;
                 column.style.top = position + 'px';
@@ -3549,6 +3806,119 @@ body.theme-dark button {
         setTimeout(() => {
             setupMatrixKeyHandler();
         }, 100);
+        
+        // Space theme - stars that react to cursor
+        let spaceStars = [];
+        let spaceMouseHandler = null;
+        
+        function createSpaceStars() {
+            // Remove existing stars
+            cleanupSpaceStars();
+            
+            if (!document.body.classList.contains('theme-space')) return;
+            
+            // Create stars
+            const starCount = 100;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'space-star';
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                star.style.left = x + 'px';
+                star.style.top = y + 'px';
+                star.style.width = (Math.random() * 2 + 1) + 'px';
+                star.style.height = star.style.width;
+                star.dataset.x = x;
+                star.dataset.y = y;
+                document.body.appendChild(star);
+                spaceStars.push(star);
+            }
+        }
+        
+        function cleanupSpaceStars() {
+            spaceStars.forEach(star => star.remove());
+            spaceStars = [];
+        }
+        
+        function setupSpaceTheme() {
+            // Remove existing handler
+            if (spaceMouseHandler) {
+                document.removeEventListener('mousemove', spaceMouseHandler);
+                spaceMouseHandler = null;
+            }
+            
+            if (document.body.classList.contains('theme-space')) {
+                createSpaceStars();
+                
+                spaceMouseHandler = (e) => {
+                    const mouseX = e.clientX;
+                    const mouseY = e.clientY;
+                    const pushRadius = 100; // Distance stars get pushed
+                    
+                    spaceStars.forEach(star => {
+                        const starX = parseFloat(star.dataset.x) || 0;
+                        const starY = parseFloat(star.dataset.y) || 0;
+                        
+                        const dx = starX - mouseX;
+                        const dy = starY - mouseY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < pushRadius && distance > 0) {
+                            // Push star away from cursor
+                            const angle = Math.atan2(dy, dx);
+                            const pushDistance = (pushRadius - distance) / pushRadius;
+                            const newX = starX + Math.cos(angle) * pushDistance * 30;
+                            const newY = starY + Math.sin(angle) * pushDistance * 30;
+                            
+                            // Keep stars within bounds
+                            const clampedX = Math.max(0, Math.min(window.innerWidth, newX));
+                            const clampedY = Math.max(0, Math.min(window.innerHeight, newY));
+                            
+                            star.style.left = clampedX + 'px';
+                            star.style.top = clampedY + 'px';
+                            star.dataset.x = clampedX;
+                            star.dataset.y = clampedY;
+                        }
+                    });
+                };
+                
+                document.addEventListener('mousemove', spaceMouseHandler);
+            } else {
+                cleanupSpaceStars();
+            }
+        }
+        
+        // Update applyTheme to handle space theme
+        const originalApplyTheme3 = applyTheme;
+        applyTheme = function(themeName, save = true) {
+            // Cleanup space theme if switching away
+            if (document.body.classList.contains('theme-space') && themeName !== 'space') {
+                cleanupSpaceStars();
+            }
+            
+            originalApplyTheme3(themeName, save);
+            
+            // Setup space theme if switching to it
+            setupSpaceTheme();
+        };
+        
+        // Setup space theme on page load if active
+        setTimeout(() => {
+            setupSpaceTheme();
+        }, 100);
+        
+        // Handle window resize for space stars
+        window.addEventListener('resize', () => {
+            if (document.body.classList.contains('theme-space')) {
+                // Update star positions based on new window size
+                spaceStars.forEach(star => {
+                    const x = parseFloat(star.style.left) || 0;
+                    const y = parseFloat(star.style.top) || 0;
+                    star.dataset.x = x;
+                    star.dataset.y = y;
+                });
+            }
+        });
         
         // Wooperbird goose on main page
         let wooperbirdCanvas, wooperbirdCtx;
@@ -4265,6 +4635,233 @@ body.theme-dark button {
                 paintCanvas.width = window.innerWidth;
                 paintCanvas.height = window.innerHeight;
                 paintCtx.putImageData(imageData, 0, 0);
+            }
+        });
+        
+        // Collaborative Drawing Board
+        let drawingBoardCanvas = null;
+        let drawingBoardCtx = null;
+        let isDrawing = false;
+        let lastDrawingX = 0;
+        let lastDrawingY = 0;
+        let drawingColor = '#000000';
+        let drawingBrushSize = 5;
+        let drawingUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+        let drawingSyncInterval = null;
+        let drawingLastSync = 0;
+        
+        function initDrawingBoard() {
+            drawingBoardCanvas = document.getElementById('drawingBoardCanvas');
+            if (!drawingBoardCanvas) return;
+            
+            drawingBoardCanvas.width = window.innerWidth;
+            drawingBoardCanvas.height = window.innerHeight;
+            drawingBoardCtx = drawingBoardCanvas.getContext('2d');
+            drawingBoardCtx.fillStyle = '#ffffff';
+            drawingBoardCtx.fillRect(0, 0, drawingBoardCanvas.width, drawingBoardCanvas.height);
+            
+            // Load existing drawing from localStorage
+            loadDrawingBoard();
+            
+            // Brush size slider
+            const brushSizeSlider = document.getElementById('drawing-brush-size-slider');
+            const brushSizeDisplay = document.getElementById('drawing-brush-size');
+            if (brushSizeSlider) {
+                brushSizeSlider.addEventListener('input', (e) => {
+                    drawingBrushSize = parseInt(e.target.value);
+                    if (brushSizeDisplay) brushSizeDisplay.textContent = drawingBrushSize;
+                });
+            }
+            
+            // Color picker
+            const colorPicker = document.getElementById('drawing-color-picker');
+            const colorDisplay = document.getElementById('drawing-color-display');
+            if (colorPicker) {
+                colorPicker.addEventListener('input', (e) => {
+                    drawingColor = e.target.value;
+                    if (colorDisplay) colorDisplay.textContent = drawingColor;
+                });
+            }
+            
+            // Drawing events
+            drawingBoardCanvas.addEventListener('mousedown', handleDrawingMouseDown);
+            drawingBoardCanvas.addEventListener('mousemove', handleDrawingMouseMove);
+            drawingBoardCanvas.addEventListener('mouseup', handleDrawingMouseUp);
+            drawingBoardCanvas.addEventListener('mouseleave', handleDrawingMouseUp);
+            drawingBoardCanvas.addEventListener('touchstart', handleDrawingTouchStart, { passive: false });
+            drawingBoardCanvas.addEventListener('touchmove', handleDrawingTouchMove, { passive: false });
+            drawingBoardCanvas.addEventListener('touchend', handleDrawingTouchEnd);
+            
+            // Start syncing with other users (polling localStorage)
+            startDrawingSync();
+        }
+        
+        function handleDrawingMouseDown(e) {
+            isDrawing = true;
+            const rect = drawingBoardCanvas.getBoundingClientRect();
+            lastDrawingX = e.clientX - rect.left;
+            lastDrawingY = e.clientY - rect.top;
+            drawDrawingPoint(lastDrawingX, lastDrawingY);
+        }
+        
+        function handleDrawingMouseMove(e) {
+            if (!isDrawing) return;
+            const rect = drawingBoardCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            drawDrawingLine(lastDrawingX, lastDrawingY, x, y);
+            lastDrawingX = x;
+            lastDrawingY = y;
+        }
+        
+        function handleDrawingMouseUp() {
+            isDrawing = false;
+        }
+        
+        function handleDrawingTouchStart(e) {
+            e.preventDefault();
+            isDrawing = true;
+            const touch = e.touches[0];
+            const rect = drawingBoardCanvas.getBoundingClientRect();
+            lastDrawingX = touch.clientX - rect.left;
+            lastDrawingY = touch.clientY - rect.top;
+            drawDrawingPoint(lastDrawingX, lastDrawingY);
+        }
+        
+        function handleDrawingTouchMove(e) {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const touch = e.touches[0];
+            const rect = drawingBoardCanvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            drawDrawingLine(lastDrawingX, lastDrawingY, x, y);
+            lastDrawingX = x;
+            lastDrawingY = y;
+        }
+        
+        function handleDrawingTouchEnd(e) {
+            e.preventDefault();
+            isDrawing = false;
+        }
+        
+        function drawDrawingPoint(x, y) {
+            if (!drawingBoardCtx) return;
+            drawingBoardCtx.fillStyle = drawingColor;
+            drawingBoardCtx.beginPath();
+            drawingBoardCtx.arc(x, y, drawingBrushSize / 2, 0, Math.PI * 2);
+            drawingBoardCtx.fill();
+            saveDrawingBoard();
+        }
+        
+        function drawDrawingLine(x1, y1, x2, y2) {
+            if (!drawingBoardCtx) return;
+            drawingBoardCtx.strokeStyle = drawingColor;
+            drawingBoardCtx.lineWidth = drawingBrushSize;
+            drawingBoardCtx.lineCap = 'round';
+            drawingBoardCtx.lineJoin = 'round';
+            drawingBoardCtx.beginPath();
+            drawingBoardCtx.moveTo(x1, y1);
+            drawingBoardCtx.lineTo(x2, y2);
+            drawingBoardCtx.stroke();
+            saveDrawingBoard();
+        }
+        
+        function saveDrawingBoard() {
+            if (!drawingBoardCanvas) return;
+            const imageData = drawingBoardCanvas.toDataURL();
+            localStorage.setItem('drawingBoard_data', imageData);
+            localStorage.setItem('drawingBoard_timestamp', Date.now().toString());
+            localStorage.setItem('drawingBoard_user', drawingUserId);
+        }
+        
+        function loadDrawingBoard() {
+            if (!drawingBoardCanvas || !drawingBoardCtx) return;
+            const savedData = localStorage.getItem('drawingBoard_data');
+            if (savedData) {
+                const img = new Image();
+                img.onload = () => {
+                    drawingBoardCtx.clearRect(0, 0, drawingBoardCanvas.width, drawingBoardCanvas.height);
+                    drawingBoardCtx.drawImage(img, 0, 0);
+                };
+                img.src = savedData;
+            }
+        }
+        
+        function startDrawingSync() {
+            // Poll for updates from other users (localStorage-based collaboration)
+            drawingSyncInterval = setInterval(() => {
+                if (!drawingBoardCanvas || document.getElementById('drawingBoardPage').classList.contains('hidden')) return;
+                
+                const lastTimestamp = localStorage.getItem('drawingBoard_timestamp');
+                const lastUser = localStorage.getItem('drawingBoard_user');
+                
+                if (lastTimestamp && lastUser && lastUser !== drawingUserId) {
+                    const timestamp = parseInt(lastTimestamp);
+                    if (timestamp > drawingLastSync) {
+                        loadDrawingBoard();
+                        drawingLastSync = timestamp;
+                    }
+                }
+                
+                // Update user count (simplified - in real Firebase this would be accurate)
+                const userCountEl = document.getElementById('drawing-user-count');
+                if (userCountEl) {
+                    // For now, just show 1+ if there's recent activity
+                    const recentActivity = lastTimestamp && (Date.now() - parseInt(lastTimestamp) < 5000);
+                    userCountEl.textContent = recentActivity ? '1+' : '1';
+                }
+            }, 500); // Check every 500ms
+        }
+        
+        function stopDrawingSync() {
+            if (drawingSyncInterval) {
+                clearInterval(drawingSyncInterval);
+                drawingSyncInterval = null;
+            }
+        }
+        
+        function clearDrawingBoard() {
+            if (!drawingBoardCanvas || !drawingBoardCtx) return;
+            if (confirm('Clear the entire canvas? This will affect all users.')) {
+                drawingBoardCtx.fillStyle = '#ffffff';
+                drawingBoardCtx.fillRect(0, 0, drawingBoardCanvas.width, drawingBoardCanvas.height);
+                saveDrawingBoard();
+            }
+        }
+        
+        // Initialize drawing board when page is shown
+        const originalShowPage = showPage;
+        showPage = function(pageId) {
+            originalShowPage(pageId);
+            if (pageId === 'drawingBoardPage') {
+                setTimeout(() => {
+                    if (!drawingBoardCanvas) {
+                        initDrawingBoard();
+                    } else {
+                        // Resize if needed
+                        const currentWidth = drawingBoardCanvas.width;
+                        const currentHeight = drawingBoardCanvas.height;
+                        if (currentWidth !== window.innerWidth || currentHeight !== window.innerHeight) {
+                            const imageData = drawingBoardCtx.getImageData(0, 0, currentWidth, currentHeight);
+                            drawingBoardCanvas.width = window.innerWidth;
+                            drawingBoardCanvas.height = window.innerHeight;
+                            drawingBoardCtx.putImageData(imageData, 0, 0);
+                        }
+                    }
+                }, 100);
+            } else {
+                stopDrawingSync();
+            }
+        };
+        
+        // Handle window resize for drawing board canvas
+        window.addEventListener('resize', () => {
+            if (drawingBoardCanvas && !document.getElementById('drawingBoardPage').classList.contains('hidden')) {
+                const imageData = drawingBoardCtx.getImageData(0, 0, drawingBoardCanvas.width, drawingBoardCanvas.height);
+                drawingBoardCanvas.width = window.innerWidth;
+                drawingBoardCanvas.height = window.innerHeight;
+                drawingBoardCtx.putImageData(imageData, 0, 0);
             }
         });
         
