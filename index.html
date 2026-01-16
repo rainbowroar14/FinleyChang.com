@@ -143,6 +143,9 @@
             color: #58a6ff;
             text-decoration: none;
             cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            z-index: 10;
         }
         
         .form-switch a:hover {
@@ -253,13 +256,17 @@
         const logoutBtn = document.getElementById('logout-btn');
         
         // Form switching
-        switchToSignup.addEventListener('click', () => {
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             signinForm.classList.add('hidden');
             signupForm.classList.remove('hidden');
             clearMessages();
         });
         
-        switchToSignin.addEventListener('click', () => {
+        switchToSignin.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             signupForm.classList.add('hidden');
             signinForm.classList.remove('hidden');
             clearMessages();
@@ -357,11 +364,8 @@
         // Auth state observer
         auth.onAuthStateChanged((user) => {
             if (user) {
-                // User is signed in
-                signinForm.classList.add('hidden');
-                signupForm.classList.add('hidden');
-                userInfo.classList.remove('hidden');
-                document.getElementById('user-email').textContent = user.email;
+                // User is signed in - redirect to home page
+                window.location.href = 'home.html';
             } else {
                 // User is signed out
                 userInfo.classList.add('hidden');
