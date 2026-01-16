@@ -10210,7 +10210,7 @@ body.theme-flashcard button:hover {
                 content.className = 'win95-window-content';
                 content.style.padding = '10px';
                 content.style.overflow = 'auto';
-                content.innerHTML = '<div style="text-align: center; margin: 10px 0;"><button id="create-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Create Lobby</button><div style="font-size: 11px; margin-bottom: 10px;">Available Lobbies:</div><div id="lobby-list">Loading...</div></div>';
+                content.innerHTML = '<div style="text-align: center; margin: 10px 0;"><button id="create-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Create Lobby</button><button id="refresh-password-lobbies" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px; margin-left: 5px;">Refresh</button><div style="font-size: 11px; margin-bottom: 10px;">Available Lobbies:</div><div id="lobby-list">Loading...</div></div>';
                 
                 lobbyWindow.appendChild(header);
                 lobbyWindow.appendChild(content);
@@ -10462,6 +10462,11 @@ body.theme-flashcard button:hover {
                 
                 window.passwordJoinLobby = (lobbyId) => joinLobbyInternal(lobbyId, false);
                 content.querySelector('#create-lobby').onclick = createLobby;
+                content.querySelector('#refresh-password-lobbies').onclick = () => {
+                    if (database) {
+                        database.ref('passwordGameLobbies').once('value', lobbyListener);
+                    }
+                };
                 loadLobbies();
                 
                 // Make draggable
@@ -10705,7 +10710,7 @@ body.theme-flashcard button:hover {
                 content.className = 'win95-window-content';
                 content.style.padding = '10px';
                 content.style.overflow = 'auto';
-                content.innerHTML = '<div style="text-align: center; margin: 10px 0;"><button id="create-paint-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Create Lobby</button><div style="font-size: 11px; margin-bottom: 10px;">Available Lobbies:</div><div id="paint-lobby-list">Loading...</div></div>';
+                content.innerHTML = '<div style="text-align: center; margin: 10px 0;"><button id="create-paint-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Create Lobby</button><button id="refresh-paint-lobbies" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px; margin-left: 5px;">Refresh</button><div style="font-size: 11px; margin-bottom: 10px;">Available Lobbies:</div><div id="paint-lobby-list">Loading...</div></div>';
                 
                 lobbyWindow.appendChild(header);
                 lobbyWindow.appendChild(content);
@@ -10931,6 +10936,11 @@ body.theme-flashcard button:hover {
                 
                 window.paintV2JoinLobby = (lobbyId) => joinLobbyInternal(lobbyId);
                 content.querySelector('#create-paint-lobby').onclick = createLobby;
+                content.querySelector('#refresh-paint-lobbies').onclick = () => {
+                    if (database) {
+                        database.ref('paintv2Lobbies').once('value', lobbyListener);
+                    }
+                };
                 loadLobbies();
                 
                 // Make draggable
@@ -10998,6 +11008,244 @@ body.theme-flashcard button:hover {
         }
         
         // Table Tennis app removed
+        
+        // GIF Maker app
+        function openGifMakerApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '700px';
+            window.style.height = '600px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                if (animationInterval) {
+                    clearInterval(animationInterval);
+                    animationInterval = null;
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.display = 'flex';
+            content.style.flexDirection = 'column';
+            content.style.height = 'calc(100% - 20px)';
+            
+            const gameHTML = `
+                <div style="margin-bottom: 10px; text-align: center;">
+                    <button id="gifmaker-new" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin: 5px;">New Frame</button>
+                    <button id="gifmaker-play" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin: 5px;">Play</button>
+                    <button id="gifmaker-download" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin: 5px;">Download GIF</button>
+                    <div style="font-size: 11px; margin: 5px;">Frames: <span id="gifmaker-frames">0</span></div>
+                    <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 5px;">
+                        <input type="color" id="gifmaker-color" value="#000000" style="width: 40px; height: 30px; border: 2px inset #c0c0c0; cursor: pointer;">
+                        <button id="gifmaker-clear" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Clear Canvas</button>
+                    </div>
+                </div>
+                <canvas id="gifmaker-canvas" width="600" height="400" style="border: 2px inset #c0c0c0; background: #fff; cursor: crosshair; display: block; margin: 0 auto;"></canvas>
+                <div id="gifmaker-preview" style="margin-top: 10px; text-align: center;"></div>
+            `;
+            content.innerHTML = gameHTML;
+            
+            const canvas = content.querySelector('#gifmaker-canvas');
+            const ctx = canvas.getContext('2d');
+            const colorPicker = content.querySelector('#gifmaker-color');
+            const clearBtn = content.querySelector('#gifmaker-clear');
+            const newFrameBtn = content.querySelector('#gifmaker-new');
+            const playBtn = content.querySelector('#gifmaker-play');
+            const downloadBtn = content.querySelector('#gifmaker-download');
+            const framesEl = content.querySelector('#gifmaker-frames');
+            const previewEl = content.querySelector('#gifmaker-preview');
+            
+            let frames = [];
+            let currentFrame = null;
+            let isDrawing = false;
+            let currentColor = '#000000';
+            let animationInterval = null;
+            let currentFrameIndex = 0;
+            
+            // Drawing functionality
+            let lastX = null;
+            let lastY = null;
+            
+            function startDrawing() {
+                if (!currentFrame) {
+                    currentFrame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                }
+                isDrawing = true;
+            }
+            
+            function drawOnCanvas(x, y, prevX, prevY) {
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                if (prevX !== undefined && prevY !== undefined) {
+                    ctx.moveTo(prevX, prevY);
+                }
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+            
+            canvas.addEventListener('mousedown', (e) => {
+                startDrawing();
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                lastX = x;
+                lastY = y;
+                drawOnCanvas(x, y);
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                drawOnCanvas(x, y, lastX, lastY);
+                lastX = x;
+                lastY = y;
+            });
+            
+            canvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+                lastX = null;
+                lastY = null;
+            });
+            
+            colorPicker.addEventListener('change', (e) => {
+                currentColor = e.target.value;
+            });
+            
+            clearBtn.onclick = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                currentFrame = null;
+            };
+            
+            newFrameBtn.onclick = () => {
+                // Save current frame
+                if (ctx.getImageData(0, 0, canvas.width, canvas.height).data.some(p => p !== 255)) {
+                    const frameData = canvas.toDataURL('image/png');
+                    frames.push(frameData);
+                    framesEl.textContent = frames.length;
+                }
+                // Clear canvas for next frame
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                currentFrame = null;
+            };
+            
+            playBtn.onclick = () => {
+                if (frames.length === 0) {
+                    alert('Add at least one frame first!');
+                    return;
+                }
+                
+                if (animationInterval) {
+                    clearInterval(animationInterval);
+                    animationInterval = null;
+                    playBtn.textContent = 'Play';
+                    currentFrameIndex = 0;
+                    previewEl.innerHTML = '';
+                    return;
+                }
+                
+                playBtn.textContent = 'Stop';
+                currentFrameIndex = 0;
+                const previewImg = document.createElement('img');
+                previewImg.style.maxWidth = '300px';
+                previewImg.style.border = '2px solid #000';
+                previewEl.innerHTML = '';
+                previewEl.appendChild(previewImg);
+                
+                animationInterval = setInterval(() => {
+                    previewImg.src = frames[currentFrameIndex];
+                    currentFrameIndex = (currentFrameIndex + 1) % frames.length;
+                }, 200);
+            };
+            
+            downloadBtn.onclick = () => {
+                if (frames.length === 0) {
+                    alert('Add at least one frame first!');
+                    return;
+                }
+                
+                // Simple GIF creation using canvas animation
+                // Note: This creates an animated canvas, not a real GIF file
+                // For real GIF creation, you'd need a library like gif.js
+                alert('GIF download feature: Create frames, then use a GIF converter tool. For now, frames are saved as images. Real GIF export would require additional libraries.');
+                
+                // Optionally, download each frame
+                frames.forEach((frame, index) => {
+                    const link = document.createElement('a');
+                    link.download = `frame_${index + 1}.png`;
+                    link.href = frame;
+                    link.click();
+                });
+            };
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'gifmaker',
+                element: window
+            });
+            
+            updateTaskbar();
+        }
             
         // Make functions globally accessible
         window.addDesktopApp = addDesktopApp;
@@ -13302,24 +13550,62 @@ body.theme-flashcard button:hover {
             
             if (database) {
                 // Load from Firebase with real-time updates
-                database.ref('suggestions').orderByChild('timestamp').on('value', (snapshot) => {
-                    const suggestions = [];
-                    snapshot.forEach((child) => {
-                        const data = child.val();
-                        suggestions.push({
-                            id: child.key,
-                            ...data
+                try {
+                    database.ref('suggestions').once('value', (snapshot) => {
+                        const suggestions = [];
+                        snapshot.forEach((child) => {
+                            const data = child.val();
+                            if (data) {
+                                suggestions.push({
+                                    id: child.key,
+                                    ...data
+                                });
+                            }
                         });
+                        // Sort by likes (descending), then by timestamp (descending)
+                        suggestions.sort((a, b) => {
+                            const likesA = a.likes || 0;
+                            const likesB = b.likes || 0;
+                            if (likesB !== likesA) return likesB - likesA;
+                            return (b.timestamp || 0) - (a.timestamp || 0);
+                        });
+                        renderSuggestions(suggestions);
+                    }, (error) => {
+                        console.error('Error loading suggestions from Firebase:', error);
+                        // Fallback to localStorage
+                        const saved = localStorage.getItem('suggestions');
+                        const suggestions = saved ? JSON.parse(saved) : [];
+                        renderSuggestions(suggestions);
                     });
-                    // Sort by likes (descending), then by timestamp (descending)
-                    suggestions.sort((a, b) => {
-                        const likesA = a.likes || 0;
-                        const likesB = b.likes || 0;
-                        if (likesB !== likesA) return likesB - likesA;
-                        return (b.timestamp || 0) - (a.timestamp || 0);
+                    
+                    // Also set up real-time listener
+                    database.ref('suggestions').on('value', (snapshot) => {
+                        const suggestions = [];
+                        snapshot.forEach((child) => {
+                            const data = child.val();
+                            if (data) {
+                                suggestions.push({
+                                    id: child.key,
+                                    ...data
+                                });
+                            }
+                        });
+                        // Sort by likes (descending), then by timestamp (descending)
+                        suggestions.sort((a, b) => {
+                            const likesA = a.likes || 0;
+                            const likesB = b.likes || 0;
+                            if (likesB !== likesA) return likesB - likesA;
+                            return (b.timestamp || 0) - (a.timestamp || 0);
+                        });
+                        renderSuggestions(suggestions);
                     });
+                } catch (error) {
+                    console.error('Error loading suggestions:', error);
+                    // Fallback to localStorage
+                    const saved = localStorage.getItem('suggestions');
+                    const suggestions = saved ? JSON.parse(saved) : [];
                     renderSuggestions(suggestions);
-                });
+                }
             } else {
                 // Load from localStorage fallback
                 const saved = localStorage.getItem('suggestions');
