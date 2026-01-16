@@ -659,6 +659,91 @@
             font-style: italic;
         }
         
+        /* Profile display in top left */
+        .profile-display {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            min-width: 150px;
+        }
+        
+        .profile-display:hover {
+            background: rgba(22, 27, 34, 0.95);
+            border-color: #58a6ff;
+        }
+        
+        .profile-display .profile-username {
+            font-weight: bold;
+            color: #58a6ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .profile-display .profile-username::before {
+            content: '👤';
+            font-size: 16px;
+        }
+        
+        .profile-display .profile-admin-badge {
+            background: #f85149;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+        
+        .profile-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            background: rgba(13, 17, 23, 0.98);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 5px 0;
+            min-width: 180px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            display: none;
+            z-index: 1001;
+        }
+        
+        .profile-menu.show {
+            display: block;
+        }
+        
+        .profile-menu-item {
+            padding: 10px 15px;
+            color: #c9d1d9;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        
+        .profile-menu-item:hover {
+            background: rgba(48, 54, 61, 0.5);
+        }
+        
+        .profile-menu-item.logout {
+            color: #f85149;
+        }
+        
+        .profile-menu-item.logout:hover {
+            background: rgba(248, 81, 73, 0.1);
+        }
+        
         /* Clock display in top left */
         .clock-display {
             position: fixed;
@@ -3411,6 +3496,18 @@ body.theme-flashcard button:hover {
         <canvas id="wooperbirdCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;"></canvas>
                 </div>
     
+    <!-- Profile display in top left (visible on all pages) -->
+    <div class="profile-display" id="profileDisplay" style="display: none;" onclick="toggleProfileMenu(event)">
+        <div class="profile-username" id="profileUsername">
+            <span id="profileUsernameText"></span>
+            <span class="profile-admin-badge" id="profileAdminBadge" style="display: none;">ADMIN</span>
+        </div>
+        <div class="profile-menu" id="profileMenu">
+            <div class="profile-menu-item" onclick="showWhoami(); document.getElementById('profileMenu').classList.remove('show');">View Profile</div>
+            <div class="profile-menu-item logout" onclick="logout()">Logout</div>
+        </div>
+    </div>
+    
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
         <h1>Welcome to the home</h1>
@@ -5345,9 +5442,77 @@ body.theme-flashcard button:hover {
         function showMainContent() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('mainPage').classList.remove('hidden');
+            // Update profile display
+            updateProfileDisplay();
             // Initialize everything that needs the user to be logged in
             if (typeof initChat === 'function') initChat();
             if (typeof loadOnlineUsers === 'function') loadOnlineUsers();
+        }
+        
+        // Update profile display with username and admin badge
+        function updateProfileDisplay() {
+            const profileDisplay = document.getElementById('profileDisplay');
+            const profileUsernameText = document.getElementById('profileUsernameText');
+            const profileAdminBadge = document.getElementById('profileAdminBadge');
+            
+            if (!profileDisplay || !profileUsernameText) return;
+            
+            const username = getLoggedInUsername();
+            if (username) {
+                profileDisplay.style.display = 'block';
+                profileUsernameText.textContent = username;
+                
+                // Show admin badge if user is admin
+                if (isAdmin()) {
+                    profileAdminBadge.style.display = 'inline-block';
+                } else {
+                    profileAdminBadge.style.display = 'none';
+                }
+            } else {
+                profileDisplay.style.display = 'none';
+            }
+        }
+        
+        // Toggle profile menu
+        function toggleProfileMenu(e) {
+            if (e) {
+                e.stopPropagation();
+            }
+            const profileMenu = document.getElementById('profileMenu');
+            if (profileMenu) {
+                profileMenu.classList.toggle('show');
+            }
+        }
+        
+        // Close profile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const profileDisplay = document.getElementById('profileDisplay');
+            const profileMenu = document.getElementById('profileMenu');
+            if (profileDisplay && profileMenu && !profileDisplay.contains(e.target)) {
+                profileMenu.classList.remove('show');
+            }
+        });
+        
+        // Logout function
+        function logout() {
+            // Clear login data
+            localStorage.removeItem('loggedInUsername');
+            localStorage.removeItem('userPasswordHash');
+            
+            // Hide profile display
+            const profileDisplay = document.getElementById('profileDisplay');
+            if (profileDisplay) {
+                profileDisplay.style.display = 'none';
+            }
+            
+            // Redirect to login page
+            checkLoginStatus();
+            
+            // Clear form fields
+            const loginUsername = document.getElementById('loginUsername');
+            const loginPassword = document.getElementById('loginPassword');
+            if (loginUsername) loginUsername.value = '';
+            if (loginPassword) loginPassword.value = '';
         }
         
         // Block access until logged in
