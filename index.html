@@ -16896,8 +16896,27 @@ body.theme-flashcard button:hover {
             try {
                 if (typeof loadGlobalData === 'function') loadGlobalData();
                 if (typeof loadCoinflipData === 'function') loadCoinflipData();
+                if (typeof loadCommandHistory === 'function') loadCommandHistory();
             } catch (e) {
                 console.error('Error loading data:', e);
+            }
+            
+            // Set up command input handler - SIMPLE AND DIRECT
+            try {
+                const commandInput = document.getElementById('commandInput');
+                if (commandInput && typeof processCommand === 'function') {
+                    commandInput.onkeydown = function(e) {
+                        if (e.key === 'Enter') {
+                            const command = this.value.trim();
+                            if (command) {
+                                processCommand(command);
+                                this.value = '';
+                            }
+                        }
+                    };
+                }
+            } catch (e) {
+                console.error('Error setting up command input:', e);
             }
             
             // Load and apply theme (this will set up handlers properly)
@@ -16923,6 +16942,15 @@ body.theme-flashcard button:hover {
                 }
             } catch (e) {
                 console.error('Error initializing remote desktop:', e);
+            }
+            
+            // Update visit counter
+            try {
+                if (typeof updateVisitCounter === 'function') {
+                    updateVisitCounter();
+                }
+            } catch (e) {
+                console.error('Error updating visit counter:', e);
             }
             
             // Ensure command bar is visible (unless on remote desktop or blocked)
