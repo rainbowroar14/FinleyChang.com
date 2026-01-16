@@ -1039,64 +1039,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
-        }
-        
-        .chat-header.hidden {
-            display: none;
         }
         
         .chat-header h2 {
             color: #c9d1d9;
             font-size: 20px;
             margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .chat-header-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        
-        .chat-header-btn {
-            padding: 6px 12px;
-            background: #238636;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        
-        .chat-header-btn:hover {
-            background: #2ea043;
-        }
-        
-        .chat-header-btn.secondary {
-            background: #30363d;
-        }
-        
-        .chat-header-btn.secondary:hover {
-            background: #484f58;
-        }
-        
-        .chat-header-btn.danger {
-            background: #f85149;
-        }
-        
-        .chat-header-btn.danger:hover {
-            background: #da3633;
-        }
-        
-        .chat-message-icon {
-            font-size: 20px;
-            margin-right: 8px;
-            vertical-align: middle;
         }
         
         .online-users {
@@ -1161,7 +1109,6 @@
         .chat-message-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin-bottom: 5px;
         }
         
@@ -1170,18 +1117,10 @@
             color: #58a6ff;
             font-size: 13px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
         
         .chat-message.own-message .chat-message-user {
             color: #3fb950;
-        }
-        
-        .chat-message-user.finleymain {
-            color: #f85149 !important;
-            font-weight: bold;
         }
         
         .chat-message-time {
@@ -3410,9 +3349,6 @@ body.theme-flashcard button:hover {
     </style>
 </head>
 <body>
-    <!-- Login/Username button in top left -->
-    <div id="loginButton" style="position: fixed; top: 20px; left: 20px; z-index: 10000; padding: 10px 20px; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: all 0.2s;" onclick="handleLoginButtonClick()">Login</div>
-    
     <!-- Main page with FinHub title -->
     <div class="page" id="mainPage">
         <div class="finhub-title">
@@ -3763,12 +3699,9 @@ body.theme-flashcard button:hover {
             <h2>✏️ Edit Profile</h2>
             <div class="edit-form">
                 <div class="edit-field">
-                    <label>Display Name:</label>
-                    <input type="text" id="editDisplayName" placeholder="Your display name" maxlength="30">
-                    <small>This is how others see you (username is used for login)</small>
-                </div>
-                <div class="edit-field" style="color: #8b949e; font-size: 12px; margin-top: -10px;">
-                    <small>Username: <span id="editUsernameDisplay"></span> (cannot be changed)</small>
+                    <label>User ID:</label>
+                    <input type="text" id="editUserId" placeholder="Your user ID" maxlength="20">
+                    <small>3-20 characters (letters, numbers, _, -)</small>
                 </div>
                 <div class="edit-field">
                     <label>Bio:</label>
@@ -3825,20 +3758,10 @@ body.theme-flashcard button:hover {
     <!-- Chat Page -->
     <div class="page hidden" id="chatPage">
         <div class="chat-container">
-            <div class="chat-header" id="chatHeader">
-                <h2>
-                    <span>💬 Online Chat</span>
-                    <button class="chat-header-btn secondary" onclick="toggleChatHeader()" title="Hide/Show Header" style="padding: 4px 8px; font-size: 10px;">−</button>
-                </h2>
-                <div class="chat-header-buttons">
-                    <button class="chat-header-btn secondary" onclick="refreshOnlineUsers()" title="Refresh Online Users">🔄 Refresh</button>
-                    <button class="chat-header-btn danger" onclick="clearChat()" title="Clear Chat Messages">🗑️ Clear</button>
-                </div>
+            <div class="chat-header">
+                <h2>💬 Online Chat</h2>
                 <div class="online-users" id="onlineUsers">
-                    <div class="online-users-title">
-                        👥 Online Users
-                        <button class="chat-header-btn secondary" onclick="refreshOnlineUsers()" title="Refresh" style="float: right; padding: 2px 6px; font-size: 10px; margin-top: -2px;">🔄</button>
-                    </div>
+                    <div class="online-users-title">👥 Online Users</div>
                     <div id="onlineUsersList"></div>
                 </div>
                 <!-- Context Menu for Online Users -->
@@ -3873,13 +3796,7 @@ body.theme-flashcard button:hover {
         <div class="chat-container">
             <div class="chat-header">
                 <h2 id="privateChatTitle">💬 Private Chat</h2>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <label style="color: #c9d1d9; font-size: 12px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                        <input type="checkbox" id="privateChatNotificationsToggle" style="cursor: pointer;">
-                        Notifications
-                    </label>
-                    <button class="chat-back-btn" id="privateChatBackBtn">← Back to Friends</button>
-                </div>
+                <button class="chat-back-btn" id="privateChatBackBtn">← Back to Friends</button>
             </div>
             <div class="chat-messages" id="privateChatMessages"></div>
             <div class="chat-input-container">
@@ -3925,51 +3842,6 @@ body.theme-flashcard button:hover {
                     <div id="boardExistingImagesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;"></div>
                 </div>
                 <button onclick="saveBoard()" style="background: #238636; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;">Save Board</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Login Page -->
-    <div class="page hidden" id="loginPage" style="background: #0d1117; color: #c9d1d9; padding: 40px;">
-        <div style="max-width: 400px; margin: 0 auto; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 30px;">
-            <h2 style="color: #58a6ff; font-size: 28px; margin-bottom: 20px; text-align: center;">Login</h2>
-            <div id="loginError" style="color: #f85149; margin-bottom: 15px; text-align: center; display: none;"></div>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Username:</label>
-                <input type="text" id="login-username" placeholder="Enter your username" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleLogin()">
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Password:</label>
-                <input type="password" id="login-password" placeholder="Enter your password" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleLogin()">
-            </div>
-            <button id="login-submit-btn" onclick="handleLogin()" style="width: 100%; padding: 12px; background: #238636; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px;">Login</button>
-            <div style="text-align: center; color: #8b949e; font-size: 14px;">
-                Don't have an account? <a href="#" onclick="showPage('registerPage'); return false;" style="color: #58a6ff; text-decoration: none;">Register</a>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Register Page -->
-    <div class="page hidden" id="registerPage" style="background: #0d1117; color: #c9d1d9; padding: 40px;">
-        <div style="max-width: 400px; margin: 0 auto; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 30px;">
-            <h2 style="color: #58a6ff; font-size: 28px; margin-bottom: 20px; text-align: center;">Register</h2>
-            <div id="registerError" style="color: #f85149; margin-bottom: 15px; text-align: center; display: none;"></div>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Username:</label>
-                <input type="text" id="register-username" placeholder="Choose a unique username" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleRegister()">
-                <small style="color: #8b949e; font-size: 12px;">3-20 characters (letters, numbers, _, -)</small>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Password:</label>
-                <input type="password" id="register-password" placeholder="Choose a password" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleRegister()">
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Confirm Password:</label>
-                <input type="password" id="register-password-confirm" placeholder="Confirm your password" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleRegister()">
-            </div>
-            <button id="register-submit-btn" onclick="handleRegister()" style="width: 100%; padding: 12px; background: #238636; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px;">Register</button>
-            <div style="text-align: center; color: #8b949e; font-size: 14px;">
-                Already have an account? <a href="#" onclick="showPage('loginPage'); return false;" style="color: #58a6ff; text-decoration: none;">Login</a>
             </div>
         </div>
     </div>
@@ -4950,10 +4822,6 @@ body.theme-flashcard button:hover {
             localStorage.setItem('termsAccepted', 'true');
             localStorage.setItem('termsVersion', '1.0');
             hideTermsModal();
-            // Redirect to login page after accepting terms
-            if (typeof showPage === 'function') {
-                showPage('loginPage');
-            }
         }
         
         function rejectTerms() {
@@ -4965,24 +4833,21 @@ body.theme-flashcard button:hover {
         
         function openEditMenu() {
             const modal = document.getElementById('editModal');
-            const displayNameInput = document.getElementById('editDisplayName');
-            const usernameDisplay = document.getElementById('editUsernameDisplay');
+            const userIdInput = document.getElementById('editUserId');
             const bioInput = document.getElementById('editBio');
             const emojiPreview = document.getElementById('emojiPreview');
             const emojiGrid = document.getElementById('emojiGrid');
             
             if (!modal) return;
             
-            const currentUsername = localStorage.getItem('loggedInUsername') || getUserId();
-            const currentBio = getUserBio(currentUsername) || '';
-            const currentAvatar = getUserAvatar(currentUsername);
-            const currentDisplayName = localStorage.getItem('displayName') || currentUsername;
+            const currentUserId = getUserId();
+            const currentBio = getUserBio(currentUserId) || '';
+            const currentAvatar = getUserAvatar(currentUserId);
             
             // Populate fields
-            if (displayNameInput) displayNameInput.value = currentDisplayName;
-            if (usernameDisplay) usernameDisplay.textContent = currentUsername;
-            if (bioInput) bioInput.value = currentBio;
-            if (emojiPreview) emojiPreview.textContent = currentAvatar;
+            userIdInput.value = currentUserId;
+            bioInput.value = currentBio;
+            emojiPreview.textContent = currentAvatar;
             updateBioCharCount();
             
             // Populate emoji grid
@@ -5018,46 +4883,65 @@ body.theme-flashcard button:hover {
         }
         
         function saveEditProfile() {
-            const displayNameInput = document.getElementById('editDisplayName');
+            const userIdInput = document.getElementById('editUserId');
             const bioInput = document.getElementById('editBio');
             const emojiPreview = document.getElementById('emojiPreview');
             
-            if (!displayNameInput || !bioInput || !emojiPreview) return;
+            if (!userIdInput || !bioInput || !emojiPreview) return;
             
-            const newDisplayName = displayNameInput.value.trim();
+            const newUserId = userIdInput.value.trim();
             const newBio = bioInput.value.trim();
             const newAvatar = emojiPreview.textContent;
             
-            // Validate display name
-            if (!newDisplayName || newDisplayName.length === 0) {
-                showCommandFeedback('edit', 'Display name cannot be empty', false);
+            // Validate user ID
+            if (newUserId.length < 3 || newUserId.length > 20) {
+                showCommandFeedback('edit', 'User ID must be 3-20 characters', false);
                 return;
             }
             
-            if (newDisplayName.length > 30) {
-                showCommandFeedback('edit', 'Display name must be 30 characters or less', false);
+            const validIdPattern = /^[a-zA-Z0-9_-]+$/;
+            if (!validIdPattern.test(newUserId)) {
+                showCommandFeedback('edit', 'User ID can only contain letters, numbers, _, and -', false);
                 return;
             }
             
-            const username = localStorage.getItem('loggedInUsername') || getUserId();
-            finishSaving(username, newDisplayName, newBio, newAvatar);
+            const oldUserId = getUserId();
+            
+            // Change user ID if different
+            if (newUserId !== oldUserId) {
+                const result = setUserId(newUserId);
+                if (result === false) {
+                    showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
+                    return;
+                } else if (result === true) {
+                    finishSaving(newUserId, newBio, newAvatar);
+                } else {
+                    // Promise result
+                    result.then((success) => {
+                        if (success) {
+                            finishSaving(newUserId, newBio, newAvatar);
+                        } else {
+                            showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
+                        }
+                    });
+                    return;
+                }
+            } else {
+                finishSaving(newUserId, newBio, newAvatar);
+            }
         }
         
-        function finishSaving(username, displayName, bio, avatar) {
-            // Save display name
-            localStorage.setItem('displayName', displayName);
-            
+        function finishSaving(userId, bio, avatar) {
             // Save bio
-            setUserBio(username, bio);
+            setUserBio(userId, bio);
             
             // Save avatar
-            setUserAvatar(username, avatar);
+            setUserAvatar(userId, avatar);
             
             // Sync to Firebase if available
             if (database) {
                 try {
-                    database.ref(`users/${username}`).update({
-                        displayName: displayName,
+                    database.ref(`users/${userId}`).update({
                         bio: bio,
                         avatar: avatar,
                         lastSeen: Date.now()
@@ -5344,44 +5228,8 @@ body.theme-flashcard button:hover {
         }
         
         function getUserAvatar(userId) {
-            // First check localStorage
             const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
-            if (avatars[userId]) {
-                return avatars[userId];
-            }
-            
-            // If Firebase is available, try to get from there
-            if (database) {
-                // Try to get from Firebase (async, but we'll cache it)
-                database.ref(`users/${userId}/avatar`).once('value', (snapshot) => {
-                    const avatar = snapshot.val();
-                    if (avatar) {
-                        // Cache it in localStorage
-                        avatars[userId] = avatar;
-                        localStorage.setItem('userAvatars', JSON.stringify(avatars));
-                    }
-                });
-            }
-            
-            return '👤';
-        }
-        
-        // Load all user avatars from Firebase on init
-        function loadUserAvatarsFromFirebase() {
-            if (database) {
-                database.ref('users').once('value', (snapshot) => {
-                    const users = snapshot.val() || {};
-                    const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
-                    
-                    Object.entries(users).forEach(([userId, userData]) => {
-                        if (userData.avatar) {
-                            avatars[userId] = userData.avatar;
-                        }
-                    });
-                    
-                    localStorage.setItem('userAvatars', JSON.stringify(avatars));
-                });
-            }
+            return avatars[userId] || '👤';
         }
         
         function setUserAvatar(userId, emoji) {
@@ -5390,90 +5238,30 @@ body.theme-flashcard button:hover {
             localStorage.setItem('userAvatars', JSON.stringify(avatars));
         }
         
-        // Friends System with Friend Requests
+        // Friends System
         function getFriends() {
             const friends = JSON.parse(localStorage.getItem('friends') || '[]');
             return friends;
         }
         
-        function getFriendRequests() {
-            const requests = JSON.parse(localStorage.getItem('friendRequests') || '[]');
-            return requests;
-        }
-        
-        function sendFriendRequest(toUsername) {
-            const username = localStorage.getItem('loggedInUsername') || getUserId();
-            if (toUsername === username) {
-                return { success: false, message: 'You cannot send a friend request to yourself!' };
-            }
-            
+        function addFriend(friendId) {
             const friends = getFriends();
-            if (friends.includes(toUsername)) {
-                return { success: false, message: 'You are already friends with this user!' };
-            }
-            
-            // Check if request already sent
-            const requests = getFriendRequests();
-            if (requests.some(r => r.from === username && r.to === toUsername)) {
-                return { success: false, message: 'Friend request already sent!' };
-            }
-            
-            // Send request
-            if (database) {
-                database.ref(`friendRequests/${toUsername}`).push({
-                    from: username,
-                    to: toUsername,
-                    timestamp: Date.now()
-                });
-            }
-            
-            return { success: true, message: `Friend request sent to ${toUsername}!` };
-        }
-        
-        function acceptFriendRequest(fromUsername) {
-            const username = localStorage.getItem('loggedInUsername') || getUserId();
-            const friends = getFriends();
-            
-            if (!friends.includes(fromUsername)) {
-                friends.push(fromUsername);
+            if (!friends.includes(friendId)) {
+                friends.push(friendId);
                 localStorage.setItem('friends', JSON.stringify(friends));
                 
-                // Also add current user to their friend list
+                // Sync to Firebase if available
                 if (database) {
-                    database.ref(`users/${fromUsername}/friends`).once('value', (snapshot) => {
-                        const theirFriends = snapshot.val() || [];
-                        if (!theirFriends.includes(username)) {
-                            theirFriends.push(username);
-                            database.ref(`users/${fromUsername}/friends`).set(theirFriends);
-                        }
-                    });
-                    database.ref(`users/${username}/friends`).set(friends);
+                    try {
+                        const userId = getUserId();
+                        database.ref(`users/${userId}/friends`).set(friends);
+                    } catch (e) {
+                        console.warn('Could not sync friends to Firebase:', e);
+                    }
                 }
+                return true;
             }
-            
-            // Remove request
-            removeFriendRequest(fromUsername);
-            
-            return true;
-        }
-        
-        function removeFriendRequest(fromUsername) {
-            const username = localStorage.getItem('loggedInUsername') || getUserId();
-            if (database) {
-                database.ref(`friendRequests/${username}`).once('value', (snapshot) => {
-                    snapshot.forEach((child) => {
-                        const data = child.val();
-                        if (data.from === fromUsername) {
-                            child.ref.remove();
-                        }
-                    });
-                });
-            }
-        }
-        
-        function addFriend(friendId) {
-            // Legacy function - now redirects to send request
-            return sendFriendRequest(friendId);
+            return false;
         }
         
         function removeFriend(friendId) {
@@ -5508,145 +5296,38 @@ body.theme-flashcard button:hover {
             
             if (!modal || !friendsList) return;
             
-            const username = localStorage.getItem('loggedInUsername') || getUserId();
             const friends = getFriends();
             
-            friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 20px;">Loading...</div>';
-            
-            // Load friend requests from Firebase
-            if (database) {
-                database.ref(`friendRequests/${username}`).once('value', (snapshot) => {
-                    const requests = [];
-                    snapshot.forEach((child) => {
-                        const data = child.val();
-                        if (data && data.from) {
-                            requests.push(data.from);
-                        }
-                    });
-                    
-                    friendsList.innerHTML = '';
-                    
-                    // Show pending friend requests first
-                    if (requests.length > 0) {
-                        const requestsTitle = document.createElement('div');
-                        requestsTitle.style.cssText = 'color: #58a6ff; font-weight: bold; margin: 15px 0 10px 0; padding: 10px; background: #161b22; border-radius: 6px;';
-                        requestsTitle.textContent = `📬 Friend Requests (${requests.length})`;
-                        friendsList.appendChild(requestsTitle);
-                        
-                        requests.forEach(fromUsername => {
-                            const requestItem = document.createElement('div');
-                            requestItem.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; background: #161b22; border: 1px solid #30363d; border-radius: 6px;';
-                            
-                            const avatar = getUserAvatar(fromUsername);
-                            const bio = getUserBio(fromUsername) || 'No bio';
-                            const displayName = localStorage.getItem(`displayName_${fromUsername}`) || fromUsername;
-                            
-                            requestItem.innerHTML = `
-                                <div style="display: flex; align-items: center; flex: 1;">
-                                    <div class="friend-avatar">${avatar}</div>
-                                    <div class="friend-info" style="margin-left: 10px;">
-                                        <div class="friend-name">${escapeHtml(displayName)} <span style="color: #8b949e; font-size: 12px;">(@${escapeHtml(fromUsername)})</span></div>
-                                        <div class="friend-bio">${escapeHtml(bio.substring(0, 50))}${bio.length > 50 ? '...' : ''}</div>
-                                    </div>
-                                </div>
-                                <div style="display: flex; gap: 8px;">
-                                    <button onclick="acceptFriendRequestHandler('${escapeHtml(fromUsername)}')" style="background: #238636; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Accept</button>
-                                    <button onclick="denyFriendRequestHandler('${escapeHtml(fromUsername)}')" style="background: #f85149; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Deny</button>
-                                </div>
-                            `;
-                            
-                            friendsList.appendChild(requestItem);
-                        });
-                        
-                        const divider = document.createElement('div');
-                        divider.style.cssText = 'height: 1px; background: #30363d; margin: 20px 0;';
-                        friendsList.appendChild(divider);
-                    }
-                    
-                    // Show existing friends
-                    if (friends.length === 0 && requests.length === 0) {
-                        friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [username]" to send a friend request!</div>';
-                    } else if (friends.length > 0) {
-                        if (requests.length > 0) {
-                            const friendsTitle = document.createElement('div');
-                            friendsTitle.style.cssText = 'color: #58a6ff; font-weight: bold; margin: 15px 0 10px 0; padding: 10px; background: #161b22; border-radius: 6px;';
-                            friendsTitle.textContent = `👥 Friends (${friends.length})`;
-                            friendsList.appendChild(friendsTitle);
-                        }
-                        
-                        friends.forEach(friendId => {
-                            const friendItem = document.createElement('div');
-                            friendItem.className = 'friend-item';
-                            
-                            const avatar = getUserAvatar(friendId);
-                            const bio = getUserBio(friendId) || 'No bio';
-                            const displayName = localStorage.getItem(`displayName_${friendId}`) || friendId;
-                            
-                            friendItem.innerHTML = `
-                                <div class="friend-avatar">${avatar}</div>
-                                <div class="friend-info">
-                                    <div class="friend-name">${escapeHtml(displayName)} <span style="color: #8b949e; font-size: 12px;">(@${escapeHtml(friendId)})</span></div>
-                                    <div class="friend-bio">${escapeHtml(bio.substring(0, 50))}${bio.length > 50 ? '...' : ''}</div>
-                                </div>
-                            `;
-                            
-                            friendItem.onclick = () => {
-                                openPrivateChat(friendId);
-                                closeFriendsList();
-                            };
-                            
-                            friendsList.appendChild(friendItem);
-                        });
-                    }
-                });
+            if (friends.length === 0) {
+                friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [id]" to add someone!</div>';
             } else {
-                // Fallback without Firebase
-                if (friends.length === 0) {
-                    friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [username]" to send a friend request!</div>';
-                } else {
-                    friendsList.innerHTML = '';
-                    friends.forEach(friendId => {
-                        const friendItem = document.createElement('div');
-                        friendItem.className = 'friend-item';
-                        
-                        const avatar = getUserAvatar(friendId);
-                        const bio = getUserBio(friendId) || 'No bio';
-                        const displayName = localStorage.getItem(`displayName_${friendId}`) || friendId;
-                        
-                        friendItem.innerHTML = `
-                            <div class="friend-avatar">${avatar}</div>
-                            <div class="friend-info">
-                                <div class="friend-name">${escapeHtml(displayName)} <span style="color: #8b949e; font-size: 12px;">(@${escapeHtml(friendId)})</span></div>
-                                <div class="friend-bio">${escapeHtml(bio.substring(0, 50))}${bio.length > 50 ? '...' : ''}</div>
-                            </div>
-                        `;
-                        
-                        friendItem.onclick = () => {
-                            openPrivateChat(friendId);
-                            closeFriendsList();
-                        };
-                        
-                        friendsList.appendChild(friendItem);
-                    });
-                }
+                friendsList.innerHTML = '';
+                friends.forEach(friendId => {
+                    const friendItem = document.createElement('div');
+                    friendItem.className = 'friend-item';
+                    
+                    const avatar = getUserAvatar(friendId);
+                    const bio = getUserBio(friendId) || 'No bio';
+                    
+                    friendItem.innerHTML = `
+                        <div class="friend-avatar">${avatar}</div>
+                        <div class="friend-info">
+                            <div class="friend-name">${friendId}</div>
+                            <div class="friend-bio">${bio.substring(0, 50)}${bio.length > 50 ? '...' : ''}</div>
+                        </div>
+                    `;
+                    
+                    friendItem.onclick = () => {
+                        openPrivateChat(friendId);
+                        closeFriendsList();
+                    };
+                    
+                    friendsList.appendChild(friendItem);
+                });
             }
             
             modal.classList.add('show');
         }
-        
-        function acceptFriendRequestHandler(fromUsername) {
-            if (acceptFriendRequest(fromUsername)) {
-                openFriendsList(); // Refresh list
-            }
-        }
-        
-        function denyFriendRequestHandler(fromUsername) {
-            removeFriendRequest(fromUsername);
-            openFriendsList(); // Refresh list
-        }
-        
-        window.acceptFriendRequestHandler = acceptFriendRequestHandler;
-        window.denyFriendRequestHandler = denyFriendRequestHandler;
         
         function closeFriendsList() {
             const modal = document.getElementById('friendsModal');
@@ -5659,9 +5340,8 @@ body.theme-flashcard button:hover {
             currentPrivateChatWith = friendId;
             const title = document.getElementById('privateChatTitle');
             const avatar = getUserAvatar(friendId);
-            const displayName = localStorage.getItem(`displayName_${friendId}`) || friendId;
             if (title) {
-                title.textContent = `💬 Private Chat with ${avatar} ${escapeHtml(displayName)}`;
+                title.textContent = `💬 Private Chat with ${avatar} ${friendId}`;
             }
             showPage('privateChatPage');
             loadPrivateChatMessages(friendId);
@@ -5782,29 +5462,110 @@ body.theme-flashcard button:hover {
         
         // Friends System
         let currentPrivateChatWith = null;
-        // REMOVED - Duplicate functions, using the ones defined earlier
+        function getFriends() {
+            const friends = JSON.parse(localStorage.getItem('friends') || '[]');
+            return friends;
+        }
+        
+        function addFriend(friendId) {
+            const friends = getFriends();
+            if (!friends.includes(friendId)) {
+                friends.push(friendId);
+                localStorage.setItem('friends', JSON.stringify(friends));
+                
+                // Sync to Firebase if available
+                if (database) {
+                    try {
+                        const userId = getUserId();
+                        database.ref(`users/${userId}/friends`).set(friends);
+                    } catch (e) {
+                        console.warn('Could not sync friends to Firebase:', e);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        function removeFriend(friendId) {
+            const friends = getFriends();
+            const index = friends.indexOf(friendId);
+            if (index > -1) {
+                friends.splice(index, 1);
+                localStorage.setItem('friends', JSON.stringify(friends));
+                
+                // Sync to Firebase if available
+                if (database) {
+                    try {
+                        const userId = getUserId();
+                        database.ref(`users/${userId}/friends`).set(friends);
+                    } catch (e) {
+                        console.warn('Could not sync friends to Firebase:', e);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        function isFriend(userId) {
+            const friends = getFriends();
+            return friends.includes(userId);
+        }
+        
+        function openFriendsList() {
+            const modal = document.getElementById('friendsModal');
+            const friendsList = document.getElementById('friendsList');
+            
+            if (!modal || !friendsList) return;
+            
+            const friends = getFriends();
+            
+            if (friends.length === 0) {
+                friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [id]" to add someone!</div>';
+            } else {
+                friendsList.innerHTML = '';
+                friends.forEach(friendId => {
+                    const friendItem = document.createElement('div');
+                    friendItem.className = 'friend-item';
+                    
+                    const avatar = getUserAvatar(friendId);
+                    const bio = getUserBio(friendId) || 'No bio';
+                    
+                    friendItem.innerHTML = `
+                        <div class="friend-avatar">${avatar}</div>
+                        <div class="friend-info">
+                            <div class="friend-name">${friendId}</div>
+                            <div class="friend-bio">${bio.substring(0, 50)}${bio.length > 50 ? '...' : ''}</div>
+                        </div>
+                    `;
+                    
+                    friendItem.onclick = () => {
+                        openPrivateChat(friendId);
+                        closeFriendsList();
+                    };
+                    
+                    friendsList.appendChild(friendItem);
+                });
+            }
+            
+            modal.classList.add('show');
+        }
+        
+        function closeFriendsList() {
+            const modal = document.getElementById('friendsModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
         
         function openPrivateChat(friendId) {
             currentPrivateChatWith = friendId;
             const title = document.getElementById('privateChatTitle');
             const avatar = getUserAvatar(friendId);
-            const displayName = localStorage.getItem(`displayName_${friendId}`) || friendId;
             if (title) {
-                title.textContent = `💬 Private Chat with ${avatar} ${escapeHtml(displayName)}`;
+                title.textContent = `💬 Private Chat with ${avatar} ${friendId}`;
             }
-            
-            // Setup notification toggle
-            const notificationToggle = document.getElementById('privateChatNotificationsToggle');
-            if (notificationToggle) {
-                const notificationsEnabled = localStorage.getItem(`privateChatNotifications_${friendId}`) !== 'false';
-                notificationToggle.checked = notificationsEnabled;
-                notificationToggle.onchange = (e) => {
-                    localStorage.setItem(`privateChatNotifications_${friendId}`, e.target.checked ? 'true' : 'false');
-                    // Re-setup notifications
-                    setupPrivateChatNotifications();
-                };
-            }
-            
             showPage('privateChatPage');
             loadPrivateChatMessages(friendId);
         }
@@ -6013,37 +5774,9 @@ body.theme-flashcard button:hover {
         let chatListeners = [];
         let onlineUsersListeners = [];
         
+        let onlineStatusInterval = null;
+        
         function initChat() {
-            // Restore chat header state
-            const headerHidden = localStorage.getItem('chatHeaderHidden') === 'true';
-            const chatHeader = document.getElementById('chatHeader');
-            if (chatHeader) {
-                if (headerHidden) {
-                    chatHeader.classList.add('hidden');
-                } else {
-                    chatHeader.classList.remove('hidden');
-                }
-            }
-            
-            // Load timeout data from Firebase
-            if (database) {
-                database.ref('chatTimeouts').on('value', (snapshot) => {
-                    const timeouts = snapshot.val() || {};
-                    // Sync to localStorage
-                    localStorage.setItem('chatTimeouts', JSON.stringify(timeouts));
-                });
-                
-                // Also check for expired timeouts periodically
-                setInterval(() => {
-                    const timeouts = JSON.parse(localStorage.getItem('chatTimeouts') || '{}');
-                    Object.keys(timeouts).forEach(username => {
-                        if (Date.now() > timeouts[username].endTime) {
-                            removeUserTimeout(username);
-                        }
-                    });
-                }, 60000); // Check every minute
-            }
-            
             if (!database) {
                 console.warn('Firebase not available - chat will use localStorage only');
                 return;
@@ -6054,15 +5787,31 @@ body.theme-flashcard button:hover {
             
             // Mark user as online
             const userRef = database.ref(`users/${userId}`);
-            userRef.set({
-                id: userId,
-                bio: userBio || '',
-                online: true,
-                lastSeen: Date.now()
-            });
+            const updateOnlineStatus = () => {
+                userRef.set({
+                    id: userId,
+                    bio: userBio || getUserBio(userId) || '',
+                    online: true,
+                    lastSeen: Date.now()
+                }).catch(err => {
+                    console.warn('Failed to update online status:', err);
+                });
+            };
+            
+            // Initial update
+            updateOnlineStatus();
+            
+            // Update online status every 30 seconds (heartbeat)
+            if (onlineStatusInterval) {
+                clearInterval(onlineStatusInterval);
+            }
+            onlineStatusInterval = setInterval(updateOnlineStatus, 30000);
             
             // Remove online status when page unloads
             window.addEventListener('beforeunload', () => {
+                if (onlineStatusInterval) {
+                    clearInterval(onlineStatusInterval);
+                }
                 userRef.update({ online: false, lastSeen: Date.now() });
             });
         }
@@ -6110,262 +5859,22 @@ body.theme-flashcard button:hover {
             const time = new Date(message.timestamp);
             const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            // Get user avatar
-            const userAvatar = getUserAvatar(message.userId) || '👤';
-            const displayName = localStorage.getItem(`displayName_${message.userId}`) || message.userId;
-            const isFinleyMain = message.userId === 'FinleyMain' || message.userId.toLowerCase() === 'finleymain';
-            const userClass = isFinleyMain ? 'chat-message-user finleymain' : 'chat-message-user';
-            
             messageDiv.innerHTML = `
                 <div class="chat-message-header">
-                    <span class="${userClass}" id="chat-user-${escapeHtml(message.userId)}" data-user-id="${escapeHtml(message.userId)}">
-                        <span class="chat-message-icon">${userAvatar}</span>
-                        ${escapeHtml(displayName)}
-                    </span>
+                    <span class="chat-message-user" onclick="showWhoami('${message.userId}')">${message.userId}</span>
                     <span class="chat-message-time">${timeStr}</span>
                 </div>
                 <div class="chat-message-text">${escapeHtml(message.text)}</div>
             `;
             
-            // Add right-click context menu for username
-            const usernameSpan = messageDiv.querySelector(`#chat-user-${escapeHtml(message.userId)}`);
-            if (usernameSpan && message.userId !== (localStorage.getItem('loggedInUsername') || getUserId())) {
-                usernameSpan.style.cursor = 'pointer';
-                usernameSpan.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    showChatUserContextMenu(e, message.userId);
-                });
-                usernameSpan.addEventListener('click', () => {
-                    showWhoami(message.userId);
-                });
-            } else if (usernameSpan) {
-                usernameSpan.addEventListener('click', () => {
-                    showWhoami(message.userId);
-                });
-            }
-            
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-        
-        function showChatUserContextMenu(event, userId) {
-            let chatContextMenu = document.getElementById('chatUserContextMenu');
-            if (!chatContextMenu) {
-                // Create context menu if it doesn't exist
-                const menu = document.createElement('div');
-                menu.id = 'chatUserContextMenu';
-                menu.className = 'context-menu hidden';
-                menu.style.cssText = 'position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);';
-                menu.innerHTML = `
-                    <div class="context-menu-item" id="chatAddFriendItem" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: "MS Sans Serif", Arial, sans-serif;">Add Friend</div>
-                    <div class="context-menu-item" id="chatViewBoardItem" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: "MS Sans Serif", Arial, sans-serif;">View Board</div>
-                `;
-                document.body.appendChild(menu);
-                chatContextMenu = menu;
-            }
-            const addFriendItem = document.getElementById('chatAddFriendItem');
-            const viewBoardItem = document.getElementById('chatViewBoardItem');
-            const currentUserId = localStorage.getItem('loggedInUsername') || getUserId();
-            const friends = getFriends();
-            const isFriend = friends.includes(userId);
-            const isOwnProfile = userId === currentUserId;
-            
-            // Hide other context menus
-            document.querySelectorAll('.context-menu').forEach(menu => {
-                if (menu.id !== 'chatUserContextMenu') {
-                    menu.classList.add('hidden');
-                }
-            });
-            
-            // Update context menu items
-            if (isFriend || isOwnProfile) {
-                addFriendItem.textContent = isOwnProfile ? 'Your Profile' : 'Already Friends';
-                addFriendItem.style.cursor = 'default';
-                addFriendItem.style.color = '#666';
-                addFriendItem.onclick = null;
-            } else {
-                addFriendItem.textContent = 'Add Friend';
-                addFriendItem.style.cursor = 'pointer';
-                addFriendItem.style.color = '#000';
-                addFriendItem.onclick = () => {
-                    const result = sendFriendRequest(userId);
-                    if (result.success) {
-                        alert(result.message);
-                    } else {
-                        alert(result.message || 'Failed to send friend request');
-                    }
-                    chatContextMenu.classList.add('hidden');
-                };
-            }
-            
-            // View Board option
-            if (isFriend || isOwnProfile) {
-                viewBoardItem.style.display = 'block';
-                viewBoardItem.onclick = () => {
-                    viewBoard(userId);
-                    chatContextMenu.classList.add('hidden');
-                };
-            } else {
-                viewBoardItem.style.display = 'none';
-            }
-            
-            // Position and show context menu
-            chatContextMenu.style.left = event.pageX + 'px';
-            chatContextMenu.style.top = event.pageY + 'px';
-            chatContextMenu.classList.remove('hidden');
-            
-            // Hide menu when clicking elsewhere
-            const hideMenu = (e) => {
-                if (!chatContextMenu.contains(e.target)) {
-                    chatContextMenu.classList.add('hidden');
-                    document.removeEventListener('click', hideMenu);
-                }
-            };
-            
-            setTimeout(() => {
-                document.addEventListener('click', hideMenu);
-            }, 100);
-        }
-        
-        function toggleChatHeader() {
-            const header = document.getElementById('chatHeader');
-            if (header) {
-                header.classList.toggle('hidden');
-                // Save preference
-                localStorage.setItem('chatHeaderHidden', header.classList.contains('hidden'));
-            }
-        }
-        
-        function refreshOnlineUsers() {
-            const usersList = document.getElementById('onlineUsersList');
-            if (usersList) {
-                // Clear the list first
-                usersList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 10px;">Refreshing...</div>';
-            }
-            
-            // Remove existing listeners
-            if (database && typeof onlineUsersListeners !== 'undefined' && onlineUsersListeners.length > 0) {
-                onlineUsersListeners.forEach(listener => {
-                    if (listener && listener.off) {
-                        listener.off();
-                    }
-                });
-                onlineUsersListeners = [];
-            }
-            
-            // Reload users
-            loadOnlineUsers();
-        }
-        
-        function clearChat() {
-            // Check if user is FinleyMain
-            const currentUsername = localStorage.getItem('loggedInUsername') || getUserId();
-            if (currentUsername !== 'FinleyMain' && currentUsername.toLowerCase() !== 'finleymain') {
-                alert('You don\'t have permission to do that');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to clear all chat messages? This cannot be undone.')) {
-                const messagesContainer = document.getElementById('chatMessages');
-                if (messagesContainer) {
-                    messagesContainer.innerHTML = '';
-                }
-                // Clear from Firebase if available - use correct path 'messages'
-                if (database) {
-                    database.ref('messages').remove().catch(err => {
-                        console.warn('Could not clear chat from Firebase:', err);
-                    });
-                }
-                // Clear from localStorage
-                localStorage.removeItem('chatMessages');
-            }
-        }
-        
-        window.toggleChatHeader = toggleChatHeader;
-        window.refreshOnlineUsers = refreshOnlineUsers;
-        window.clearChat = clearChat;
-        
-        // Timeout system for chat moderation
-        function timeoutUser(username, minutes) {
-            const endTime = Date.now() + (minutes * 60000);
-            const timeoutData = {
-                username: username,
-                endTime: endTime,
-                minutes: minutes,
-                timestamp: Date.now()
-            };
-            
-            // Save to Firebase
-            if (database) {
-                database.ref(`chatTimeouts/${username}`).set(timeoutData);
-            }
-            
-            // Save to localStorage
-            const timeouts = JSON.parse(localStorage.getItem('chatTimeouts') || '{}');
-            timeouts[username] = timeoutData;
-            localStorage.setItem('chatTimeouts', JSON.stringify(timeouts));
-        }
-        
-        function isUserTimedOut(username) {
-            const timeoutInfo = getUserTimeoutInfo(username);
-            if (!timeoutInfo) return false;
-            
-            // Check if timeout has expired
-            if (Date.now() > timeoutInfo.endTime) {
-                // Timeout expired, remove it
-                removeUserTimeout(username);
-                return false;
-            }
-            
-            return true;
-        }
-        
-        function getUserTimeoutInfo(username) {
-            // Check localStorage
-            const timeouts = JSON.parse(localStorage.getItem('chatTimeouts') || '{}');
-            if (timeouts[username]) {
-                return timeouts[username];
-            }
-            
-            return null;
-        }
-        
-        function removeUserTimeout(username) {
-            // Remove from Firebase
-            if (database) {
-                database.ref(`chatTimeouts/${username}`).remove();
-            }
-            
-            // Remove from localStorage
-            const timeouts = JSON.parse(localStorage.getItem('chatTimeouts') || '{}');
-            delete timeouts[username];
-            localStorage.setItem('chatTimeouts', JSON.stringify(timeouts));
         }
         
         function sendChatMessage(text) {
             if (!text || !text.trim()) return;
             
-            // Check if user is logged in
-            if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
-                alert('Please log in to send chat messages!');
-                if (typeof showPage === 'function') {
-                    showPage('loginPage');
-                }
-                return;
-            }
-            
             const userId = getUserId();
-            // Use loggedInUsername for timeout checks
-            const username = localStorage.getItem('loggedInUsername') || userId;
-            
-            // Check if user is timed out
-            if (isUserTimedOut(username)) {
-                const timeoutInfo = getUserTimeoutInfo(username);
-                const remainingMinutes = Math.ceil((timeoutInfo.endTime - Date.now()) / 60000);
-                alert(`You are timed out from chat! Time remaining: ${remainingMinutes} minute(s)`);
-                return;
-            }
-            
             const message = {
                 userId: userId,
                 text: text.trim(),
@@ -6388,25 +5897,20 @@ body.theme-flashcard button:hover {
             }
         }
         
+        let onlineUsersListener = null;
+        let onlineUsersRefreshInterval = null;
+        
         function loadOnlineUsers() {
             const usersList = document.getElementById('onlineUsersList');
             if (!usersList) return;
             
-            // Remove existing listeners
-            if (database && typeof onlineUsersListeners !== 'undefined' && onlineUsersListeners.length > 0) {
-                onlineUsersListeners.forEach(listener => {
-                    if (listener && listener.off) {
-                        listener.off();
-                    }
-                });
-                onlineUsersListeners = [];
-            }
-            
             if (database) {
-                const usersRef = database.ref('users');
-                // Use on() for real-time updates, but clear list first
-                usersList.innerHTML = ''; // Clear list before loading
-                const listener = usersRef.on('value', (snapshot) => {
+                // Remove old listener if exists
+                if (onlineUsersListener) {
+                    database.ref('users').off('value', onlineUsersListener);
+                }
+                
+                const updateOnlineUsersList = (snapshot) => {
                     const users = snapshot.val() || {};
                     const currentTime = Date.now();
                     const onlineThreshold = 60000; // 1 minute
@@ -6436,11 +5940,19 @@ body.theme-flashcard button:hover {
                             usersList.appendChild(userDiv);
                         }
                     });
-                });
-                // Store listener for cleanup
-                if (typeof onlineUsersListeners !== 'undefined') {
-                    onlineUsersListeners.push(listener);
+                };
+                
+                // Set up real-time listener
+                onlineUsersListener = updateOnlineUsersList;
+                database.ref('users').on('value', onlineUsersListener);
+                
+                // Also refresh every 5 seconds to catch any missed updates
+                if (onlineUsersRefreshInterval) {
+                    clearInterval(onlineUsersRefreshInterval);
                 }
+                onlineUsersRefreshInterval = setInterval(() => {
+                    database.ref('users').once('value', updateOnlineUsersList);
+                }, 5000);
             } else {
                 // Fallback: show local users
                 usersList.innerHTML = '<div class="online-user-item"><span class="user-id">' + getUserId() + '</span> (Local only)</div>';
@@ -6506,24 +6018,6 @@ body.theme-flashcard button:hover {
                 };
             }
             
-            // Set up View Board button
-            if (isFriend || isOwnProfile) {
-                viewBoardItem.style.display = 'block';
-                viewBoardItem.style.cursor = 'pointer';
-                viewBoardItem.style.color = '#000';
-                viewBoardItem.onclick = () => {
-                    if (typeof viewBoard === 'function') {
-                        viewBoard(userId);
-                    } else if (typeof window.viewBoard === 'function') {
-                        window.viewBoard(userId);
-                    }
-                    contextMenu.classList.add('hidden');
-                };
-            } else {
-                viewBoardItem.style.display = 'none';
-                viewBoardItem.onclick = null;
-            }
-            
             // Position and show context menu
             contextMenu.style.left = event.pageX + 'px';
             contextMenu.style.top = event.pageY + 'px';
@@ -6547,23 +6041,13 @@ body.theme-flashcard button:hover {
             if (!userId) userId = getUserId();
             if (database) {
                 return new Promise((resolve) => {
-                    // Try new path first (userData/{username}/board)
-                    database.ref(`userData/${userId}/board`).once('value', (snapshot) => {
+                    database.ref(`boards/${userId}`).once('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
                             resolve(data);
                         } else {
-                            // Try legacy path (boards/{userId})
-                            database.ref(`boards/${userId}`).once('value', (snapshot2) => {
-                                const data2 = snapshot2.val();
-                                if (data2) {
-                                    resolve(data2);
-                                } else {
-                                    // Fallback to localStorage
-                                    const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
-                                    resolve(boards[userId] || { text: '', images: [] });
-                                }
-                            });
+                            const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
+                            resolve(boards[userId] || { text: '', images: [] });
                         }
                     });
                 });
@@ -6696,35 +6180,10 @@ body.theme-flashcard button:hover {
         // Initialize chat when page loads
         document.addEventListener('DOMContentLoaded', () => {
             initChat();
+            loadOnlineUsers();
             
             const chatInput = document.getElementById('chatInput');
             const chatSendBtn = document.getElementById('chatSendBtn');
-            
-            // Function to update chat UI based on login status
-            function updateChatUI() {
-                if (chatInput && chatSendBtn) {
-                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
-                    if (!loggedIn) {
-                        chatInput.disabled = true;
-                        chatInput.placeholder = 'Please log in to chat...';
-                        chatSendBtn.disabled = true;
-                        chatSendBtn.style.opacity = '0.5';
-                        chatSendBtn.style.cursor = 'not-allowed';
-                    } else {
-                        chatInput.disabled = false;
-                        chatInput.placeholder = 'Type a message...';
-                        chatSendBtn.disabled = false;
-                        chatSendBtn.style.opacity = '1';
-                        chatSendBtn.style.cursor = 'pointer';
-                    }
-                }
-            }
-            
-            // Update UI on load
-            updateChatUI();
-            
-            // Update UI when login status changes (check periodically)
-            setInterval(updateChatUI, 1000);
             
             if (chatInput && chatSendBtn) {
                 chatSendBtn.onclick = () => {
@@ -6747,26 +6206,12 @@ body.theme-flashcard button:hover {
         loadClockSetting();
         
         // Command input handler
-        // Command input - will be initialized after DOM loads
-        let commandInput = null;
-        
-        // Initialize command input after DOM is ready
-        function initCommandInput() {
-            commandInput = document.getElementById('commandInput');
-            if (!commandInput) {
-                // Retry if element doesn't exist yet
-                setTimeout(initCommandInput, 100);
-                return;
-            }
-            
-            // Set up the main command handler
-            commandInput.addEventListener('keydown', handleCommandKeydown);
-        }
+        const commandInput = document.getElementById('commandInput');
         
         // Semicolon key to focus command bar (works even when paper app is active)
         document.addEventListener('keydown', (e) => {
             // Only trigger if semicolon is pressed and not already typing in command input
-            if (e.key === ';' && commandInput && document.activeElement !== commandInput) {
+            if (e.key === ';' && document.activeElement !== commandInput) {
                 const activeEl = document.activeElement;
                 
                 // Block semicolon only if in a regular input/textarea (not contentEditable like paper app)
@@ -6785,7 +6230,7 @@ body.theme-flashcard button:hover {
             }
         });
         
-        function handleCommandKeydown(e) {
+        commandInput.addEventListener('keydown', (e) => {
             // Disable commands when on remote desktop
             const remoteDesktopPage = document.getElementById('remoteDesktopPage');
             if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
@@ -7215,15 +6660,6 @@ body.theme-flashcard button:hover {
                     showWhoami(targetId);
                 } else if (command === 'edit') {
                     resetConfirm = false;
-                    // Check if logged in
-                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
-                    if (!loggedIn) {
-                        showCommandFeedback('edit', 'Please log in to edit your profile!', false);
-                        if (typeof showPage === 'function') {
-                            showPage('loginPage');
-                        }
-                        return;
-                    }
                     openEditMenu();
                 } else if (command === 'boardedit') {
                     resetConfirm = false;
@@ -7233,82 +6669,49 @@ body.theme-flashcard button:hover {
                     commandInput.placeholder = 'Edit your board';
                 } else if (command.startsWith('friend ')) {
                     resetConfirm = false;
-                    // Check if logged in
-                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
-                    if (!loggedIn) {
-                        showCommandFeedback('friend', 'Please log in to send friend requests!', false);
-                        if (typeof showPage === 'function') {
-                            showPage('loginPage');
-                        }
-                        return;
-                    }
-                    const username = command.substring(7).trim();
-                    if (!username) {
-                        showCommandFeedback('friend', 'Please provide a username. Usage: friend [username]', false);
+                    const friendId = command.substring(7).trim();
+                    if (!friendId) {
+                        showCommandFeedback('friend', 'Please provide a user ID. Usage: friend [user id]', false);
+                    } else if (friendId === getUserId()) {
+                        showCommandFeedback('friend', 'You cannot add yourself as a friend!', false);
                     } else {
-                        // Send friend request
-                        const result = sendFriendRequest(username);
-                        if (result.success) {
-                            showCommandFeedback('friend', result.message, true);
+                        // Check if user exists and get their info to verify
+                        if (database) {
+                            database.ref(`users/${friendId}`).once('value', (snapshot) => {
+                                if (snapshot.exists()) {
+                                    const userData = snapshot.val();
+                                    const userBio = userData.bio || '(No bio)';
+                                    const isOnline = userData.online || (Date.now() - (userData.lastSeen || 0) < 60000);
+                                    const status = isOnline ? '🟢 Online' : '⚫ Offline';
+                                    
+                                    if (addFriend(friendId)) {
+                                        showCommandFeedback('friend', `Added ${friendId} (${status}) as a friend! Bio: ${userBio.substring(0, 30)}`, true);
+                                    } else {
+                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                                    }
+                                } else {
+                                    // User doesn't exist in Firebase, but still allow adding (might be offline)
+                                    if (addFriend(friendId)) {
+                                        showCommandFeedback('friend', `Added ${friendId} as a friend! (User not currently online)`, true);
+                                    } else {
+                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                                    }
+                                }
+                            });
                         } else {
-                            showCommandFeedback('friend', result.message || 'Failed to send friend request', false);
+                            // No Firebase, just add directly
+                            if (addFriend(friendId)) {
+                                showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
+                            } else {
+                                showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                            }
                         }
                     }
                 } else if (command === 'friends') {
                     resetConfirm = false;
-                    // Check if logged in
-                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
-                    if (!loggedIn) {
-                        showCommandFeedback('friends', 'Please log in to view your friends!', false);
-                        if (typeof showPage === 'function') {
-                            showPage('loginPage');
-                        }
-                        return;
-                    }
-                    resetConfirm = false;
                     openFriendsList();
-                } else if (command.startsWith('timeout ')) {
-                    resetConfirm = false;
-                    // Check if user is FinleyMain
-                    const currentUsername = localStorage.getItem('loggedInUsername') || getUserId();
-                    if (currentUsername !== 'FinleyMain' && currentUsername.toLowerCase() !== 'finleymain') {
-                        showCommandFeedback('timeout', 'Only FinleyMain can use the timeout command!', false);
-                        commandInput.value = '';
-                        return;
-                    }
-                    
-                    // Parse command: timeout <user> <minutes>
-                    const parts = command.substring(8).trim().split(/\s+/);
-                    if (parts.length < 2) {
-                        showCommandFeedback('timeout', 'Usage: timeout <user> <minutes>', false);
-                        commandInput.value = '';
-                        return;
-                    }
-                    
-                    const targetUser = parts[0];
-                    const minutes = parseInt(parts[1]);
-                    
-                    if (isNaN(minutes) || minutes <= 0) {
-                        showCommandFeedback('timeout', 'Invalid time! Please provide a positive number of minutes.', false);
-                        commandInput.value = '';
-                        return;
-                    }
-                    
-                    // Timeout the user
-                    timeoutUser(targetUser, minutes);
-                    showCommandFeedback('timeout', `${targetUser} has been timed out for ${minutes} minute(s)!`, true);
-                    commandInput.value = '';
                 } else if (command === 'chat') {
                     resetConfirm = false;
-                    // Check if logged in
-                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
-                    if (!loggedIn) {
-                        showCommandFeedback('chat', 'Please log in to use chat!', false);
-                        if (typeof showPage === 'function') {
-                            showPage('loginPage');
-                        }
-                        return;
-                    }
                     const chatPage = document.getElementById('chatPage');
                     if (chatPage && !chatPage.classList.contains('hidden')) {
                         // Chat is open, close it
@@ -7425,7 +6828,7 @@ body.theme-flashcard button:hover {
                     }, 2000);
                 }
             }
-        }
+        });
         
         // Minesweeper game code
         const GRID_SIZE = 10;
@@ -12928,6 +12331,46 @@ body.theme-flashcard button:hover {
             closeBtn.className = 'win95-window-button';
             closeBtn.textContent = '×';
             closeBtn.onclick = () => {
+                // Clean up lobby when closing window
+                if (currentLobbyId && database) {
+                    const userId = getUserId();
+                    database.ref(`passwordGameLobbies/${currentLobbyId}`).once('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            let players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
+                            players = players.filter(p => p !== userId);
+                            
+                            // If no players left, reset lobby but keep it (for fixed lobby system)
+                            if (players.length === 0) {
+                                database.ref(`passwordGameLobbies/${currentLobbyId}`).update({
+                                    host: null,
+                                    hostName: null,
+                                    players: [],
+                                    password: '',
+                                    gameStarted: false
+                                });
+                            } else {
+                                // Remove player from lobby
+                                database.ref(`passwordGameLobbies/${currentLobbyId}`).update({
+                                    players: players
+                                });
+                                
+                                // If player was host, assign new host
+                                if (data.host === userId && players.length > 0) {
+                                    database.ref(`passwordGameLobbies/${currentLobbyId}`).update({
+                                        host: players[0],
+                                        hostName: players[0]
+                                    });
+                                }
+                            }
+                            
+                            // Remove listener
+                            if (lobbyListener) {
+                                database.ref(`passwordGameLobbies/${currentLobbyId}`).off('value', lobbyListener);
+                            }
+                        }
+                    });
+                }
                 window.remove();
                 desktopWindows = desktopWindows.filter(w => w.element !== window);
                 updateTaskbar();
@@ -13149,7 +12592,7 @@ body.theme-flashcard button:hover {
                 content.className = 'win95-window-content';
                 content.style.padding = '10px';
                 content.style.overflow = 'auto';
-                content.innerHTML = '<div style="text-align: center; margin: 10px 0;"><button id="create-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Create Lobby</button><button id="refresh-password-lobbies" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px; margin-left: 5px;">Refresh</button><div style="font-size: 11px; margin-bottom: 10px;">Available Lobbies:</div><div id="lobby-list">Loading...</div></div>';
+                content.innerHTML = '<div style="text-align: center; margin: 10px 0;"><button id="refresh-password-lobbies" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Refresh</button><div style="font-size: 11px; margin-bottom: 10px;">Available Lobbies:</div><div id="lobby-list">Loading...</div></div>';
                 
                 lobbyWindow.appendChild(header);
                 lobbyWindow.appendChild(content);
@@ -13158,70 +12601,92 @@ body.theme-flashcard button:hover {
                 let lobbyRefreshInterval = null;
                 let lobbyListener = null;
                 
-                function renderLobbies(lobbies) {
+                function renderLobbies(lobbiesData) {
                     const listEl = content.querySelector('#lobby-list');
-                    if (lobbies.length === 0) {
-                        listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
-                    } else {
-                        listEl.innerHTML = '';
-                        lobbies.forEach(lobby => {
+                    if (!listEl) return;
+                    
+                    // Always show 5 fixed lobbies
+                    const fixedLobbyIds = ['lobby1', 'lobby2', 'lobby3', 'lobby4', 'lobby5'];
+                    let html = '';
+                    
+                    fixedLobbyIds.forEach((lobbyId, index) => {
+                        const lobbyNum = index + 1;
+                        const lobby = lobbiesData[lobbyId];
+                        
+                        if (lobby) {
                             const hasPassword = lobby.lobbyPassword && lobby.lobbyPassword.length > 0;
-                            const hostName = lobby.hostName || lobby.host || 'Unknown';
+                            const hostName = lobby.hostName || lobby.host || 'None';
                             const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
+                            const isFull = players.length >= 2;
+                            const isGameStarted = lobby.gameStarted || false;
+                            const statusText = isGameStarted ? ' (Game in progress)' : isFull ? ' (Full)' : ' (Open)';
                             
-                            const lobbyDiv = document.createElement('div');
-                            lobbyDiv.style.cssText = 'border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;';
-                            lobbyDiv.innerHTML = `
-                                <div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div>
-                                <div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div>
-                                <div style="font-size: 10px; color: #666;">Players: ${players.length}/2 ${hasPassword ? '🔒' : ''}</div>
-                                <button class="password-join-btn" data-lobby-id="${escapeHtml(lobby.id)}" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button>
-                            `;
-                            
-                            const joinBtn = lobbyDiv.querySelector('.password-join-btn');
-                            joinBtn.onclick = () => {
-                                joinLobbyInternal(lobby.id, false);
-                            };
-                            
-                            listEl.appendChild(lobbyDiv);
-                        });
-                    }
+                            html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobbyNum}</div><div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div><div style="font-size: 10px; color: #666;">Players: ${players.length}/2${statusText} ${hasPassword ? '🔒' : ''}</div><button data-lobby-id="${lobbyId}" class="join-lobby-btn" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px; ${isFull && !isGameStarted ? 'opacity: 0.5;' : ''}" ${isFull && !isGameStarted ? 'disabled' : ''}>Join</button></div>`;
+                        } else {
+                            // Lobby doesn't exist yet, show empty
+                            html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobbyNum}</div><div style="font-size: 10px; color: #666;">Host: None</div><div style="font-size: 10px; color: #666;">Players: 0/2 (Open)</div><button data-lobby-id="${lobbyId}" class="join-lobby-btn" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
+                        }
+                    });
+                    
+                    listEl.innerHTML = html;
+                    
+                    // Attach event listeners to all join buttons
+                    listEl.querySelectorAll('.join-lobby-btn').forEach(btn => {
+                        btn.onclick = () => {
+                            const lobbyId = btn.getAttribute('data-lobby-id');
+                            if (lobbyId) {
+                                joinLobbyInternal(lobbyId, false);
+                            }
+                        };
+                    });
                 }
                 
                 function loadLobbies() {
                     const listEl = content.querySelector('#lobby-list');
                     if (database) {
+                        // Initialize fixed lobbies if they don't exist
+                        const fixedLobbyIds = ['lobby1', 'lobby2', 'lobby3', 'lobby4', 'lobby5'];
+                        fixedLobbyIds.forEach(lobbyId => {
+                            database.ref(`passwordGameLobbies/${lobbyId}`).once('value', (snapshot) => {
+                                if (!snapshot.exists()) {
+                                    database.ref(`passwordGameLobbies/${lobbyId}`).set({
+                                        host: null,
+                                        hostName: null,
+                                        players: [],
+                                        password: '',
+                                        lobbyPassword: null,
+                                        attempts: {},
+                                        gameStarted: false,
+                                        createdAt: Date.now()
+                                    });
+                                }
+                            });
+                        });
+                        
                         // Remove old listener if exists
                         if (lobbyListener) {
                             database.ref('passwordGameLobbies').off('value', lobbyListener);
                         }
                         
-                        // Set up listener that updates every 5 seconds
+                        // Set up listener for all lobbies
                         lobbyListener = (snapshot) => {
-                            const lobbies = [];
-                            snapshot.forEach((child) => {
-                                const data = child.val();
-                                if (!data.gameStarted) {
-                                    const players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
-                                    if (players.length < 2) {
-                                        lobbies.push({ id: child.key, ...data, players });
-                                    }
-                                }
-                            });
-                            renderLobbies(lobbies);
+                            const allLobbies = snapshot.val() || {};
+                            renderLobbies(allLobbies);
                         };
                         
                         database.ref('passwordGameLobbies').on('value', lobbyListener);
                         
-                        // Also refresh every 5 seconds
+                        // Also refresh every 2 seconds for better responsiveness
                         if (lobbyRefreshInterval) {
                             clearInterval(lobbyRefreshInterval);
                         }
                         lobbyRefreshInterval = setInterval(() => {
                             database.ref('passwordGameLobbies').once('value', lobbyListener);
-                        }, 5000);
+                        }, 2000);
                     } else {
-                        listEl.innerHTML = '<div style="font-size: 11px; color: #f85149; text-align: center; margin: 10px 0;">Firebase not available. Please check connection.</div>';
+                        if (listEl) {
+                            listEl.innerHTML = '<div style="font-size: 11px; color: #f85149; text-align: center; margin: 10px 0;">Firebase not available. Please check connection.</div>';
+                        }
                     }
                 }
                 
@@ -13322,18 +12787,64 @@ body.theme-flashcard button:hover {
                 }
                 
                 function joinLobbyInternal(lobbyId, isHostPlayer, providedPassword = null) {
+                    const userId = getUserId() || 'user' + Date.now();
+                    
                     // Check if lobby has password
                     if (database && !isHostPlayer) {
                         database.ref(`passwordGameLobbies/${lobbyId}`).once('value', (snapshot) => {
                             const data = snapshot.val();
+                            
+                            // If lobby doesn't exist, create it with this user as host
                             if (!data) {
-                                alert('Lobby not found!');
+                                database.ref(`passwordGameLobbies/${lobbyId}`).set({
+                                    host: userId,
+                                    hostName: userId,
+                                    players: [userId],
+                                    password: '',
+                                    lobbyPassword: null,
+                                    attempts: {},
+                                    gameStarted: false,
+                                    createdAt: Date.now()
+                                }).then(() => {
+                                    currentLobbyId = lobbyId;
+                                    isMultiplayer = true;
+                                    isHost = true;
+                                    modeEl.textContent = 'You are HOST. Set word to start...';
+                                    
+                                    if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
+                                    if (lobbyIdEl) lobbyIdEl.textContent = lobbyId;
+                                    setupGameMode();
+                                    updateLobbyInfo();
+                                    
+                                    // Listen for lobby updates
+                                    setupLobbyListener();
+                                });
+                                return;
+                            }
+                            
+                            // Check if game already started
+                            if (data.gameStarted) {
+                                alert('This game has already started! Please join another lobby.');
                                 return;
                             }
                             
                             const players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
                             if (players.length >= 2) {
                                 alert('Lobby is full!');
+                                return;
+                            }
+                            
+                            // Check if already in lobby
+                            if (players.includes(userId)) {
+                                alert('You are already in this lobby!');
+                                currentLobbyId = lobbyId;
+                                isMultiplayer = true;
+                                isHost = data.host === userId;
+                                if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
+                                if (lobbyIdEl) lobbyIdEl.textContent = lobbyId;
+                                setupGameMode();
+                                updateLobbyInfo();
+                                setupLobbyListener();
                                 return;
                             }
                             
@@ -13352,43 +12863,33 @@ body.theme-flashcard button:hover {
                             }
                             
                             // Add player to lobby
-                            const userId = getUserId() || 'user' + Date.now();
                             const currentPlayers = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
                             if (!currentPlayers.includes(userId)) {
                                 currentPlayers.push(userId);
-                                database.ref(`passwordGameLobbies/${lobbyId}`).update({
+                                
+                                // Update lobby, set as host if first player
+                                const updates = {
                                     players: currentPlayers
-                                });
-                            }
-                            
-                            // Continue joining
-                            currentLobbyId = lobbyId;
-                            isMultiplayer = true;
-                            isHost = false;
-                            modeEl.textContent = 'You are GUESSING. Wait for host to set word...';
-                            
-                            // Show lobby info
-                            if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
-                            if (lobbyIdEl) lobbyIdEl.textContent = lobbyId.substring(0, 8);
-                            setupGameMode();
-                            updateLobbyInfo();
-                            
-                            // Listen for lobby updates
-                            if (database && currentLobbyId) {
-                                if (lobbyListener) {
-                                    database.ref(`passwordGameLobbies/${currentLobbyId}`).off('value', lobbyListener);
-                                }
-                                lobbyListener = (snapshot) => {
-                                    const data = snapshot.val();
-                                    if (data) {
-                                        updateLobbyInfo();
-                                        if (data.gameStarted && data.password) {
-                                            currentPassword = data.password;
-                                            modeEl.textContent = 'Game started! Guess the word!';
-                                        }
-                                    }
                                 };
-                                database.ref(`passwordGameLobbies/${currentLobbyId}`).on('value', lobbyListener);
+                                if (!data.host || currentPlayers.length === 1) {
+                                    updates.host = userId;
+                                    updates.hostName = userId;
+                                }
+                                
+                                database.ref(`passwordGameLobbies/${lobbyId}`).update(updates).then(() => {
+                                    currentLobbyId = lobbyId;
+                                    isMultiplayer = true;
+                                    isHost = updates.host === userId;
+                                    modeEl.textContent = isHost ? 'You are HOST. Set word to start...' : 'You are GUESSING. Wait for host to set word...';
+                                    
+                                    if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
+                                    if (lobbyIdEl) lobbyIdEl.textContent = lobbyId;
+                                    setupGameMode();
+                                    updateLobbyInfo();
+                                    
+                                    // Listen for lobby updates
+                                    setupLobbyListener();
+                                });
                             }
                         });
                         return;
@@ -13401,11 +12902,15 @@ body.theme-flashcard button:hover {
                     
                     // Show lobby info
                     if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
-                    if (lobbyIdEl) lobbyIdEl.textContent = lobbyId.substring(0, 8);
+                    if (lobbyIdEl) lobbyIdEl.textContent = lobbyId;
                     updateLobbyInfo();
                     setupGameMode();
                     
                     // Listen for lobby updates
+                    setupLobbyListener();
+                }
+                
+                function setupLobbyListener() {
                     if (database && currentLobbyId) {
                         if (lobbyListener) {
                             database.ref(`passwordGameLobbies/${currentLobbyId}`).off('value', lobbyListener);
@@ -13414,6 +12919,17 @@ body.theme-flashcard button:hover {
                             const data = snapshot.val();
                             if (data) {
                                 updateLobbyInfo();
+                                if (data.gameStarted && data.password) {
+                                    currentPassword = data.password;
+                                    if (!isHost) {
+                                        modeEl.textContent = 'Game started! Guess the word!';
+                                    }
+                                }
+                            } else {
+                                // Lobby was deleted, reset
+                                currentLobbyId = null;
+                                isMultiplayer = false;
+                                if (lobbyInfoEl) lobbyInfoEl.style.display = 'none';
                             }
                         };
                         database.ref(`passwordGameLobbies/${currentLobbyId}`).on('value', lobbyListener);
@@ -13425,13 +12941,29 @@ body.theme-flashcard button:hover {
                     
                     database.ref(`passwordGameLobbies/${currentLobbyId}`).once('value', (snapshot) => {
                         const data = snapshot.val();
-                        if (!data) return;
+                        if (!data) {
+                            // Lobby was deleted, clean up
+                            currentLobbyId = null;
+                            isMultiplayer = false;
+                            if (lobbyInfoEl) lobbyInfoEl.style.display = 'none';
+                            return;
+                        }
                         
-                        const players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
+                        // Clean up empty arrays/objects in players
+                        let players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
+                        players = players.filter(p => p && p.trim() !== '');
+                        
+                        // Update players list if needed
+                        if (players.length !== (Array.isArray(data.players) ? data.players.length : Object.keys(data.players || {}).length)) {
+                            database.ref(`passwordGameLobbies/${currentLobbyId}`).update({
+                                players: players
+                            });
+                        }
+                        
                         const playerNames = players.map(p => escapeHtml(p || 'Unknown')).join(', ');
                         
                         if (lobbyPlayersEl) {
-                            lobbyPlayersEl.textContent = `Players (${players.length}/2): ${playerNames}`;
+                            lobbyPlayersEl.textContent = `Players (${players.length}/2): ${playerNames || 'None'}`;
                         }
                         
                         if (isHost) {
@@ -13491,15 +13023,17 @@ body.theme-flashcard button:hover {
                     }
                 }
                 
-                // Set global function for backwards compatibility
-                window.passwordJoinLobby = (lobbyId) => joinLobbyInternal(lobbyId, false);
-                
-                content.querySelector('#create-lobby').onclick = createLobby;
-                content.querySelector('#refresh-password-lobbies').onclick = () => {
-                    if (database) {
-                        database.ref('passwordGameLobbies').once('value', lobbyListener);
-                    }
-                };
+                const refreshBtn = content.querySelector('#refresh-password-lobbies');
+                if (refreshBtn) {
+                    refreshBtn.onclick = () => {
+                        if (database) {
+                            database.ref('passwordGameLobbies').once('value', (snapshot) => {
+                                const allLobbies = snapshot.val() || {};
+                                renderLobbies(allLobbies);
+                            });
+                        }
+                    };
+                }
                 loadLobbies();
                 
                 // Make draggable
@@ -13835,12 +13369,8 @@ body.theme-flashcard button:hover {
             // Make join function globally accessible - update each time showPaintV2Lobbies is called
             // Lobby system
             function showPaintV2Lobbies() {
-                // Make sure the global join function is accessible when buttons are created (for backwards compatibility)
-                window.paintV2JoinLobby = (lobbyId) => {
-                    if (typeof joinLobbyInternal === 'function') {
-                        joinLobbyInternal(lobbyId);
-                    }
-                };
+                // Make sure the global join function is accessible when buttons are created
+                window.paintV2JoinLobby = (lobbyId) => joinLobbyInternal(lobbyId);
                 
                 windowZIndex++;
                 const lobbyWindow = document.createElement('div');
@@ -13884,28 +13414,14 @@ body.theme-flashcard button:hover {
                     if (lobbies.length === 0) {
                         listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
                     } else {
-                        listEl.innerHTML = '';
+                        let html = '';
                         lobbies.forEach(lobby => {
                             const hasPassword = lobby.password && lobby.password.length > 0;
                             const hostName = lobby.hostName || lobby.host || 'Unknown';
                             const maxPlayers = lobby.maxPlayers || 10;
-                            
-                            const lobbyDiv = document.createElement('div');
-                            lobbyDiv.style.cssText = 'border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;';
-                            lobbyDiv.innerHTML = `
-                                <div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div>
-                                <div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div>
-                                <div style="font-size: 10px; color: #666;">Players: ${lobby.playerCount}/${maxPlayers} ${hasPassword ? '🔒' : ''}</div>
-                                <button class="paintv2-join-btn" data-lobby-id="${escapeHtml(lobby.id)}" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button>
-                            `;
-                            
-                            const joinBtn = lobbyDiv.querySelector('.paintv2-join-btn');
-                            joinBtn.onclick = () => {
-                                joinLobbyInternal(lobby.id);
-                            };
-                            
-                            listEl.appendChild(lobbyDiv);
+                            html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div><div style="font-size: 10px; color: #666;">Players: ${lobby.playerCount}/${maxPlayers} ${hasPassword ? '🔒' : ''}</div><button onclick="window.paintV2JoinLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
                         });
+                        listEl.innerHTML = html;
                     }
                 }
                 
@@ -17561,34 +17077,13 @@ body.theme-flashcard button:hover {
                 console.error('Error cleaning up theme elements:', e);
             }
             
-            // Check login status (but continue initialization)
-            try {
-                if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
-                    if (typeof showPage === 'function') {
-                        showPage('loginPage');
-                    }
-                } else if (typeof isLoggedIn === 'function' && isLoggedIn()) {
-                    // Load user data if logged in
-                    const username = localStorage.getItem('loggedInUsername');
-                    if (username && typeof loadUserData === 'function') {
-                        loadUserData(username);
-                    }
-                }
-            } catch (e) {
-                console.error('Error checking login:', e);
-            }
-            
             // Load data
             try {
                 if (typeof loadGlobalData === 'function') loadGlobalData();
                 if (typeof loadCoinflipData === 'function') loadCoinflipData();
-                if (typeof loadCommandHistory === 'function') loadCommandHistory();
             } catch (e) {
                 console.error('Error loading data:', e);
             }
-            
-            // Command input handler is set up separately (see line 6587)
-            // Don't override it here
             
             // Load and apply theme (this will set up handlers properly)
             try {
@@ -17615,22 +17110,6 @@ body.theme-flashcard button:hover {
                 console.error('Error initializing remote desktop:', e);
             }
             
-            // Update visit counter
-            try {
-                if (typeof updateVisitCounter === 'function') {
-                    updateVisitCounter();
-                }
-            } catch (e) {
-                console.error('Error updating visit counter:', e);
-            }
-            
-            // Update login button
-            try {
-                updateLoginButton();
-            } catch (e) {
-                console.error('Error updating login button:', e);
-            }
-            
             // Ensure command bar is visible (unless on remote desktop or blocked)
             try {
                 const commandBar = document.querySelector('.command-bar');
@@ -17647,213 +17126,13 @@ body.theme-flashcard button:hover {
             }
         }
         
-        // Update login button based on login status
-        function updateLoginButton() {
-            const loginButton = document.getElementById('loginButton');
-            if (!loginButton) return;
-            
-            const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
-            const username = localStorage.getItem('loggedInUsername');
-            
-            if (loggedIn && username) {
-                loginButton.textContent = username;
-                loginButton.style.background = '#58a6ff';
-                loginButton.title = 'Click to logout or view profile';
-            } else {
-                loginButton.textContent = 'Login';
-                loginButton.style.background = '#238636';
-                loginButton.title = 'Click to login';
-            }
-        }
-        
-        // Handle login button click
-        function handleLoginButtonClick() {
-            const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
-            
-            if (loggedIn) {
-                // Show logout confirmation or user menu
-                if (confirm('Do you want to logout?')) {
-                    if (typeof logoutUser === 'function') {
-                        logoutUser();
-                    } else if (typeof handleLogout === 'function') {
-                        handleLogout();
-                    } else {
-                        localStorage.removeItem('loggedInUsername');
-                        window.location.reload();
-                    }
-                    updateLoginButton();
-                }
-            } else {
-                // Go to login page
-                if (typeof showPage === 'function') {
-                    showPage('loginPage');
-                }
-            }
-        }
-        
-        // Make function globally accessible
-        window.handleLoginButtonClick = handleLoginButtonClick;
-        
-        // Login and Register handlers
-        function handleLogin() {
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-            const errorDiv = document.getElementById('loginError');
-            
-            if (!username || !password) {
-                errorDiv.textContent = 'Please enter both username and password';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            errorDiv.style.display = 'none';
-            
-            // Check if user exists in Firebase
-            if (database) {
-                database.ref(`users/${username}`).once('value', (snapshot) => {
-                    if (!snapshot.exists()) {
-                        errorDiv.textContent = 'Username not found. Please register first.';
-                        errorDiv.style.display = 'block';
-                        return;
-                    }
-                    
-                    const userData = snapshot.val();
-                    // Hash password and compare
-                    const hash = btoa(password).split('').reverse().join(''); // Simple hash for demo
-                    if (userData.password === hash) {
-                        // Login successful
-                        localStorage.setItem('loggedInUsername', username);
-                        updateLoginButton();
-                        showPage('mainPage');
-                        // Load user data
-                        if (typeof loadUserData === 'function') {
-                            loadUserData(username);
-                        }
-                    } else {
-                        errorDiv.textContent = 'Incorrect password';
-                        errorDiv.style.display = 'block';
-                    }
-                });
-            } else {
-                // Fallback to localStorage
-                const users = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-                if (!users[username]) {
-                    errorDiv.textContent = 'Username not found. Please register first.';
-                    errorDiv.style.display = 'block';
-                    return;
-                }
-                const hash = btoa(password).split('').reverse().join('');
-                if (users[username].password === hash) {
-                    localStorage.setItem('loggedInUsername', username);
-                    updateLoginButton();
-                    showPage('mainPage');
-                } else {
-                    errorDiv.textContent = 'Incorrect password';
-                    errorDiv.style.display = 'block';
-                }
-            }
-        }
-        
-        function handleRegister() {
-            const username = document.getElementById('register-username').value.trim();
-            const password = document.getElementById('register-password').value;
-            const passwordConfirm = document.getElementById('register-password-confirm').value;
-            const errorDiv = document.getElementById('registerError');
-            
-            if (!username || !password || !passwordConfirm) {
-                errorDiv.textContent = 'Please fill in all fields';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            if (password !== passwordConfirm) {
-                errorDiv.textContent = 'Passwords do not match';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            if (username.length < 3 || username.length > 20) {
-                errorDiv.textContent = 'Username must be 3-20 characters';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            const validIdPattern = /^[a-zA-Z0-9_-]+$/;
-            if (!validIdPattern.test(username)) {
-                errorDiv.textContent = 'Username can only contain letters, numbers, _, and -';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            errorDiv.style.display = 'none';
-            
-            // Check if username already exists
-            if (database) {
-                database.ref(`users/${username}`).once('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        errorDiv.textContent = 'Username already taken. Please choose another.';
-                        errorDiv.style.display = 'block';
-                        return;
-                    }
-                    
-                    // Create new user
-                    const hash = btoa(password).split('').reverse().join('');
-                    database.ref(`users/${username}`).set({
-                        username: username,
-                        password: hash,
-                        displayName: username,
-                        bio: '',
-                        avatar: '👤',
-                        createdAt: Date.now()
-                    });
-                    
-                    localStorage.setItem('loggedInUsername', username);
-                    localStorage.setItem('displayName', username);
-                    updateLoginButton();
-                    showPage('mainPage');
-                });
-            } else {
-                // Fallback to localStorage
-                const users = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-                if (users[username]) {
-                    errorDiv.textContent = 'Username already taken. Please choose another.';
-                    errorDiv.style.display = 'block';
-                    return;
-                }
-                
-                const hash = btoa(password).split('').reverse().join('');
-                users[username] = { password: hash, displayName: username };
-                localStorage.setItem('registeredUsers', JSON.stringify(users));
-                localStorage.setItem('loggedInUsername', username);
-                localStorage.setItem('displayName', username);
-                updateLoginButton();
-                showPage('mainPage');
-            }
-        }
-        
-        function isLoggedIn() {
-            return !!localStorage.getItem('loggedInUsername');
-        }
-        
-        window.handleLogin = handleLogin;
-        window.handleRegister = handleRegister;
-        window.isLoggedIn = isLoggedIn;
-        
-        // Initialize command input and on DOM ready
-        function initAll() {
-            initCommandInput();
-            initializeOnLoad();
-        }
-        
+        // Initialize on DOM ready
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initAll);
+            document.addEventListener('DOMContentLoaded', initializeOnLoad);
         } else {
             // DOM already loaded
-            initAll();
+            initializeOnLoad();
         }
-        
-        // Update login button periodically to reflect login status changes
-        setInterval(updateLoginButton, 1000);
         
         // Check if blocked on page load
         if (checkBlocked()) {
