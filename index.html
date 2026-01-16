@@ -2630,10 +2630,23 @@ body.theme-mlg {
     font-family: 'Impact', 'Arial Black', sans-serif;
     background: linear-gradient(135deg, #1a0033 0%, #330066 25%, #000000 50%, #330066 75%, #1a0033 100%) !important;
     background-size: 400% 400%;
-    animation: mlg-gradient 5s ease infinite;
+    animation: mlg-gradient 5s ease infinite, mlg-crazy-shake 0.05s ease-in-out infinite !important;
     color: #00ff00;
     position: relative;
     overflow: hidden;
+}
+
+@keyframes mlg-crazy-shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    10% { transform: translate(-10px, -8px) rotate(-1deg); }
+    20% { transform: translate(8px, 10px) rotate(1deg); }
+    30% { transform: translate(-8px, 8px) rotate(-1deg); }
+    40% { transform: translate(10px, -10px) rotate(1deg); }
+    50% { transform: translate(-6px, -8px) rotate(-0.5deg); }
+    60% { transform: translate(8px, 6px) rotate(0.5deg); }
+    70% { transform: translate(-10px, 8px) rotate(-1deg); }
+    80% { transform: translate(6px, -10px) rotate(1deg); }
+    90% { transform: translate(-8px, -6px) rotate(-0.5deg); }
 }
 
 @keyframes mlg-gradient {
@@ -2672,7 +2685,7 @@ body.theme-mlg .commands-menu {
         0 0 20px #00ff00,
         inset 0 0 20px rgba(0, 255, 0, 0.2) !important;
     text-shadow: 0 0 10px #00ff00 !important;
-    animation: mlg-pulse 1s ease-in-out infinite;
+    animation: mlg-pulse 1s ease-in-out infinite, mlg-crazy-shake 0.05s ease-in-out infinite !important;
 }
 
 @keyframes mlg-pulse {
@@ -2708,13 +2721,11 @@ body.theme-mlg .letters-source {
         0 0 10px #00ff00,
         0 0 20px #00ff00,
         0 0 30px #00ff00 !important;
-    animation: mlg-text-shake 0.1s ease-in-out infinite;
+    animation: mlg-crazy-shake 0.05s ease-in-out infinite !important;
 }
 
-@keyframes mlg-text-shake {
-    0%, 100% { transform: translate(0, 0); }
-    25% { transform: translate(-1px, 1px); }
-    75% { transform: translate(1px, -1px); }
+body.theme-mlg *:not(.mlg-emoji-rain):not(.mlg-airhorn):not(.mlg-oh-text):not(.mlg-dorito):not(.mlg-mountain-dew) {
+    animation: mlg-crazy-shake 0.05s ease-in-out infinite !important;
 }
 
 body.theme-mlg button {
@@ -2727,7 +2738,7 @@ body.theme-mlg button {
     box-shadow: 
         0 0 20px #00ff00,
         inset 0 0 10px rgba(0, 255, 0, 0.5) !important;
-    animation: mlg-button-pulse 0.5s ease-in-out infinite;
+    animation: mlg-button-pulse 0.5s ease-in-out infinite, mlg-crazy-shake 0.05s ease-in-out infinite !important;
 }
 
 @keyframes mlg-button-pulse {
@@ -2838,6 +2849,25 @@ body.theme-mlg button:hover {
     }
     100% {
         transform: translate(var(--dx), var(--dy)) rotate(-720deg) scale(0);
+        opacity: 0;
+    }
+}
+
+.mlg-emoji-rain {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    font-size: 30px;
+    animation: mlg-emoji-fly 3s linear forwards;
+}
+
+@keyframes mlg-emoji-fly {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--dx), var(--dy)) rotate(720deg) scale(0);
         opacity: 0;
     }
 }
@@ -8590,6 +8620,8 @@ body.theme-flashcard button:hover {
         let mlgKeyHandler = null;
         let mlgClickHandler = null;
         let mlgMouseHandler = null;
+        let mlgEmojiInterval = null;
+        const mlgEmojis = ['🔥', '💯', '👌', '😎', '🎮', '🏆', '⭐', '💪', '🚀', '🎯', '💥', '⚡', '🎉', '💎', '👑', '🎊', '🌟', '✨', '💫', '🎈', '🎁', '🏅', '🥇', '🎪', '🎭', '🎨', '🎬', '🎤', '🎧', '🎸', '🥁', '🎺', '🎻', '🎹', '🎲', '🎰', '🕹️', '🏹', '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🥊', '🥋', '🥅', '⛸️', '🥌', '🛷', '🚲', '🛴', '🛹', '🛼', '🛸', '🚁', '✈️', '🛩️', '🛫', '🛬', '🪂', '💺', '🚢', '⛵', '🛥️', '🚤', '🛳️', '⛴️', '🚀', '🛸', '🛰️'];
         
         function setupMLGTheme() {
             // Clean up existing handlers
@@ -8665,7 +8697,75 @@ body.theme-flashcard button:hover {
                     }
                 };
                 document.addEventListener('mousemove', mlgMouseHandler);
+                
+                // Spawn emojis from all sides continuously
+                mlgEmojiInterval = setInterval(() => {
+                    if (!document.body.classList.contains('theme-mlg')) {
+                        if (mlgEmojiInterval) {
+                            clearInterval(mlgEmojiInterval);
+                            mlgEmojiInterval = null;
+                        }
+                        return;
+                    }
+                    
+                    // Spawn multiple emojis at once
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            createMLGEmojiFromRandomSide();
+                        }, i * 100);
+                    }
+                }, 200); // Spawn every 200ms
             }
+        }
+        
+        function createMLGEmojiFromRandomSide() {
+            if (!document.body.classList.contains('theme-mlg')) return;
+            
+            const emoji = mlgEmojis[Math.floor(Math.random() * mlgEmojis.length)];
+            const side = Math.floor(Math.random() * 4); // 0=top, 1=right, 2=bottom, 3=left
+            
+            const emojiEl = document.createElement('div');
+            emojiEl.className = 'mlg-emoji-rain';
+            emojiEl.textContent = emoji;
+            
+            let startX, startY, endX, endY;
+            
+            if (side === 0) { // Top
+                startX = Math.random() * window.innerWidth;
+                startY = -50;
+                endX = startX + (Math.random() - 0.5) * 400;
+                endY = window.innerHeight + 50;
+            } else if (side === 1) { // Right
+                startX = window.innerWidth + 50;
+                startY = Math.random() * window.innerHeight;
+                endX = -50;
+                endY = startY + (Math.random() - 0.5) * 400;
+            } else if (side === 2) { // Bottom
+                startX = Math.random() * window.innerWidth;
+                startY = window.innerHeight + 50;
+                endX = startX + (Math.random() - 0.5) * 400;
+                endY = -50;
+            } else { // Left
+                startX = -50;
+                startY = Math.random() * window.innerHeight;
+                endX = window.innerWidth + 50;
+                endY = startY + (Math.random() - 0.5) * 400;
+            }
+            
+            emojiEl.style.left = startX + 'px';
+            emojiEl.style.top = startY + 'px';
+            
+            const dx = endX - startX;
+            const dy = endY - startY;
+            
+            emojiEl.style.setProperty('--dx', dx + 'px');
+            emojiEl.style.setProperty('--dy', dy + 'px');
+            
+            document.body.appendChild(emojiEl);
+            
+            setTimeout(() => {
+                emojiEl.remove();
+            }, 3000);
         }
         
         function createMLGOh() {
@@ -8742,7 +8842,15 @@ body.theme-flashcard button:hover {
         }
         
         function cleanupMLGEffects() {
-            document.querySelectorAll('.mlg-airhorn, .mlg-oh-text, .mlg-dorito, .mlg-mountain-dew').forEach(el => el.remove());
+            document.querySelectorAll('.mlg-airhorn, .mlg-oh-text, .mlg-dorito, .mlg-mountain-dew, .mlg-emoji-rain').forEach(el => el.remove());
+            
+            // Clear emoji interval
+            if (typeof mlgEmojiInterval !== 'undefined' && mlgEmojiInterval) {
+                try {
+                    clearInterval(mlgEmojiInterval);
+                } catch (e) {}
+                mlgEmojiInterval = null;
+            }
             
             // Remove handlers if they exist
             if (typeof mlgKeyHandler !== 'undefined' && mlgKeyHandler) {
