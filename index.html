@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinHub - Finley Chang</title>
+    <title>Clever | Portal</title>
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234169E1'/%3E%3Ctext x='50' y='75' font-size='70' font-weight='bold' font-family='Arial, sans-serif' text-anchor='middle' fill='white' filter='url(%23glow)'%3EC%3C/text%3E%3Cdefs%3E%3Cfilter id='glow'%3E%3CfeGaussianBlur stdDeviation='3' result='coloredBlur'/%3E%3CfeMerge%3E%3CfeMergeNode in='coloredBlur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E">
     <!-- Firebase SDK -->
@@ -8622,6 +8622,101 @@ body.theme-flashcard button:hover {
         let mlgMouseHandler = null;
         let mlgEmojiInterval = null;
         const mlgEmojis = ['🔥', '💯', '👌', '😎', '🎮', '🏆', '⭐', '💪', '🚀', '🎯', '💥', '⚡', '🎉', '💎', '👑', '🎊', '🌟', '✨', '💫', '🎈', '🎁', '🏅', '🥇', '🎪', '🎭', '🎨', '🎬', '🎤', '🎧', '🎸', '🥁', '🎺', '🎻', '🎹', '🎲', '🎰', '🕹️', '🏹', '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🥊', '🥋', '🥅', '⛸️', '🥌', '🛷', '🚲', '🛴', '🛹', '🛼', '🛸', '🚁', '✈️', '🛩️', '🛫', '🛬', '🪂', '💺', '🚢', '⛵', '🛥️', '🚤', '🛳️', '⛴️', '🚀', '🛸', '🛰️'];
+        let mlgAudioContext = null;
+        
+        // Initialize audio context for MLG sounds
+        function initMLGAudio() {
+            try {
+                if (!mlgAudioContext) {
+                    mlgAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            } catch (e) {
+                console.error('Error initializing MLG audio:', e);
+            }
+        }
+        
+        // Play airhorn sound
+        function playMLGAirhorn() {
+            if (!mlgAudioContext) initMLGAudio();
+            if (!mlgAudioContext) return;
+            
+            try {
+                const oscillator = mlgAudioContext.createOscillator();
+                const gainNode = mlgAudioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(mlgAudioContext.destination);
+                
+                // Airhorn-like sound (multiple frequencies)
+                oscillator.frequency.setValueAtTime(200, mlgAudioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, mlgAudioContext.currentTime + 0.1);
+                oscillator.frequency.exponentialRampToValueAtTime(400, mlgAudioContext.currentTime + 0.3);
+                
+                gainNode.gain.setValueAtTime(0.3, mlgAudioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, mlgAudioContext.currentTime + 0.3);
+                
+                oscillator.start(mlgAudioContext.currentTime);
+                oscillator.stop(mlgAudioContext.currentTime + 0.3);
+            } catch (e) {
+                console.error('Error playing airhorn:', e);
+            }
+        }
+        
+        // Play "OH" sound
+        function playMLGOh() {
+            if (!mlgAudioContext) initMLGAudio();
+            if (!mlgAudioContext) return;
+            
+            try {
+                const oscillator = mlgAudioContext.createOscillator();
+                const gainNode = mlgAudioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(mlgAudioContext.destination);
+                
+                // "OH" sound - rising tone
+                oscillator.frequency.setValueAtTime(150, mlgAudioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(300, mlgAudioContext.currentTime + 0.2);
+                oscillator.frequency.exponentialRampToValueAtTime(500, mlgAudioContext.currentTime + 0.4);
+                
+                gainNode.gain.setValueAtTime(0.2, mlgAudioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, mlgAudioContext.currentTime + 0.4);
+                
+                oscillator.type = 'sine';
+                oscillator.start(mlgAudioContext.currentTime);
+                oscillator.stop(mlgAudioContext.currentTime + 0.4);
+            } catch (e) {
+                console.error('Error playing OH sound:', e);
+            }
+        }
+        
+        // Play random MLG sound effect
+        function playMLGRandomSound() {
+            if (!mlgAudioContext) initMLGAudio();
+            if (!mlgAudioContext) return;
+            
+            try {
+                const oscillator = mlgAudioContext.createOscillator();
+                const gainNode = mlgAudioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(mlgAudioContext.destination);
+                
+                // Random beep
+                const freq = 300 + Math.random() * 400;
+                oscillator.frequency.setValueAtTime(freq, mlgAudioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(freq * 1.5, mlgAudioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.15, mlgAudioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, mlgAudioContext.currentTime + 0.1);
+                
+                oscillator.type = 'square';
+                oscillator.start(mlgAudioContext.currentTime);
+                oscillator.stop(mlgAudioContext.currentTime + 0.1);
+            } catch (e) {
+                console.error('Error playing random sound:', e);
+            }
+        }
         
         function setupMLGTheme() {
             // Clean up existing handlers
@@ -8664,10 +8759,14 @@ body.theme-flashcard button:hover {
                     if (e.key === ' ' || e.key === 'Space') {
                         e.preventDefault();
                         createMLGOh();
+                        playMLGOh();
                     } else if (e.key.length === 1 && /[a-zA-Z0-9]/.test(e.key)) {
                         // Random MLG effects on keypress
                         if (Math.random() < 0.3) {
                             createMLGAirhorn();
+                            playMLGAirhorn();
+                        } else if (Math.random() < 0.2) {
+                            playMLGRandomSound();
                         }
                     }
                 };
@@ -8686,6 +8785,10 @@ body.theme-flashcard button:hover {
                     } else {
                         createMLGMountainDew(e.clientX, e.clientY);
                     }
+                    // Play sound on click
+                    if (Math.random() < 0.5) {
+                        playMLGRandomSound();
+                    }
                 };
                 document.addEventListener('click', mlgClickHandler, true);
                 
@@ -8694,6 +8797,7 @@ body.theme-flashcard button:hover {
                     if (!document.body.classList.contains('theme-mlg')) return;
                     if (Math.random() < 0.01) { // 1% chance
                         createMLGAirhorn(e.clientX, e.clientY);
+                        playMLGAirhorn();
                     }
                 };
                 document.addEventListener('mousemove', mlgMouseHandler);
@@ -8712,6 +8816,10 @@ body.theme-flashcard button:hover {
                     for (let i = 0; i < 3; i++) {
                         setTimeout(() => {
                             createMLGEmojiFromRandomSide();
+                            // Occasional sound with emojis
+                            if (Math.random() < 0.1) {
+                                playMLGRandomSound();
+                            }
                         }, i * 100);
                     }
                 }, 200); // Spawn every 200ms
