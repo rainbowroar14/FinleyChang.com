@@ -2346,6 +2346,232 @@ body.theme-flashcard .commands-menu {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* Minecraft Theme */
+body.theme-minecraft {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    background: #87CEEB !important;
+    background-image: 
+        linear-gradient(to bottom, #87CEEB 0%, #6AB0D9 40%, #5B9FD0 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 32px, rgba(0,0,0,0.03) 32px, rgba(0,0,0,0.03) 33px);
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+body.theme-minecraft::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to bottom, transparent, rgba(107, 142, 35, 0.3));
+    pointer-events: none;
+    z-index: 0;
+}
+
+body.theme-minecraft .command-bar,
+body.theme-minecraft .clock-display,
+body.theme-minecraft .command-feedback,
+body.theme-minecraft .commands-menu {
+    background: rgba(139, 90, 43, 0.95) !important;
+    border: 4px solid #8b5a2b !important;
+    border-style: outset !important;
+    color: #ffffff !important;
+    box-shadow: 
+        inset -2px -2px 0 rgba(0,0,0,0.3),
+        inset 2px 2px 0 rgba(255,255,255,0.3),
+        0 0 10px rgba(0,0,0,0.5) !important;
+}
+
+body.theme-minecraft .command-input {
+    background: rgba(101, 67, 33, 0.9) !important;
+    border: 3px solid #654321 !important;
+    border-style: inset !important;
+    color: #ffffff !important;
+    font-family: 'Press Start 2P', 'Courier New', monospace !important;
+    font-size: 10px !important;
+}
+
+body.theme-minecraft .command-bar::before {
+    color: #8b5a2b !important;
+}
+
+body.theme-minecraft .page {
+    background: #87CEEB !important;
+}
+
+body.theme-minecraft .home-page h1,
+body.theme-minecraft .subtitle,
+body.theme-minecraft .letters-source {
+    color: #ffffff !important;
+    text-shadow: 
+        2px 2px 0 #000000,
+        -1px -1px 0 #000000,
+        1px -1px 0 #000000,
+        -1px 1px 0 #000000 !important;
+}
+
+body.theme-minecraft button {
+    background: #8b5a2b !important;
+    border: 4px solid #654321 !important;
+    border-style: outset !important;
+    color: #ffffff !important;
+    font-family: 'Press Start 2P', 'Courier New', monospace !important;
+    font-size: 10px !important;
+    box-shadow: 
+        inset -2px -2px 0 rgba(0,0,0,0.3),
+        inset 2px 2px 0 rgba(255,255,255,0.3) !important;
+}
+
+body.theme-minecraft button:hover {
+    background: #9d6a3b !important;
+    box-shadow: 
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        inset 2px 2px 0 rgba(255,255,255,0.4) !important;
+}
+
+body.theme-minecraft button:active {
+    border-style: inset !important;
+    box-shadow: 
+        inset 2px 2px 0 rgba(0,0,0,0.3),
+        inset -2px -2px 0 rgba(255,255,255,0.3) !important;
+}
+
+/* Minecraft Explosion Effect */
+.minecraft-explosion {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+.minecraft-explosion-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #ff4400;
+    border: 2px solid #ff8800;
+    border-radius: 2px;
+    animation: minecraft-explode 0.6s ease-out forwards;
+}
+
+@keyframes minecraft-explode {
+    0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.3) translate(var(--dx), var(--dy));
+        opacity: 0;
+    }
+}
+
+/* Pirate Theme */
+body.theme-pirate {
+    font-family: 'Bangers', 'Arial Black', sans-serif;
+    background: linear-gradient(to bottom, #87CEEB 0%, #4682B4 30%, #1e3a5f 60%, #0d1b2a 100%) !important;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+body.theme-pirate::before {
+    content: '🏴‍☠️';
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 60px;
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+    animation: pirate-flag 3s ease-in-out infinite;
+}
+
+@keyframes pirate-flag {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+body.theme-pirate .command-bar,
+body.theme-pirate .clock-display,
+body.theme-pirate .command-feedback,
+body.theme-pirate .commands-menu {
+    background: rgba(139, 90, 43, 0.95) !important;
+    border: 3px solid #8b5a2b !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    font-family: 'Bangers', 'Arial Black', sans-serif !important;
+}
+
+body.theme-pirate .command-input {
+    background: rgba(101, 67, 33, 0.9) !important;
+    border: 2px solid #8b5a2b !important;
+    color: #ffffff !important;
+    font-family: 'Bangers', 'Arial Black', sans-serif !important;
+}
+
+body.theme-pirate .command-bar::before {
+    content: '⚓ ' !important;
+    color: #ffd700 !important;
+}
+
+body.theme-pirate .page {
+    background: linear-gradient(to bottom, #87CEEB 0%, #4682B4 30%, #1e3a5f 60%, #0d1b2a 100%) !important;
+}
+
+body.theme-pirate .home-page h1,
+body.theme-pirate .subtitle,
+body.theme-pirate .letters-source {
+    color: #ffffff !important;
+    text-shadow: 
+        3px 3px 0 #000000,
+        -1px -1px 0 #000000,
+        1px -1px 0 #000000,
+        -1px 1px 0 #000000 !important;
+}
+
+body.theme-pirate button {
+    background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
+    border: 3px solid #8b5a2b !important;
+    color: #000000 !important;
+    font-family: 'Bangers', 'Arial Black', sans-serif !important;
+    font-weight: bold !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.theme-pirate button:hover {
+    background: linear-gradient(to bottom, #ffd700, #daa520) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Pirate Cannonball */
+.pirate-cannonball {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, #cccccc, #333333);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 
+        inset -3px -3px 0 rgba(0,0,0,0.5),
+        0 0 5px rgba(0,0,0,0.8);
+    animation: cannonball-fly 2s linear forwards;
+}
+
+@keyframes cannonball-fly {
+    0% {
+        left: -30px;
+        top: 50%;
+        transform: translateY(-50%) rotate(0deg);
+    }
+    100% {
+        left: calc(100vw + 30px);
+        top: 50%;
+        transform: translateY(-50%) rotate(720deg);
+    }
+}
+
 body.theme-flashcard .command-input {
     background: rgba(255, 255, 255, 0.9) !important;
     border: 2px solid #8b7355 !important;
@@ -3419,6 +3645,8 @@ body.theme-flashcard button:hover {
                     { name: 'theme ocean', desc: 'Ocean theme with wave animation' },
                     { name: 'theme clouds', desc: 'Clouds theme with animated clouds' },
                     { name: 'theme flashcard', desc: 'Flashcard theme with writable flashcards' },
+                    { name: 'theme minecraft', desc: 'Minecraft theme - press SPACE for explosions!' },
+                    { name: 'theme pirate', desc: 'Pirate theme with cannonballs across screen' },
                     { name: 'stars', desc: 'Spawn more stars (space theme only)' },
                     { name: 'flashcard', desc: 'Create a new flashcard (flashcard theme only)' },
                     { name: 'fc', desc: 'Create a new flashcard (flashcard theme only)' },
@@ -3594,6 +3822,7 @@ body.theme-flashcard button:hover {
         let isGooseMode = false; // Track if in goose mode
         let resetConfirm = false; // Track if reset command was just used (needs confirmation)
         let resetUsed = false; // Track if reset has been used (can only use once)
+        let globalWindowZIndex = 10000; // Global z-index for leaderboards and popup windows
         
         // Helper function to escape HTML
         function escapeHtml(text) {
@@ -6322,14 +6551,14 @@ body.theme-flashcard button:hover {
         
         // Show leaderboard for minesweeper page (sweeper command)
         function showMinesweeperPageLeaderboard() {
-            windowZIndex++;
+            globalWindowZIndex++;
             const leaderboardWindow = document.createElement('div');
             leaderboardWindow.className = 'win95-window';
             leaderboardWindow.style.left = '150px';
             leaderboardWindow.style.top = '100px';
             leaderboardWindow.style.width = '400px';
             leaderboardWindow.style.height = '500px';
-            leaderboardWindow.style.zIndex = windowZIndex;
+            leaderboardWindow.style.zIndex = globalWindowZIndex;
             
             const header = document.createElement('div');
             header.className = 'win95-window-header';
@@ -6442,7 +6671,7 @@ body.theme-flashcard button:hover {
             let isDragging = false;
             header.addEventListener('mousedown', (e) => {
                 isDragging = true;
-                leaderboardWindow.style.zIndex = ++windowZIndex;
+                leaderboardWindow.style.zIndex = ++globalWindowZIndex;
                 const initialX = e.clientX - leaderboardWindow.offsetLeft;
                 const initialY = e.clientY - leaderboardWindow.offsetTop;
                 
@@ -6780,7 +7009,7 @@ body.theme-flashcard button:hover {
         }
         
         // Theme System
-        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean', 'clouds', 'flashcard'];
+        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean', 'clouds', 'flashcard', 'minecraft', 'pirate'];
         let currentTheme = 'dark'; // Default theme
         
         // Load saved theme
@@ -6829,6 +7058,21 @@ body.theme-flashcard button:hover {
             // Add new theme class
             document.body.classList.add(`theme-${themeName}`);
             currentTheme = themeName;
+            
+            // Setup theme-specific features
+            if (themeName === 'space') {
+                initStars();
+            } else if (themeName === 'ocean') {
+                setupOceanTheme();
+            } else if (themeName === 'minecraft') {
+                setupMinecraftTheme();
+            } else if (themeName === 'pirate') {
+                setupPirateTheme();
+            } else if (themeName === 'paper') {
+                initPaperDrawing();
+            } else if (themeName === 'flashcard') {
+                // Flashcard theme setup if needed
+            }
             
             // Reapply custom background if switching to dark/light and one exists
             if (willBeDarkOrLight) {
@@ -7089,15 +7333,23 @@ body.theme-flashcard button:hover {
         // Update applyTheme to handle space theme
         const originalApplyTheme3 = applyTheme;
         applyTheme = function(themeName, save = true) {
-            // Cleanup space theme if switching away
+            // Cleanup previous theme effects
             if (document.body.classList.contains('theme-space') && themeName !== 'space') {
                 cleanupSpaceStars();
+            }
+            if (document.body.classList.contains('theme-ocean') && themeName !== 'ocean') {
+                cleanupOceanFish();
+            }
+            if (document.body.classList.contains('theme-pirate') && themeName !== 'pirate') {
+                cleanupPirateCannonballs();
             }
             
             originalApplyTheme3(themeName, save);
             
             // Setup space theme if switching to it
-            setupSpaceTheme();
+            if (themeName === 'space') {
+                setupSpaceTheme();
+            }
         };
         
         // Setup space theme on page load if active
@@ -7179,6 +7431,134 @@ body.theme-flashcard button:hover {
                 createOceanFish();
             } else {
                 cleanupOceanFish();
+            }
+        }
+        
+        // Minecraft theme - explosion on space
+        let minecraftKeyHandler = null;
+        
+        function createMinecraftExplosion(x, y) {
+            if (!document.body.classList.contains('theme-minecraft')) return;
+            
+            const explosion = document.createElement('div');
+            explosion.className = 'minecraft-explosion';
+            explosion.style.left = x + 'px';
+            explosion.style.top = y + 'px';
+            document.body.appendChild(explosion);
+            
+            // Create particles
+            const particleCount = 20;
+            const colors = ['#ff4400', '#ff8800', '#ffff00', '#ffffff'];
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'minecraft-explosion-particle';
+                const angle = (Math.PI * 2 * i) / particleCount;
+                const distance = 30 + Math.random() * 40;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance;
+                particle.style.setProperty('--dx', dx + 'px');
+                particle.style.setProperty('--dy', dy + 'px');
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                explosion.appendChild(particle);
+            }
+            
+            // Remove after animation
+            setTimeout(() => {
+                explosion.remove();
+            }, 600);
+        }
+        
+        function setupMinecraftTheme() {
+            // Remove old handler if exists
+            if (minecraftKeyHandler) {
+                document.removeEventListener('keydown', minecraftKeyHandler);
+            }
+            
+            if (document.body.classList.contains('theme-minecraft')) {
+                minecraftKeyHandler = (e) => {
+                    if (!document.body.classList.contains('theme-minecraft')) return;
+                    if (e.code !== 'Space') return;
+                    
+                    // Don't trigger if typing in command input
+                    const commandInput = document.getElementById('commandInput');
+                    if (commandInput && document.activeElement === commandInput) return;
+                    
+                    e.preventDefault();
+                    
+                    // Create explosion at random position or mouse position
+                    const x = e.clientX || Math.random() * window.innerWidth;
+                    const y = e.clientY || Math.random() * window.innerHeight;
+                    createMinecraftExplosion(x, y);
+                };
+                
+                document.addEventListener('keydown', minecraftKeyHandler);
+            }
+        }
+        
+        // Pirate theme - cannonballs
+        let pirateCannonballs = [];
+        let pirateShootInterval = null;
+        let pirateClickHandler = null;
+        
+        function createPirateCannonball() {
+            if (!document.body.classList.contains('theme-pirate')) return;
+            
+            const cannonball = document.createElement('div');
+            cannonball.className = 'pirate-cannonball';
+            
+            // Random starting height
+            const startY = Math.random() * window.innerHeight;
+            cannonball.style.top = startY + 'px';
+            
+            document.body.appendChild(cannonball);
+            pirateCannonballs.push(cannonball);
+            
+            // Remove after animation
+            setTimeout(() => {
+                if (cannonball.parentNode) {
+                    cannonball.remove();
+                }
+                pirateCannonballs = pirateCannonballs.filter(cb => cb !== cannonball);
+            }, 2000);
+        }
+        
+        function cleanupPirateCannonballs() {
+            pirateCannonballs.forEach(cb => {
+                if (cb.parentNode) cb.remove();
+            });
+            pirateCannonballs = [];
+            if (pirateShootInterval) {
+                clearInterval(pirateShootInterval);
+                pirateShootInterval = null;
+            }
+            if (pirateClickHandler) {
+                document.removeEventListener('click', pirateClickHandler);
+                pirateClickHandler = null;
+            }
+        }
+        
+        function setupPirateTheme() {
+            cleanupPirateCannonballs();
+            
+            if (document.body.classList.contains('theme-pirate')) {
+                // Shoot cannonballs periodically
+                pirateShootInterval = setInterval(() => {
+                    if (document.body.classList.contains('theme-pirate')) {
+                        createPirateCannonball();
+                    } else {
+                        cleanupPirateCannonballs();
+                    }
+                }, 3000);
+                
+                // Also shoot on mouse click
+                pirateClickHandler = (e) => {
+                    if (!document.body.classList.contains('theme-pirate')) return;
+                    const commandInput = document.getElementById('commandInput');
+                    if (commandInput && (e.target === commandInput || commandInput.contains(e.target))) return;
+                    createPirateCannonball();
+                };
+                document.addEventListener('click', pirateClickHandler);
             }
         }
         
@@ -8510,14 +8890,14 @@ body.theme-flashcard button:hover {
             
             // Show leaderboard
             function showMinesweeperLeaderboard() {
-                windowZIndex++;
+                globalWindowZIndex++;
                 const leaderboardWindow = document.createElement('div');
                 leaderboardWindow.className = 'win95-window';
                 leaderboardWindow.style.left = '150px';
                 leaderboardWindow.style.top = '100px';
                 leaderboardWindow.style.width = '350px';
                 leaderboardWindow.style.height = '400px';
-                leaderboardWindow.style.zIndex = windowZIndex;
+                leaderboardWindow.style.zIndex = globalWindowZIndex;
                 
                 const header = document.createElement('div');
                 header.className = 'win95-window-header';
@@ -8588,7 +8968,7 @@ body.theme-flashcard button:hover {
                 let isDragging = false;
                 header.addEventListener('mousedown', (e) => {
                     isDragging = true;
-                    leaderboardWindow.style.zIndex = ++windowZIndex;
+                    leaderboardWindow.style.zIndex = ++globalWindowZIndex;
                     const initialX = e.clientX - leaderboardWindow.offsetLeft;
                     const initialY = e.clientY - leaderboardWindow.offsetTop;
                     
