@@ -3852,6 +3852,51 @@ body.theme-flashcard button:hover {
         </div>
     </div>
     
+    <!-- Login Page -->
+    <div class="page hidden" id="loginPage" style="background: #0d1117; color: #c9d1d9; padding: 40px;">
+        <div style="max-width: 400px; margin: 0 auto; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 30px;">
+            <h2 style="color: #58a6ff; font-size: 28px; margin-bottom: 20px; text-align: center;">Login</h2>
+            <div id="loginError" style="color: #f85149; margin-bottom: 15px; text-align: center; display: none;"></div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Username:</label>
+                <input type="text" id="login-username" placeholder="Enter your username" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleLogin()">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Password:</label>
+                <input type="password" id="login-password" placeholder="Enter your password" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleLogin()">
+            </div>
+            <button id="login-submit-btn" onclick="handleLogin()" style="width: 100%; padding: 12px; background: #238636; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px;">Login</button>
+            <div style="text-align: center; color: #8b949e; font-size: 14px;">
+                Don't have an account? <a href="#" onclick="showPage('registerPage'); return false;" style="color: #58a6ff; text-decoration: none;">Register</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Register Page -->
+    <div class="page hidden" id="registerPage" style="background: #0d1117; color: #c9d1d9; padding: 40px;">
+        <div style="max-width: 400px; margin: 0 auto; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 30px;">
+            <h2 style="color: #58a6ff; font-size: 28px; margin-bottom: 20px; text-align: center;">Register</h2>
+            <div id="registerError" style="color: #f85149; margin-bottom: 15px; text-align: center; display: none;"></div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Username:</label>
+                <input type="text" id="register-username" placeholder="Choose a unique username" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleRegister()">
+                <small style="color: #8b949e; font-size: 12px;">3-20 characters (letters, numbers, _, -)</small>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Password:</label>
+                <input type="password" id="register-password" placeholder="Choose a password" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleRegister()">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #c9d1d9; margin-bottom: 5px; font-size: 14px;">Confirm Password:</label>
+                <input type="password" id="register-password-confirm" placeholder="Confirm your password" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 16px;" onkeypress="if(event.key==='Enter') handleRegister()">
+            </div>
+            <button id="register-submit-btn" onclick="handleRegister()" style="width: 100%; padding: 12px; background: #238636; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px;">Register</button>
+            <div style="text-align: center; color: #8b949e; font-size: 14px;">
+                Already have an account? <a href="#" onclick="showPage('loginPage'); return false;" style="color: #58a6ff; text-decoration: none;">Login</a>
+            </div>
+        </div>
+    </div>
+    
     <!-- Visit Counter -->
     <div class="visit-counter" id="visitCounter">
         <div class="visit-counter-number" id="visitCounterNumber">0</div>
@@ -6752,6 +6797,15 @@ body.theme-flashcard button:hover {
                     showWhoami(targetId);
                 } else if (command === 'edit') {
                     resetConfirm = false;
+                    // Check if logged in
+                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
+                    if (!loggedIn) {
+                        showCommandFeedback('edit', 'Please log in to edit your profile!', false);
+                        if (typeof showPage === 'function') {
+                            showPage('loginPage');
+                        }
+                        return;
+                    }
                     openEditMenu();
                 } else if (command === 'boardedit') {
                     resetConfirm = false;
@@ -6761,6 +6815,15 @@ body.theme-flashcard button:hover {
                     commandInput.placeholder = 'Edit your board';
                 } else if (command.startsWith('friend ')) {
                     resetConfirm = false;
+                    // Check if logged in
+                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
+                    if (!loggedIn) {
+                        showCommandFeedback('friend', 'Please log in to send friend requests!', false);
+                        if (typeof showPage === 'function') {
+                            showPage('loginPage');
+                        }
+                        return;
+                    }
                     const username = command.substring(7).trim();
                     if (!username) {
                         showCommandFeedback('friend', 'Please provide a username. Usage: friend [username]', false);
@@ -6774,6 +6837,16 @@ body.theme-flashcard button:hover {
                         }
                     }
                 } else if (command === 'friends') {
+                    resetConfirm = false;
+                    // Check if logged in
+                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
+                    if (!loggedIn) {
+                        showCommandFeedback('friends', 'Please log in to view your friends!', false);
+                        if (typeof showPage === 'function') {
+                            showPage('loginPage');
+                        }
+                        return;
+                    }
                     resetConfirm = false;
                     openFriendsList();
                 } else if (command === 'chat') {
@@ -17152,6 +17225,151 @@ body.theme-flashcard button:hover {
         
         // Make function globally accessible
         window.handleLoginButtonClick = handleLoginButtonClick;
+        
+        // Login and Register handlers
+        function handleLogin() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!username || !password) {
+                errorDiv.textContent = 'Please enter both username and password';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            errorDiv.style.display = 'none';
+            
+            // Check if user exists in Firebase
+            if (database) {
+                database.ref(`users/${username}`).once('value', (snapshot) => {
+                    if (!snapshot.exists()) {
+                        errorDiv.textContent = 'Username not found. Please register first.';
+                        errorDiv.style.display = 'block';
+                        return;
+                    }
+                    
+                    const userData = snapshot.val();
+                    // Hash password and compare
+                    const hash = btoa(password).split('').reverse().join(''); // Simple hash for demo
+                    if (userData.password === hash) {
+                        // Login successful
+                        localStorage.setItem('loggedInUsername', username);
+                        updateLoginButton();
+                        showPage('mainPage');
+                        // Load user data
+                        if (typeof loadUserData === 'function') {
+                            loadUserData(username);
+                        }
+                    } else {
+                        errorDiv.textContent = 'Incorrect password';
+                        errorDiv.style.display = 'block';
+                    }
+                });
+            } else {
+                // Fallback to localStorage
+                const users = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                if (!users[username]) {
+                    errorDiv.textContent = 'Username not found. Please register first.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+                const hash = btoa(password).split('').reverse().join('');
+                if (users[username].password === hash) {
+                    localStorage.setItem('loggedInUsername', username);
+                    updateLoginButton();
+                    showPage('mainPage');
+                } else {
+                    errorDiv.textContent = 'Incorrect password';
+                    errorDiv.style.display = 'block';
+                }
+            }
+        }
+        
+        function handleRegister() {
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
+            const errorDiv = document.getElementById('registerError');
+            
+            if (!username || !password || !passwordConfirm) {
+                errorDiv.textContent = 'Please fill in all fields';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password !== passwordConfirm) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (username.length < 3 || username.length > 20) {
+                errorDiv.textContent = 'Username must be 3-20 characters';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            const validIdPattern = /^[a-zA-Z0-9_-]+$/;
+            if (!validIdPattern.test(username)) {
+                errorDiv.textContent = 'Username can only contain letters, numbers, _, and -';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            errorDiv.style.display = 'none';
+            
+            // Check if username already exists
+            if (database) {
+                database.ref(`users/${username}`).once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        errorDiv.textContent = 'Username already taken. Please choose another.';
+                        errorDiv.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Create new user
+                    const hash = btoa(password).split('').reverse().join('');
+                    database.ref(`users/${username}`).set({
+                        username: username,
+                        password: hash,
+                        displayName: username,
+                        bio: '',
+                        avatar: '👤',
+                        createdAt: Date.now()
+                    });
+                    
+                    localStorage.setItem('loggedInUsername', username);
+                    localStorage.setItem('displayName', username);
+                    updateLoginButton();
+                    showPage('mainPage');
+                });
+            } else {
+                // Fallback to localStorage
+                const users = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                if (users[username]) {
+                    errorDiv.textContent = 'Username already taken. Please choose another.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+                
+                const hash = btoa(password).split('').reverse().join('');
+                users[username] = { password: hash, displayName: username };
+                localStorage.setItem('registeredUsers', JSON.stringify(users));
+                localStorage.setItem('loggedInUsername', username);
+                localStorage.setItem('displayName', username);
+                updateLoginButton();
+                showPage('mainPage');
+            }
+        }
+        
+        function isLoggedIn() {
+            return !!localStorage.getItem('loggedInUsername');
+        }
+        
+        window.handleLogin = handleLogin;
+        window.handleRegister = handleRegister;
+        window.isLoggedIn = isLoggedIn;
         
         // Initialize on DOM ready
         if (document.readyState === 'loading') {
