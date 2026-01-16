@@ -1855,7 +1855,7 @@ body.theme-matrix button:hover {
 
 @keyframes matrix-char-fall {
     0% {
-        top: -100px;
+        top: -20px;
         opacity: 0;
     }
     2% {
@@ -1865,7 +1865,7 @@ body.theme-matrix button:hover {
         opacity: 1;
     }
     100% {
-        top: calc(100vh + 100px);
+        top: calc(100vh + 20px);
         opacity: 0;
     }
 }
@@ -7354,6 +7354,7 @@ body.theme-flashcard button:hover {
             const column = document.createElement('div');
             column.className = 'matrix-column';
             column.style.left = x + 'px';
+            column.style.top = '0px';
             column.style.position = 'fixed';
             
             // Random speed for this column
@@ -7368,7 +7369,7 @@ body.theme-flashcard button:hover {
             startChar.textContent = key;
             startChar.style.animationDuration = baseSpeed + 's';
             startChar.style.animationDelay = '0s';
-            startChar.style.top = '-100px';
+            startChar.style.top = '-20px';
             column.appendChild(startChar);
             
             // Add random special characters that cascade down
@@ -7390,7 +7391,8 @@ body.theme-flashcard button:hover {
                 const delay = (i + 1) * delayBetweenChars;
                 char.style.animationDuration = baseSpeed + 's';
                 char.style.animationDelay = delay + 's';
-                char.style.top = (-100 - (i + 1) * charSpacing) + 'px';
+                // Position characters above the start character, cascading upward
+                char.style.top = (-20 - (i + 1) * charSpacing) + 'px';
                 
                 column.appendChild(char);
             }
@@ -7415,9 +7417,13 @@ body.theme-flashcard button:hover {
         let matrixKeyHandler = null;
         
         function setupMatrixKeyHandler() {
-            // Remove existing handler if any
-            if (matrixKeyHandler) {
-                document.removeEventListener('keydown', matrixKeyHandler);
+            // Always remove existing handler first to prevent duplicates
+            if (typeof matrixKeyHandler !== 'undefined' && matrixKeyHandler) {
+                try {
+                    document.removeEventListener('keydown', matrixKeyHandler);
+                } catch (e) {
+                    console.error('Error removing matrix handler:', e);
+                }
                 matrixKeyHandler = null;
             }
             
@@ -7491,18 +7497,8 @@ body.theme-flashcard button:hover {
         // Make wrapped applyTheme globally accessible
         window.applyTheme = applyTheme;
         
-        // Load theme on page load
-        loadTheme();
-        
-        // Load background preferences after theme is loaded
-        setTimeout(() => {
-            loadBackgroundPreferences();
-        }, 50);
-        
-        // Setup matrix handler on page load if matrix theme is active
-        setTimeout(() => {
-            setupMatrixKeyHandler();
-        }, 100);
+        // Load theme on page load - will be called from initializeOnLoad
+        // loadTheme() is now called in initializeOnLoad()
         
         // Space theme - stars that react to cursor
         let spaceStars = [];
@@ -7833,7 +7829,14 @@ body.theme-flashcard button:hover {
         }
         
         function setupPirateTheme() {
-            cleanupPirateCannonballs();
+            // Always clean up first to prevent duplicates
+            if (typeof cleanupPirateCannonballs === 'function') {
+                try {
+                    cleanupPirateCannonballs();
+                } catch (e) {
+                    console.error('Error cleaning up pirate cannonballs:', e);
+                }
+            }
             
             if (document.body.classList.contains('theme-pirate')) {
                 // Shoot cannonballs periodically
@@ -8233,15 +8236,31 @@ body.theme-flashcard button:hover {
         const fireworkColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#ff0088', '#88ff00', '#0088ff'];
         
         function setupFireworkTheme() {
-            // Remove existing handler if any
-            if (fireworkKeyHandler) {
-                document.removeEventListener('keydown', fireworkKeyHandler);
+            // Always remove existing handler first to prevent duplicates
+            if (typeof fireworkKeyHandler !== 'undefined' && fireworkKeyHandler) {
+                try {
+                    document.removeEventListener('keydown', fireworkKeyHandler);
+                } catch (e) {
+                    console.error('Error removing firework handler:', e);
+                }
                 fireworkKeyHandler = null;
+            }
+            
+            // Clean up any existing fireworks
+            if (typeof cleanupFireworks === 'function') {
+                try {
+                    cleanupFireworks();
+                } catch (e) {
+                    console.error('Error cleaning up fireworks:', e);
+                }
             }
             
             // Only add handler if firework theme is active
             if (document.body.classList.contains('theme-firework')) {
                 fireworkKeyHandler = (e) => {
+                    // Check if still in firework theme
+                    if (!document.body.classList.contains('theme-firework')) return;
+                    
                     // Don't trigger on command input
                     const commandInput = document.getElementById('commandInput');
                     if (commandInput && document.activeElement === commandInput) return;
@@ -8252,7 +8271,8 @@ body.theme-flashcard button:hover {
                     // Only handle letter keys (a-z, A-Z)
                     const key = e.key;
                     if (key.length === 1 && /[a-zA-Z]/.test(key)) {
-                        createFirework(key.toUpperCase(), e.clientX || window.innerWidth / 2);
+                        // Shoot from random position at bottom
+                        createFirework(key.toUpperCase());
                     }
                 };
                 
@@ -8261,8 +8281,8 @@ body.theme-flashcard button:hover {
         }
         
         function createFirework(letter, startX) {
-            // Use bottom center if no x position provided
-            const x = startX || window.innerWidth / 2;
+            // Use random position at bottom if no x position provided
+            const x = startX || (50 + Math.random() * (window.innerWidth - 100));
             const y = window.innerHeight;
             
             // Create rocket
@@ -8328,6 +8348,12 @@ body.theme-flashcard button:hover {
         function cleanupFireworks() {
             // Remove all firework elements
             document.querySelectorAll('.firework-rocket, .firework-explosion, .firework-particle').forEach(el => el.remove());
+            
+            // Remove handler if it exists
+            if (fireworkKeyHandler) {
+                document.removeEventListener('keydown', fireworkKeyHandler);
+                fireworkKeyHandler = null;
+            }
         }
         
         // Remote Desktop System
@@ -13993,9 +14019,9 @@ body.theme-flashcard button:hover {
         }
         
         // Initialize drawing board when page is shown
-        const originalShowPage = showPage;
+        const originalShowPageForDrawing = showPage;
         showPage = function(pageId) {
-            originalShowPage(pageId);
+            originalShowPageForDrawing(pageId);
             if (pageId === 'drawingBoardPage') {
                 setTimeout(() => {
                     if (!drawingBoardCanvas) {
@@ -14680,9 +14706,83 @@ body.theme-flashcard button:hover {
             }
         });
         
-        // Initialize global data on page load
-        loadGlobalData();
-        loadCoinflipData();
+        // Initialize everything on page load - ensure proper order
+        function initializeOnLoad() {
+            // Clean up any existing handlers first to prevent duplicates
+            try {
+                if (typeof matrixKeyHandler !== 'undefined' && matrixKeyHandler) {
+                    document.removeEventListener('keydown', matrixKeyHandler);
+                    matrixKeyHandler = null;
+                }
+                if (typeof fireworkKeyHandler !== 'undefined' && fireworkKeyHandler) {
+                    document.removeEventListener('keydown', fireworkKeyHandler);
+                    fireworkKeyHandler = null;
+                }
+                if (typeof pirateClickHandler !== 'undefined' && pirateClickHandler) {
+                    document.removeEventListener('click', pirateClickHandler);
+                    pirateClickHandler = null;
+                }
+                if (typeof minecraftKeyHandler !== 'undefined' && minecraftKeyHandler) {
+                    document.removeEventListener('keydown', minecraftKeyHandler);
+                    minecraftKeyHandler = null;
+                }
+            } catch (e) {
+                console.error('Error cleaning up handlers:', e);
+            }
+            
+            // Clean up any existing theme elements
+            try {
+                if (typeof cleanupMatrixColumns === 'function') cleanupMatrixColumns();
+                if (typeof cleanupFireworks === 'function') cleanupFireworks();
+                if (typeof cleanupPirateCannonballs === 'function') cleanupPirateCannonballs();
+                if (typeof cleanupPaperDrawing === 'function') cleanupPaperDrawing();
+                if (typeof cleanupSpaceStars === 'function') cleanupSpaceStars();
+                if (typeof cleanupOceanFish === 'function') cleanupOceanFish();
+            } catch (e) {
+                console.error('Error cleaning up theme elements:', e);
+            }
+            
+            // Load data
+            try {
+                if (typeof loadGlobalData === 'function') loadGlobalData();
+                if (typeof loadCoinflipData === 'function') loadCoinflipData();
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+            
+            // Load and apply theme (this will set up handlers properly)
+            try {
+                if (typeof loadTheme === 'function') {
+                    loadTheme();
+                    
+                    // Load background preferences after theme is loaded
+                    setTimeout(() => {
+                        if (typeof loadBackgroundPreferences === 'function') {
+                            loadBackgroundPreferences();
+                        }
+                    }, 50);
+                }
+            } catch (e) {
+                console.error('Error loading theme:', e);
+            }
+            
+            // Initialize remote desktop if needed
+            try {
+                if (typeof initRemoteDesktop === 'function' && document.getElementById('remoteDesktop')) {
+                    initRemoteDesktop();
+                }
+            } catch (e) {
+                console.error('Error initializing remote desktop:', e);
+            }
+        }
+        
+        // Initialize on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeOnLoad);
+        } else {
+            // DOM already loaded
+            initializeOnLoad();
+        }
         
         // Check if blocked on page load
         if (checkBlocked()) {
