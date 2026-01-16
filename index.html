@@ -1423,6 +1423,7 @@
             gap: 8px;
             min-width: 250px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
         }
         
         .command-bar::before {
@@ -1854,7 +1855,7 @@ body.theme-matrix button:hover {
 
 @keyframes matrix-char-fall {
     0% {
-        top: -30px;
+        top: -100px;
         opacity: 0;
     }
     2% {
@@ -1864,7 +1865,7 @@ body.theme-matrix button:hover {
         opacity: 1;
     }
     100% {
-        top: calc(100vh + 30px);
+        top: calc(100vh + 100px);
         opacity: 0;
     }
 }
@@ -7367,7 +7368,7 @@ body.theme-flashcard button:hover {
             startChar.textContent = key;
             startChar.style.animationDuration = baseSpeed + 's';
             startChar.style.animationDelay = '0s';
-            startChar.style.top = '-30px';
+            startChar.style.top = '-100px';
             column.appendChild(startChar);
             
             // Add random special characters that cascade down
@@ -7389,7 +7390,7 @@ body.theme-flashcard button:hover {
                 const delay = (i + 1) * delayBetweenChars;
                 char.style.animationDuration = baseSpeed + 's';
                 char.style.animationDelay = delay + 's';
-                char.style.top = (-30 - (i + 1) * charSpacing) + 'px';
+                char.style.top = (-100 - (i + 1) * charSpacing) + 'px';
                 
                 column.appendChild(char);
             }
@@ -7844,14 +7845,16 @@ body.theme-flashcard button:hover {
                     }
                 }, 3000);
                 
-                // Also shoot on mouse click
+                // Also shoot on mouse click - use capture phase
                 pirateClickHandler = (e) => {
                     if (!document.body.classList.contains('theme-pirate')) return;
                     const commandInput = document.getElementById('commandInput');
                     if (commandInput && (e.target === commandInput || commandInput.contains(e.target))) return;
+                    // Don't trigger on buttons or interactive elements
+                    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.closest('button')) return;
                     createPirateCannonball();
                 };
-                document.addEventListener('click', pirateClickHandler);
+                document.addEventListener('click', pirateClickHandler, true);
             }
         }
         
@@ -7865,19 +7868,15 @@ body.theme-flashcard button:hover {
         let paperBrushSize = 3;
         
         function initPaperDrawing() {
-            // Check if canvas already exists
-            if (document.getElementById('paper-drawing-canvas')) {
-                paperCanvas = document.getElementById('paper-drawing-canvas');
-                paperCtx = paperCanvas.getContext('2d');
-                return;
-            }
+            // Clean up existing canvas first
+            cleanupPaperDrawing();
             
             if (!document.body.classList.contains('theme-paper')) return;
             
             // Create canvas for drawing
             paperCanvas = document.createElement('canvas');
             paperCanvas.id = 'paper-drawing-canvas';
-            paperCanvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; z-index: 5; background: transparent;';
+            paperCanvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; z-index: 5; background: transparent; cursor: crosshair;';
             paperCanvas.width = window.innerWidth;
             paperCanvas.height = window.innerHeight;
             paperCtx = paperCanvas.getContext('2d');
@@ -7887,14 +7886,14 @@ body.theme-flashcard button:hover {
             paperCtx.lineJoin = 'round';
             document.body.appendChild(paperCanvas);
             
-            // Drawing events
-            paperCanvas.addEventListener('mousedown', handlePaperMouseDown);
-            paperCanvas.addEventListener('mousemove', handlePaperMouseMove);
-            paperCanvas.addEventListener('mouseup', handlePaperMouseUp);
-            paperCanvas.addEventListener('mouseleave', handlePaperMouseUp);
-            paperCanvas.addEventListener('touchstart', handlePaperTouchStart, { passive: false });
-            paperCanvas.addEventListener('touchmove', handlePaperTouchMove, { passive: false });
-            paperCanvas.addEventListener('touchend', handlePaperTouchEnd);
+            // Drawing events - use capture to ensure they fire
+            paperCanvas.addEventListener('mousedown', handlePaperMouseDown, true);
+            paperCanvas.addEventListener('mousemove', handlePaperMouseMove, true);
+            paperCanvas.addEventListener('mouseup', handlePaperMouseUp, true);
+            paperCanvas.addEventListener('mouseleave', handlePaperMouseUp, true);
+            paperCanvas.addEventListener('touchstart', handlePaperTouchStart, { passive: false, capture: true });
+            paperCanvas.addEventListener('touchmove', handlePaperTouchMove, { passive: false, capture: true });
+            paperCanvas.addEventListener('touchend', handlePaperTouchEnd, { capture: true });
         }
         
         function handlePaperMouseDown(e) {
