@@ -8235,6 +8235,10 @@ body.theme-flashcard button:hover {
                 openPasswordGameApp(iconId, name);
                 return;
             }
+            if (type === 'paintv2') {
+                openPaintV2App(iconId, name);
+                return;
+            }
             windowZIndex++;
             const window = document.createElement('div');
             window.className = 'win95-window';
@@ -10313,6 +10317,324 @@ body.theme-flashcard button:hover {
             
             // Start the game
             startNewGame();
+        }
+        
+        // Paint v2 Multiplayer app
+        function openPaintV2App(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '100px';
+            window.style.top = '100px';
+            window.style.width = '600px';
+            window.style.height = '550px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => {
+                if (currentLobbyId && database) {
+                    const userId = getUserId();
+                    database.ref(`paintv2Lobbies/${currentLobbyId}/players/${userId}`).remove();
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.display = 'flex';
+            content.style.flexDirection = 'column';
+            content.style.height = 'calc(100% - 20px)';
+            
+            const gameHTML = `
+                <div style="margin-bottom: 10px; text-align: center;">
+                    <button id="paintv2-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 5px;">Multiplayer Lobbies</button>
+                    <div id="paintv2-status" style="font-size: 11px; color: #666; margin: 5px 0;">Click to join/create a lobby</div>
+                    <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 5px;">
+                        <input type="color" id="paintv2-color" value="#000000" style="width: 40px; height: 30px; border: 2px inset #c0c0c0; cursor: pointer;">
+                        <button id="paintv2-clear" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Clear</button>
+                    </div>
+                </div>
+                <canvas id="paintv2-canvas" width="560" height="400" style="border: 2px inset #c0c0c0; background: #fff; cursor: crosshair; display: block; margin: 0 auto;"></canvas>
+            `;
+            content.innerHTML = gameHTML;
+            
+            const canvas = content.querySelector('#paintv2-canvas');
+            const ctx = canvas.getContext('2d');
+            const colorPicker = content.querySelector('#paintv2-color');
+            const clearBtn = content.querySelector('#paintv2-clear');
+            const lobbyBtn = content.querySelector('#paintv2-lobby');
+            const statusEl = content.querySelector('#paintv2-status');
+            
+            let currentLobbyId = null;
+            let userId = getUserId() || 'user' + Date.now();
+            let isDrawing = false;
+            let currentColor = '#000000';
+            
+            // Drawing functionality
+            function drawOnCanvas(x, y, color, prevX, prevY) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                if (prevX !== undefined && prevY !== undefined) {
+                    ctx.moveTo(prevX, prevY);
+                }
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                // Sync to Firebase
+                if (currentLobbyId && database) {
+                    database.ref(`paintv2Lobbies/${currentLobbyId}/drawings`).push({
+                        x: x / canvas.width,
+                        y: y / canvas.height,
+                        prevX: prevX !== undefined ? prevX / canvas.width : undefined,
+                        prevY: prevY !== undefined ? prevY / canvas.height : undefined,
+                        color: color,
+                        userId: userId,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+            
+            let lastX = null;
+            let lastY = null;
+            
+            canvas.addEventListener('mousedown', (e) => {
+                if (!currentLobbyId) {
+                    statusEl.textContent = 'Please join/create a lobby first!';
+                    statusEl.style.color = '#f85149';
+                    return;
+                }
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                lastX = x;
+                lastY = y;
+                drawOnCanvas(x, y, currentColor);
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing || !currentLobbyId) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                drawOnCanvas(x, y, currentColor, lastX, lastY);
+                lastX = x;
+                lastY = y;
+            });
+            
+            canvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+                lastX = null;
+                lastY = null;
+            });
+            
+            colorPicker.addEventListener('change', (e) => {
+                currentColor = e.target.value;
+            });
+            
+            clearBtn.onclick = () => {
+                if (currentLobbyId && database) {
+                    database.ref(`paintv2Lobbies/${currentLobbyId}`).update({ clearCanvas: Date.now() });
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            };
+            
+            // Lobby system
+            function showPaintV2Lobbies() {
+                windowZIndex++;
+                const lobbyWindow = document.createElement('div');
+                lobbyWindow.className = 'win95-window';
+                lobbyWindow.style.left = '200px';
+                lobbyWindow.style.top = '100px';
+                lobbyWindow.style.width = '350px';
+                lobbyWindow.style.height = '400px';
+                lobbyWindow.style.zIndex = windowZIndex;
+                
+                const header = document.createElement('div');
+                header.className = 'win95-window-header';
+                const title = document.createElement('div');
+                title.className = 'win95-window-title';
+                title.textContent = 'Paint v2 - Multiplayer';
+                const controls = document.createElement('div');
+                controls.className = 'win95-window-controls';
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'win95-window-button';
+                closeBtn.textContent = '×';
+                closeBtn.onclick = () => lobbyWindow.remove();
+                controls.appendChild(closeBtn);
+                header.appendChild(title);
+                header.appendChild(controls);
+                
+                const content = document.createElement('div');
+                content.className = 'win95-window-content';
+                content.style.padding = '10px';
+                content.style.overflow = 'auto';
+                content.innerHTML = '<div style="text-align: center; margin: 10px 0;"><button id="create-paint-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Create Lobby</button><div style="font-size: 11px; margin-bottom: 10px;">Available Lobbies:</div><div id="paint-lobby-list">Loading...</div></div>';
+                
+                lobbyWindow.appendChild(header);
+                lobbyWindow.appendChild(content);
+                document.getElementById('remoteDesktop').appendChild(lobbyWindow);
+                
+                function loadLobbies() {
+                    const listEl = content.querySelector('#paint-lobby-list');
+                    if (database) {
+                        database.ref('paintv2Lobbies').on('value', (snapshot) => {
+                            const lobbies = [];
+                            snapshot.forEach((child) => {
+                                const data = child.val();
+                                const players = data.players || {};
+                                const playerCount = Object.keys(players).length;
+                                if (playerCount < 10) {
+                                    lobbies.push({ id: child.key, ...data, playerCount });
+                                }
+                            });
+                            if (lobbies.length === 0) {
+                                listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
+                            } else {
+                                let html = '';
+                                lobbies.forEach(lobby => {
+                                    html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Players: ${lobby.playerCount}/10</div><button onclick="joinPaintLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
+                                });
+                                listEl.innerHTML = html;
+                            }
+                        });
+                    } else {
+                        listEl.innerHTML = '<div style="font-size: 11px; color: #f85149; text-align: center; margin: 10px 0;">Firebase not available. Please check connection.</div>';
+                    }
+                }
+                
+                function createLobby() {
+                    const lobbyId = 'lobby_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    if (database) {
+                        database.ref(`paintv2Lobbies/${lobbyId}`).set({
+                            host: userId,
+                            players: { [userId]: true },
+                            drawings: {},
+                            createdAt: Date.now()
+                        });
+                        joinLobbyInternal(lobbyId);
+                        lobbyWindow.remove();
+                    }
+                }
+                
+                function joinLobbyInternal(lobbyId) {
+                    currentLobbyId = lobbyId;
+                    if (database) {
+                        database.ref(`paintv2Lobbies/${lobbyId}/players/${userId}`).set(true);
+                        statusEl.textContent = `Joined lobby ${lobbyId.substring(0, 6)}`;
+                        statusEl.style.color = '#238636';
+                        
+                        // Listen for drawings
+                        database.ref(`paintv2Lobbies/${lobbyId}/drawings`).on('child_added', (snapshot) => {
+                            const drawing = snapshot.val();
+                            if (drawing.userId !== userId) {
+                                const x = drawing.x * canvas.width;
+                                const y = drawing.y * canvas.height;
+                                const prevX = drawing.prevX !== undefined ? drawing.prevX * canvas.width : undefined;
+                                const prevY = drawing.prevY !== undefined ? drawing.prevY * canvas.height : undefined;
+                                drawOnCanvas(x, y, drawing.color, prevX, prevY);
+                            }
+                        });
+                        
+                        // Listen for clear
+                        database.ref(`paintv2Lobbies/${lobbyId}/clearCanvas`).on('value', (snapshot) => {
+                            if (snapshot.val()) {
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            }
+                        });
+                    }
+                }
+                
+                window.joinPaintLobby = (lobbyId) => joinLobbyInternal(lobbyId);
+                content.querySelector('#create-paint-lobby').onclick = createLobby;
+                loadLobbies();
+                
+                // Make draggable
+                let isDragging = false;
+                header.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    lobbyWindow.style.zIndex = ++windowZIndex;
+                    const initialX = e.clientX - lobbyWindow.offsetLeft;
+                    const initialY = e.clientY - lobbyWindow.offsetTop;
+                    const onMove = (e) => {
+                        if (isDragging) {
+                            lobbyWindow.style.left = (e.clientX - initialX) + 'px';
+                            lobbyWindow.style.top = (e.clientY - initialY) + 'px';
+                        }
+                    };
+                    const onUp = () => {
+                        isDragging = false;
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                    };
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+            }
+            
+            lobbyBtn.onclick = showPaintV2Lobbies;
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'paintv2',
+                element: window
+            });
+            
+            updateTaskbar();
         }
         
         // Table Tennis app removed
