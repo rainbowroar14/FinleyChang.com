@@ -5976,6 +5976,16 @@ body.theme-flashcard button:hover {
                     // Sync to localStorage
                     localStorage.setItem('chatTimeouts', JSON.stringify(timeouts));
                 });
+                
+                // Also check for expired timeouts periodically
+                setInterval(() => {
+                    const timeouts = JSON.parse(localStorage.getItem('chatTimeouts') || '{}');
+                    Object.keys(timeouts).forEach(username => {
+                        if (Date.now() > timeouts[username].endTime) {
+                            removeUserTimeout(username);
+                        }
+                    });
+                }, 60000); // Check every minute
             }
             
             if (!database) {
@@ -6075,19 +6085,42 @@ body.theme-flashcard button:hover {
         }
         
         function refreshOnlineUsers() {
-            // Reload users (loadOnlineUsers already handles listener cleanup)
+            const usersList = document.getElementById('onlineUsersList');
+            if (usersList) {
+                // Clear the list first
+                usersList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 10px;">Refreshing...</div>';
+            }
+            
+            // Remove existing listeners
+            if (database && typeof onlineUsersListeners !== 'undefined' && onlineUsersListeners.length > 0) {
+                onlineUsersListeners.forEach(listener => {
+                    if (listener && listener.off) {
+                        listener.off();
+                    }
+                });
+                onlineUsersListeners = [];
+            }
+            
+            // Reload users
             loadOnlineUsers();
         }
         
         function clearChat() {
+            // Check if user is FinleyMain
+            const currentUsername = localStorage.getItem('loggedInUsername') || getUserId();
+            if (currentUsername !== 'FinleyMain' && currentUsername.toLowerCase() !== 'finleymain') {
+                alert('Only FinleyMain can clear chat messages!');
+                return;
+            }
+            
             if (confirm('Are you sure you want to clear all chat messages? This cannot be undone.')) {
                 const messagesContainer = document.getElementById('chatMessages');
                 if (messagesContainer) {
                     messagesContainer.innerHTML = '';
                 }
-                // Clear from Firebase if available
+                // Clear from Firebase if available - use correct path 'messages'
                 if (database) {
-                    database.ref('chatMessages').remove().catch(err => {
+                    database.ref('messages').remove().catch(err => {
                         console.warn('Could not clear chat from Firebase:', err);
                     });
                 }
@@ -6219,6 +6252,8 @@ body.theme-flashcard button:hover {
             
             if (database) {
                 const usersRef = database.ref('users');
+                // Use on() for real-time updates, but clear list first
+                usersList.innerHTML = ''; // Clear list before loading
                 const listener = usersRef.on('value', (snapshot) => {
                     const users = snapshot.val() || {};
                     const currentTime = Date.now();
