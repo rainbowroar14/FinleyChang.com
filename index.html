@@ -10215,6 +10215,12 @@ body.theme-flashcard button:hover {
                 <div style="text-align: center; margin-bottom: 10px;">
                     <button id="passwordgame-multiplayer" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Multiplayer Mode</button>
                     <button id="passwordgame-new" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
+                    <div id="passwordgame-lobby-info" style="display: none; border: 1px inset #c0c0c0; background: #f0f0f0; padding: 8px; margin: 5px 0; font-size: 11px;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">Lobby: <span id="passwordgame-lobby-id">-</span></div>
+                        <div id="passwordgame-lobby-status" style="margin-bottom: 5px;">Status: Waiting for players...</div>
+                        <div id="passwordgame-lobby-players" style="font-size: 10px; color: #666;">Players: Loading...</div>
+                        <button id="passwordgame-start-game" style="display: none; background: #238636; color: white; border: 2px outset #238636; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-top: 5px;">Start Game</button>
+                    </div>
                     <div style="font-size: 12px; margin-bottom: 5px;">Attempts: <span id="passwordgame-attempts">0</span>/${maxAttempts}</div>
                     <div id="passwordgame-mode" style="font-size: 11px; color: #666; margin-bottom: 10px;">Guess the 5-letter password!</div>
                 </div>
@@ -10237,10 +10243,47 @@ body.theme-flashcard button:hover {
             const resultEl = content.querySelector('#passwordgame-result');
             const modeEl = content.querySelector('#passwordgame-mode');
             const multiplayerBtn = content.querySelector('#passwordgame-multiplayer');
+            const lobbyInfoEl = content.querySelector('#passwordgame-lobby-info');
+            const lobbyIdEl = content.querySelector('#passwordgame-lobby-id');
+            const lobbyStatusEl = content.querySelector('#passwordgame-lobby-status');
+            const lobbyPlayersEl = content.querySelector('#passwordgame-lobby-players');
+            const startGameBtn = content.querySelector('#passwordgame-start-game');
             
             let isMultiplayer = false;
             let currentLobbyId = null;
             let isHost = false;
+            let lobbyListener = null;
+            
+            // Update lobby info function
+            function updateLobbyInfo() {
+                if (!currentLobbyId || !database) return;
+                
+                database.ref(`passwordGameLobbies/${currentLobbyId}`).once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (!data) return;
+                    
+                    const players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
+                    const playerNames = players.map(p => escapeHtml(p || 'Unknown')).join(', ');
+                    
+                    if (lobbyPlayersEl) {
+                        lobbyPlayersEl.textContent = `Players (${players.length}/2): ${playerNames}`;
+                    }
+                    
+                    if (isHost) {
+                        if (lobbyStatusEl) {
+                            lobbyStatusEl.textContent = `Status: You are HOST - ${players.length >= 2 ? 'Ready to start!' : 'Waiting for player...'}`;
+                        }
+                        if (startGameBtn) {
+                            startGameBtn.style.display = players.length >= 2 && currentPassword && !data.gameStarted ? 'block' : 'none';
+                        }
+                    } else {
+                        if (lobbyStatusEl) {
+                            lobbyStatusEl.textContent = data.gameStarted ? 'Status: Game started!' : 'Status: Waiting for host to start...';
+                        }
+                        if (startGameBtn) startGameBtn.style.display = 'none';
+                    }
+                });
+            }
             
             function startNewGame() {
                 currentPassword = words[Math.floor(Math.random() * words.length)];
@@ -10565,7 +10608,30 @@ body.theme-flashcard button:hover {
                             isMultiplayer = true;
                             isHost = false;
                             modeEl.textContent = 'You are GUESSING. Wait for host to set word...';
+                            
+                            // Show lobby info
+                            if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
+                            if (lobbyIdEl) lobbyIdEl.textContent = lobbyId.substring(0, 8);
                             setupGameMode();
+                            updateLobbyInfo();
+                            
+                            // Listen for lobby updates
+                            if (database && currentLobbyId) {
+                                if (lobbyListener) {
+                                    database.ref(`passwordGameLobbies/${currentLobbyId}`).off('value', lobbyListener);
+                                }
+                                lobbyListener = (snapshot) => {
+                                    const data = snapshot.val();
+                                    if (data) {
+                                        updateLobbyInfo();
+                                        if (data.gameStarted && data.password) {
+                                            currentPassword = data.password;
+                                            modeEl.textContent = 'Game started! Guess the word!';
+                                        }
+                                    }
+                                };
+                                database.ref(`passwordGameLobbies/${currentLobbyId}`).on('value', lobbyListener);
+                            }
                         });
                         return;
                     }
@@ -10574,8 +10640,56 @@ body.theme-flashcard button:hover {
                     currentLobbyId = lobbyId;
                     isMultiplayer = true;
                     isHost = isHostPlayer;
-                    modeEl.textContent = isHost ? 'You are the HOST. Pick a 5-letter word!' : 'You are GUESSING. Wait for host to set word...';
+                    
+                    // Show lobby info
+                    if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
+                    if (lobbyIdEl) lobbyIdEl.textContent = lobbyId.substring(0, 8);
+                    updateLobbyInfo();
                     setupGameMode();
+                    
+                    // Listen for lobby updates
+                    if (database && currentLobbyId) {
+                        if (lobbyListener) {
+                            database.ref(`passwordGameLobbies/${currentLobbyId}`).off('value', lobbyListener);
+                        }
+                        lobbyListener = (snapshot) => {
+                            const data = snapshot.val();
+                            if (data) {
+                                updateLobbyInfo();
+                            }
+                        };
+                        database.ref(`passwordGameLobbies/${currentLobbyId}`).on('value', lobbyListener);
+                    }
+                }
+                
+                function updateLobbyInfo() {
+                    if (!currentLobbyId || !database) return;
+                    
+                    database.ref(`passwordGameLobbies/${currentLobbyId}`).once('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (!data) return;
+                        
+                        const players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
+                        const playerNames = players.map(p => escapeHtml(p || 'Unknown')).join(', ');
+                        
+                        if (lobbyPlayersEl) {
+                            lobbyPlayersEl.textContent = `Players (${players.length}/2): ${playerNames}`;
+                        }
+                        
+                        if (isHost) {
+                            if (lobbyStatusEl) {
+                                lobbyStatusEl.textContent = `Status: You are HOST - ${players.length >= 2 ? 'Ready to start!' : 'Waiting for player...'}`;
+                            }
+                            if (startGameBtn) {
+                                startGameBtn.style.display = players.length >= 2 && currentPassword && !data.gameStarted ? 'block' : 'none';
+                            }
+                        } else {
+                            if (lobbyStatusEl) {
+                                lobbyStatusEl.textContent = data.gameStarted ? 'Status: Game started!' : 'Status: Waiting for host to start...';
+                            }
+                            if (startGameBtn) startGameBtn.style.display = 'none';
+                        }
+                    });
                 }
                 
                 function setupGameMode() {
@@ -10594,21 +10708,28 @@ body.theme-flashcard button:hover {
                                         gameStarted: true
                                     });
                                     currentPassword = word;
-                                    inputSection.innerHTML = '<div style="font-size: 11px; color: #238636; padding: 5px; text-align: center;">Word set! Guesser can now play.</div>';
+                                    inputSection.innerHTML = '<div style="font-size: 11px; color: #238636; padding: 5px; text-align: center;">Word set! Click Start Game when ready.</div>';
+                                    updateLobbyInfo();
                                 }
                             }
                         };
+                        
+                        // Start game button handler
+                        if (startGameBtn) {
+                            startGameBtn.onclick = () => {
+                                if (database && currentPassword) {
+                                    database.ref(`passwordGameLobbies/${currentLobbyId}`).update({
+                                        gameStarted: true
+                                    });
+                                    updateLobbyInfo();
+                                } else {
+                                    alert('Please set a word first!');
+                                }
+                            };
+                        }
                     } else {
                         inputField.placeholder = 'Enter 5 letters...';
-                        if (database) {
-                            database.ref(`passwordGameLobbies/${currentLobbyId}`).on('value', (snapshot) => {
-                                const data = snapshot.val();
-                                if (data.gameStarted && data.password) {
-                                    currentPassword = data.password;
-                                    modeEl.textContent = 'Game started! Guess the word!';
-                                }
-                            });
-                        }
+                        // Lobby updates are handled by the listener in joinLobbyInternal
                     }
                 }
                 
@@ -10717,7 +10838,11 @@ body.theme-flashcard button:hover {
                 if (currentLobbyId && database) {
                     const userId = getUserId();
                     database.ref(`paintv2Lobbies/${currentLobbyId}/players/${userId}`).remove();
+                    if (paintLobbyListener) {
+                        database.ref(`paintv2Lobbies/${currentLobbyId}`).off('value', paintLobbyListener);
+                    }
                 }
+                if (lobbyInfoEl) lobbyInfoEl.style.display = 'none';
                 window.remove();
                 desktopWindows = desktopWindows.filter(w => w.element !== window);
                 updateTaskbar();
@@ -10738,6 +10863,11 @@ body.theme-flashcard button:hover {
             const gameHTML = `
                 <div style="margin-bottom: 10px; text-align: center;">
                     <button id="paintv2-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 5px;">Multiplayer Lobbies</button>
+                    <div id="paintv2-lobby-info" style="display: none; border: 1px inset #c0c0c0; background: #f0f0f0; padding: 8px; margin: 5px 0; font-size: 11px;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">Lobby: <span id="paintv2-lobby-id">-</span></div>
+                        <div id="paintv2-lobby-status" style="margin-bottom: 5px;">Status: In lobby</div>
+                        <div id="paintv2-lobby-players" style="font-size: 10px; color: #666;">Players: Loading...</div>
+                    </div>
                     <div id="paintv2-status" style="font-size: 11px; color: #666; margin: 5px 0;">Click to join/create a lobby</div>
                     <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 5px;">
                         <input type="color" id="paintv2-color" value="#000000" style="width: 40px; height: 30px; border: 2px inset #c0c0c0; cursor: pointer;">
@@ -10754,11 +10884,41 @@ body.theme-flashcard button:hover {
             const clearBtn = content.querySelector('#paintv2-clear');
             const lobbyBtn = content.querySelector('#paintv2-lobby');
             const statusEl = content.querySelector('#paintv2-status');
+            const lobbyInfoEl = content.querySelector('#paintv2-lobby-info');
+            const paintLobbyIdEl = content.querySelector('#paintv2-lobby-id');
+            const paintLobbyStatusEl = content.querySelector('#paintv2-lobby-status');
+            const paintLobbyPlayersEl = content.querySelector('#paintv2-lobby-players');
             
             let currentLobbyId = null;
             let userId = getUserId() || 'user' + Date.now();
             let isDrawing = false;
             let currentColor = '#000000';
+            let paintLobbyListener = null;
+            
+            // Update Paint v2 lobby info function
+            function updatePaintLobbyInfo() {
+                if (!currentLobbyId || !database) return;
+                
+                database.ref(`paintv2Lobbies/${currentLobbyId}`).once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (!data) return;
+                    
+                    const players = Object.keys(data.players || {});
+                    const isHostPlayer = data.host === userId;
+                    const playerNames = players.map(p => {
+                        if (p === data.host) return escapeHtml(p) + ' (Host)';
+                        return escapeHtml(p);
+                    }).join(', ');
+                    
+                    if (paintLobbyPlayersEl) {
+                        paintLobbyPlayersEl.textContent = `Players (${players.length}/${data.maxPlayers || 10}): ${playerNames}`;
+                    }
+                    
+                    if (paintLobbyStatusEl) {
+                        paintLobbyStatusEl.textContent = isHostPlayer ? 'Status: You are HOST - Drawing active!' : 'Status: Drawing active!';
+                    }
+                });
+            }
             
             // Drawing functionality
             function drawOnCanvas(x, y, color, prevX, prevY) {
@@ -11063,6 +11223,23 @@ body.theme-flashcard button:hover {
                             database.ref(`paintv2Lobbies/${lobbyId}/players/${userId}`).set(true);
                             statusEl.textContent = `Joined lobby ${lobbyId.substring(0, 6)}`;
                             statusEl.style.color = '#238636';
+                            
+                            // Show lobby info
+                            if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
+                            if (paintLobbyIdEl) paintLobbyIdEl.textContent = lobbyId.substring(0, 8);
+                            updatePaintLobbyInfo();
+                            
+                            // Listen for lobby updates
+                            if (paintLobbyListener) {
+                                database.ref(`paintv2Lobbies/${lobbyId}`).off('value', paintLobbyListener);
+                            }
+                            paintLobbyListener = (snapshot) => {
+                                const data = snapshot.val();
+                                if (data) {
+                                    updatePaintLobbyInfo();
+                                }
+                            };
+                            database.ref(`paintv2Lobbies/${lobbyId}`).on('value', paintLobbyListener);
                             
                             // Listen for drawings
                             database.ref(`paintv2Lobbies/${lobbyId}/drawings`).on('child_added', (snapshot) => {
