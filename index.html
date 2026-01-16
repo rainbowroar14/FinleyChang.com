@@ -2666,6 +2666,7 @@ body.theme-flashcard button:hover {
     <!-- Minesweeper page -->
     <div class="page minesweeper-page hidden" id="minesweeperPage" oncontextmenu="return false;">
         <button id="restart-btn">Restart Game</button>
+        <button id="minesweeper-page-leaderboard-btn" style="margin-left: 10px;">Leaderboard</button>
         <div id="message">Flags Remaining: 10</div>
         <div id="minesweeper-timer-display" style="font-size: 16px; margin: 10px 0; font-weight: bold;">Time: <span id="minesweeper-timer-text">0</span>s</div>
         <div id="minesweeper-game-container">
@@ -5987,7 +5988,158 @@ body.theme-flashcard button:hover {
             if (restartBtn) {
                 restartBtn.addEventListener('click', initGame);
             }
+            
+            // Add leaderboard button handler
+            const leaderboardBtn = document.getElementById('minesweeper-page-leaderboard-btn');
+            if (leaderboardBtn) {
+                leaderboardBtn.addEventListener('click', showMinesweeperPageLeaderboard);
+            }
+            
             initGame();
+        }
+        
+        // Show leaderboard for minesweeper page (sweeper command)
+        function showMinesweeperPageLeaderboard() {
+            windowZIndex++;
+            const leaderboardWindow = document.createElement('div');
+            leaderboardWindow.className = 'win95-window';
+            leaderboardWindow.style.left = '150px';
+            leaderboardWindow.style.top = '100px';
+            leaderboardWindow.style.width = '400px';
+            leaderboardWindow.style.height = '500px';
+            leaderboardWindow.style.zIndex = windowZIndex;
+            
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = 'Minesweeper Leaderboard';
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => leaderboardWindow.remove();
+            
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '10px';
+            content.style.overflow = 'auto';
+            content.innerHTML = '<div style="text-align: center; margin-bottom: 10px;"><div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">Top Speed Times</div><div id="minesweeper-page-leaderboard-list">Loading...</div></div>';
+            
+            leaderboardWindow.appendChild(header);
+            leaderboardWindow.appendChild(content);
+            
+            // Append to remoteDesktop if it exists, otherwise append to body
+            const remoteDesktop = document.getElementById('remoteDesktop');
+            if (remoteDesktop) {
+                remoteDesktop.appendChild(leaderboardWindow);
+            } else {
+                document.body.appendChild(leaderboardWindow);
+            }
+            
+            function loadLeaderboard() {
+                const listEl = content.querySelector('#minesweeper-page-leaderboard-list');
+                
+                if (database) {
+                    database.ref('minesweeperLeaderboard').orderByChild('time').limitToFirst(10).once('value', (snapshot) => {
+                        const scores = [];
+                        snapshot.forEach((child) => {
+                            const data = child.val();
+                            if (data) {
+                                scores.push({
+                                    id: child.key,
+                                    ...data
+                                });
+                            }
+                        });
+                        // Sort by time (ascending - fastest first)
+                        scores.sort((a, b) => (a.time || 999999) - (b.time || 999999));
+                        renderLeaderboard(scores);
+                    }, (error) => {
+                        console.error('Error loading leaderboard:', error);
+                        // Fallback to localStorage
+                        loadFromLocalStorage();
+                    });
+                } else {
+                    loadFromLocalStorage();
+                }
+                
+                function loadFromLocalStorage() {
+                    const saved = localStorage.getItem('minesweeperLeaderboard');
+                    const scores = saved ? JSON.parse(saved) : [];
+                    // Sort by time (ascending - fastest first)
+                    scores.sort((a, b) => (a.time || 999999) - (b.time || 999999));
+                    // Get top 10
+                    renderLeaderboard(scores.slice(0, 10));
+                }
+                
+                function renderLeaderboard(scores) {
+                    const listEl = content.querySelector('#minesweeper-page-leaderboard-list');
+                    if (scores.length === 0) {
+                        listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No scores yet. Be the first!</div>';
+                        return;
+                    }
+                    
+                    let html = '<div style="font-size: 11px;">';
+                    scores.forEach((score, index) => {
+                        const rank = index + 1;
+                        const time = score.time || 0;
+                        const userId = escapeHtml(score.userId || 'Anonymous');
+                        const date = score.timestamp ? new Date(score.timestamp).toLocaleDateString() : 'Unknown';
+                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+                        
+                        html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-weight: bold; font-size: 12px;">${medal}</span>
+                                    <span style="font-size: 11px; margin-left: 5px;">${userId}</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: bold; font-size: 12px; color: #238636;">${time}s</div>
+                                    <div style="font-size: 9px; color: #666;">${date}</div>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                    listEl.innerHTML = html;
+                }
+            }
+            
+            loadLeaderboard();
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                leaderboardWindow.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - leaderboardWindow.offsetLeft;
+                const initialY = e.clientY - leaderboardWindow.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        leaderboardWindow.style.left = (e.clientX - initialX) + 'px';
+                        leaderboardWindow.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
         }
         
         // Pong game code - placeholder for JavaScript
