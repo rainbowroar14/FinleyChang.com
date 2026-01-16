@@ -8822,6 +8822,32 @@ body.theme-flashcard button:hover {
                             }
                         }, i * 100);
                     }
+                    
+                    // Also spawn Doritos and Mountain Dew occasionally
+                    if (Math.random() < 0.3) { // 30% chance
+                        const side = Math.floor(Math.random() * 4);
+                        let x, y;
+                        
+                        if (side === 0) { // Top
+                            x = Math.random() * window.innerWidth;
+                            y = -50;
+                        } else if (side === 1) { // Right
+                            x = window.innerWidth + 50;
+                            y = Math.random() * window.innerHeight;
+                        } else if (side === 2) { // Bottom
+                            x = Math.random() * window.innerWidth;
+                            y = window.innerHeight + 50;
+                        } else { // Left
+                            x = -50;
+                            y = Math.random() * window.innerHeight;
+                        }
+                        
+                        if (Math.random() < 0.5) {
+                            createMLGDorito(x, y);
+                        } else {
+                            createMLGMountainDew(x, y);
+                        }
+                    }
                 }, 200); // Spawn every 200ms
             }
         }
