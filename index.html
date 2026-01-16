@@ -3048,6 +3048,10 @@ body.theme-flashcard button:hover {
                     <div class="online-users-title">👥 Online Users</div>
                     <div id="onlineUsersList"></div>
                 </div>
+                <!-- Context Menu for Online Users -->
+                <div id="onlineUserContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                    <div class="context-menu-item" id="addFriendContextItem" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Add Friend</div>
+                </div>
             </div>
             <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-container">
@@ -4356,9 +4360,26 @@ body.theme-flashcard button:hover {
         function getUserId() {
             let userId = localStorage.getItem('userId');
             if (!userId) {
-                // Generate a unique ID (8 character alphanumeric)
-                userId = 'user_' + Math.random().toString(36).substr(2, 8);
-                localStorage.setItem('userId', userId);
+                // Generate a more unique ID using timestamp + random to avoid collisions
+                const timestamp = Date.now().toString(36);
+                const random = Math.random().toString(36).substr(2, 6);
+                userId = 'user_' + timestamp + '_' + random;
+                
+                // If Firebase is available, check if this ID exists and regenerate if needed
+                if (database) {
+                    database.ref(`users/${userId}`).once('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            // ID collision, regenerate with more randomness
+                            const newRandom = Math.random().toString(36).substr(2, 8);
+                            userId = 'user_' + Date.now().toString(36) + '_' + newRandom;
+                            localStorage.setItem('userId', userId);
+                        } else {
+                            localStorage.setItem('userId', userId);
+                        }
+                    });
+                } else {
+                    localStorage.setItem('userId', userId);
+                }
             }
             return userId;
         }
@@ -5103,6 +5124,8 @@ body.theme-flashcard button:hover {
                     const users = snapshot.val() || {};
                     const currentTime = Date.now();
                     const onlineThreshold = 60000; // 1 minute
+                    const currentUserId = getUserId();
+                    const friends = getFriends();
                     
                     usersList.innerHTML = '';
                     
@@ -5111,8 +5134,19 @@ body.theme-flashcard button:hover {
                         if (isOnline) {
                             const userDiv = document.createElement('div');
                             userDiv.className = 'online-user-item';
-                            userDiv.innerHTML = `<span class="user-id">${id}</span>${user.bio ? `: ${user.bio.substring(0, 30)}` : ''}`;
+                            // Include unique identifier in data attribute for debugging
+                            userDiv.setAttribute('data-user-id', id);
+                            userDiv.innerHTML = `<span class="user-id">${escapeHtml(id)}</span>${user.bio ? `: ${escapeHtml(user.bio.substring(0, 30))}` : ''}`;
                             userDiv.onclick = () => showWhoami(id);
+                            
+                            // Add right-click context menu for friend requests
+                            if (id !== currentUserId) {
+                                userDiv.addEventListener('contextmenu', (e) => {
+                                    e.preventDefault();
+                                    showOnlineUserContextMenu(e, id, friends.includes(id));
+                                });
+                            }
+                            
                             usersList.appendChild(userDiv);
                         }
                     });
@@ -5121,6 +5155,78 @@ body.theme-flashcard button:hover {
                 // Fallback: show local users
                 usersList.innerHTML = '<div class="online-user-item"><span class="user-id">' + getUserId() + '</span> (Local only)</div>';
             }
+        }
+        
+        function showOnlineUserContextMenu(event, userId, isAlreadyFriend) {
+            const contextMenu = document.getElementById('onlineUserContextMenu');
+            const addFriendItem = document.getElementById('addFriendContextItem');
+            
+            if (!contextMenu || !addFriendItem) return;
+            
+            // Hide other context menus
+            document.querySelectorAll('.context-menu').forEach(menu => {
+                if (menu.id !== 'onlineUserContextMenu') {
+                    menu.classList.add('hidden');
+                }
+            });
+            
+            // Update context menu item text
+            if (isAlreadyFriend) {
+                addFriendItem.textContent = 'Already Friends';
+                addFriendItem.style.cursor = 'default';
+                addFriendItem.style.color = '#666';
+                addFriendItem.onclick = null;
+            } else {
+                addFriendItem.textContent = 'Add Friend';
+                addFriendItem.style.cursor = 'pointer';
+                addFriendItem.style.color = '#000';
+                addFriendItem.onclick = () => {
+                    // Verify user exists before adding
+                    if (database) {
+                        database.ref(`users/${userId}`).once('value', (snapshot) => {
+                            if (snapshot.exists()) {
+                                const userData = snapshot.val();
+                                const userBio = userData.bio || '(No bio)';
+                                if (addFriend(userId)) {
+                                    alert(`Added ${userId} as a friend!\nBio: ${userBio.substring(0, 50)}`);
+                                    loadOnlineUsers(); // Refresh the list
+                                } else {
+                                    alert(`Failed to add ${userId} as a friend. They might already be your friend.`);
+                                }
+                            } else {
+                                alert(`User ${userId} not found. They may have disconnected.`);
+                            }
+                            contextMenu.classList.add('hidden');
+                        });
+                    } else {
+                        // No Firebase, just add directly
+                        if (addFriend(userId)) {
+                            alert(`Added ${userId} as a friend!`);
+                            loadOnlineUsers(); // Refresh the list
+                        } else {
+                            alert(`Failed to add ${userId} as a friend.`);
+                        }
+                        contextMenu.classList.add('hidden');
+                    }
+                };
+            }
+            
+            // Position and show context menu
+            contextMenu.style.left = event.pageX + 'px';
+            contextMenu.style.top = event.pageY + 'px';
+            contextMenu.classList.remove('hidden');
+            
+            // Hide menu when clicking elsewhere
+            const hideMenu = (e) => {
+                if (!contextMenu.contains(e.target)) {
+                    contextMenu.classList.add('hidden');
+                    document.removeEventListener('click', hideMenu);
+                }
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', hideMenu);
+            }, 100);
         }
         
         function escapeHtml(text) {
@@ -5620,10 +5726,36 @@ body.theme-flashcard button:hover {
                     } else if (friendId === getUserId()) {
                         showCommandFeedback('friend', 'You cannot add yourself as a friend!', false);
                     } else {
-                        if (addFriend(friendId)) {
-                            showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
+                        // Check if user exists and get their info to verify
+                        if (database) {
+                            database.ref(`users/${friendId}`).once('value', (snapshot) => {
+                                if (snapshot.exists()) {
+                                    const userData = snapshot.val();
+                                    const userBio = userData.bio || '(No bio)';
+                                    const isOnline = userData.online || (Date.now() - (userData.lastSeen || 0) < 60000);
+                                    const status = isOnline ? '🟢 Online' : '⚫ Offline';
+                                    
+                                    if (addFriend(friendId)) {
+                                        showCommandFeedback('friend', `Added ${friendId} (${status}) as a friend! Bio: ${userBio.substring(0, 30)}`, true);
+                                    } else {
+                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                                    }
+                                } else {
+                                    // User doesn't exist in Firebase, but still allow adding (might be offline)
+                                    if (addFriend(friendId)) {
+                                        showCommandFeedback('friend', `Added ${friendId} as a friend! (User not currently online)`, true);
+                                    } else {
+                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                                    }
+                                }
+                            });
                         } else {
-                            showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                            // No Firebase, just add directly
+                            if (addFriend(friendId)) {
+                                showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
+                            } else {
+                                showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                            }
                         }
                     }
                 } else if (command === 'friends') {
@@ -10992,8 +11124,92 @@ body.theme-flashcard button:hover {
                 }
             };
             
+            // Join lobby function - must be accessible globally
+            function joinLobbyInternal(lobbyId, providedPassword = null) {
+                // Check if lobby has password
+                if (database) {
+                    database.ref(`paintv2Lobbies/${lobbyId}`).once('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (!data) {
+                            alert('Lobby not found!');
+                            return;
+                        }
+                        
+                        const players = data.players || {};
+                        const playerCount = Object.keys(players).length;
+                        const maxPlayers = data.maxPlayers || 10;
+                        
+                        if (playerCount >= maxPlayers) {
+                            alert('Lobby is full!');
+                            return;
+                        }
+                        
+                        const lobbyPassword = data.password;
+                        if (lobbyPassword && lobbyPassword.length > 0) {
+                            if (providedPassword === null) {
+                                // Ask for password
+                                const passwordInput = prompt(`This lobby is password protected. Enter password:`);
+                                if (passwordInput !== lobbyPassword) {
+                                    alert('Incorrect password!');
+                                    return;
+                                }
+                            } else if (providedPassword !== lobbyPassword) {
+                                alert('Incorrect password!');
+                                return;
+                            }
+                        }
+                        
+                        // Join the lobby
+                        currentLobbyId = lobbyId;
+                        database.ref(`paintv2Lobbies/${lobbyId}/players/${userId}`).set(true);
+                        statusEl.textContent = `Joined lobby ${lobbyId.substring(0, 6)}`;
+                        statusEl.style.color = '#238636';
+                        
+                        // Show lobby info
+                        if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
+                        if (paintLobbyIdEl) paintLobbyIdEl.textContent = lobbyId.substring(0, 8);
+                        updatePaintLobbyInfo();
+                        
+                        // Listen for lobby updates
+                        if (paintLobbyListener) {
+                            database.ref(`paintv2Lobbies/${lobbyId}`).off('value', paintLobbyListener);
+                        }
+                        paintLobbyListener = (snapshot) => {
+                            const data = snapshot.val();
+                            if (data) {
+                                updatePaintLobbyInfo();
+                            }
+                        };
+                        database.ref(`paintv2Lobbies/${lobbyId}`).on('value', paintLobbyListener);
+                        
+                        // Listen for drawings
+                        database.ref(`paintv2Lobbies/${lobbyId}/drawings`).on('child_added', (snapshot) => {
+                            const drawing = snapshot.val();
+                            if (drawing.userId !== userId) {
+                                const x = drawing.x * canvas.width;
+                                const y = drawing.y * canvas.height;
+                                const prevX = drawing.prevX !== undefined ? drawing.prevX * canvas.width : undefined;
+                                const prevY = drawing.prevY !== undefined ? drawing.prevY * canvas.height : undefined;
+                                drawOnCanvas(x, y, drawing.color, prevX, prevY);
+                            }
+                        });
+                        
+                        // Listen for clear
+                        database.ref(`paintv2Lobbies/${lobbyId}/clearCanvas`).on('value', (snapshot) => {
+                            if (snapshot.val()) {
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            }
+                        });
+                    });
+                }
+            }
+            
+            // Make join function globally accessible - update each time showPaintV2Lobbies is called
             // Lobby system
             function showPaintV2Lobbies() {
+                // Make sure the global join function is accessible when buttons are created
+                window.paintV2JoinLobby = (lobbyId) => joinLobbyInternal(lobbyId);
+                
                 windowZIndex++;
                 const lobbyWindow = document.createElement('div');
                 lobbyWindow.className = 'win95-window';
@@ -11183,87 +11399,6 @@ body.theme-flashcard button:hover {
                         document.addEventListener('mouseup', onUp);
                     });
                 }
-                
-                function joinLobbyInternal(lobbyId, providedPassword = null) {
-                    // Check if lobby has password
-                    if (database) {
-                        database.ref(`paintv2Lobbies/${lobbyId}`).once('value', (snapshot) => {
-                            const data = snapshot.val();
-                            if (!data) {
-                                alert('Lobby not found!');
-                                return;
-                            }
-                            
-                            const players = data.players || {};
-                            const playerCount = Object.keys(players).length;
-                            const maxPlayers = data.maxPlayers || 10;
-                            
-                            if (playerCount >= maxPlayers) {
-                                alert('Lobby is full!');
-                                return;
-                            }
-                            
-                            const lobbyPassword = data.password;
-                            if (lobbyPassword && lobbyPassword.length > 0) {
-                                if (providedPassword === null) {
-                                    // Ask for password
-                                    const passwordInput = prompt(`This lobby is password protected. Enter password:`);
-                                    if (passwordInput !== lobbyPassword) {
-                                        alert('Incorrect password!');
-                                        return;
-                                    }
-                                } else if (providedPassword !== lobbyPassword) {
-                                    alert('Incorrect password!');
-                                    return;
-                                }
-                            }
-                            
-                            // Join the lobby
-                            currentLobbyId = lobbyId;
-                            database.ref(`paintv2Lobbies/${lobbyId}/players/${userId}`).set(true);
-                            statusEl.textContent = `Joined lobby ${lobbyId.substring(0, 6)}`;
-                            statusEl.style.color = '#238636';
-                            
-                            // Show lobby info
-                            if (lobbyInfoEl) lobbyInfoEl.style.display = 'block';
-                            if (paintLobbyIdEl) paintLobbyIdEl.textContent = lobbyId.substring(0, 8);
-                            updatePaintLobbyInfo();
-                            
-                            // Listen for lobby updates
-                            if (paintLobbyListener) {
-                                database.ref(`paintv2Lobbies/${lobbyId}`).off('value', paintLobbyListener);
-                            }
-                            paintLobbyListener = (snapshot) => {
-                                const data = snapshot.val();
-                                if (data) {
-                                    updatePaintLobbyInfo();
-                                }
-                            };
-                            database.ref(`paintv2Lobbies/${lobbyId}`).on('value', paintLobbyListener);
-                            
-                            // Listen for drawings
-                            database.ref(`paintv2Lobbies/${lobbyId}/drawings`).on('child_added', (snapshot) => {
-                                const drawing = snapshot.val();
-                                if (drawing.userId !== userId) {
-                                    const x = drawing.x * canvas.width;
-                                    const y = drawing.y * canvas.height;
-                                    const prevX = drawing.prevX !== undefined ? drawing.prevX * canvas.width : undefined;
-                                    const prevY = drawing.prevY !== undefined ? drawing.prevY * canvas.height : undefined;
-                                    drawOnCanvas(x, y, drawing.color, prevX, prevY);
-                                }
-                            });
-                            
-                            // Listen for clear
-                            database.ref(`paintv2Lobbies/${lobbyId}/clearCanvas`).on('value', (snapshot) => {
-                                if (snapshot.val()) {
-                                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                                }
-                            });
-                        });
-                    }
-                }
-                
-                window.paintV2JoinLobby = (lobbyId) => joinLobbyInternal(lobbyId);
                 content.querySelector('#create-paint-lobby').onclick = createLobby;
                 content.querySelector('#refresh-paint-lobbies').onclick = () => {
                     if (database) {
