@@ -5009,136 +5009,81 @@ body.theme-flashcard button:hover {
         }
         
         // Initialize command history toggle
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if user is logged in on page load
-            if (!isLoggedIn()) {
-                showPage('loginPage');
-            } else {
-                // Load user data if logged in
-                const username = localStorage.getItem('loggedInUsername');
-                if (username) {
-                    loadUserData(username);
+        // REMOVED - Now handled in initializeOnLoad() to prevent conflicts
+        
+        // Set up edit modal buttons (these can be set up immediately, not in DOMContentLoaded)
+        const editSaveBtn = document.getElementById('editSaveBtn');
+        const editCancelBtn = document.getElementById('editCancelBtn');
+        const editBio = document.getElementById('editBio');
+        
+        if (editSaveBtn) {
+            editSaveBtn.addEventListener('click', saveEditProfile);
+        }
+        if (editCancelBtn) {
+            editCancelBtn.addEventListener('click', closeEditMenu);
+        }
+        if (editBio) {
+            editBio.addEventListener('input', updateBioCharCount);
+        }
+        
+        // Close edit modal when clicking outside
+        const editModal = document.getElementById('editModal');
+        if (editModal) {
+            editModal.addEventListener('click', (e) => {
+                if (e.target === editModal) {
+                    closeEditMenu();
                 }
-            }
-            
-            // Add Enter key handlers for login/register
-            const loginPassword = document.getElementById('login-password');
-            const registerPasswordConfirm = document.getElementById('register-password-confirm');
-            
-            if (loginPassword) {
-                loginPassword.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        handleLogin();
+            });
+        }
+        
+        // Friends modal
+        const friendsCloseBtn = document.getElementById('friendsCloseBtn');
+        if (friendsCloseBtn) {
+            friendsCloseBtn.addEventListener('click', closeFriendsList);
+        }
+        
+        const friendsModal = document.getElementById('friendsModal');
+        if (friendsModal) {
+            friendsModal.addEventListener('click', (e) => {
+                if (e.target === friendsModal) {
+                    closeFriendsList();
+                }
+            });
+        }
+        
+        // Private chat
+        const privateChatBackBtn = document.getElementById('privateChatBackBtn');
+        if (privateChatBackBtn) {
+            privateChatBackBtn.addEventListener('click', () => {
+                showPage('mainPage');
+                openFriendsList();
+            });
+        }
+        
+        const privateChatSendBtn = document.getElementById('privateChatSendBtn');
+        const privateChatInput = document.getElementById('privateChatInput');
+        
+        if (privateChatSendBtn && privateChatInput) {
+            privateChatSendBtn.onclick = () => {
+                if (currentPrivateChatWith) {
+                    const text = privateChatInput.value;
+                    if (text.trim()) {
+                        sendPrivateMessage(text, currentPrivateChatWith);
+                        privateChatInput.value = '';
                     }
-                });
-            }
+                }
+            };
             
-            if (registerPasswordConfirm) {
-                registerPasswordConfirm.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        handleRegister();
+            privateChatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && currentPrivateChatWith) {
+                    const text = privateChatInput.value;
+                    if (text.trim()) {
+                        sendPrivateMessage(text, currentPrivateChatWith);
+                        privateChatInput.value = '';
                     }
-                });
-            }
-            
-            const toggle = document.getElementById('commandHistoryToggle');
-            if (toggle) {
-                toggle.addEventListener('click', toggleCommandHistory);
-            }
-            
-            // Load history from localStorage
-            loadCommandHistory();
-            
-            // Check terms agreement
-            checkTermsAgreement();
-            
-            // Terms modal buttons
-            const agreeBtn = document.getElementById('termsAgreeBtn');
-            const disagreeBtn = document.getElementById('termsDisagreeBtn');
-            if (agreeBtn) {
-                agreeBtn.addEventListener('click', acceptTerms);
-            }
-            if (disagreeBtn) {
-                disagreeBtn.addEventListener('click', rejectTerms);
-            }
-            
-            // Edit modal buttons
-            const editSaveBtn = document.getElementById('editSaveBtn');
-            const editCancelBtn = document.getElementById('editCancelBtn');
-            const editBio = document.getElementById('editBio');
-            
-            if (editSaveBtn) {
-                editSaveBtn.addEventListener('click', saveEditProfile);
-            }
-            if (editCancelBtn) {
-                editCancelBtn.addEventListener('click', closeEditMenu);
-            }
-            if (editBio) {
-                editBio.addEventListener('input', updateBioCharCount);
-            }
-            
-            // Close edit modal when clicking outside
-            const editModal = document.getElementById('editModal');
-            if (editModal) {
-                editModal.addEventListener('click', (e) => {
-                    if (e.target === editModal) {
-                        closeEditMenu();
-                    }
-                });
-            }
-            
-            // Friends modal
-            const friendsCloseBtn = document.getElementById('friendsCloseBtn');
-            if (friendsCloseBtn) {
-                friendsCloseBtn.addEventListener('click', closeFriendsList);
-            }
-            
-            const friendsModal = document.getElementById('friendsModal');
-            if (friendsModal) {
-                friendsModal.addEventListener('click', (e) => {
-                    if (e.target === friendsModal) {
-                        closeFriendsList();
-                    }
-                });
-            }
-            
-            // Private chat
-            const privateChatBackBtn = document.getElementById('privateChatBackBtn');
-            if (privateChatBackBtn) {
-                privateChatBackBtn.addEventListener('click', () => {
-                    showPage('mainPage');
-                    openFriendsList();
-                });
-            }
-            
-            const privateChatSendBtn = document.getElementById('privateChatSendBtn');
-            const privateChatInput = document.getElementById('privateChatInput');
-            
-            if (privateChatSendBtn && privateChatInput) {
-                privateChatSendBtn.onclick = () => {
-                    if (currentPrivateChatWith) {
-                        const text = privateChatInput.value;
-                        if (text.trim()) {
-                            sendPrivateMessage(text, currentPrivateChatWith);
-                            privateChatInput.value = '';
-                        }
-                    }
-                };
-                
-                privateChatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && currentPrivateChatWith) {
-                        const text = privateChatInput.value;
-                        if (text.trim()) {
-                            sendPrivateMessage(text, currentPrivateChatWith);
-                            privateChatInput.value = '';
-                        }
-                    }
-                });
-            }
-            
-            // Update visit counter
-            updateVisitCounter();
-        });
+                }
+            });
+        }
         
         // Load command history from localStorage
         function loadCommandHistory() {
@@ -6514,28 +6459,7 @@ body.theme-flashcard button:hover {
         }
         
         // Initialize chat when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            initChat();
-            
-            const chatInput = document.getElementById('chatInput');
-            const chatSendBtn = document.getElementById('chatSendBtn');
-            
-            if (chatInput && chatSendBtn) {
-                chatSendBtn.onclick = () => {
-                    const text = chatInput.value;
-                    if (text.trim()) {
-                        sendChatMessage(text);
-                        chatInput.value = '';
-                    }
-                };
-                
-                chatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        chatSendBtn.click();
-                    }
-                });
-            }
-        });
+        // REMOVED - Now handled in initializeOnLoad() to prevent conflicts
         
         // Load clock setting on page load
         loadClockSetting();
@@ -17270,29 +17194,54 @@ body.theme-flashcard button:hover {
         
         // Initialize everything on page load - ensure proper order
         function initializeOnLoad() {
-            // Clean up any existing handlers first to prevent duplicates
+            // STEP 1: Clean up ALL existing handlers first to prevent duplicates
             try {
+                // Matrix theme
                 if (typeof matrixKeyHandler !== 'undefined' && matrixKeyHandler) {
                     document.removeEventListener('keydown', matrixKeyHandler);
                     matrixKeyHandler = null;
                 }
+                // Firework theme
                 if (typeof fireworkKeyHandler !== 'undefined' && fireworkKeyHandler) {
                     document.removeEventListener('keydown', fireworkKeyHandler);
                     fireworkKeyHandler = null;
                 }
+                // Pirate theme
                 if (typeof pirateClickHandler !== 'undefined' && pirateClickHandler) {
-                    document.removeEventListener('click', pirateClickHandler);
+                    document.removeEventListener('click', pirateClickHandler, true);
                     pirateClickHandler = null;
                 }
+                if (typeof pirateInterval !== 'undefined' && pirateInterval) {
+                    clearInterval(pirateInterval);
+                    pirateInterval = null;
+                }
+                // Minecraft theme
                 if (typeof minecraftKeyHandler !== 'undefined' && minecraftKeyHandler) {
                     document.removeEventListener('keydown', minecraftKeyHandler);
                     minecraftKeyHandler = null;
+                }
+                // MLG theme
+                if (typeof mlgKeyHandler !== 'undefined' && mlgKeyHandler) {
+                    document.removeEventListener('keydown', mlgKeyHandler);
+                    mlgKeyHandler = null;
+                }
+                if (typeof mlgClickHandler !== 'undefined' && mlgClickHandler) {
+                    document.removeEventListener('click', mlgClickHandler, true);
+                    mlgClickHandler = null;
+                }
+                if (typeof mlgMouseHandler !== 'undefined' && mlgMouseHandler) {
+                    document.removeEventListener('mousemove', mlgMouseHandler);
+                    mlgMouseHandler = null;
+                }
+                if (typeof mlgEmojiInterval !== 'undefined' && mlgEmojiInterval) {
+                    clearInterval(mlgEmojiInterval);
+                    mlgEmojiInterval = null;
                 }
             } catch (e) {
                 console.error('Error cleaning up handlers:', e);
             }
             
-            // Clean up any existing theme elements
+            // STEP 2: Clean up ALL existing theme elements
             try {
                 if (typeof cleanupMatrixColumns === 'function') cleanupMatrixColumns();
                 if (typeof cleanupFireworks === 'function') cleanupFireworks();
@@ -17300,19 +17249,128 @@ body.theme-flashcard button:hover {
                 if (typeof cleanupPaperDrawing === 'function') cleanupPaperDrawing();
                 if (typeof cleanupSpaceStars === 'function') cleanupSpaceStars();
                 if (typeof cleanupOceanFish === 'function') cleanupOceanFish();
+                if (typeof cleanupClouds === 'function') cleanupClouds();
+                if (typeof cleanupFlashcards === 'function') cleanupFlashcards();
+                if (typeof cleanupMLGEffects === 'function') cleanupMLGEffects();
             } catch (e) {
                 console.error('Error cleaning up theme elements:', e);
             }
             
-            // Load data
+            // STEP 3: Check login status FIRST (before anything else)
+            try {
+                if (!isLoggedIn()) {
+                    showPage('loginPage');
+                    // Don't continue initialization if not logged in
+                    return;
+                } else {
+                    // Load user data if logged in
+                    const username = localStorage.getItem('loggedInUsername');
+                    if (username && typeof loadUserData === 'function') {
+                        loadUserData(username);
+                    }
+                }
+            } catch (e) {
+                console.error('Error checking login:', e);
+            }
+            
+            // STEP 4: Load data
             try {
                 if (typeof loadGlobalData === 'function') loadGlobalData();
                 if (typeof loadCoinflipData === 'function') loadCoinflipData();
+                if (typeof loadCommandHistory === 'function') loadCommandHistory();
             } catch (e) {
                 console.error('Error loading data:', e);
             }
             
-            // Load and apply theme (this will set up handlers properly)
+            // STEP 5: Initialize chat
+            try {
+                if (typeof initChat === 'function') {
+                    initChat();
+                }
+                
+                // Set up chat handlers
+                const chatInput = document.getElementById('chatInput');
+                const chatSendBtn = document.getElementById('chatSendBtn');
+                if (chatInput && chatSendBtn) {
+                    chatSendBtn.onclick = () => {
+                        const text = chatInput.value;
+                        if (text.trim() && typeof sendChatMessage === 'function') {
+                            sendChatMessage(text);
+                            chatInput.value = '';
+                        }
+                    };
+                    chatInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            chatSendBtn.click();
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Error initializing chat:', e);
+            }
+            
+            // STEP 6: Set up login/register Enter key handlers
+            try {
+                const loginPassword = document.getElementById('login-password');
+                const registerPasswordConfirm = document.getElementById('register-password-confirm');
+                
+                if (loginPassword) {
+                    loginPassword.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter' && typeof handleLogin === 'function') {
+                            handleLogin();
+                        }
+                    });
+                }
+                
+                if (registerPasswordConfirm) {
+                    registerPasswordConfirm.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter' && typeof handleRegister === 'function') {
+                            handleRegister();
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Error setting up login handlers:', e);
+            }
+            
+            // STEP 7: Set up command history toggle
+            try {
+                const toggle = document.getElementById('commandHistoryToggle');
+                if (toggle && typeof toggleCommandHistory === 'function') {
+                    toggle.addEventListener('click', toggleCommandHistory);
+                }
+            } catch (e) {
+                console.error('Error setting up command history:', e);
+            }
+            
+            // STEP 8: Check terms agreement
+            try {
+                if (typeof checkTermsAgreement === 'function') {
+                    checkTermsAgreement();
+                }
+                
+                const agreeBtn = document.getElementById('termsAgreeBtn');
+                const disagreeBtn = document.getElementById('termsDisagreeBtn');
+                if (agreeBtn && typeof acceptTerms === 'function') {
+                    agreeBtn.addEventListener('click', acceptTerms);
+                }
+                if (disagreeBtn && typeof rejectTerms === 'function') {
+                    disagreeBtn.addEventListener('click', rejectTerms);
+                }
+            } catch (e) {
+                console.error('Error setting up terms:', e);
+            }
+            
+            // STEP 8.5: Update visit counter
+            try {
+                if (typeof updateVisitCounter === 'function') {
+                    updateVisitCounter();
+                }
+            } catch (e) {
+                console.error('Error updating visit counter:', e);
+            }
+            
+            // STEP 9: Load and apply theme (this will set up handlers properly)
             try {
                 if (typeof loadTheme === 'function') {
                     loadTheme();
@@ -17328,7 +17386,7 @@ body.theme-flashcard button:hover {
                 console.error('Error loading theme:', e);
             }
             
-            // Initialize remote desktop if needed
+            // STEP 10: Initialize remote desktop if needed
             try {
                 if (typeof initRemoteDesktop === 'function' && document.getElementById('remoteDesktop')) {
                     initRemoteDesktop();
@@ -17337,14 +17395,15 @@ body.theme-flashcard button:hover {
                 console.error('Error initializing remote desktop:', e);
             }
             
-            // Ensure command bar is visible (unless on remote desktop or blocked)
+            // STEP 11: Ensure command bar is visible (unless on remote desktop or blocked)
             try {
                 const commandBar = document.querySelector('.command-bar');
                 if (commandBar) {
                     const currentPage = document.querySelector('.page:not(.hidden)');
                     const isRemoteDesktop = currentPage && currentPage.id === 'remoteDesktopPage';
+                    const isLoginPage = currentPage && currentPage.id === 'loginPage';
                     const isBlocked = localStorage.getItem('isBlocked') === 'true';
-                    if (!isRemoteDesktop && !isBlocked) {
+                    if (!isRemoteDesktop && !isLoginPage && !isBlocked) {
                         commandBar.style.display = 'flex';
                     }
                 }
@@ -17353,7 +17412,7 @@ body.theme-flashcard button:hover {
             }
         }
         
-        // Initialize on DOM ready
+        // Initialize on DOM ready - SINGLE POINT OF ENTRY
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeOnLoad);
         } else {
