@@ -3327,6 +3327,7 @@ body.theme-flashcard button:hover {
                     { name: 'achievements', desc: 'View achievements' },
                     { name: 'changelog', desc: 'View changelog and updates' },
                     { name: 'suggest', desc: 'Open suggestions area to view and create suggestions' },
+                    { name: 'party', desc: 'Open party GUI with minigames' },
                     { name: 'background', desc: 'Change background' },
                     { name: 'bg', desc: 'Change background' },
                     { name: 'goose', desc: 'Transform to GooseHub' },
@@ -3544,6 +3545,13 @@ body.theme-flashcard button:hover {
         let isGooseMode = false; // Track if in goose mode
         let resetConfirm = false; // Track if reset command was just used (needs confirmation)
         let resetUsed = false; // Track if reset has been used (can only use once)
+        
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
         
         // Load global data
         function loadGlobalData() {
@@ -5453,6 +5461,11 @@ body.theme-flashcard button:hover {
                     loadSuggestions();
                     commandInput.value = '';
                     commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'party') {
+                    resetConfirm = false;
+                    openPartyGUI();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
                 } else if (command === 'background' || command === 'bg') {
                     resetConfirm = false;
                     showPage('backgroundPage');
@@ -7211,6 +7224,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🔐</text></svg>") no-repeat center';
             } else if (type === 'paintv2') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎨</text></svg>") no-repeat center';
+            } else if (type === 'gifmaker') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎬</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -7270,6 +7285,8 @@ body.theme-flashcard button:hover {
                     openPasswordGameApp(iconId, name);
                 } else if (type === 'paintv2') {
                     openPaintV2App(iconId, name);
+                } else if (type === 'gifmaker') {
+                    openGifMakerApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -7551,6 +7568,16 @@ body.theme-flashcard button:hover {
                         <button id="install-paintv2" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🎬</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">GIF Maker</div>
+                            <div style="font-size: 11px; color: #666;">Create simple animations and export as GIF!</div>
+                        </div>
+                        <button id="install-gifmaker" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
             `;
             
             content.appendChild(storeContent);
@@ -7726,6 +7753,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('paintv2', 'Paint v2', x, y);
                         alert('Paint v2 installed successfully!');
+                    };
+                }
+                
+                const installGifMakerBtn = document.getElementById('install-gifmaker');
+                if (installGifMakerBtn) {
+                    installGifMakerBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'gifmaker');
+                        if (alreadyInstalled) {
+                            alert('GIF Maker is already installed!');
+                            return;
+                        }
+                        
+                        // Add GIF Maker icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('gifmaker', 'GIF Maker', x, y);
+                        alert('GIF Maker installed successfully!');
                     };
                 }
                 
@@ -8237,6 +8282,10 @@ body.theme-flashcard button:hover {
             }
             if (type === 'paintv2') {
                 openPaintV2App(iconId, name);
+                return;
+            }
+            if (type === 'gifmaker') {
+                openGifMakerApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -10167,54 +10216,217 @@ body.theme-flashcard button:hover {
                 lobbyWindow.appendChild(content);
                 document.getElementById('remoteDesktop').appendChild(lobbyWindow);
                 
+                let lobbyRefreshInterval = null;
+                let lobbyListener = null;
+                
+                function renderLobbies(lobbies) {
+                    const listEl = content.querySelector('#lobby-list');
+                    if (lobbies.length === 0) {
+                        listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
+                    } else {
+                        let html = '';
+                        lobbies.forEach(lobby => {
+                            const hasPassword = lobby.lobbyPassword && lobby.lobbyPassword.length > 0;
+                            const hostName = lobby.hostName || lobby.host || 'Unknown';
+                            const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
+                            html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div><div style="font-size: 10px; color: #666;">Players: ${players.length}/2 ${hasPassword ? '🔒' : ''}</div><button onclick="window.passwordJoinLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
+                        });
+                        listEl.innerHTML = html;
+                    }
+                }
+                
                 function loadLobbies() {
                     const listEl = content.querySelector('#lobby-list');
                     if (database) {
-                        database.ref('passwordGameLobbies').on('value', (snapshot) => {
+                        // Remove old listener if exists
+                        if (lobbyListener) {
+                            database.ref('passwordGameLobbies').off('value', lobbyListener);
+                        }
+                        
+                        // Set up listener that updates every 5 seconds
+                        lobbyListener = (snapshot) => {
                             const lobbies = [];
                             snapshot.forEach((child) => {
                                 const data = child.val();
-                                if (!data.gameStarted && data.players && data.players.length < 2) {
-                                    lobbies.push({ id: child.key, ...data });
+                                if (!data.gameStarted) {
+                                    const players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
+                                    if (players.length < 2) {
+                                        lobbies.push({ id: child.key, ...data, players });
+                                    }
                                 }
                             });
-                            if (lobbies.length === 0) {
-                                listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
-                            } else {
-                                let html = '';
-                                lobbies.forEach(lobby => {
-                                    html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Players: ${(lobby.players || []).length}/2</div><button onclick="joinLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
-                                });
-                                listEl.innerHTML = html;
-                            }
-                        });
+                            renderLobbies(lobbies);
+                        };
+                        
+                        database.ref('passwordGameLobbies').on('value', lobbyListener);
+                        
+                        // Also refresh every 5 seconds
+                        if (lobbyRefreshInterval) {
+                            clearInterval(lobbyRefreshInterval);
+                        }
+                        lobbyRefreshInterval = setInterval(() => {
+                            database.ref('passwordGameLobbies').once('value', lobbyListener);
+                        }, 5000);
                     } else {
                         listEl.innerHTML = '<div style="font-size: 11px; color: #f85149; text-align: center; margin: 10px 0;">Firebase not available. Please check connection.</div>';
                     }
                 }
                 
-                function createLobby() {
-                    const userId = getUserId() || 'user' + Date.now();
-                    const lobbyId = 'lobby_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    if (database) {
-                        database.ref(`passwordGameLobbies/${lobbyId}`).set({
-                            host: userId,
-                            players: [userId],
-                            password: '',
-                            attempts: {},
-                            gameStarted: false,
-                            createdAt: Date.now()
-                        });
-                        joinLobbyInternal(lobbyId, true);
-                        lobbyWindow.remove();
+                closeBtn.onclick = () => {
+                    if (lobbyListener && database) {
+                        database.ref('passwordGameLobbies').off('value', lobbyListener);
                     }
+                    if (lobbyRefreshInterval) {
+                        clearInterval(lobbyRefreshInterval);
+                    }
+                    lobbyWindow.remove();
+                };
+                
+                function createLobby() {
+                    windowZIndex++;
+                    const settingsWindow = document.createElement('div');
+                    settingsWindow.className = 'win95-window';
+                    settingsWindow.style.left = '250px';
+                    settingsWindow.style.top = '150px';
+                    settingsWindow.style.width = '300px';
+                    settingsWindow.style.height = '200px';
+                    settingsWindow.style.zIndex = windowZIndex;
+                    
+                    const settingsHeader = document.createElement('div');
+                    settingsHeader.className = 'win95-window-header';
+                    const settingsTitle = document.createElement('div');
+                    settingsTitle.className = 'win95-window-title';
+                    settingsTitle.textContent = 'Lobby Settings';
+                    const settingsControls = document.createElement('div');
+                    settingsControls.className = 'win95-window-controls';
+                    const settingsCloseBtn = document.createElement('button');
+                    settingsCloseBtn.className = 'win95-window-button';
+                    settingsCloseBtn.textContent = '×';
+                    settingsCloseBtn.onclick = () => settingsWindow.remove();
+                    settingsControls.appendChild(settingsCloseBtn);
+                    settingsHeader.appendChild(settingsTitle);
+                    settingsHeader.appendChild(settingsControls);
+                    
+                    const settingsContent = document.createElement('div');
+                    settingsContent.className = 'win95-window-content';
+                    settingsContent.style.padding = '15px';
+                    settingsContent.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-size: 11px; display: block; margin-bottom: 5px;">Password (optional):</label>
+                            <input type="password" id="password-lobby-password" placeholder="Leave empty for no password" style="width: 100%; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px;">
+                        </div>
+                        <button id="password-create-confirm" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%; margin-top: 10px;">Create Lobby</button>
+                    `;
+                    
+                    settingsWindow.appendChild(settingsHeader);
+                    settingsWindow.appendChild(settingsContent);
+                    document.getElementById('remoteDesktop').appendChild(settingsWindow);
+                    
+                    const confirmBtn = settingsContent.querySelector('#password-create-confirm');
+                    confirmBtn.onclick = () => {
+                        const password = settingsContent.querySelector('#password-lobby-password').value.trim();
+                        const userId = getUserId() || 'user' + Date.now();
+                        const hostName = userId;
+                        const lobbyId = 'lobby_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        if (database) {
+                            database.ref(`passwordGameLobbies/${lobbyId}`).set({
+                                host: userId,
+                                hostName: hostName,
+                                players: [userId],
+                                password: '',
+                                lobbyPassword: password || null,
+                                attempts: {},
+                                gameStarted: false,
+                                createdAt: Date.now()
+                            });
+                            settingsWindow.remove();
+                            joinLobbyInternal(lobbyId, true, password);
+                            lobbyWindow.remove();
+                        }
+                    };
+                    
+                    // Make draggable
+                    let isDragging = false;
+                    settingsHeader.addEventListener('mousedown', (e) => {
+                        isDragging = true;
+                        settingsWindow.style.zIndex = ++windowZIndex;
+                        const initialX = e.clientX - settingsWindow.offsetLeft;
+                        const initialY = e.clientY - settingsWindow.offsetTop;
+                        const onMove = (e) => {
+                            if (isDragging) {
+                                settingsWindow.style.left = (e.clientX - initialX) + 'px';
+                                settingsWindow.style.top = (e.clientY - initialY) + 'px';
+                            }
+                        };
+                        const onUp = () => {
+                            isDragging = false;
+                            document.removeEventListener('mousemove', onMove);
+                            document.removeEventListener('mouseup', onUp);
+                        };
+                        document.addEventListener('mousemove', onMove);
+                        document.addEventListener('mouseup', onUp);
+                    });
                 }
                 
-                function joinLobbyInternal(lobbyId, isHostPlayer) {
+                function joinLobbyInternal(lobbyId, isHostPlayer, providedPassword = null) {
+                    // Check if lobby has password
+                    if (database && !isHostPlayer) {
+                        database.ref(`passwordGameLobbies/${lobbyId}`).once('value', (snapshot) => {
+                            const data = snapshot.val();
+                            if (!data) {
+                                alert('Lobby not found!');
+                                return;
+                            }
+                            
+                            const players = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
+                            if (players.length >= 2) {
+                                alert('Lobby is full!');
+                                return;
+                            }
+                            
+                            const lobbyPassword = data.lobbyPassword;
+                            if (lobbyPassword && lobbyPassword.length > 0) {
+                                if (providedPassword === null) {
+                                    const passwordInput = prompt(`This lobby is password protected. Enter password:`);
+                                    if (passwordInput !== lobbyPassword) {
+                                        alert('Incorrect password!');
+                                        return;
+                                    }
+                                } else if (providedPassword !== lobbyPassword) {
+                                    alert('Incorrect password!');
+                                    return;
+                                }
+                            }
+                            
+                            // Add player to lobby
+                            const userId = getUserId() || 'user' + Date.now();
+                            const currentPlayers = Array.isArray(data.players) ? data.players : Object.keys(data.players || {});
+                            if (!currentPlayers.includes(userId)) {
+                                currentPlayers.push(userId);
+                                database.ref(`passwordGameLobbies/${lobbyId}`).update({
+                                    players: currentPlayers
+                                });
+                            }
+                            
+                            // Continue joining
+                            currentLobbyId = lobbyId;
+                            isMultiplayer = true;
+                            isHost = false;
+                            modeEl.textContent = 'You are GUESSING. Wait for host to set word...';
+                            setupGameMode();
+                        });
+                        return;
+                    }
+                    
+                    // Host or no password check needed
                     currentLobbyId = lobbyId;
                     isMultiplayer = true;
                     isHost = isHostPlayer;
                     modeEl.textContent = isHost ? 'You are the HOST. Pick a 5-letter word!' : 'You are GUESSING. Wait for host to set word...';
+                    setupGameMode();
+                }
+                
+                function setupGameMode() {
                     if (isHost) {
                         inputField.placeholder = 'Enter word to hide...';
                         const inputSection = content.querySelector('#passwordgame-input-section');
@@ -10225,7 +10437,7 @@ body.theme-flashcard button:hover {
                             const word = setWordInput.value.toUpperCase().trim();
                             if (word.length === 5 && /^[A-Z]+$/.test(word)) {
                                 if (database) {
-                                    database.ref(`passwordGameLobbies/${lobbyId}`).update({
+                                    database.ref(`passwordGameLobbies/${currentLobbyId}`).update({
                                         password: word,
                                         gameStarted: true
                                     });
@@ -10237,7 +10449,7 @@ body.theme-flashcard button:hover {
                     } else {
                         inputField.placeholder = 'Enter 5 letters...';
                         if (database) {
-                            database.ref(`passwordGameLobbies/${lobbyId}`).on('value', (snapshot) => {
+                            database.ref(`passwordGameLobbies/${currentLobbyId}`).on('value', (snapshot) => {
                                 const data = snapshot.val();
                                 if (data.gameStarted && data.password) {
                                     currentPassword = data.password;
@@ -10248,7 +10460,7 @@ body.theme-flashcard button:hover {
                     }
                 }
                 
-                window.joinLobby = (lobbyId) => joinLobbyInternal(lobbyId, false);
+                window.passwordJoinLobby = (lobbyId) => joinLobbyInternal(lobbyId, false);
                 content.querySelector('#create-lobby').onclick = createLobby;
                 loadLobbies();
                 
@@ -10499,77 +10711,225 @@ body.theme-flashcard button:hover {
                 lobbyWindow.appendChild(content);
                 document.getElementById('remoteDesktop').appendChild(lobbyWindow);
                 
+                let lobbyRefreshInterval = null;
+                let lobbyListener = null;
+                
+                function renderLobbies(lobbies) {
+                    const listEl = content.querySelector('#paint-lobby-list');
+                    if (lobbies.length === 0) {
+                        listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
+                    } else {
+                        let html = '';
+                        lobbies.forEach(lobby => {
+                            const hasPassword = lobby.password && lobby.password.length > 0;
+                            const hostName = lobby.hostName || lobby.host || 'Unknown';
+                            const maxPlayers = lobby.maxPlayers || 10;
+                            html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div><div style="font-size: 10px; color: #666;">Players: ${lobby.playerCount}/${maxPlayers} ${hasPassword ? '🔒' : ''}</div><button onclick="window.paintV2JoinLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
+                        });
+                        listEl.innerHTML = html;
+                    }
+                }
+                
                 function loadLobbies() {
                     const listEl = content.querySelector('#paint-lobby-list');
                     if (database) {
-                        database.ref('paintv2Lobbies').on('value', (snapshot) => {
+                        // Remove old listener if exists
+                        if (lobbyListener) {
+                            database.ref('paintv2Lobbies').off('value', lobbyListener);
+                        }
+                        
+                        // Set up listener that updates every 5 seconds
+                        lobbyListener = (snapshot) => {
                             const lobbies = [];
                             snapshot.forEach((child) => {
                                 const data = child.val();
                                 const players = data.players || {};
                                 const playerCount = Object.keys(players).length;
-                                if (playerCount < 10) {
+                                const maxPlayers = data.maxPlayers || 10;
+                                if (playerCount < maxPlayers) {
                                     lobbies.push({ id: child.key, ...data, playerCount });
                                 }
                             });
-                            if (lobbies.length === 0) {
-                                listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
-                            } else {
-                                let html = '';
-                                lobbies.forEach(lobby => {
-                                    html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Players: ${lobby.playerCount}/10</div><button onclick="joinPaintLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
-                                });
-                                listEl.innerHTML = html;
-                            }
-                        });
+                            renderLobbies(lobbies);
+                        };
+                        
+                        database.ref('paintv2Lobbies').on('value', lobbyListener);
+                        
+                        // Also refresh every 5 seconds
+                        if (lobbyRefreshInterval) {
+                            clearInterval(lobbyRefreshInterval);
+                        }
+                        lobbyRefreshInterval = setInterval(() => {
+                            database.ref('paintv2Lobbies').once('value', lobbyListener);
+                        }, 5000);
                     } else {
                         listEl.innerHTML = '<div style="font-size: 11px; color: #f85149; text-align: center; margin: 10px 0;">Firebase not available. Please check connection.</div>';
                     }
                 }
                 
+                closeBtn.onclick = () => {
+                    if (lobbyListener && database) {
+                        database.ref('paintv2Lobbies').off('value', lobbyListener);
+                    }
+                    if (lobbyRefreshInterval) {
+                        clearInterval(lobbyRefreshInterval);
+                    }
+                    lobbyWindow.remove();
+                };
+                
                 function createLobby() {
-                    const lobbyId = 'lobby_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    windowZIndex++;
+                    const settingsWindow = document.createElement('div');
+                    settingsWindow.className = 'win95-window';
+                    settingsWindow.style.left = '250px';
+                    settingsWindow.style.top = '150px';
+                    settingsWindow.style.width = '300px';
+                    settingsWindow.style.height = '250px';
+                    settingsWindow.style.zIndex = windowZIndex;
+                    
+                    const settingsHeader = document.createElement('div');
+                    settingsHeader.className = 'win95-window-header';
+                    const settingsTitle = document.createElement('div');
+                    settingsTitle.className = 'win95-window-title';
+                    settingsTitle.textContent = 'Lobby Settings';
+                    const settingsControls = document.createElement('div');
+                    settingsControls.className = 'win95-window-controls';
+                    const settingsCloseBtn = document.createElement('button');
+                    settingsCloseBtn.className = 'win95-window-button';
+                    settingsCloseBtn.textContent = '×';
+                    settingsCloseBtn.onclick = () => settingsWindow.remove();
+                    settingsControls.appendChild(settingsCloseBtn);
+                    settingsHeader.appendChild(settingsTitle);
+                    settingsHeader.appendChild(settingsControls);
+                    
+                    const settingsContent = document.createElement('div');
+                    settingsContent.className = 'win95-window-content';
+                    settingsContent.style.padding = '15px';
+                    settingsContent.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-size: 11px; display: block; margin-bottom: 5px;">Max Players (2-20):</label>
+                            <input type="number" id="paint-maxplayers" min="2" max="20" value="10" style="width: 100%; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-size: 11px; display: block; margin-bottom: 5px;">Password (optional):</label>
+                            <input type="password" id="paint-lobby-password" placeholder="Leave empty for no password" style="width: 100%; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px;">
+                        </div>
+                        <button id="paint-create-confirm" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; width: 100%; margin-top: 10px;">Create Lobby</button>
+                    `;
+                    
+                    settingsWindow.appendChild(settingsHeader);
+                    settingsWindow.appendChild(settingsContent);
+                    document.getElementById('remoteDesktop').appendChild(settingsWindow);
+                    
+                    const confirmBtn = settingsContent.querySelector('#paint-create-confirm');
+                    confirmBtn.onclick = () => {
+                        const maxPlayers = parseInt(settingsContent.querySelector('#paint-maxplayers').value) || 10;
+                        const password = settingsContent.querySelector('#paint-lobby-password').value.trim();
+                        const hostName = getUserId() || 'Anonymous';
+                        
+                        const lobbyId = 'lobby_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        if (database) {
+                            database.ref(`paintv2Lobbies/${lobbyId}`).set({
+                                host: userId,
+                                hostName: hostName,
+                                players: { [userId]: true },
+                                drawings: {},
+                                maxPlayers: Math.max(2, Math.min(20, maxPlayers)),
+                                password: password || null,
+                                createdAt: Date.now()
+                            });
+                            settingsWindow.remove();
+                            joinLobbyInternal(lobbyId, password);
+                            lobbyWindow.remove();
+                        }
+                    };
+                    
+                    // Make draggable
+                    let isDragging = false;
+                    settingsHeader.addEventListener('mousedown', (e) => {
+                        isDragging = true;
+                        settingsWindow.style.zIndex = ++windowZIndex;
+                        const initialX = e.clientX - settingsWindow.offsetLeft;
+                        const initialY = e.clientY - settingsWindow.offsetTop;
+                        const onMove = (e) => {
+                            if (isDragging) {
+                                settingsWindow.style.left = (e.clientX - initialX) + 'px';
+                                settingsWindow.style.top = (e.clientY - initialY) + 'px';
+                            }
+                        };
+                        const onUp = () => {
+                            isDragging = false;
+                            document.removeEventListener('mousemove', onMove);
+                            document.removeEventListener('mouseup', onUp);
+                        };
+                        document.addEventListener('mousemove', onMove);
+                        document.addEventListener('mouseup', onUp);
+                    });
+                }
+                
+                function joinLobbyInternal(lobbyId, providedPassword = null) {
+                    // Check if lobby has password
                     if (database) {
-                        database.ref(`paintv2Lobbies/${lobbyId}`).set({
-                            host: userId,
-                            players: { [userId]: true },
-                            drawings: {},
-                            createdAt: Date.now()
+                        database.ref(`paintv2Lobbies/${lobbyId}`).once('value', (snapshot) => {
+                            const data = snapshot.val();
+                            if (!data) {
+                                alert('Lobby not found!');
+                                return;
+                            }
+                            
+                            const players = data.players || {};
+                            const playerCount = Object.keys(players).length;
+                            const maxPlayers = data.maxPlayers || 10;
+                            
+                            if (playerCount >= maxPlayers) {
+                                alert('Lobby is full!');
+                                return;
+                            }
+                            
+                            const lobbyPassword = data.password;
+                            if (lobbyPassword && lobbyPassword.length > 0) {
+                                if (providedPassword === null) {
+                                    // Ask for password
+                                    const passwordInput = prompt(`This lobby is password protected. Enter password:`);
+                                    if (passwordInput !== lobbyPassword) {
+                                        alert('Incorrect password!');
+                                        return;
+                                    }
+                                } else if (providedPassword !== lobbyPassword) {
+                                    alert('Incorrect password!');
+                                    return;
+                                }
+                            }
+                            
+                            // Join the lobby
+                            currentLobbyId = lobbyId;
+                            database.ref(`paintv2Lobbies/${lobbyId}/players/${userId}`).set(true);
+                            statusEl.textContent = `Joined lobby ${lobbyId.substring(0, 6)}`;
+                            statusEl.style.color = '#238636';
+                            
+                            // Listen for drawings
+                            database.ref(`paintv2Lobbies/${lobbyId}/drawings`).on('child_added', (snapshot) => {
+                                const drawing = snapshot.val();
+                                if (drawing.userId !== userId) {
+                                    const x = drawing.x * canvas.width;
+                                    const y = drawing.y * canvas.height;
+                                    const prevX = drawing.prevX !== undefined ? drawing.prevX * canvas.width : undefined;
+                                    const prevY = drawing.prevY !== undefined ? drawing.prevY * canvas.height : undefined;
+                                    drawOnCanvas(x, y, drawing.color, prevX, prevY);
+                                }
+                            });
+                            
+                            // Listen for clear
+                            database.ref(`paintv2Lobbies/${lobbyId}/clearCanvas`).on('value', (snapshot) => {
+                                if (snapshot.val()) {
+                                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                }
+                            });
                         });
-                        joinLobbyInternal(lobbyId);
-                        lobbyWindow.remove();
                     }
                 }
                 
-                function joinLobbyInternal(lobbyId) {
-                    currentLobbyId = lobbyId;
-                    if (database) {
-                        database.ref(`paintv2Lobbies/${lobbyId}/players/${userId}`).set(true);
-                        statusEl.textContent = `Joined lobby ${lobbyId.substring(0, 6)}`;
-                        statusEl.style.color = '#238636';
-                        
-                        // Listen for drawings
-                        database.ref(`paintv2Lobbies/${lobbyId}/drawings`).on('child_added', (snapshot) => {
-                            const drawing = snapshot.val();
-                            if (drawing.userId !== userId) {
-                                const x = drawing.x * canvas.width;
-                                const y = drawing.y * canvas.height;
-                                const prevX = drawing.prevX !== undefined ? drawing.prevX * canvas.width : undefined;
-                                const prevY = drawing.prevY !== undefined ? drawing.prevY * canvas.height : undefined;
-                                drawOnCanvas(x, y, drawing.color, prevX, prevY);
-                            }
-                        });
-                        
-                        // Listen for clear
-                        database.ref(`paintv2Lobbies/${lobbyId}/clearCanvas`).on('value', (snapshot) => {
-                            if (snapshot.val()) {
-                                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            }
-                        });
-                    }
-                }
-                
-                window.joinPaintLobby = (lobbyId) => joinLobbyInternal(lobbyId);
+                window.paintV2JoinLobby = (lobbyId) => joinLobbyInternal(lobbyId);
                 content.querySelector('#create-paint-lobby').onclick = createLobby;
                 loadLobbies();
                 
@@ -12826,6 +13186,30 @@ body.theme-flashcard button:hover {
                             title: '🎨 Paint v2 Multiplayer Drawing',
                             description: 'Added Paint v2 multiplayer to the App Store! Draw with others in real-time by joining or creating lobbies. All players can see each other\'s drawings instantly. Features color picker, clear button, and Firebase real-time synchronization. Install it from the App Store in Remote Desktop!',
                             userRequest: 'add paint v2 in the shop were you can draw with others if you join there lobby'
+                        });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
+                    }
+                    
+                    // Check for GIF Maker
+                    const hasGifMaker = entries.some(e => e.title && e.title.includes('GIF Maker'));
+                    if (!hasGifMaker) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🎬 GIF Maker - Simple Animation Tool',
+                            description: 'Added GIF Maker to the App Store! Create simple animations by drawing frames. Features include: draw on canvas, add frames, preview animation, and download frames as images. Perfect for creating simple animated GIFs frame by frame. Install it from the App Store in Remote Desktop!',
+                            userRequest: 'do the GIF maker — simple animation tool'
+                        });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
+                    }
+                    
+                    // Check for Party command and minigames
+                    const hasParty = entries.some(e => e.title && e.title.includes('Party') && e.title.includes('Minigames'));
+                    if (!hasParty) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🎉 Party Command with Minigames',
+                            description: 'Added "party" command that opens a GUI with minigames! Currently includes "Draw Together" - a collaborative drawing minigame where friends can draw together in real-time using Firebase. Create or join lobbies to play with friends. More minigames coming soon! Use the "party" command to open the party GUI.',
+                            userRequest: 'try to add the command party where you can open a gui to make a party and there is many minigames for now only have the minigame draw together'
                         });
                         localStorage.setItem('changelog', JSON.stringify(entries));
                     }
