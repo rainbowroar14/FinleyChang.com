@@ -1819,7 +1819,6 @@ body.theme-matrix button:hover {
 /* Matrix falling characters */
 .matrix-column {
     position: fixed;
-    top: -50px;
     font-family: 'Courier New', monospace;
     font-size: 16px;
     color: #00ff41;
@@ -1833,14 +1832,41 @@ body.theme-matrix button:hover {
 }
 
 .matrix-column .char {
+    position: absolute;
     display: block;
-    opacity: 1;
+    opacity: 0;
     height: 18px;
+    width: 20px;
     text-align: center;
+    left: 0;
+    animation: matrix-char-fall linear forwards;
 }
 
 .matrix-column .char.fade {
-    opacity: 0.3;
+    opacity: 0.2;
+}
+
+.matrix-column .char.bright {
+    opacity: 1;
+    color: #ffffff;
+    text-shadow: 0 0 10px #ffffff, 0 0 20px #00ff41;
+}
+
+@keyframes matrix-char-fall {
+    0% {
+        top: -30px;
+        opacity: 0;
+    }
+    2% {
+        opacity: 1;
+    }
+    98% {
+        opacity: 1;
+    }
+    100% {
+        top: calc(100vh + 30px);
+        opacity: 0;
+    }
 }
 
 body.theme-coffee {
@@ -2544,6 +2570,129 @@ body.theme-pirate button:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
+/* Firework Theme */
+body.theme-firework {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #000000 !important;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+body.theme-firework .command-bar,
+body.theme-firework .clock-display,
+body.theme-firework .command-feedback,
+body.theme-firework .commands-menu {
+    background: rgba(0, 0, 0, 0.95) !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.theme-firework .command-input {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+}
+
+body.theme-firework .command-bar::before {
+    color: #ffffff !important;
+}
+
+body.theme-firework .page {
+    background: #000000 !important;
+}
+
+body.theme-firework .home-page h1,
+body.theme-firework .subtitle,
+body.theme-firework .letters-source {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important;
+}
+
+body.theme-firework button {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.theme-firework button:hover {
+    background: rgba(20, 20, 20, 0.95) !important;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Firework Elements */
+.firework-rocket {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    font-size: 20px;
+    color: #ffaa00;
+    text-shadow: 0 0 10px #ffaa00;
+    animation: firework-launch 1s ease-out forwards;
+}
+
+.firework-explosion {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10001;
+    font-size: 80px;
+    font-weight: bold;
+    text-shadow: 
+        0 0 20px currentColor,
+        0 0 40px currentColor,
+        0 0 60px currentColor;
+    animation: firework-explode 1.5s ease-out forwards;
+}
+
+.firework-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: firework-particle 1.5s ease-out forwards;
+}
+
+@keyframes firework-launch {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-80vh) scale(0.5);
+        opacity: 0;
+    }
+}
+
+@keyframes firework-explode {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.8) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes firework-particle {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--dx), var(--dy)) scale(0);
+        opacity: 0;
+    }
+}
+
 /* Pirate Cannonball */
 .pirate-cannonball {
     position: fixed;
@@ -2556,19 +2705,110 @@ body.theme-pirate button:hover {
     box-shadow: 
         inset -3px -3px 0 rgba(0,0,0,0.5),
         0 0 5px rgba(0,0,0,0.8);
-    animation: cannonball-fly 2s linear forwards;
+    /* Animation is set dynamically in JavaScript */
 }
 
-@keyframes cannonball-fly {
+@keyframes cannonball-fly-left {
     0% {
         left: -30px;
-        top: 50%;
+        top: var(--start-y);
         transform: translateY(-50%) rotate(0deg);
     }
     100% {
         left: calc(100vw + 30px);
-        top: 50%;
+        top: var(--start-y);
         transform: translateY(-50%) rotate(720deg);
+    }
+}
+
+@keyframes cannonball-fly-right {
+    0% {
+        left: calc(100vw + 30px);
+        top: var(--start-y);
+        transform: translateY(-50%) rotate(0deg);
+    }
+    100% {
+        left: -30px;
+        top: var(--start-y);
+        transform: translateY(-50%) rotate(-720deg);
+    }
+}
+
+@keyframes cannonball-fly-up {
+    0% {
+        left: var(--start-x);
+        top: calc(100vh + 30px);
+        transform: translateX(-50%) rotate(0deg);
+    }
+    100% {
+        left: var(--start-x);
+        top: -30px;
+        transform: translateX(-50%) rotate(720deg);
+    }
+}
+
+@keyframes cannonball-fly-down {
+    0% {
+        left: var(--start-x);
+        top: -30px;
+        transform: translateX(-50%) rotate(0deg);
+    }
+    100% {
+        left: var(--start-x);
+        top: calc(100vh + 30px);
+        transform: translateX(-50%) rotate(-720deg);
+    }
+}
+
+@keyframes cannonball-fly-diagonal-tl-br {
+    0% {
+        left: -30px;
+        top: -30px;
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        left: calc(100vw + 30px);
+        top: calc(100vh + 30px);
+        transform: translate(-50%, -50%) rotate(720deg);
+    }
+}
+
+@keyframes cannonball-fly-diagonal-tr-bl {
+    0% {
+        left: calc(100vw + 30px);
+        top: -30px;
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        left: -30px;
+        top: calc(100vh + 30px);
+        transform: translate(-50%, -50%) rotate(-720deg);
+    }
+}
+
+@keyframes cannonball-fly-diagonal-bl-tr {
+    0% {
+        left: -30px;
+        top: calc(100vh + 30px);
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        left: calc(100vw + 30px);
+        top: -30px;
+        transform: translate(-50%, -50%) rotate(720deg);
+    }
+}
+
+@keyframes cannonball-fly-diagonal-br-tl {
+    0% {
+        left: calc(100vw + 30px);
+        top: calc(100vh + 30px);
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        left: -30px;
+        top: -30px;
+        transform: translate(-50%, -50%) rotate(-720deg);
     }
 }
 
@@ -7009,7 +7249,7 @@ body.theme-flashcard button:hover {
         }
         
         // Theme System
-        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean', 'clouds', 'flashcard', 'minecraft', 'pirate'];
+        const availableThemes = ['1995', 'cyberpunk', 'terminal', 'coffee', 'dark', 'light', 'matrix', 'paper', 'space', 'ocean', 'clouds', 'flashcard', 'minecraft', 'pirate', 'firework'];
         let currentTheme = 'dark'; // Default theme
         
         // Load saved theme
@@ -7072,6 +7312,8 @@ body.theme-flashcard button:hover {
                 initPaperDrawing();
             } else if (themeName === 'flashcard') {
                 // Flashcard theme setup if needed
+            } else if (themeName === 'firework') {
+                setupFireworkTheme();
             }
             
             // Reapply custom background if switching to dark/light and one exists
@@ -7111,49 +7353,61 @@ body.theme-flashcard button:hover {
             const column = document.createElement('div');
             column.className = 'matrix-column';
             column.style.left = x + 'px';
-            column.style.display = 'flex';
-            column.style.flexDirection = 'column';
+            column.style.position = 'fixed';
             
-            // Start with the pressed key
+            // Random speed for this column
+            const baseSpeed = 1.5 + Math.random() * 1.5; // 1.5-3 seconds per character
+            const charCount = 25 + Math.floor(Math.random() * 15); // 25-40 characters
+            const charSpacing = 18; // Vertical spacing between characters
+            const delayBetweenChars = baseSpeed * 0.06; // Delay between each character appearing
+            
+            // Start with the pressed key (bright) - this is the "head"
             const startChar = document.createElement('span');
-            startChar.className = 'char';
+            startChar.className = 'char bright';
             startChar.textContent = key;
+            startChar.style.animationDuration = baseSpeed + 's';
+            startChar.style.animationDelay = '0s';
+            startChar.style.top = '-30px';
             column.appendChild(startChar);
             
-            // Add random special characters
-            for (let i = 0; i < 30; i++) {
+            // Add random special characters that cascade down
+            for (let i = 0; i < charCount; i++) {
                 const char = document.createElement('span');
                 char.className = 'char';
-                char.textContent = matrixSpecialChars[Math.floor(Math.random() * matrixSpecialChars.length)];
-                if (i > 20) {
+                
+                // Randomly make some characters bright (the "head" of the trail)
+                if (Math.random() < 0.12) {
+                    char.classList.add('bright');
+                } else if (i > charCount - 8) {
                     char.classList.add('fade');
                 }
+                
+                char.textContent = matrixSpecialChars[Math.floor(Math.random() * matrixSpecialChars.length)];
+                
+                // Stagger animation delays to create cascading effect
+                // Each character starts slightly after the one above it
+                const delay = (i + 1) * delayBetweenChars;
+                char.style.animationDuration = baseSpeed + 's';
+                char.style.animationDelay = delay + 's';
+                char.style.top = (-30 - (i + 1) * charSpacing) + 'px';
+                
                 column.appendChild(char);
             }
             
             document.body.appendChild(column);
             matrixColumns.push(column);
             
-            // Animate falling
-            let position = -50;
-            const speed = 0.5 + Math.random() * 1; // Random speed between 0.5-1.5 (slower)
-            const animate = () => {
-                position += speed;
-                column.style.top = position + 'px';
-                
-                // Remove when off screen
-                if (position > window.innerHeight + 100) {
+            // Remove column after all characters have fallen
+            const totalDuration = (charCount * baseSpeed * 0.08) + baseSpeed + 1;
+            setTimeout(() => {
+                if (column.parentNode) {
                     column.remove();
-                    const index = matrixColumns.indexOf(column);
-                    if (index > -1) {
-                        matrixColumns.splice(index, 1);
-                    }
-                } else {
-                    requestAnimationFrame(animate);
                 }
-            };
-            
-            animate();
+                const index = matrixColumns.indexOf(column);
+                if (index > -1) {
+                    matrixColumns.splice(index, 1);
+                }
+            }, totalDuration * 1000);
         }
         
         // Matrix theme keypress listener
@@ -7343,12 +7597,19 @@ body.theme-flashcard button:hover {
             if (document.body.classList.contains('theme-pirate') && themeName !== 'pirate') {
                 cleanupPirateCannonballs();
             }
+            if (document.body.classList.contains('theme-firework') && themeName !== 'firework') {
+                cleanupFireworks();
+            }
             
             originalApplyTheme3(themeName, save);
             
             // Setup space theme if switching to it
             if (themeName === 'space') {
                 setupSpaceTheme();
+            }
+            // Setup firework theme if switching to it
+            if (themeName === 'firework') {
+                setupFireworkTheme();
             }
         };
         
@@ -7507,9 +7768,41 @@ body.theme-flashcard button:hover {
             const cannonball = document.createElement('div');
             cannonball.className = 'pirate-cannonball';
             
-            // Random starting height
-            const startY = Math.random() * window.innerHeight;
-            cannonball.style.top = startY + 'px';
+            // Random direction: left, right, up, down, or diagonal
+            const directions = ['left', 'right', 'up', 'down', 'diagonal-tl-br', 'diagonal-tr-bl', 'diagonal-bl-tr', 'diagonal-br-tl'];
+            const direction = directions[Math.floor(Math.random() * directions.length)];
+            
+            // Set animation based on direction
+            let animationName = 'cannonball-fly-' + direction;
+            
+            // Set initial position and CSS variables based on direction
+            if (direction === 'left') {
+                const startY = Math.random() * window.innerHeight;
+                cannonball.style.setProperty('--start-y', startY + 'px');
+                cannonball.style.top = startY + 'px';
+                cannonball.style.left = '-30px';
+            } else if (direction === 'right') {
+                const startY = Math.random() * window.innerHeight;
+                cannonball.style.setProperty('--start-y', startY + 'px');
+                cannonball.style.top = startY + 'px';
+                cannonball.style.left = 'calc(100vw + 30px)';
+            } else if (direction === 'up') {
+                const startX = Math.random() * window.innerWidth;
+                cannonball.style.setProperty('--start-x', startX + 'px');
+                cannonball.style.left = startX + 'px';
+                cannonball.style.top = 'calc(100vh + 30px)';
+            } else if (direction === 'down') {
+                const startX = Math.random() * window.innerWidth;
+                cannonball.style.setProperty('--start-x', startX + 'px');
+                cannonball.style.left = startX + 'px';
+                cannonball.style.top = '-30px';
+            } else {
+                // Diagonal directions - no need to set initial position, animation handles it
+                cannonball.style.left = '0px';
+                cannonball.style.top = '0px';
+            }
+            
+            cannonball.style.animation = animationName + ' 2s linear forwards';
             
             document.body.appendChild(cannonball);
             pirateCannonballs.push(cannonball);
@@ -7936,6 +8229,108 @@ body.theme-flashcard button:hover {
         // Make createFlashcard globally accessible
         window.createFlashcard = createFlashcard;
         
+        // Firework Theme
+        let fireworkKeyHandler = null;
+        const fireworkColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#ff0088', '#88ff00', '#0088ff'];
+        
+        function setupFireworkTheme() {
+            // Remove existing handler if any
+            if (fireworkKeyHandler) {
+                document.removeEventListener('keydown', fireworkKeyHandler);
+                fireworkKeyHandler = null;
+            }
+            
+            // Only add handler if firework theme is active
+            if (document.body.classList.contains('theme-firework')) {
+                fireworkKeyHandler = (e) => {
+                    // Don't trigger on command input
+                    const commandInput = document.getElementById('commandInput');
+                    if (commandInput && document.activeElement === commandInput) return;
+                    
+                    // Don't trigger on special keys (Ctrl, Alt, etc.)
+                    if (e.ctrlKey || e.altKey || e.metaKey) return;
+                    
+                    // Only handle letter keys (a-z, A-Z)
+                    const key = e.key;
+                    if (key.length === 1 && /[a-zA-Z]/.test(key)) {
+                        createFirework(key.toUpperCase(), e.clientX || window.innerWidth / 2);
+                    }
+                };
+                
+                document.addEventListener('keydown', fireworkKeyHandler);
+            }
+        }
+        
+        function createFirework(letter, startX) {
+            // Use bottom center if no x position provided
+            const x = startX || window.innerWidth / 2;
+            const y = window.innerHeight;
+            
+            // Create rocket
+            const rocket = document.createElement('div');
+            rocket.className = 'firework-rocket';
+            rocket.textContent = '🚀';
+            rocket.style.left = x + 'px';
+            rocket.style.bottom = '0px';
+            document.body.appendChild(rocket);
+            
+            // Calculate explosion position (near top of screen)
+            const explosionY = window.innerHeight * 0.3 + Math.random() * (window.innerHeight * 0.2);
+            const explosionX = x + (Math.random() - 0.5) * 100; // Slight random offset
+            
+            // Remove rocket after launch
+            setTimeout(() => {
+                rocket.remove();
+                
+                // Create explosion with letter
+                const explosion = document.createElement('div');
+                explosion.className = 'firework-explosion';
+                explosion.textContent = letter;
+                explosion.style.left = explosionX + 'px';
+                explosion.style.top = explosionY + 'px';
+                explosion.style.color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+                explosion.style.transform = 'translate(-50%, -50%)';
+                document.body.appendChild(explosion);
+                
+                // Create particles
+                const particleCount = 30;
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'firework-particle';
+                    particle.style.left = explosionX + 'px';
+                    particle.style.top = explosionY + 'px';
+                    
+                    // Random direction and distance
+                    const angle = (Math.PI * 2 * i) / particleCount;
+                    const distance = 50 + Math.random() * 100;
+                    const dx = Math.cos(angle) * distance;
+                    const dy = Math.sin(angle) * distance;
+                    
+                    particle.style.setProperty('--dx', dx + 'px');
+                    particle.style.setProperty('--dy', dy + 'px');
+                    particle.style.background = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+                    particle.style.boxShadow = `0 0 10px ${particle.style.background}`;
+                    
+                    document.body.appendChild(particle);
+                    
+                    // Remove particle after animation
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 1500);
+                }
+                
+                // Remove explosion after animation
+                setTimeout(() => {
+                    explosion.remove();
+                }, 1500);
+            }, 1000);
+        }
+        
+        function cleanupFireworks() {
+            // Remove all firework elements
+            document.querySelectorAll('.firework-rocket, .firework-explosion, .firework-particle').forEach(el => el.remove());
+        }
+        
         // Remote Desktop System
         let desktopIcons = [];
         let desktopWindows = [];
@@ -8080,6 +8475,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎨</text></svg>") no-repeat center';
             } else if (type === 'gifmaker') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎬</text></svg>") no-repeat center';
+            } else if (type === 'clicker') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🖱️</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -8141,6 +8538,8 @@ body.theme-flashcard button:hover {
                     openPaintV2App(iconId, name);
                 } else if (type === 'gifmaker') {
                     openGifMakerApp(iconId, name);
+                } else if (type === 'clicker') {
+                    openClickerApp(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -8432,6 +8831,16 @@ body.theme-flashcard button:hover {
                         <button id="install-gifmaker" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
+                <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">🖱️</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Clicker</div>
+                            <div style="font-size: 11px; color: #666;">See how many clicks you can get! Compete with everyone!</div>
+                        </div>
+                        <button id="install-clicker" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                    </div>
+                </div>
             `;
             
             content.appendChild(storeContent);
@@ -8625,6 +9034,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('gifmaker', 'GIF Maker', x, y);
                         alert('GIF Maker installed successfully!');
+                    };
+                }
+                
+                const installClickerBtn = document.getElementById('install-clicker');
+                if (installClickerBtn) {
+                    installClickerBtn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'clicker');
+                        if (alreadyInstalled) {
+                            alert('Clicker is already installed!');
+                            return;
+                        }
+                        
+                        // Add Clicker icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('clicker', 'Clicker', x, y);
+                        alert('Clicker installed successfully!');
                     };
                 }
                 
@@ -9140,6 +9567,10 @@ body.theme-flashcard button:hover {
             }
             if (type === 'gifmaker') {
                 openGifMakerApp(iconId, name);
+                return;
+            }
+            if (type === 'clicker') {
+                openClickerApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -12275,6 +12706,297 @@ body.theme-flashcard button:hover {
                 iconId: iconId,
                 name: name,
                 type: 'gifmaker',
+                element: window
+            });
+            
+            updateTaskbar();
+        }
+        
+        // Clicker app
+        function openClickerApp(iconId, name) {
+            windowZIndex++;
+            const window = document.createElement('div');
+            window.className = 'win95-window';
+            window.style.left = '150px';
+            window.style.top = '100px';
+            window.style.width = '450px';
+            window.style.height = '500px';
+            window.style.zIndex = windowZIndex;
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'win95-window-header';
+            
+            const title = document.createElement('div');
+            title.className = 'win95-window-title';
+            title.textContent = name;
+            
+            const controls = document.createElement('div');
+            controls.className = 'win95-window-controls';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win95-window-button';
+            closeBtn.textContent = '×';
+            controls.appendChild(closeBtn);
+            header.appendChild(title);
+            header.appendChild(controls);
+            
+            // Content
+            const content = document.createElement('div');
+            content.className = 'win95-window-content';
+            content.style.padding = '20px';
+            content.style.textAlign = 'center';
+            content.style.overflow = 'auto';
+            
+            const userId = getUserId();
+            
+            // Get current click count
+            function getClickCount() {
+                const saved = localStorage.getItem(`clicker_${userId}`);
+                return saved ? parseInt(saved) : 0;
+            }
+            
+            // Save click count
+            function saveClickCount(count) {
+                localStorage.setItem(`clicker_${userId}`, count.toString());
+                if (database) {
+                    database.ref(`clickerScores/${userId}`).set({
+                        userId: userId,
+                        clicks: count,
+                        lastUpdated: Date.now()
+                    });
+                }
+            }
+            
+            let clickCount = getClickCount();
+            
+            const gameHTML = `
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px; color: #000;">Your Clicks</div>
+                    <div id="clicker-count" style="font-size: 48px; font-weight: bold; color: #008080; margin-bottom: 20px;">${clickCount}</div>
+                    <button id="clicker-button" style="background: #008080; border: 3px outset #008080; padding: 30px 60px; cursor: pointer; font-size: 20px; font-weight: bold; color: #fff; width: 250px; height: 120px; margin-bottom: 20px;">CLICK ME!</button>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 15px;">Click as fast as you can!</div>
+                    <button id="clicker-leaderboard-btn" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 8px 16px; cursor: pointer; font-size: 11px; font-weight: bold; margin-right: 10px;">Leaderboard</button>
+                    <button id="clicker-reset-btn" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 8px 16px; cursor: pointer; font-size: 11px; font-weight: bold;">Reset</button>
+                </div>
+            `;
+            content.innerHTML = gameHTML;
+            
+            const clickCountEl = content.querySelector('#clicker-count');
+            const clickerBtn = content.querySelector('#clicker-button');
+            const leaderboardBtn = content.querySelector('#clicker-leaderboard-btn');
+            const resetBtn = content.querySelector('#clicker-reset-btn');
+            
+            // Click handler
+            let clickAnimation = null;
+            clickerBtn.addEventListener('click', () => {
+                clickCount++;
+                clickCountEl.textContent = clickCount;
+                saveClickCount(clickCount);
+                
+                // Button animation
+                if (clickAnimation) {
+                    clearTimeout(clickAnimation);
+                }
+                clickerBtn.style.transform = 'scale(0.95)';
+                clickerBtn.style.background = '#006666';
+                clickAnimation = setTimeout(() => {
+                    clickerBtn.style.transform = 'scale(1)';
+                    clickerBtn.style.background = '#008080';
+                }, 100);
+            });
+            
+            // Reset handler
+            resetBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to reset your click count? This cannot be undone!')) {
+                    clickCount = 0;
+                    clickCountEl.textContent = '0';
+                    saveClickCount(0);
+                }
+            });
+            
+            // Leaderboard handler
+            function showClickerLeaderboard() {
+                globalWindowZIndex++;
+                const leaderboardWindow = document.createElement('div');
+                leaderboardWindow.className = 'win95-window';
+                leaderboardWindow.style.left = '200px';
+                leaderboardWindow.style.top = '150px';
+                leaderboardWindow.style.width = '400px';
+                leaderboardWindow.style.height = '500px';
+                leaderboardWindow.style.zIndex = globalWindowZIndex;
+                
+                const header = document.createElement('div');
+                header.className = 'win95-window-header';
+                
+                const title = document.createElement('div');
+                title.className = 'win95-window-title';
+                title.textContent = 'Clicker Leaderboard';
+                
+                const controls = document.createElement('div');
+                controls.className = 'win95-window-controls';
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'win95-window-button';
+                closeBtn.textContent = '×';
+                closeBtn.onclick = () => leaderboardWindow.remove();
+                
+                controls.appendChild(closeBtn);
+                header.appendChild(title);
+                header.appendChild(controls);
+                
+                const content = document.createElement('div');
+                content.className = 'win95-window-content';
+                content.style.padding = '10px';
+                content.style.overflow = 'auto';
+                content.innerHTML = '<div style="text-align: center; margin-bottom: 10px;"><div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">Top Clickers</div><div id="clicker-leaderboard-list">Loading...</div></div>';
+                
+                leaderboardWindow.appendChild(header);
+                leaderboardWindow.appendChild(content);
+                document.getElementById('remoteDesktop').appendChild(leaderboardWindow);
+                
+                function loadLeaderboard() {
+                    const listEl = content.querySelector('#clicker-leaderboard-list');
+                    
+                    if (database) {
+                        database.ref('clickerScores').orderByChild('clicks').limitToLast(10).once('value', (snapshot) => {
+                            const scores = [];
+                            snapshot.forEach((child) => {
+                                const data = child.val();
+                                if (data) {
+                                    scores.push({
+                                        id: child.key,
+                                        ...data
+                                    });
+                                }
+                            });
+                            // Sort by clicks (descending - highest first)
+                            scores.sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
+                            renderLeaderboard(scores);
+                        }, (error) => {
+                            console.error('Error loading leaderboard:', error);
+                            loadFromLocalStorage();
+                        });
+                    } else {
+                        loadFromLocalStorage();
+                    }
+                    
+                    function loadFromLocalStorage() {
+                        // Get all clicker scores from localStorage
+                        const scores = [];
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (key && key.startsWith('clicker_')) {
+                                const userId = key.replace('clicker_', '');
+                                const clicks = parseInt(localStorage.getItem(key)) || 0;
+                                scores.push({
+                                    userId: userId,
+                                    clicks: clicks
+                                });
+                            }
+                        }
+                        // Sort by clicks (descending)
+                        scores.sort((a, b) => b.clicks - a.clicks);
+                        renderLeaderboard(scores.slice(0, 10));
+                    }
+                    
+                    function renderLeaderboard(scores) {
+                        const listEl = content.querySelector('#clicker-leaderboard-list');
+                        if (scores.length === 0) {
+                            listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No scores yet. Start clicking!</div>';
+                            return;
+                        }
+                        
+                        let html = '<div style="font-size: 11px;">';
+                        scores.forEach((score, index) => {
+                            const rank = index + 1;
+                            const clicks = score.clicks || 0;
+                            const userId = escapeHtml(score.userId || 'Anonymous');
+                            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+                            
+                            html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: bold; font-size: 12px;">${medal} ${userId}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-weight: bold; font-size: 12px; color: #008080;">${clicks.toLocaleString()} clicks</div>
+                                    </div>
+                                </div>
+                            </div>`;
+                        });
+                        html += '</div>';
+                        listEl.innerHTML = html;
+                    }
+                }
+                
+                loadLeaderboard();
+                
+                // Make window draggable
+                let isDragging = false;
+                header.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    leaderboardWindow.style.zIndex = ++globalWindowZIndex;
+                    const initialX = e.clientX - leaderboardWindow.offsetLeft;
+                    const initialY = e.clientY - leaderboardWindow.offsetTop;
+                    
+                    const onMove = (e) => {
+                        if (isDragging) {
+                            leaderboardWindow.style.left = (e.clientX - initialX) + 'px';
+                            leaderboardWindow.style.top = (e.clientY - initialY) + 'px';
+                        }
+                    };
+                    
+                    const onUp = () => {
+                        isDragging = false;
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                    };
+                    
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+            }
+            
+            leaderboardBtn.addEventListener('click', showClickerLeaderboard);
+            
+            window.appendChild(header);
+            window.appendChild(content);
+            document.getElementById('remoteDesktop').appendChild(window);
+            
+            // Make window draggable
+            let isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                window.style.zIndex = ++windowZIndex;
+                const initialX = e.clientX - window.offsetLeft;
+                const initialY = e.clientY - window.offsetTop;
+                
+                const onMove = (e) => {
+                    if (isDragging) {
+                        window.style.left = (e.clientX - initialX) + 'px';
+                        window.style.top = (e.clientY - initialY) + 'px';
+                    }
+                };
+                
+                const onUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            
+            closeBtn.onclick = () => {
+                window.remove();
+            };
+            
+            desktopWindows.push({
+                iconId: iconId,
+                name: name,
+                type: 'clicker',
                 element: window
             });
             
