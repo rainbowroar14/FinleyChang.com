@@ -7133,8 +7133,8 @@ body.theme-flashcard button:hover {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🤖</text></svg>") no-repeat center';
             } else if (type === 'passwordgame') {
                 iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🔐</text></svg>") no-repeat center';
-            } else if (type === 'tabletennis') {
-                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🏓</text></svg>") no-repeat center';
+            } else if (type === 'paintv2') {
+                iconImg.style.background = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' stroke=\'%23000\' stroke-width=\'1\'/><text x=\'16\' y=\'20\' font-size=\'20\' text-anchor=\'middle\' fill=\'%23000\'>🎨</text></svg>") no-repeat center';
             }
             iconImg.style.backgroundSize = 'contain';
             
@@ -7192,8 +7192,8 @@ body.theme-flashcard button:hover {
                     openChatbotApp(iconId, name);
                 } else if (type === 'passwordgame') {
                     openPasswordGameApp(iconId, name);
-                } else if (type === 'tabletennis') {
-                    openTableTennisApp(iconId, name);
+                } else if (type === 'paintv2') {
+                    openPaintV2App(iconId, name);
                 } else if (type !== 'computer') {
                     openDesktopApp(type, iconId, name);
                 }
@@ -7467,12 +7467,12 @@ body.theme-flashcard button:hover {
                 </div>
                 <div style="border: 1px inset #c0c0c0; padding: 15px; margin-bottom: 15px; background: #fff;">
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-                        <div style="font-size: 32px;">🏓</div>
+                        <div style="font-size: 32px;">🎨</div>
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Table Tennis</div>
-                            <div style="font-size: 11px; color: #666;">Ball comes at you - move mouse left/right to hit it!</div>
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">Paint v2</div>
+                            <div style="font-size: 11px; color: #666;">Multiplayer drawing - draw with others in real-time!</div>
                         </div>
-                        <button id="install-tabletennis" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
+                        <button id="install-paintv2" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Install</button>
                     </div>
                 </div>
             `;
@@ -7635,23 +7635,6 @@ body.theme-flashcard button:hover {
                     };
                 }
                 
-                const installTableTennisBtn = document.getElementById('install-tabletennis');
-                if (installTableTennisBtn) {
-                    installTableTennisBtn.onclick = () => {
-                        // Check if already installed
-                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'tabletennis');
-                        if (alreadyInstalled) {
-                            alert('Table Tennis is already installed!');
-                            return;
-                        }
-                        
-                        // Add Table Tennis icon to desktop
-                        const x = Math.random() * 200 + 50;
-                        const y = Math.random() * 200 + 50;
-                        addDesktopIcon('tabletennis', 'Table Tennis', x, y);
-                        alert('Table Tennis installed successfully!');
-                    };
-                }
             }, 100);
         }
         
@@ -7680,12 +7663,6 @@ body.theme-flashcard button:hover {
             const closeBtn = document.createElement('button');
             closeBtn.className = 'win95-window-button';
             closeBtn.textContent = '×';
-            closeBtn.onclick = () => {
-                window.remove();
-                desktopWindows = desktopWindows.filter(w => w.element !== window);
-                updateTaskbar();
-            };
-            
             controls.appendChild(closeBtn);
             header.appendChild(title);
             header.appendChild(controls);
@@ -7700,7 +7677,9 @@ body.theme-flashcard button:hover {
             const gameHTML = `
                 <div style="text-align: center; margin-bottom: 10px;">
                     <button id="minesweeper-restart" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
-                    <div style="font-size: 12px; margin-bottom: 10px;">Mines: <span id="mines-count">10</span></div>
+                    <div style="font-size: 12px; margin-bottom: 5px;">Mines: <span id="mines-count">10</span></div>
+                    <div style="font-size: 12px; margin-bottom: 5px;">Time: <span id="minesweeper-timer">0</span>s</div>
+                    <button id="minesweeper-leaderboard-btn" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Leaderboard</button>
                 </div>
                 <div id="minesweeper-grid" style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; max-width: 360px; margin: 0 auto;"></div>
             `;
@@ -7710,11 +7689,28 @@ body.theme-flashcard button:hover {
             const gridEl = content.querySelector('#minesweeper-grid');
             const restartBtn = content.querySelector('#minesweeper-restart');
             const minesCountEl = content.querySelector('#mines-count');
+            const timerEl = content.querySelector('#minesweeper-timer');
+            const leaderboardBtn = content.querySelector('#minesweeper-leaderboard-btn');
             
             let minesweeperBoard = [];
             let revealed = [];
             let flagged = [];
             let gameOver = false;
+            let gameStarted = false;
+            let gameWon = false;
+            let timer = 0;
+            let timerInterval = null;
+            
+            // Set up close button to clean up timer
+            closeBtn.onclick = () => {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                window.remove();
+                desktopWindows = desktopWindows.filter(w => w.element !== window);
+                updateTaskbar();
+            };
             const GRID_SIZE = 10;
             const NUM_MINES = 10;
             
@@ -7723,6 +7719,14 @@ body.theme-flashcard button:hover {
                 revealed = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(false));
                 flagged = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(false));
                 gameOver = false;
+                gameStarted = false;
+                gameWon = false;
+                timer = 0;
+                timerEl.textContent = timer;
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
                 
                 // Place mines
                 let minesPlaced = 0;
@@ -7800,10 +7804,29 @@ body.theme-flashcard button:hover {
             function revealCell(row, col) {
                 if (revealed[row][col] || flagged[row][col] || gameOver) return;
                 
+                // Start timer on first click
+                if (!gameStarted) {
+                    gameStarted = true;
+                    timer = 0;
+                    timerInterval = setInterval(() => {
+                        if (gameOver || gameWon) {
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                            return;
+                        }
+                        timer++;
+                        timerEl.textContent = timer;
+                    }, 1000);
+                }
+                
                 revealed[row][col] = true;
                 
                 if (minesweeperBoard[row][col] === -1) {
                     gameOver = true;
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                    }
                     alert('Game Over!');
                     renderMinesweeper();
                     return;
@@ -7835,9 +7858,146 @@ body.theme-flashcard button:hover {
                 }
                 if (revealedCount === GRID_SIZE * GRID_SIZE - NUM_MINES) {
                     gameOver = true;
-                    alert('You Win!');
+                    gameWon = true;
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                    }
+                    const userId = getUserId() || 'Anonymous';
+                    saveMinesweeperScore(timer, userId);
+                    alert(`You Win! Time: ${timer}s`);
                 }
             }
+            
+            // Save score to Firebase leaderboard
+            function saveMinesweeperScore(time, userId) {
+                if (database) {
+                    const scoreData = {
+                        userId: userId,
+                        time: time,
+                        timestamp: Date.now()
+                    };
+                    database.ref('minesweeperLeaderboard').push(scoreData);
+                } else {
+                    // localStorage fallback
+                    const saved = localStorage.getItem('minesweeperLeaderboard');
+                    const scores = saved ? JSON.parse(saved) : [];
+                    scores.push({
+                        id: 'score_' + Date.now(),
+                        userId: userId,
+                        time: time,
+                        timestamp: Date.now()
+                    });
+                    // Keep only top 50
+                    scores.sort((a, b) => a.time - b.time);
+                    scores.splice(50);
+                    localStorage.setItem('minesweeperLeaderboard', JSON.stringify(scores));
+                }
+            }
+            
+            // Show leaderboard
+            function showMinesweeperLeaderboard() {
+                windowZIndex++;
+                const leaderboardWindow = document.createElement('div');
+                leaderboardWindow.className = 'win95-window';
+                leaderboardWindow.style.left = '150px';
+                leaderboardWindow.style.top = '100px';
+                leaderboardWindow.style.width = '350px';
+                leaderboardWindow.style.height = '400px';
+                leaderboardWindow.style.zIndex = windowZIndex;
+                
+                const header = document.createElement('div');
+                header.className = 'win95-window-header';
+                
+                const title = document.createElement('div');
+                title.className = 'win95-window-title';
+                title.textContent = 'Minesweeper Leaderboard';
+                
+                const controls = document.createElement('div');
+                controls.className = 'win95-window-controls';
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'win95-window-button';
+                closeBtn.textContent = '×';
+                closeBtn.onclick = () => {
+                    leaderboardWindow.remove();
+                };
+                
+                controls.appendChild(closeBtn);
+                header.appendChild(title);
+                header.appendChild(controls);
+                
+                const content = document.createElement('div');
+                content.className = 'win95-window-content';
+                content.style.padding = '10px';
+                content.style.overflow = 'auto';
+                
+                content.innerHTML = '<p style="text-align: center; margin: 10px 0;">Loading leaderboard...</p>';
+                
+                leaderboardWindow.appendChild(header);
+                leaderboardWindow.appendChild(content);
+                document.getElementById('remoteDesktop').appendChild(leaderboardWindow);
+                
+                // Load leaderboard
+                function loadLeaderboard() {
+                    if (database) {
+                        database.ref('minesweeperLeaderboard').orderByChild('time').limitToFirst(20).once('value', (snapshot) => {
+                            const scores = [];
+                            snapshot.forEach((child) => {
+                                const data = child.val();
+                                scores.push(data);
+                            });
+                            renderLeaderboard(scores);
+                        });
+                    } else {
+                        const saved = localStorage.getItem('minesweeperLeaderboard');
+                        const scores = saved ? JSON.parse(saved).slice(0, 20) : [];
+                        renderLeaderboard(scores);
+                    }
+                }
+                
+                function renderLeaderboard(scores) {
+                    if (scores.length === 0) {
+                        content.innerHTML = '<p style="text-align: center; margin: 10px 0;">No scores yet!</p>';
+                        return;
+                    }
+                    
+                    let html = '<div style="font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #000; padding-bottom: 5px;">Rank | Player | Time</div>';
+                    scores.forEach((score, index) => {
+                        html += `<div style="margin: 3px 0; font-size: 11px;">${index + 1}. ${escapeHtml(score.userId || 'Anonymous')} - ${score.time}s</div>`;
+                    });
+                    content.innerHTML = html;
+                }
+                
+                loadLeaderboard();
+                
+                // Make draggable
+                let isDragging = false;
+                header.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    leaderboardWindow.style.zIndex = ++windowZIndex;
+                    const initialX = e.clientX - leaderboardWindow.offsetLeft;
+                    const initialY = e.clientY - leaderboardWindow.offsetTop;
+                    
+                    const onMove = (e) => {
+                        if (isDragging) {
+                            leaderboardWindow.style.left = (e.clientX - initialX) + 'px';
+                            leaderboardWindow.style.top = (e.clientY - initialY) + 'px';
+                        }
+                    };
+                    
+                    const onUp = () => {
+                        isDragging = false;
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                    };
+                    
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+            }
+            
+            leaderboardBtn.onclick = showMinesweeperLeaderboard;
             
             function updateMinesCount() {
                 let flagCount = 0;
@@ -7979,10 +8139,6 @@ body.theme-flashcard button:hover {
             }
             if (type === 'passwordgame') {
                 openPasswordGameApp(iconId, name);
-                return;
-            }
-            if (type === 'tabletennis') {
-                openTableTennisApp(iconId, name);
                 return;
             }
             windowZIndex++;
@@ -9020,15 +9176,7 @@ body.theme-flashcard button:hover {
                     }
                 });
                 
-                // Draw paddle (more visible, higher up)
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(paddleX, canvas.height - 40, PADDLE_WIDTH, PADDLE_HEIGHT);
-                // Add border to make it more visible
-                ctx.strokeStyle = '#00ffff';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(paddleX, canvas.height - 40, PADDLE_WIDTH, PADDLE_HEIGHT);
-                
-                // Draw ball (bigger and brighter)
+                // Draw ball first (bigger and brighter) so it's always visible
                 ctx.beginPath();
                 ctx.arc(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2);
                 ctx.fillStyle = '#ffff00';
@@ -9037,6 +9185,19 @@ body.theme-flashcard button:hover {
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 ctx.closePath();
+                
+                // Draw paddle (more visible, higher up) - ensure it's always visible at bottom
+                const paddleY = canvas.height - 35;
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(paddleX, paddleY, PADDLE_WIDTH, PADDLE_HEIGHT);
+                // Add bright border to make it more visible
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(paddleX, paddleY, PADDLE_WIDTH, PADDLE_HEIGHT);
+                // Add inner highlight
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(paddleX + 2, paddleY + 2, PADDLE_WIDTH - 4, PADDLE_HEIGHT - 4);
             }
             
             // Update game
@@ -9056,8 +9217,9 @@ body.theme-flashcard button:hover {
                 }
                 
                 // Ball collision with paddle (updated position)
-                if (ballY + BALL_RADIUS > canvas.height - 40 && 
-                    ballY + BALL_RADIUS < canvas.height - 30 &&
+                const paddleY = canvas.height - 35;
+                if (ballY + BALL_RADIUS > paddleY && 
+                    ballY + BALL_RADIUS < paddleY + PADDLE_HEIGHT &&
                     ballX > paddleX && 
                     ballX < paddleX + PADDLE_WIDTH) {
                     ballSpeedY = -Math.abs(ballSpeedY);
@@ -9329,7 +9491,23 @@ body.theme-flashcard button:hover {
                             'Why don\'t scientists trust atoms? Because they make up everything!',
                             'Why did the scarecrow win an award? He was outstanding in his field!',
                             'What do you call a fake noodle? An impasta!',
-                            'Why don\'t eggs tell jokes? They\'d crack each other up!'
+                            'Why don\'t eggs tell jokes? They\'d crack each other up!',
+                            'Why did the math book look so sad? Because it had too many problems!',
+                            'What do you call a bear with no teeth? A gummy bear!',
+                            'Why don\'t programmers like nature? It has too many bugs!',
+                            'What\'s a computer\'s favorite snack? Microchips!',
+                            'Why did the coffee file a police report? It got mugged!',
+                            'What do you call a sleeping bull? A bulldozer!',
+                            'Why don\'t scientists trust stairs? Because they\'re always up to something!',
+                            'What did one ocean say to the other? Nothing, they just waved!',
+                            'Why did the bicycle fall over? Because it was two tired!',
+                            'What\'s a ninja\'s favorite type of shoes? Sneakers!',
+                            'Why do programmers prefer dark mode? Because light attracts bugs!',
+                            'What do you call a can opener that doesn\'t work? A can\'t opener!',
+                            'Why don\'t skeletons fight each other? They don\'t have the guts!',
+                            'What do you call a factory that makes okay products? A satisfactory!',
+                            'Why did the golfer bring two pairs of pants? In case he got a hole in one!',
+                            'What\'s the best thing about Switzerland? I don\'t know, but the flag is a big plus!'
                         ];
                         return jokes[Math.floor(Math.random() * jokes.length)];
                     }
@@ -9338,7 +9516,26 @@ body.theme-flashcard button:hover {
                             'Octopuses have three hearts!',
                             'A group of flamingos is called a flamboyance!',
                             'Honey never spoils - archaeologists have found 3000-year-old honey that\'s still edible!',
-                            'Bananas are berries, but strawberries aren\'t!'
+                            'Bananas are berries, but strawberries aren\'t!',
+                            'A day on Venus is longer than its year! Venus rotates so slowly that it takes longer to rotate once than to orbit the sun.',
+                            'Sharks have been around longer than trees! Sharks have existed for about 400 million years, while trees have only been around for 350 million years.',
+                            'Wombat poop is cube-shaped! This helps prevent it from rolling away and marks territory better.',
+                            'Dolphins have names for each other! They use unique whistles to identify themselves.',
+                            'There are more possible games of chess than atoms in the observable universe!',
+                            'A single cloud can weigh more than a million pounds!',
+                            'You have about 37 trillion cells in your body!',
+                            'Lightning strikes the Earth about 100 times per second!',
+                            'The human brain can process images in as little as 13 milliseconds!',
+                            'A group of owls is called a parliament!',
+                            'Polar bears have black skin under their white fur!',
+                            'Cows have best friends and get stressed when separated!',
+                            'Bananas are naturally radioactive due to their potassium content!',
+                            'A single strand of spaghetti is called a "spaghetto"!',
+                            'Butterflies taste with their feet!',
+                            'There\'s a species of jellyfish that is biologically immortal!',
+                            'The longest word in English has 189,819 letters! It\'s the chemical name for titin protein.',
+                            'A "jiffy" is an actual unit of time - 1/100th of a second!',
+                            'Humans share 50% of their DNA with bananas!'
                         ];
                         return facts[Math.floor(Math.random() * facts.length)];
                     }
@@ -9365,7 +9562,112 @@ body.theme-flashcard button:hover {
             
             // Questions about the chatbot itself
             if (msg.includes('what can you do') || msg.includes('what do you do')) {
-                return 'I can chat with you, answer questions, tell jokes, share facts, and try to be helpful! What would you like to know?';
+                return 'I can chat with you, answer questions, tell jokes, share facts, define words, and try to be helpful! What would you like to know?';
+            }
+            
+            // Definitions - "what does X mean" or "define X"
+            if (msg.match(/(what does|what is|define|definition of|meaning of)\s+(.+)/) || msg.match(/^define\s+(.+)$/)) {
+                const defMatch = msg.match(/(what does|what is|define|definition of|meaning of)\s+(.+)/) || msg.match(/^define\s+(.+)$/);
+                if (defMatch) {
+                    const word = defMatch[2].trim().toLowerCase().replace(/\?/g, '');
+                    
+                    // Dictionary of common word definitions
+                    const definitions = {
+                        'computer': 'An electronic device that processes data according to instructions stored in its memory.',
+                        'internet': 'A global network of interconnected computers that communicate using standardized protocols.',
+                        'website': 'A collection of web pages accessible via the internet, identified by a domain name.',
+                        'chatbot': 'A computer program designed to simulate conversation with human users, especially over the internet.',
+                        'code': 'Instructions written in a programming language that tell a computer what to do.',
+                        'programming': 'The process of creating instructions for computers to execute, usually written in code.',
+                        'software': 'Programs and data that tell a computer what to do and how to do it.',
+                        'hardware': 'The physical components of a computer system, such as the processor, memory, and storage.',
+                        'algorithm': 'A step-by-step procedure or set of rules for solving a problem or completing a task.',
+                        'data': 'Information, especially facts or numbers, collected for reference or analysis.',
+                        'browser': 'A software application used to access and view websites on the internet.',
+                        'email': 'Electronic mail - messages sent and received through the internet.',
+                        'password': 'A secret word or phrase used to gain access to a computer, website, or application.',
+                        'virus': 'Malicious software designed to damage or gain unauthorized access to computer systems.',
+                        'firewall': 'A security system that monitors and controls incoming and outgoing network traffic.',
+                        'cookie': 'A small piece of data stored on your computer by websites to remember your preferences.',
+                        'cloud': 'Remote servers accessed over the internet for storing, managing, and processing data.',
+                        'ai': 'Artificial Intelligence - the simulation of human intelligence in machines.',
+                        'javascript': 'A programming language commonly used to create interactive effects within web browsers.',
+                        'html': 'HyperText Markup Language - the standard language for creating web pages.',
+                        'css': 'Cascading Style Sheets - used to style and format web pages.',
+                        'api': 'Application Programming Interface - a set of rules allowing different software to communicate.',
+                        'database': 'An organized collection of data stored and accessed electronically.',
+                        'server': 'A computer or system that provides resources, data, or services to other computers over a network.',
+                        'client': 'A computer or program that accesses services provided by a server.',
+                        'protocol': 'A set of rules governing the exchange of data between devices.',
+                        'encryption': 'The process of converting data into a coded form to prevent unauthorized access.',
+                        'debugging': 'The process of finding and fixing errors or bugs in computer code.',
+                        'function': 'A block of code designed to perform a specific task, which can be reused.',
+                        'variable': 'A container that stores data values in programming.',
+                        'array': 'A data structure that stores multiple values in a single variable.',
+                        'loop': 'A programming construct that repeats a block of code until a condition is met.',
+                        'boolean': 'A data type that can only be true or false.',
+                        'string': 'A sequence of characters, such as text, in programming.',
+                        'integer': 'A whole number without decimal points.',
+                        'float': 'A number with decimal points in programming.',
+                        'object': 'A data structure containing properties and methods in programming.',
+                        'class': 'A blueprint for creating objects in object-oriented programming.',
+                        'method': 'A function associated with an object in programming.',
+                        'property': 'An attribute or characteristic of an object in programming.'
+                    };
+                    
+                    if (definitions[word]) {
+                        return `${word.charAt(0).toUpperCase() + word.slice(1)}: ${definitions[word]}`;
+                    } else {
+                        return `I don't have a definition for "${word}" in my dictionary. Could you try another word or ask me about something else?`;
+                    }
+                }
+            }
+            
+            // Direct joke requests (even without "tell me")
+            if (msg.includes('joke')) {
+                const jokes = [
+                    'Why don\'t scientists trust atoms? Because they make up everything!',
+                    'Why did the scarecrow win an award? He was outstanding in his field!',
+                    'What do you call a fake noodle? An impasta!',
+                    'Why don\'t eggs tell jokes? They\'d crack each other up!',
+                    'Why did the math book look so sad? Because it had too many problems!',
+                    'What do you call a bear with no teeth? A gummy bear!',
+                    'Why don\'t programmers like nature? It has too many bugs!',
+                    'What\'s a computer\'s favorite snack? Microchips!',
+                    'Why did the coffee file a police report? It got mugged!',
+                    'What do you call a sleeping bull? A bulldozer!',
+                    'Why don\'t scientists trust stairs? Because they\'re always up to something!',
+                    'What did one ocean say to the other? Nothing, they just waved!',
+                    'Why did the bicycle fall over? Because it was two tired!',
+                    'What\'s a ninja\'s favorite type of shoes? Sneakers!',
+                    'Why do programmers prefer dark mode? Because light attracts bugs!'
+                ];
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            }
+            
+            // Direct fact requests (even without "tell me")
+            if (msg.includes('fact') || msg.includes('fun fact')) {
+                const facts = [
+                    'Octopuses have three hearts!',
+                    'A group of flamingos is called a flamboyance!',
+                    'Honey never spoils - archaeologists have found 3000-year-old honey that\'s still edible!',
+                    'Bananas are berries, but strawberries aren\'t!',
+                    'A day on Venus is longer than its year! Venus rotates so slowly that it takes longer to rotate once than to orbit the sun.',
+                    'Sharks have been around longer than trees! Sharks have existed for about 400 million years, while trees have only been around for 350 million years.',
+                    'Wombat poop is cube-shaped! This helps prevent it from rolling away and marks territory better.',
+                    'Dolphins have names for each other! They use unique whistles to identify themselves.',
+                    'There are more possible games of chess than atoms in the observable universe!',
+                    'A single cloud can weigh more than a million pounds!',
+                    'You have about 37 trillion cells in your body!',
+                    'Lightning strikes the Earth about 100 times per second!',
+                    'The human brain can process images in as little as 13 milliseconds!',
+                    'A group of owls is called a parliament!',
+                    'Polar bears have black skin under their white fur!',
+                    'Cows have best friends and get stressed when separated!',
+                    'Butterflies taste with their feet!',
+                    'Humans share 50% of their DNA with bananas!'
+                ];
+                return facts[Math.floor(Math.random() * facts.length)];
             }
             
             // Math (simple)
@@ -9612,14 +9914,15 @@ body.theme-flashcard button:hover {
             // Game HTML
             const gameHTML = `
                 <div style="text-align: center; margin-bottom: 10px;">
+                    <button id="passwordgame-multiplayer" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Multiplayer Mode</button>
                     <button id="passwordgame-new" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
                     <div style="font-size: 12px; margin-bottom: 5px;">Attempts: <span id="passwordgame-attempts">0</span>/${maxAttempts}</div>
-                    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">Guess the 5-letter password!</div>
+                    <div id="passwordgame-mode" style="font-size: 11px; color: #666; margin-bottom: 10px;">Guess the 5-letter password!</div>
                 </div>
                 <div id="passwordgame-guesses" style="flex: 1; overflow-y: auto; border: 1px inset #c0c0c0; padding: 10px; margin-bottom: 10px; background: #fff; font-size: 11px; font-family: monospace; min-height: 200px;">
                     <!-- Guesses will appear here -->
                 </div>
-                <div style="display: flex; gap: 5px;">
+                <div id="passwordgame-input-section" style="display: flex; gap: 5px;">
                     <input type="text" id="passwordgame-input" maxlength="5" style="flex: 1; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px; font-family: monospace; text-transform: uppercase;" placeholder="Enter 5 letters...">
                     <button id="passwordgame-submit" style="padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; font-weight: bold; cursor: pointer;">Guess</button>
                 </div>
@@ -9633,6 +9936,12 @@ body.theme-flashcard button:hover {
             const newGameBtn = content.querySelector('#passwordgame-new');
             const attemptsEl = content.querySelector('#passwordgame-attempts');
             const resultEl = content.querySelector('#passwordgame-result');
+            const modeEl = content.querySelector('#passwordgame-mode');
+            const multiplayerBtn = content.querySelector('#passwordgame-multiplayer');
+            
+            let isMultiplayer = false;
+            let currentLobbyId = null;
+            let isHost = false;
             
             function startNewGame() {
                 currentPassword = words[Math.floor(Math.random() * words.length)];
@@ -9724,6 +10033,152 @@ body.theme-flashcard button:hover {
             
             newGameBtn.onclick = startNewGame;
             
+            // Multiplayer mode handler
+            function showMultiplayerLobbies() {
+                windowZIndex++;
+                const lobbyWindow = document.createElement('div');
+                lobbyWindow.className = 'win95-window';
+                lobbyWindow.style.left = '150px';
+                lobbyWindow.style.top = '100px';
+                lobbyWindow.style.width = '400px';
+                lobbyWindow.style.height = '400px';
+                lobbyWindow.style.zIndex = windowZIndex;
+                
+                const header = document.createElement('div');
+                header.className = 'win95-window-header';
+                const title = document.createElement('div');
+                title.className = 'win95-window-title';
+                title.textContent = 'Password Game - Multiplayer';
+                const controls = document.createElement('div');
+                controls.className = 'win95-window-controls';
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'win95-window-button';
+                closeBtn.textContent = '×';
+                closeBtn.onclick = () => lobbyWindow.remove();
+                controls.appendChild(closeBtn);
+                header.appendChild(title);
+                header.appendChild(controls);
+                
+                const content = document.createElement('div');
+                content.className = 'win95-window-content';
+                content.style.padding = '10px';
+                content.style.overflow = 'auto';
+                content.innerHTML = '<div style="text-align: center; margin: 10px 0;"><button id="create-lobby" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">Create Lobby</button><div style="font-size: 11px; margin-bottom: 10px;">Available Lobbies:</div><div id="lobby-list">Loading...</div></div>';
+                
+                lobbyWindow.appendChild(header);
+                lobbyWindow.appendChild(content);
+                document.getElementById('remoteDesktop').appendChild(lobbyWindow);
+                
+                function loadLobbies() {
+                    const listEl = content.querySelector('#lobby-list');
+                    if (database) {
+                        database.ref('passwordGameLobbies').on('value', (snapshot) => {
+                            const lobbies = [];
+                            snapshot.forEach((child) => {
+                                const data = child.val();
+                                if (!data.gameStarted && data.players && data.players.length < 2) {
+                                    lobbies.push({ id: child.key, ...data });
+                                }
+                            });
+                            if (lobbies.length === 0) {
+                                listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
+                            } else {
+                                let html = '';
+                                lobbies.forEach(lobby => {
+                                    html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Players: ${(lobby.players || []).length}/2</div><button onclick="joinLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
+                                });
+                                listEl.innerHTML = html;
+                            }
+                        });
+                    } else {
+                        listEl.innerHTML = '<div style="font-size: 11px; color: #f85149; text-align: center; margin: 10px 0;">Firebase not available. Please check connection.</div>';
+                    }
+                }
+                
+                function createLobby() {
+                    const userId = getUserId() || 'user' + Date.now();
+                    const lobbyId = 'lobby_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    if (database) {
+                        database.ref(`passwordGameLobbies/${lobbyId}`).set({
+                            host: userId,
+                            players: [userId],
+                            password: '',
+                            attempts: {},
+                            gameStarted: false,
+                            createdAt: Date.now()
+                        });
+                        joinLobbyInternal(lobbyId, true);
+                        lobbyWindow.remove();
+                    }
+                }
+                
+                function joinLobbyInternal(lobbyId, isHostPlayer) {
+                    currentLobbyId = lobbyId;
+                    isMultiplayer = true;
+                    isHost = isHostPlayer;
+                    modeEl.textContent = isHost ? 'You are the HOST. Pick a 5-letter word!' : 'You are GUESSING. Wait for host to set word...';
+                    if (isHost) {
+                        inputField.placeholder = 'Enter word to hide...';
+                        const inputSection = content.querySelector('#passwordgame-input-section');
+                        inputSection.innerHTML = '<input type="text" id="passwordgame-set-word" maxlength="5" style="flex: 1; padding: 5px; border: 1px inset #c0c0c0; font-size: 11px; font-family: monospace; text-transform: uppercase;" placeholder="Enter 5-letter word..."><button id="passwordgame-set-word-btn" style="padding: 5px 15px; background: #c0c0c0; border: 2px outset #c0c0c0; font-size: 11px; font-weight: bold; cursor: pointer;">Set Word</button>';
+                        const setWordInput = content.querySelector('#passwordgame-set-word');
+                        const setWordBtn = content.querySelector('#passwordgame-set-word-btn');
+                        setWordBtn.onclick = () => {
+                            const word = setWordInput.value.toUpperCase().trim();
+                            if (word.length === 5 && /^[A-Z]+$/.test(word)) {
+                                if (database) {
+                                    database.ref(`passwordGameLobbies/${lobbyId}`).update({
+                                        password: word,
+                                        gameStarted: true
+                                    });
+                                    currentPassword = word;
+                                    inputSection.innerHTML = '<div style="font-size: 11px; color: #238636; padding: 5px; text-align: center;">Word set! Guesser can now play.</div>';
+                                }
+                            }
+                        };
+                    } else {
+                        inputField.placeholder = 'Enter 5 letters...';
+                        if (database) {
+                            database.ref(`passwordGameLobbies/${lobbyId}`).on('value', (snapshot) => {
+                                const data = snapshot.val();
+                                if (data.gameStarted && data.password) {
+                                    currentPassword = data.password;
+                                    modeEl.textContent = 'Game started! Guess the word!';
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                window.joinLobby = (lobbyId) => joinLobbyInternal(lobbyId, false);
+                content.querySelector('#create-lobby').onclick = createLobby;
+                loadLobbies();
+                
+                // Make draggable
+                let isDragging = false;
+                header.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    lobbyWindow.style.zIndex = ++windowZIndex;
+                    const initialX = e.clientX - lobbyWindow.offsetLeft;
+                    const initialY = e.clientY - lobbyWindow.offsetTop;
+                    const onMove = (e) => {
+                        if (isDragging) {
+                            lobbyWindow.style.left = (e.clientX - initialX) + 'px';
+                            lobbyWindow.style.top = (e.clientY - initialY) + 'px';
+                        }
+                    };
+                    const onUp = () => {
+                        isDragging = false;
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                    };
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+            }
+            
+            multiplayerBtn.onclick = showMultiplayerLobbies;
+            
             window.appendChild(header);
             window.appendChild(content);
             document.getElementById('remoteDesktop').appendChild(window);
@@ -9766,281 +10221,8 @@ body.theme-flashcard button:hover {
             startNewGame();
         }
         
-        // Table Tennis app
-        function openTableTennisApp(iconId, name) {
-            windowZIndex++;
-            const window = document.createElement('div');
-            window.className = 'win95-window';
-            window.style.left = '100px';
-            window.style.top = '100px';
-            window.style.width = '500px';
-            window.style.height = '600px';
-            window.style.zIndex = windowZIndex;
+        // Table Tennis app removed
             
-            // Header
-            const header = document.createElement('div');
-            header.className = 'win95-window-header';
-            
-            const title = document.createElement('div');
-            title.className = 'win95-window-title';
-            title.textContent = name;
-            
-            const controls = document.createElement('div');
-            controls.className = 'win95-window-controls';
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'win95-window-button';
-            closeBtn.textContent = '×';
-            closeBtn.onclick = () => {
-                if (tableTennisGameInterval) {
-                    cancelAnimationFrame(tableTennisGameInterval);
-                    tableTennisGameInterval = null;
-                }
-                window.remove();
-                desktopWindows = desktopWindows.filter(w => w.element !== window);
-                updateTaskbar();
-            };
-            
-            controls.appendChild(closeBtn);
-            header.appendChild(title);
-            header.appendChild(controls);
-            
-            // Content
-            const content = document.createElement('div');
-            content.className = 'win95-window-content';
-            content.style.padding = '10px';
-            content.style.overflow = 'hidden';
-            content.style.display = 'flex';
-            content.style.flexDirection = 'column';
-            content.style.alignItems = 'center';
-            
-            // Game HTML
-            const gameHTML = `
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <button id="tabletennis-restart" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 10px;">New Game</button>
-                    <div style="font-size: 12px; margin-bottom: 5px;">Score: <span id="tabletennis-score">0</span></div>
-                    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">Move your mouse left/right to hit the ball!</div>
-                </div>
-                <canvas id="tabletennis-canvas" width="460" height="500" style="border: 2px inset #c0c0c0; background: #1a1a1a; display: block; cursor: none;"></canvas>
-            `;
-            content.innerHTML = gameHTML;
-            
-            const canvas = content.querySelector('#tabletennis-canvas');
-            const ctx = canvas.getContext('2d');
-            const restartBtn = content.querySelector('#tabletennis-restart');
-            const scoreEl = content.querySelector('#tabletennis-score');
-            
-            // Game constants
-            const PADDLE_WIDTH = 100;
-            const PADDLE_HEIGHT = 15;
-            const BALL_RADIUS = 10;
-            
-            // Game state
-            let paddleX = canvas.width / 2 - PADDLE_WIDTH / 2;
-            let ballX = canvas.width / 2;
-            let ballY = 50;
-            let ballSpeedX = (Math.random() - 0.5) * 6;
-            let ballSpeedY = 4;
-            let score = 0;
-            let tableTennisGameInterval = null;
-            let gameRunning = false;
-            
-            // Draw game
-            function draw() {
-                // Clear canvas
-                ctx.fillStyle = '#1a1a1a';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw net (center line)
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([10, 10]);
-                ctx.beginPath();
-                ctx.moveTo(0, canvas.height / 2);
-                ctx.lineTo(canvas.width, canvas.height / 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-                
-                // Draw paddle (at bottom, bright and visible)
-                ctx.fillStyle = '#00ff00';
-                ctx.fillRect(paddleX, canvas.height - 30, PADDLE_WIDTH, PADDLE_HEIGHT);
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(paddleX, canvas.height - 30, PADDLE_WIDTH, PADDLE_HEIGHT);
-                
-                // Draw ball
-                ctx.beginPath();
-                ctx.arc(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffff00';
-                ctx.fill();
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                ctx.closePath();
-                
-                // Draw cursor indicator on paddle
-                ctx.fillStyle = '#ff0000';
-                ctx.beginPath();
-                ctx.arc(paddleX + PADDLE_WIDTH / 2, canvas.height - 22, 5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            // Update game
-            function update() {
-                if (!gameRunning) return;
-                
-                // Move ball
-                ballX += ballSpeedX;
-                ballY += ballSpeedY;
-                
-                // Ball collision with side walls
-                if (ballX + BALL_RADIUS > canvas.width || ballX - BALL_RADIUS < 0) {
-                    ballSpeedX = -ballSpeedX;
-                    ballX = Math.max(BALL_RADIUS, Math.min(canvas.width - BALL_RADIUS, ballX));
-                }
-                
-                // Ball collision with top wall
-                if (ballY - BALL_RADIUS < 0) {
-                    ballSpeedY = -ballSpeedY;
-                    ballY = BALL_RADIUS;
-                }
-                
-                // Ball collision with paddle
-                if (ballY + BALL_RADIUS > canvas.height - 30 && 
-                    ballY + BALL_RADIUS < canvas.height - 15 &&
-                    ballX > paddleX && 
-                    ballX < paddleX + PADDLE_WIDTH) {
-                    ballSpeedY = -Math.abs(ballSpeedY);
-                    // Add spin based on where ball hits paddle
-                    const hitPos = (ballX - paddleX) / PADDLE_WIDTH;
-                    ballSpeedX = (hitPos - 0.5) * 8;
-                    score++;
-                    scoreEl.textContent = score;
-                    // Speed up slightly
-                    ballSpeedY *= 1.05;
-                }
-                
-                // Check if ball fell off bottom (game over)
-                if (ballY > canvas.height) {
-                    gameOver();
-                    return;
-                }
-                
-                // Check if ball hits net (bounce)
-                if (ballY > canvas.height / 2 - 10 && ballY < canvas.height / 2 + 10 && 
-                    ballSpeedY > 0) {
-                    // Ball bounces off net
-                    ballSpeedY = -ballSpeedY;
-                }
-            }
-            
-            // Game loop
-            function gameLoop() {
-                update();
-                draw();
-                if (gameRunning) {
-                    tableTennisGameInterval = requestAnimationFrame(gameLoop);
-                }
-            }
-            
-            function startGame() {
-                if (tableTennisGameInterval) {
-                    cancelAnimationFrame(tableTennisGameInterval);
-                }
-                
-                gameRunning = true;
-                score = 0;
-                scoreEl.textContent = score;
-                paddleX = canvas.width / 2 - PADDLE_WIDTH / 2;
-                ballX = canvas.width / 2;
-                ballY = 50;
-                ballSpeedX = (Math.random() - 0.5) * 6;
-                ballSpeedY = 4;
-                draw();
-                gameLoop();
-            }
-            
-            function gameOver() {
-                gameRunning = false;
-                if (tableTennisGameInterval) {
-                    cancelAnimationFrame(tableTennisGameInterval);
-                    tableTennisGameInterval = null;
-                }
-                alert('Game Over! Final Score: ' + score);
-                startGame();
-            }
-            
-            // Mouse controls - follow mouse X position
-            const handleMouseMove = (e) => {
-                if (!gameRunning || !window.parentNode) return;
-                const rect = canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                paddleX = Math.max(0, Math.min(canvas.width - PADDLE_WIDTH, mouseX - PADDLE_WIDTH / 2));
-            };
-            
-            // Add event listeners
-            canvas.addEventListener('mousemove', handleMouseMove);
-            
-            closeBtn.onclick = () => {
-                canvas.removeEventListener('mousemove', handleMouseMove);
-                if (tableTennisGameInterval) {
-                    cancelAnimationFrame(tableTennisGameInterval);
-                    tableTennisGameInterval = null;
-                }
-                window.remove();
-                desktopWindows = desktopWindows.filter(w => w.element !== window);
-                updateTaskbar();
-            };
-            
-            restartBtn.onclick = () => {
-                if (tableTennisGameInterval) {
-                    cancelAnimationFrame(tableTennisGameInterval);
-                }
-                startGame();
-            };
-            
-            window.appendChild(header);
-            window.appendChild(content);
-            document.getElementById('remoteDesktop').appendChild(window);
-            
-            // Make window draggable
-            let isDragging = false;
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                window.style.zIndex = ++windowZIndex;
-                const initialX = e.clientX - window.offsetLeft;
-                const initialY = e.clientY - window.offsetTop;
-                
-                const onMove = (e) => {
-                    if (isDragging) {
-                        window.style.left = (e.clientX - initialX) + 'px';
-                        window.style.top = (e.clientY - initialY) + 'px';
-                    }
-                };
-                
-                const onUp = () => {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                };
-                
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
-            });
-            
-            desktopWindows.push({
-                iconId: iconId,
-                name: name,
-                type: 'tabletennis',
-                element: window
-            });
-            
-            updateTaskbar();
-            
-            // Start the game
-            startGame();
-        }
-        
         // Make functions globally accessible
         window.addDesktopApp = addDesktopApp;
         window.renameDesktopIcon = renameDesktopIcon;
@@ -12153,6 +12335,7 @@ body.theme-flashcard button:hover {
                     }
                     // Check for Chatbot AI update
                     const hasChatbotAI = entries.some(e => e.title && e.title.includes('Chatbot AI'));
+                    const hasChatbotEnhancement = entries.some(e => e.title && e.title.includes('Enhanced Chatbot') && e.title.includes('Jokes'));
                     if (!hasChatbotAI) {
                         entries.push({
                             date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
@@ -12162,26 +12345,72 @@ body.theme-flashcard button:hover {
                         });
                         localStorage.setItem('changelog', JSON.stringify(entries));
                     }
-                    // Check for Block Breaker paddle fix and Table Tennis
-                    const hasPaddleFix = entries.some(e => e.title && e.title.includes('Block Breaker paddle'));
-                    const hasTableTennis = entries.some(e => e.title && e.title.includes('Table Tennis'));
-                    if (!hasPaddleFix || !hasTableTennis) {
-                        if (!hasPaddleFix) {
-                            entries.push({
-                                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-                                title: '🔧 Fixed Block Breaker Paddle Visibility',
-                                description: 'Fixed the paddle visibility issue in Block Breaker. The paddle is now positioned higher and has a bright cyan border to make it much more visible. The paddle now has better contrast against the black background.',
-                                userRequest: 'you cant see the paddle thing down below of the block breaker'
-                            });
-                        }
-                        if (!hasTableTennis) {
-                            entries.push({
-                                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-                                title: '🏓 Added Table Tennis Game to Desktop',
-                                description: 'Added a Table Tennis game to the Remote Desktop App Store! A ball comes at you from the top, and you move your mouse left/right to hit it back. Features score tracking, a net in the middle, and increasing difficulty. Install it from the App Store in Remote Desktop, then double-click the Table Tennis icon to play.',
-                                userRequest: 'add table tennis game not ping pong where a ball comes at you and you have to move your mouse to it make it long left and right'
-                            });
-                        }
+                    if (!hasChatbotEnhancement) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🎭 Enhanced Chatbot with More Jokes, Facts & Definitions',
+                            description: 'Significantly expanded the chatbot\'s knowledge! Added 20+ jokes (programming, science, and general humor), 23+ fun facts (science, nature, technology), and a dictionary with 40+ definitions for common computer and technology terms. The chatbot now responds to "tell me a joke", "fun fact", "what does X mean", and "define X".',
+                            userRequest: 'make chatbot smarter like if you ask a joke or a fun fact and definitions'
+                        });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
+                    }
+                    // Check for Block Breaker paddle fix
+                    const hasPaddleFix = entries.some(e => e.title && e.title.includes('Block Breaker') && e.title.includes('Paddle'));
+                    if (!hasPaddleFix) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🧱 Block Breaker Paddle Visibility Fix',
+                            description: 'Fixed Block Breaker paddle visibility! The paddle is now bright green with white borders and inner highlights, positioned higher up on the canvas for better visibility. The ball is also brighter yellow with a white border for better visibility.',
+                            userRequest: 'expain block breakers view and remove table tennis'
+                        });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
+                    }
+                    
+                    // Check for Table Tennis removal
+                    const hasTableTennisRemoval = entries.some(e => e.title && e.title.includes('Table Tennis') && e.title.includes('Removed'));
+                    if (!hasTableTennisRemoval) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🗑️ Table Tennis Game Removed',
+                            description: 'Removed Table Tennis game from the App Store and desktop. The game has been completely removed as requested.',
+                            userRequest: 'remove table tennis'
+                        });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
+                    }
+                    
+                    // Check for Minesweeper timer & leaderboard
+                    const hasMinesweeperTimer = entries.some(e => e.title && e.title.includes('Minesweeper') && e.title.includes('Timer'));
+                    if (!hasMinesweeperTimer) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '⏱️ Minesweeper Timer & Leaderboard',
+                            description: 'Added timer to Minesweeper! The timer starts on your first click and stops when you win or lose. Completed games are saved to a Firebase leaderboard showing the best times. View the leaderboard by clicking the "Leaderboard" button in Minesweeper.',
+                            userRequest: 'add a timer in minesweeper with a leaderboard'
+                        });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
+                    }
+                    
+                    // Check for Password Game multiplayer
+                    const hasPasswordMultiplayer = entries.some(e => e.title && e.title.includes('Password Game') && e.title.includes('Multiplayer'));
+                    if (!hasPasswordMultiplayer) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🔐 Password Game Multiplayer Mode',
+                            description: 'Added multiplayer mode to Password Game! Click "Multiplayer Mode" to create or join lobbies. In multiplayer: one player (host) picks a 5-letter word, and another player (guesser) tries to guess it. Uses Firebase for real-time synchronization between players.',
+                            userRequest: 'add a multiplayermode in password game where 1 person picks the word and another person guesses where you can join lobbies'
+                        });
+                        localStorage.setItem('changelog', JSON.stringify(entries));
+                    }
+                    
+                    // Check for Paint v2 multiplayer
+                    const hasPaintV2 = entries.some(e => e.title && e.title.includes('Paint v2'));
+                    if (!hasPaintV2) {
+                        entries.push({
+                            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                            title: '🎨 Paint v2 Multiplayer Drawing',
+                            description: 'Added Paint v2 multiplayer to the App Store! Draw with others in real-time by joining or creating lobbies. All players can see each other\'s drawings instantly. Features color picker, clear button, and Firebase real-time synchronization. Install it from the App Store in Remote Desktop!',
+                            userRequest: 'add paint v2 in the shop were you can draw with others if you join there lobby'
+                        });
                         localStorage.setItem('changelog', JSON.stringify(entries));
                     }
                     // Add Password Game entry
