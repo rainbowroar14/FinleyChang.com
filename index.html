@@ -3,589 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clever | Portal</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234169E1'/%3E%3Ctext x='50' y='75' font-size='70' font-weight='bold' font-family='Arial, sans-serif' text-anchor='middle' fill='white' filter='url(%23glow)'%3EC%3C/text%3E%3Cdefs%3E%3Cfilter id='glow'%3E%3CfeGaussianBlur stdDeviation='3' result='coloredBlur'/%3E%3CfeMerge%3E%3CfeMergeNode in='coloredBlur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E">
+    <title>Login System</title>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <!-- External CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        
+        .login-container h1 {
+            color: #c9d1d9;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #c9d1d9;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background: #2ea043;
+        }
+        
+        .btn:disabled {
+            background: #30363d;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #21262d;
+        }
+        
+        .btn-secondary:hover {
+            background: #30363d;
+        }
+        
+        .error-message {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid #f85149;
+            color: #f85149;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .success-message {
+            background: rgba(35, 134, 54, 0.1);
+            border: 1px solid #3fb950;
+            color: #3fb950;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .form-switch {
+            text-align: center;
+            margin-top: 20px;
+            color: #8b949e;
+            font-size: 14px;
+        }
+        
+        .form-switch a {
+            color: #58a6ff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .form-switch a:hover {
+            text-decoration: underline;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .user-info {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .user-info h2 {
+            color: #c9d1d9;
+            margin-bottom: 15px;
+        }
+        
+        .user-info p {
+            color: #8b949e;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
-
 <body>
-    <!-- Main page with FinHub title -->
-    <!-- Login page (must be first, blocks all access) -->
-    <div class="page login-page" id="loginPage" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #0d1117; color: #c9d1d9;">
-        <div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
-            <h1 style="color: #c9d1d9; font-size: 32px; margin-bottom: 10px; text-align: center;">Login</h1>
-            <p style="color: #8b949e; font-size: 14px; margin-bottom: 30px; text-align: center;">You must login to access this website</p>
-            <div id="loginError" style="color: #f85149; font-size: 14px; margin-bottom: 15px; min-height: 20px; text-align: center;"></div>
-            <div style="margin-bottom: 20px;">
-                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Username:</label>
-                <input type="text" id="loginUsername" placeholder="Enter username" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
+    <div class="login-container">
+        <!-- Sign In Form -->
+        <div id="signin-form">
+            <h1>Sign In</h1>
+            <div id="error-message" class="error-message"></div>
+            <div id="success-message" class="success-message"></div>
+            <form id="signin-form-element">
+                <div class="form-group">
+                    <label for="signin-email">Email</label>
+                    <input type="email" id="signin-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signin-password">Password</label>
+                    <input type="password" id="signin-password" required>
+                </div>
+                <button type="submit" class="btn" id="signin-btn">Sign In</button>
+            </form>
+            <div class="form-switch">
+                Don't have an account? <a id="switch-to-signup">Sign up</a>
             </div>
-            <div style="margin-bottom: 20px;">
-                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Password:</label>
-                <input type="password" id="loginPassword" placeholder="Enter password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
-            </div>
-            <button id="loginSubmitBtn" onclick="attemptLogin()" style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 15px; transition: background 0.2s;">Login</button>
-            <button id="registerBtn" onclick="showRegisterForm()" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #58a6ff; border: 1px solid #30363d; border-radius: 6px; cursor: pointer; transition: all 0.2s;">Create Account</button>
-        </div>
-        <!-- Register form (hidden by default) -->
-        <div id="registerForm" style="display: none; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.3); margin-top: 20px;">
-            <h2 style="color: #c9d1d9; font-size: 28px; margin-bottom: 10px; text-align: center;">Create Account</h2>
-            <p style="color: #8b949e; font-size: 14px; margin-bottom: 30px; text-align: center;">Choose a unique username and password</p>
-            <div id="registerError" style="color: #f85149; font-size: 14px; margin-bottom: 15px; min-height: 20px; text-align: center;"></div>
-            <div style="margin-bottom: 20px;">
-                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Username (3-20 characters):</label>
-                <input type="text" id="registerUsername" placeholder="Enter username" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Password (min 4 characters):</label>
-                <input type="password" id="registerPassword" placeholder="Enter password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Confirm Password:</label>
-                <input type="password" id="registerPasswordConfirm" placeholder="Confirm password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
-            </div>
-            <button id="registerSubmitBtn" onclick="attemptRegister()" style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 15px;">Register</button>
-            <button onclick="showLoginForm()" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #58a6ff; border: 1px solid #30363d; border-radius: 6px; cursor: pointer;">Back to Login</button>
-        </div>
-    </div>
-    
-    <div class="page hidden" id="mainPage">
-        <div class="finhub-title">
-            <!-- Big F made of small letters -->
-            <div class="big-letter letter-f" id="letter-f"></div>
-            <!-- Big i made of small letters -->
-            <div class="big-letter letter-i" id="letter-i"></div>
-            <!-- Big n made of small letters -->
-            <div class="big-letter letter-n" id="letter-n"></div>
-            <!-- Big H made of small letters -->
-            <div class="big-letter letter-h" id="letter-h"></div>
-            <!-- Big u made of small letters -->
-            <div class="big-letter letter-u" id="letter-u"></div>
-            <!-- Big b made of small letters -->
-            <div class="big-letter letter-b" id="letter-b"></div>
         </div>
         
-        <p class="subtitle">Built with code, powered by Finley</p>
-        <p class="letters-source">Spelled with letters from: F-I-N-L-E-Y</p>
-        <!-- Canvas for wooperbird goose on main page -->
-        <canvas id="wooperbirdCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;"></canvas>
+        <!-- Sign Up Form -->
+        <div id="signup-form" class="hidden">
+            <h1>Sign Up</h1>
+            <div id="error-message-signup" class="error-message"></div>
+            <div id="success-message-signup" class="success-message"></div>
+            <form id="signup-form-element">
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
                 </div>
-    
-    <!-- Profile display in top left (visible on all pages) -->
-    <div class="profile-display" id="profileDisplay" style="display: none;" onclick="toggleProfileMenu(event)">
-        <div class="profile-username" id="profileUsername">
-            <span id="profileUsernameText"></span>
-            <span class="profile-admin-badge" id="profileAdminBadge" style="display: none;">ADMIN</span>
-        </div>
-        <div class="profile-menu" id="profileMenu">
-            <div class="profile-menu-item" onclick="showWhoami(); document.getElementById('profileMenu').classList.remove('show');">View Profile</div>
-            <div class="profile-menu-item" onclick="viewBoard(); document.getElementById('profileMenu').classList.remove('show');">View My Board</div>
-            <div class="profile-menu-item logout" onclick="logout()">Logout</div>
-        </div>
-    </div>
-    
-    <!-- Home page -->
-    <div class="page home-page hidden" id="homePage">
-        <h1>Welcome to the home</h1>
-        <p>Type "back" in the command bar to return</p>
-        <a href="https://sso.browardschools.com/" target="_blank">Broward Schools Login</a>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" required>
+                </div>
+                <button type="submit" class="btn" id="signup-btn">Sign Up</button>
+            </form>
+            <div class="form-switch">
+                Already have an account? <a id="switch-to-signin">Sign in</a>
             </div>
-    
-    <!-- Minesweeper page -->
-    <div class="page minesweeper-page hidden" id="minesweeperPage" oncontextmenu="return false;">
-        <button id="restart-btn">Restart Game</button>
-        <button id="minesweeper-page-leaderboard-btn" style="margin-left: 10px;">Leaderboard</button>
-        <div id="message">Flags Remaining: 10</div>
-        <div id="minesweeper-timer-display" style="font-size: 16px; margin: 10px 0; font-weight: bold;">Time: <span id="minesweeper-timer-text">0</span>s</div>
-        <div id="minesweeper-game-container">
-            <div class="minesweeper-grid" id="minesweeper-grid"></div>
+        </div>
+        
+        <!-- User Info (shown after login) -->
+        <div id="user-info" class="hidden">
+            <h2>Welcome!</h2>
+            <p id="user-email"></p>
+            <button class="btn btn-secondary" id="logout-btn">Logout</button>
         </div>
     </div>
 
-    <!-- Pong page -->
-    <div class="page sandboxels-page hidden" id="pongPage">
-        <iframe id="pong-iframe" class="sandboxels-iframe" src="https://web-pong.com/" name="pong_frame"></iframe>
-        <button class="sandboxels-close-btn" onclick="closePong()">X CLOSE VIEW (Return to finleychang.com)</button>
-                    </div>
-    
-    <!-- Sandboxels page -->
-    <div class="page sandboxels-page hidden" id="sandboxelsPage">
-        <iframe id="sandboxels-iframe" class="sandboxels-iframe" src="https://shalbito.vercel.app/" name="sandboxels_frame"></iframe>
-        <button class="sandboxels-close-btn" onclick="closeSandboxels()">X CLOSE VIEW (Return to finleychang.com)</button>
-        </div>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
         
-    <!-- Paint page -->
-    <div class="page sandboxels-page hidden" id="paintPage">
-        <canvas id="paintCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; cursor: crosshair;"></canvas>
-        <div style="position: fixed; top: 20px; left: 20px; color: black; font-size: 16px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); z-index: 1000; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 8px;">
-            <div>Brush Size: <span id="paint-brush-size">5</span></div>
-            <div style="margin-top: 10px;">
-                <label for="paint-color-picker" style="display: block; margin-bottom: 5px;">Color:</label>
-                <input type="color" id="paint-color-picker" value="#000000" style="width: 60px; height: 30px; cursor: pointer; border: 2px solid #333; border-radius: 4px;">
-                <span id="paint-color-display" style="margin-left: 10px;">#000000</span>
-            </div>
-            </div>
-        <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
-            </div>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
         
-    <!-- Collaborative Drawing Board page -->
-    <div class="page sandboxels-page hidden" id="drawingBoardPage">
-        <canvas id="drawingBoardCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; cursor: crosshair;"></canvas>
-        <div style="position: fixed; top: 20px; left: 20px; color: black; font-size: 16px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); z-index: 1000; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 8px; min-width: 250px;">
-            <div style="margin-bottom: 10px;">
-                <strong>Collaborative Drawing Board</strong>
-            </div>
-            <div style="margin-bottom: 10px;">
-                <div>Brush Size: <span id="drawing-brush-size">5</span></div>
-                <input type="range" id="drawing-brush-size-slider" min="1" max="50" value="5" style="width: 100%; margin-top: 5px;">
-            </div>
-            <div style="margin-top: 10px;">
-                <label for="drawing-color-picker" style="display: block; margin-bottom: 5px;">Color:</label>
-                <input type="color" id="drawing-color-picker" value="#000000" style="width: 60px; height: 30px; cursor: pointer; border: 2px solid #333; border-radius: 4px;">
-                <span id="drawing-color-display" style="margin-left: 10px;">#000000</span>
-            </div>
-            <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #ccc;">
-                <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Active Users: <span id="drawing-user-count">1</span></div>
-                <button onclick="clearDrawingBoard()" style="padding: 8px 15px; font-size: 14px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 5px;">Clear Canvas</button>
-            </div>
-        </div>
-        <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
-    </div>
-    
-    <!-- Remote Desktop page -->
-    <div class="page remote-desktop-page hidden" id="remoteDesktopPage">
-        <div id="remoteDesktop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #008080; font-family: 'MS Sans Serif', Arial, sans-serif; overflow: hidden;">
-            <!-- Desktop Icons Container -->
-            <div id="desktopIcons" style="position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 40px); padding: 10px;">
-                <!-- Icons will be added here dynamically -->
-            </div>
-            
-            <!-- Taskbar -->
-            <div id="taskbar" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background: #c0c0c0; border-top: 2px solid #ffffff; display: flex; align-items: center; padding: 0 4px; z-index: 1000;">
-                <button id="startButton" style="height: 32px; padding: 0 12px; background: #c0c0c0; border: 2px outset #c0c0c0; font-family: 'MS Sans Serif', Arial, sans-serif; font-size: 11px; font-weight: bold; cursor: pointer; margin-right: 4px;">Start</button>
-                <div id="taskbarApps" style="flex: 1; display: flex; align-items: center; gap: 2px;"></div>
-            </div>
-            
-            <!-- Context Menu -->
-            <div id="desktopContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                <div class="context-menu-item" data-action="add-paper" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">New Paper</div>
-                <div class="context-menu-item" data-action="add-paint" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">New Paint</div>
-            </div>
-            
-            <!-- Icon Context Menu -->
-            <div id="iconContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                <div class="context-menu-item" onclick="openSelectedIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Open</div>
-                <div class="context-menu-item" onclick="renameDesktopIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Rename</div>
-                <div class="context-menu-item" onclick="deleteDesktopIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Delete</div>
-            </div>
-            
-            <!-- Computer Context Menu -->
-            <div id="computerContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                <div class="context-menu-item" onclick="powerOffDesktop()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Power Off</div>
-            </div>
-        </div>
-    </div>
+        // DOM elements
+        const signinForm = document.getElementById('signin-form');
+        const signupForm = document.getElementById('signup-form');
+        const userInfo = document.getElementById('user-info');
+        const signinFormElement = document.getElementById('signin-form-element');
+        const signupFormElement = document.getElementById('signup-form-element');
+        const switchToSignup = document.getElementById('switch-to-signup');
+        const switchToSignin = document.getElementById('switch-to-signin');
+        const logoutBtn = document.getElementById('logout-btn');
         
-    <!-- Coinflip page -->
-    <div class="page coinflip-page hidden" id="coinflipPage">
-        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Coin Flip</h1>
-        <div id="money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 15px; font-weight: bold;">
-            Money: $<span id="money-count">0</span>
-            </div>
-        <div id="win-chance-display" style="color: #58a6ff; font-size: 18px; margin-bottom: 20px;">
-            Win Chance: <span id="win-chance-percent">50</span>%
-        </div>
-        <div id="coin-container" style="width: 200px; height: 200px; margin: 20px auto; position: relative; perspective: 1000px;">
-            <div id="coin" style="width: 200px; height: 200px; position: relative; transform-style: preserve-3d; transition: transform 0.6s;">
-                <div id="coin-front" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border: 8px solid #c9a520; display: flex; align-items: center; justify-content: center; font-size: 72px; font-weight: bold; color: #8b6914; backface-visibility: hidden; transform: rotateY(0deg);">H</div>
-                <div id="coin-back" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border: 8px solid #c9a520; display: flex; align-items: center; justify-content: center; font-size: 72px; font-weight: bold; color: #8b6914; backface-visibility: hidden; transform: rotateY(180deg);">T</div>
-            </div>
-        </div>
-        <div id="coinflip-result" style="color: #c9d1d9; font-size: 24px; margin: 20px 0; min-height: 30px;"></div>
-        <div style="margin: 30px 0;">
-            <button id="heads-btn" onclick="guessCoin('heads')" style="padding: 15px 30px; margin: 10px; font-size: 18px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Heads</button>
-            <button id="tails-btn" onclick="guessCoin('tails')" style="padding: 15px 30px; margin: 10px; font-size: 18px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Tails</button>
-        </div>
-        <div id="streak-display" style="color: #58a6ff; font-size: 20px; margin-top: 20px;">
-            Streak: <span id="streak-count">0</span>
-        </div>
-    </div>
-    
-    <!-- Clicker page -->
-    <div class="page clicker-page hidden" id="clickerPage">
-        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Clicker Game</h1>
-        <div id="clicker-money-display" style="color: #ffd700; font-size: 24px; margin-bottom: 15px; font-weight: bold;">
-            Money: $<span id="clicker-money-count">0</span>
-        </div>
-        <div id="clicker-per-click" style="color: #58a6ff; font-size: 18px; margin-bottom: 20px;">
-            Money Per Click: $<span id="clicker-amount">1</span>
-        </div>
-        <div style="margin: 40px 0;">
-            <button id="clicker-button" onclick="clickMoney()" style="padding: 30px 60px; font-size: 32px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.1s; user-select: none;">CLICK ME!</button>
-        </div>
-    </div>
-    
-    <!-- Achievements page -->
-    <div class="page achievements-page hidden" id="achievementsPage">
-        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 10px;">Achievements</h1>
-        <div id="achievements-stats" style="color: #58a6ff; font-size: 18px; margin-bottom: 20px;">
-            Found: <span id="found-count">0</span> / <span id="total-count">256</span>
-                </div>
-        <div id="achievements-grid" class="achievements-grid">
-            <!-- Achievements will be generated here -->
-            </div>
-        <div style="margin-top: 30px;">
-            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
-        </div>
-    </div>
-
-    <!-- Goose Rain page -->
-    <div class="page gooserain-page hidden" id="gooserainPage">
-        <canvas id="gooseCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #87CEEB 0%, #98D8C8 100%); cursor: crosshair;"></canvas>
-        <div style="position: fixed; top: 20px; left: 20px; color: white; font-size: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 1000;">
-            Geese: <span id="goose-count">0</span>
-                </div>
-        <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
-            </div>
-    
-    <!-- Stones page -->
-    <div class="page stones-page hidden" id="stonesPage">
-        <canvas id="stonesCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #4682B4 0%, #5F9EA0 60%, #D2B48C 60%, #CD853F 100%); cursor: crosshair;"></canvas>
-        <div style="position: fixed; top: 20px; left: 20px; color: white; font-size: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 1000;">
-            Stones: <span id="stones-count">0</span>
-        </div>
-        <div style="position: fixed; top: 50px; left: 20px; color: white; font-size: 16px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 1000;">
-            Press E to spawn stones
-        </div>
-        <button onclick="showPage('mainPage')" style="position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; z-index: 1000;">Back</button>
-    </div>
-    
-    <!-- Limbo page (blocked) -->
-    <div class="page limbo-page hidden" id="limboPage">
-        <h1 style="color: #f85149; font-size: 48px; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">⚠️ BLOCKED ⚠️</h1>
-        <p style="color: #c9d1d9; font-size: 24px; margin-bottom: 40px; text-align: center;">Your blocked from this website</p>
-        <p style="color: #8b949e; font-size: 18px; margin-bottom: 30px;">Enter the password to be unblocked:</p>
-        <input type="text" id="limboPasswordInput" placeholder="Password" style="padding: 15px 20px; font-size: 20px; background: #161b22; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; margin-bottom: 20px; text-align: center; min-width: 250px;">
-        <button id="limboSubmitBtn" onclick="checkLimboPassword()" style="padding: 15px 40px; font-size: 20px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Submit</button>
-        <p id="limboError" style="color: #f85149; font-size: 16px; margin-top: 20px; min-height: 24px;"></p>
-    </div>
-    
-    <!-- Panic Menu page -->
-    <div class="page panicmenu-page hidden" id="panicmenuPage">
-        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Panic Menu</h1>
-        <p style="color: #8b949e; font-size: 16px; margin-bottom: 30px;">Set a hotkey and URL to quickly swap tabs</p>
-        <div style="max-width: 500px; margin: 0 auto;">
-            <div style="margin-bottom: 20px;">
-                <label style="color: #c9d1d9; font-size: 18px; display: block; margin-bottom: 10px;">Hotkey:</label>
-                <input type="text" id="panicHotkeyInput" placeholder="Press a key..." style="width: 100%; padding: 12px; font-size: 16px; background: #161b22; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; text-align: center;" readonly>
-                <p style="color: #8b949e; font-size: 14px; margin-top: 5px;">Click the input and press a key to set</p>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="color: #c9d1d9; font-size: 18px; display: block; margin-bottom: 10px;">Website URL:</label>
-                <input type="text" id="panicUrlInput" placeholder="https://example.com" style="width: 100%; padding: 12px; font-size: 16px; background: #161b22; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9;">
-            </div>
-            <button onclick="savePanicSettings()" style="width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px;">Save Settings</button>
-            <div id="panicStatus" style="color: #58a6ff; font-size: 16px; text-align: center; min-height: 24px; margin-bottom: 20px;"></div>
-            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer;">Back</button>
-        </div>
-    </div>
-    
-    <!-- Suggestions page -->
-    <div class="page suggestions-page hidden" id="suggestionsPage">
-        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">💡 Suggestions</h1>
-        <p style="color: #8b949e; font-size: 16px; margin-bottom: 30px;">View and create suggestions for the website</p>
-        <div style="max-width: 900px; margin: 0 auto;">
-            <!-- Create suggestion form -->
-            <div style="background: #161b22; border: 2px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
-                <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 15px;">Create New Suggestion</h2>
-                <textarea id="suggestion-input" placeholder="Enter your suggestion here..." style="width: 100%; min-height: 100px; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; margin-bottom: 15px; font-family: inherit; resize: vertical;" maxlength="500"></textarea>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span id="suggestion-char-count" style="color: #8b949e; font-size: 14px;">0/500 characters</span>
-                    <button onclick="submitSuggestion()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Submit Suggestion</button>
-                </div>
-            </div>
+        // Form switching
+        switchToSignup.addEventListener('click', () => {
+            signinForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+            clearMessages();
+        });
+        
+        switchToSignin.addEventListener('click', () => {
+            signupForm.classList.add('hidden');
+            signinForm.classList.remove('hidden');
+            clearMessages();
+        });
+        
+        // Show error message
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Show success message
+        function showSuccess(elementId, message) {
+            const successEl = document.getElementById(elementId);
+            successEl.textContent = message;
+            successEl.classList.add('show');
+            setTimeout(() => {
+                successEl.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Clear messages
+        function clearMessages() {
+            document.querySelectorAll('.error-message, .success-message').forEach(el => {
+                el.classList.remove('show');
+            });
+        }
+        
+        // Sign in
+        signinFormElement.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+            const signinBtn = document.getElementById('signin-btn');
             
-            <!-- Suggestions list -->
-            <div id="suggestions-list" style="background: #161b22; border: 2px solid #30363d; border-radius: 8px; padding: 20px;">
-                <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 20px;">All Suggestions</h2>
-                <div id="suggestions-content" style="color: #c9d1d9;">
-                    <p style="color: #8b949e; text-align: center; padding: 20px;">Loading suggestions...</p>
-                </div>
-            </div>
-        </div>
-        <div style="margin-top: 30px;">
-            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
-        </div>
-    </div>
-    
-    <!-- Changelog page -->
-    <div class="page changelog-page hidden" id="changelogPage">
-        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">📝 Changelog</h1>
-        <p style="color: #8b949e; font-size: 16px; margin-bottom: 30px;">Track of all additions and updates to the website</p>
-        <div style="max-width: 800px; margin: 0 auto; text-align: left;">
-            <div id="changelog-content" style="background: #161b22; border: 2px solid #30363d; border-radius: 8px; padding: 20px; color: #c9d1d9;">
-                <!-- Changelog entries will be displayed here -->
-            </div>
-        </div>
-        <div style="margin-top: 30px;">
-            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
-        </div>
-    </div>
-    
-    <!-- Background Selection page -->
-    <div class="page background-page hidden" id="backgroundPage">
-        <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Background Selection</h1>
-        <div id="bg-theme-warning" style="display: none; padding: 15px; margin-bottom: 20px; background: #f85149; color: white; border-radius: 8px; font-size: 16px; max-width: 600px;">
-            <strong>⚠️ Background colors only work on Dark or Light theme.</strong> Switch to one of those themes to use custom backgrounds.
-        </div>
-        <div style="margin-bottom: 30px;">
-            <button id="bg-solid-btn" onclick="setBgMode('solid')" style="padding: 10px 20px; margin: 5px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer;">Solid Color</button>
-            <button id="bg-gradient-btn" onclick="setBgMode('gradient')" style="padding: 10px 20px; margin: 5px; font-size: 16px; font-weight: bold; background: #30363d; color: white; border: none; border-radius: 6px; cursor: pointer;">Gradient (2 Colors)</button>
-        </div>
-        <div id="bg-solid-section" style="display: none;">
-            <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 15px;">Select Color</h2>
-            <div id="bg-solid-colors" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; max-width: 800px; margin-bottom: 20px;">
-                <!-- Colors will be generated here -->
-            </div>
-        </div>
-        <div id="bg-gradient-section" style="display: none;">
-            <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 15px;">Select 2 Colors</h2>
-            <div style="margin-bottom: 15px;">
-                <p style="color: #8b949e; font-size: 16px;">Color 1: <span id="bg-gradient-color1-name" style="color: #c9d1d9; font-weight: bold;">Not selected</span></p>
-                <p style="color: #8b949e; font-size: 16px;">Color 2: <span id="bg-gradient-color2-name" style="color: #c9d1d9; font-weight: bold;">Not selected</span></p>
-            </div>
-            <div id="bg-gradient-colors" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; max-width: 800px; margin-bottom: 20px;">
-                <!-- Colors will be generated here -->
-            </div>
-            <button id="bg-apply-gradient-btn" onclick="applyGradientBackground()" disabled style="padding: 12px 24px; font-size: 18px; font-weight: bold; background: #30363d; color: white; border: none; border-radius: 8px; cursor: not-allowed; margin-top: 20px;">Apply Gradient</button>
-        </div>
-        <div style="margin-top: 30px;">
-            <button onclick="showPage('mainPage')" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #f85149; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Back</button>
-        </div>
-    </div>
-    
-    <!-- Remote Desktop page -->
-    <div class="page remote-desktop-page hidden" id="remoteDesktopPage">
-        <div id="remoteDesktop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #008080; font-family: 'MS Sans Serif', Arial, sans-serif; overflow: hidden;">
-            <!-- Desktop icons container -->
-            <div id="desktopIcons" style="position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 40px); padding: 10px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 20px;">
-                <!-- Icons will be added here dynamically -->
-            </div>
+            signinBtn.disabled = true;
+            signinBtn.textContent = 'Signing in...';
             
-            <!-- Taskbar -->
-            <div id="taskbar" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background: #c0c0c0; border-top: 2px solid #ffffff; display: flex; align-items: center; padding: 0 4px; z-index: 1000; box-shadow: 0 -2px 4px rgba(0,0,0,0.3);">
-                <div style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; margin: 2px; cursor: pointer; font-size: 11px; font-weight: bold; user-select: none;" onclick="showPage('mainPage')">
-                    Start
-                </div>
-                <div id="taskbarApps" style="flex: 1; display: flex; gap: 2px; padding: 0 4px;">
-                    <!-- Taskbar buttons will be added here -->
-                </div>
-            </div>
-        </div>
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showSuccess('success-message', 'Signed in successfully!');
+            } catch (error) {
+                showError('error-message', error.message);
+            } finally {
+                signinBtn.disabled = false;
+                signinBtn.textContent = 'Sign In';
+            }
+        });
         
-        <!-- Right-click context menu -->
-        <div id="desktopContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-            <div class="context-menu-item" onclick="addDesktopApp('paper')" style="padding: 4px 20px; cursor: pointer; font-size: 11px; background: transparent; border: none; text-align: left; width: 100%;">New Paper</div>
-            <div class="context-menu-item" onclick="addDesktopApp('paint')" style="padding: 4px 20px; cursor: pointer; font-size: 11px; background: transparent; border: none; text-align: left; width: 100%;">New Paint</div>
-        </div>
+        // Sign up
+        signupFormElement.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const signupBtn = document.getElementById('signup-btn');
+            
+            if (password !== confirmPassword) {
+                showError('error-message-signup', 'Passwords do not match');
+                return;
+            }
+            
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating account...';
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                // Save user data to database
+                await database.ref('users/' + userCredential.user.uid).set({
+                    email: email,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                });
+                showSuccess('success-message-signup', 'Account created successfully!');
+            } catch (error) {
+                showError('error-message-signup', error.message);
+            } finally {
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Sign Up';
+            }
+        });
         
-        <!-- Icon right-click menu -->
-        <div id="iconContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-            <div class="context-menu-item" onclick="renameDesktopIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; background: transparent; border: none; text-align: left; width: 100%;">Rename</div>
-            <div class="context-menu-item" onclick="deleteDesktopIcon()" style="padding: 4px 20px; cursor: pointer; font-size: 11px; background: transparent; border: none; text-align: left; width: 100%;">Delete</div>
-        </div>
+        // Logout
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+            } catch (error) {
+                showError('error-message', error.message);
+            }
+        });
         
-        <!-- Trash can -->
-        <div id="trashCan" class="desktop-icon" style="position: absolute; bottom: 50px; right: 10px; width: 80px; text-align: center; cursor: pointer; user-select: none;" draggable="false">
-            <div style="width: 32px; height: 32px; margin: 0 auto 4px; background: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect x=%228%22 y=%228%22 width=%2216%22 height=%2216%22 fill=%22%23000%22/><rect x=%2210%22 y=%2210%22 width=%2212%22 height=%222%22 fill=%22%23000%22/><rect x=%2212%22 y=%2212%22 width=%228%22 height=%222%22 fill=%22%23fff%22/></svg>') no-repeat center; background-size: contain;"></div>
-            <div style="font-size: 11px; color: #fff; text-shadow: 1px 1px 1px #000;">Trash</div>
-        </div>
-    </div>
-    
-    <!-- Clock display (top left) -->
-    <div class="clock-display hidden" id="clockDisplay"></div>
-    
-    <!-- Edit Profile Modal -->
-    <div class="edit-modal" id="editModal">
-        <div class="edit-modal-content">
-            <h2>✏️ Edit Profile</h2>
-            <div class="edit-form">
-                <div class="edit-field">
-                    <label>User ID:</label>
-                    <input type="text" id="editUserId" placeholder="Your user ID" maxlength="20">
-                    <small>3-20 characters (letters, numbers, _, -)</small>
-                </div>
-                <div class="edit-field">
-                    <label>Bio:</label>
-                    <textarea id="editBio" placeholder="Tell us about yourself..." maxlength="200"></textarea>
-                    <small><span id="bioCharCount">0</span>/200 characters</small>
-                </div>
-                <div class="edit-field">
-                    <label>Avatar Emoji:</label>
-                    <div class="emoji-picker">
-                        <div class="emoji-preview" id="emojiPreview">👤</div>
-                        <div class="emoji-grid" id="emojiGrid">
-                            <!-- Emojis will be populated here -->
-                        </div>
-                    </div>
-                </div>
-                <div class="edit-buttons">
-                    <button class="edit-save-btn" id="editSaveBtn">Save</button>
-                    <button class="edit-cancel-btn" id="editCancelBtn">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Terms and Agreements Modal -->
-    <div class="terms-modal" id="termsModal">
-        <div class="terms-modal-content">
-            <h2>📋 Terms and Agreements</h2>
-            <div class="terms-text">
-                <p><strong>Welcome to FinHub!</strong></p>
-                <p>By using this website, you agree to the following terms:</p>
-                <ul>
-                    <li><strong>Be Respectful:</strong> No inappropriate content, harassment, or offensive language</li>
-                    <li><strong>No Inappropriate Drawings:</strong> Keep drawings appropriate and respectful</li>
-                    <li><strong>No Bad Words:</strong> Keep chat clean and friendly</li>
-                    <li><strong>Respect Others:</strong> Be kind to other users</li>
-                    <li><strong>No Spam:</strong> Don't spam messages or flood the chat</li>
-                    <li><strong>Privacy:</strong> Don't share personal information</li>
-                </ul>
-                <p><strong>Violations may result in being banned from the service.</strong></p>
-                <p>By clicking "I Agree", you acknowledge that you have read and agree to these terms.</p>
-            </div>
-            <div class="terms-buttons">
-                <button class="terms-agree-btn" id="termsAgreeBtn">I Agree</button>
-                <button class="terms-disagree-btn" id="termsDisagreeBtn">I Disagree</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Command feedback display -->
-    <div class="command-feedback hidden" id="commandFeedback">
-        <span class="command-text"></span><span class="feedback-text"></span>
-    </div>
-    
-    <!-- Chat Page -->
-    <div class="page hidden" id="chatPage">
-        <div class="chat-container">
-            <div class="chat-header">
-                <h2>💬 Online Chat</h2>
-            </div>
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-container">
-                <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="500">
-                <button class="chat-send-btn" id="chatSendBtn">Send</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Friends List Modal -->
-    <div class="friends-modal" id="friendsModal">
-        <div class="friends-modal-content">
-            <h2>👥 My Friends</h2>
-            <div class="friends-list" id="friendsList">
-                <!-- Friends will be populated here -->
-            </div>
-            <div class="friends-buttons">
-                <button class="friends-close-btn" id="friendsCloseBtn">Close</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Private Chat Page -->
-    <div class="page hidden" id="privateChatPage">
-        <div class="chat-container">
-            <div class="chat-header">
-                <h2 id="privateChatTitle">💬 Private Chat</h2>
-                <button class="chat-back-btn" id="privateChatBackBtn">← Back to Friends</button>
-            </div>
-            <div class="chat-messages" id="privateChatMessages"></div>
-            <div class="chat-input-container">
-                <input type="text" class="chat-input" id="privateChatInput" placeholder="Type a message..." maxlength="500">
-                <button class="chat-send-btn" id="privateChatSendBtn">Send</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Board View Page -->
-    <div class="page hidden" id="boardViewPage">
-        <div style="padding: 20px; max-width: 800px; margin: 0 auto; background: #0d1117; min-height: 100vh; color: #c9d1d9;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 id="boardViewTitle" style="color: #58a6ff; margin: 0;">📋 Board</h2>
-                <button onclick="showPage('mainPage')" style="background: #238636; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">Back</button>
-            </div>
-            <div id="boardContent" style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; min-height: 400px;">
-                <div style="text-align: center; color: #666; padding: 40px;">Loading board...</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Board Edit Page -->
-    <div class="page hidden" id="boardEditPage">
-        <div style="padding: 20px; max-width: 800px; margin: 0 auto; background: #0d1117; min-height: 100vh; color: #c9d1d9;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: #58a6ff; margin: 0;">✏️ Edit Your Board</h2>
-                <button onclick="showPage('mainPage')" style="background: #238636; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">Back</button>
-            </div>
-            <div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px;">
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-weight: bold;">Text Content:</label>
-                    <textarea id="boardTextInput" placeholder="Write something on your board..." style="width: 100%; min-height: 200px; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 14px; font-family: inherit; resize: vertical;"></textarea>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-weight: bold;">Upload Images:</label>
-                    <input type="file" id="boardImageInput" accept="image/*" multiple style="display: none;">
-                    <button onclick="document.getElementById('boardImageInput').click()" style="background: #238636; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-bottom: 10px;">Choose Images</button>
-                    <div id="boardImagesPreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;"></div>
-                </div>
-                <div id="boardExistingImages" style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-weight: bold;">Current Images:</label>
-                    <div id="boardExistingImagesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;"></div>
-                </div>
-                <button onclick="saveBoard()" style="background: #238636; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;">Save Board</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Visit Counter -->
-    <div class="visit-counter" id="visitCounter">
-        <div class="visit-counter-number" id="visitCounterNumber">0</div>
-        <div class="visit-counter-label">Total Visits</div>
-    </div>
-    
-    <!-- Command history toggle -->
-    <div class="command-history-toggle" id="commandHistoryToggle" title="Click to toggle command history">📜 History</div>
-    
-    <!-- Command history display -->
-    <div class="command-history" id="commandHistory">
-        <div class="command-history-header">Command History (Last 10)</div>
-        <div id="commandHistoryEntries"></div>
-    </div>
-    
-    <!-- Command bar in bottom left -->
-    <div class="command-bar">
-        <input type="text" class="command-input" id="commandInput" placeholder="Type a color or 'home'..." autocomplete="off">
-    </div>
-    
-        <!-- Commands menu - draggable -->
-    <div class="commands-menu" id="commandsMenu">
-        <div class="commands-menu-header" id="commandsMenuHeader">
-            <h3>Commands</h3>
-            <button class="commands-menu-close" id="commandsMenuClose">×</button>
-        </div>
-        <div class="commands-list" id="commandsList">
-            <!-- Commands will be dynamically generated based on unlocks -->
-        </div>
-    </div>
-
-    <script src="app.js"></script>
-
+        // Auth state observer
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                signinForm.classList.add('hidden');
+                signupForm.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                document.getElementById('user-email').textContent = user.email;
+            } else {
+                // User is signed out
+                userInfo.classList.add('hidden');
+                signinForm.classList.remove('hidden');
+            }
+        });
+    </script>
 </body>
 </html>
