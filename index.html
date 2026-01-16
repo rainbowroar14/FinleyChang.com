@@ -16892,6 +16892,23 @@ body.theme-flashcard button:hover {
                 console.error('Error cleaning up theme elements:', e);
             }
             
+            // Check login status (but continue initialization)
+            try {
+                if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
+                    if (typeof showPage === 'function') {
+                        showPage('loginPage');
+                    }
+                } else if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+                    // Load user data if logged in
+                    const username = localStorage.getItem('loggedInUsername');
+                    if (username && typeof loadUserData === 'function') {
+                        loadUserData(username);
+                    }
+                }
+            } catch (e) {
+                console.error('Error checking login:', e);
+            }
+            
             // Load data
             try {
                 if (typeof loadGlobalData === 'function') loadGlobalData();
