@@ -3558,6 +3558,45 @@ body.theme-flashcard button:hover {
         <p id="limboError" style="color: #f85149; font-size: 16px; margin-top: 20px; min-height: 24px;"></p>
     </div>
     
+    <!-- Login page -->
+    <div class="page login-page hidden" id="loginPage">
+        <div style="max-width: 400px; margin: 0 auto; padding: 40px; background: #161b22; border: 2px solid #30363d; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+            <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 30px; text-align: center;">Clever Portal</h1>
+            <div id="login-form">
+                <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 20px; text-align: center;">Login</h2>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Username:</label>
+                    <input type="text" id="login-username" placeholder="Enter username" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Password:</label>
+                    <input type="password" id="login-password" placeholder="Enter password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
+                </div>
+                <button id="login-submit-btn" onclick="handleLogin()" style="width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 15px;">Login</button>
+                <button onclick="showRegisterForm()" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #58a6ff; border: 2px solid #58a6ff; border-radius: 8px; cursor: pointer;">Create Account</button>
+                <p id="login-error" style="color: #f85149; font-size: 14px; margin-top: 15px; text-align: center; min-height: 20px;"></p>
+            </div>
+            <div id="register-form" style="display: none;">
+                <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 20px; text-align: center;">Register</h2>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Username (3-20 chars, alphanumeric):</label>
+                    <input type="text" id="register-username" placeholder="Choose username" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Password:</label>
+                    <input type="password" id="register-password" placeholder="Choose password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Confirm Password:</label>
+                    <input type="password" id="register-password-confirm" placeholder="Confirm password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
+                </div>
+                <button id="register-submit-btn" onclick="handleRegister()" style="width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 15px;">Register</button>
+                <button onclick="showLoginForm()" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #58a6ff; border: 2px solid #58a6ff; border-radius: 8px; cursor: pointer;">Back to Login</button>
+                <p id="register-error" style="color: #f85149; font-size: 14px; margin-top: 15px; text-align: center; min-height: 20px;"></p>
+            </div>
+        </div>
+    </div>
+    
     <!-- Panic Menu page -->
     <div class="page panicmenu-page hidden" id="panicmenuPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Panic Menu</h1>
@@ -4564,6 +4603,12 @@ body.theme-flashcard button:hover {
         
         // Navigation system
         function showPage(pageId) {
+            // Check if login is required (all pages except loginPage)
+            if (pageId !== 'loginPage' && !isLoggedIn()) {
+                showPage('loginPage');
+                return;
+            }
+            
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.add('hidden');
             });
@@ -4572,7 +4617,7 @@ body.theme-flashcard button:hover {
             // Show/hide command bar based on page
             const commandBar = document.querySelector('.command-bar');
             if (commandBar) {
-                if (pageId === 'remoteDesktopPage') {
+                if (pageId === 'remoteDesktopPage' || pageId === 'loginPage') {
                     commandBar.style.display = 'none';
                 } else {
                     commandBar.style.display = 'flex';
@@ -4965,6 +5010,37 @@ body.theme-flashcard button:hover {
         
         // Initialize command history toggle
         document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in on page load
+            if (!isLoggedIn()) {
+                showPage('loginPage');
+            } else {
+                // Load user data if logged in
+                const username = localStorage.getItem('loggedInUsername');
+                if (username) {
+                    loadUserData(username);
+                }
+            }
+            
+            // Add Enter key handlers for login/register
+            const loginPassword = document.getElementById('login-password');
+            const registerPasswordConfirm = document.getElementById('register-password-confirm');
+            
+            if (loginPassword) {
+                loginPassword.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleLogin();
+                    }
+                });
+            }
+            
+            if (registerPasswordConfirm) {
+                registerPasswordConfirm.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleRegister();
+                    }
+                });
+            }
+            
             const toggle = document.getElementById('commandHistoryToggle');
             if (toggle) {
                 toggle.addEventListener('click', toggleCommandHistory);
@@ -5121,8 +5197,35 @@ body.theme-flashcard button:hover {
             console.log('ℹ️ Running in offline mode (localStorage). To enable online chat, configure Firebase.');
         }
         
-        // User Profile System
+        // User Profile System with Login
+        let currentUsername = null;
+        
+        // Simple password hashing (for demo - in production use proper hashing)
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash.toString(36);
+        }
+        
+        // Check if user is logged in
+        function isLoggedIn() {
+            const loggedInUser = localStorage.getItem('loggedInUsername');
+            return loggedInUser !== null;
+        }
+        
+        // Get current username (logged in user or fallback to userId)
         function getUserId() {
+            const loggedInUser = localStorage.getItem('loggedInUsername');
+            if (loggedInUser) {
+                currentUsername = loggedInUser;
+                return loggedInUser;
+            }
+            
+            // Fallback to old system if not logged in
             let userId = localStorage.getItem('userId');
             if (!userId) {
                 // Generate a more unique ID using timestamp + random to avoid collisions
@@ -5148,6 +5251,240 @@ body.theme-flashcard button:hover {
             }
             return userId;
         }
+        
+        // Login function
+        function handleLogin() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            if (!username || !password) {
+                errorEl.textContent = 'Please enter both username and password';
+                return;
+            }
+            
+            // Validate username format
+            const validIdPattern = /^[a-zA-Z0-9_-]{3,20}$/;
+            if (!validIdPattern.test(username)) {
+                errorEl.textContent = 'Username must be 3-20 characters (alphanumeric, _, -)';
+                return;
+            }
+            
+            if (database) {
+                database.ref(`accounts/${username}`).once('value', (snapshot) => {
+                    if (!snapshot.exists()) {
+                        errorEl.textContent = 'Username not found';
+                        return;
+                    }
+                    
+                    const accountData = snapshot.val();
+                    const passwordHash = hashPassword(password);
+                    
+                    if (accountData.passwordHash === passwordHash) {
+                        // Login successful
+                        localStorage.setItem('loggedInUsername', username);
+                        currentUsername = username;
+                        
+                        // Load user data from Firebase
+                        loadUserData(username);
+                        
+                        // Hide login page and show main page
+                        showPage('mainPage');
+                        errorEl.textContent = '';
+                        document.getElementById('login-username').value = '';
+                        document.getElementById('login-password').value = '';
+                    } else {
+                        errorEl.textContent = 'Incorrect password';
+                    }
+                });
+            } else {
+                errorEl.textContent = 'Database not available. Please check your connection.';
+            }
+        }
+        
+        // Register function
+        function handleRegister() {
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
+            const errorEl = document.getElementById('register-error');
+            
+            if (!username || !password || !passwordConfirm) {
+                errorEl.textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            // Validate username format
+            const validIdPattern = /^[a-zA-Z0-9_-]{3,20}$/;
+            if (!validIdPattern.test(username)) {
+                errorEl.textContent = 'Username must be 3-20 characters (alphanumeric, _, -)';
+                return;
+            }
+            
+            if (password.length < 4) {
+                errorEl.textContent = 'Password must be at least 4 characters';
+                return;
+            }
+            
+            if (password !== passwordConfirm) {
+                errorEl.textContent = 'Passwords do not match';
+                return;
+            }
+            
+            if (database) {
+                // Check if username already exists
+                database.ref(`accounts/${username}`).once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        errorEl.textContent = 'Username already taken';
+                        return;
+                    }
+                    
+                    // Create account
+                    const passwordHash = hashPassword(password);
+                    database.ref(`accounts/${username}`).set({
+                        username: username,
+                        passwordHash: passwordHash,
+                        createdAt: Date.now()
+                    }).then(() => {
+                        // Auto-login after registration
+                        localStorage.setItem('loggedInUsername', username);
+                        currentUsername = username;
+                        
+                        // Initialize user data
+                        initializeUserData(username);
+                        
+                        // Hide register form and show main page
+                        showPage('mainPage');
+                        errorEl.textContent = '';
+                        document.getElementById('register-username').value = '';
+                        document.getElementById('register-password').value = '';
+                        document.getElementById('register-password-confirm').value = '';
+                    }).catch((error) => {
+                        errorEl.textContent = 'Registration failed: ' + error.message;
+                    });
+                });
+            } else {
+                errorEl.textContent = 'Database not available. Please check your connection.';
+            }
+        }
+        
+        // Show register form
+        function showRegisterForm() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('login-error').textContent = '';
+            document.getElementById('register-error').textContent = '';
+        }
+        
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('login-error').textContent = '';
+            document.getElementById('register-error').textContent = '';
+        }
+        
+        // Logout function
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('loggedInUsername');
+                currentUsername = null;
+                showPage('loginPage');
+            }
+        }
+        
+        // Load user data from Firebase
+        function loadUserData(username) {
+            if (!database) return;
+            
+            database.ref(`userData/${username}`).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    
+                    // Load all user data into localStorage
+                    if (userData.notes) {
+                        localStorage.setItem(`notes_${username}`, userData.notes);
+                    }
+                    if (userData.code) {
+                        localStorage.setItem(`code_${username}`, userData.code);
+                    }
+                    if (userData.calendarEvents) {
+                        localStorage.setItem(`calendar_events_${username}`, JSON.stringify(userData.calendarEvents));
+                    }
+                    if (userData.files) {
+                        localStorage.setItem(`files_${username}`, JSON.stringify(userData.files));
+                    }
+                    if (userData.desktopIcons) {
+                        localStorage.setItem('desktopIcons', JSON.stringify(userData.desktopIcons));
+                    }
+                    if (userData.bio) {
+                        const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
+                        bios[username] = userData.bio;
+                        localStorage.setItem('userBios', JSON.stringify(bios));
+                    }
+                    if (userData.avatar) {
+                        const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
+                        avatars[username] = userData.avatar;
+                        localStorage.setItem('userAvatars', JSON.stringify(avatars));
+                    }
+                    if (userData.friends) {
+                        localStorage.setItem('friends', JSON.stringify(userData.friends));
+                    }
+                    if (userData.board) {
+                        localStorage.setItem(`board_${username}`, JSON.stringify(userData.board));
+                    }
+                }
+            });
+        }
+        
+        // Save user data to Firebase
+        function saveUserDataToFirebase(username) {
+            if (!database || !username) return;
+            
+            const userData = {
+                notes: localStorage.getItem(`notes_${username}`) || '',
+                code: localStorage.getItem(`code_${username}`) || '',
+                calendarEvents: JSON.parse(localStorage.getItem(`calendar_events_${username}`) || '[]'),
+                files: JSON.parse(localStorage.getItem(`files_${username}`) || '[]'),
+                desktopIcons: JSON.parse(localStorage.getItem('desktopIcons') || '[]'),
+                bio: (JSON.parse(localStorage.getItem('userBios') || '{}'))[username] || '',
+                avatar: (JSON.parse(localStorage.getItem('userAvatars') || '{}'))[username] || '',
+                friends: JSON.parse(localStorage.getItem('friends') || '[]'),
+                board: JSON.parse(localStorage.getItem(`board_${username}`) || '{}'),
+                lastSynced: Date.now()
+            };
+            
+            database.ref(`userData/${username}`).set(userData);
+        }
+        
+        // Initialize user data structure
+        function initializeUserData(username) {
+            if (!database) return;
+            
+            const userData = {
+                notes: '',
+                code: '',
+                calendarEvents: [],
+                files: [],
+                desktopIcons: [],
+                bio: '',
+                avatar: '',
+                friends: [],
+                board: {},
+                createdAt: Date.now(),
+                lastSynced: Date.now()
+            };
+            
+            database.ref(`userData/${username}`).set(userData);
+        }
+        
+        // Auto-save user data periodically
+        setInterval(() => {
+            if (isLoggedIn()) {
+                const username = localStorage.getItem('loggedInUsername');
+                saveUserDataToFirebase(username);
+            }
+        }, 30000); // Save every 30 seconds
         
         function setUserId(newUserId) {
             if (!newUserId || newUserId.trim() === '') {
@@ -5981,6 +6318,19 @@ body.theme-flashcard button:hover {
                 };
             }
             
+            // Set up View Board button
+            if (isFriend || isOwnProfile) {
+                viewBoardItem.style.display = 'block';
+                viewBoardItem.style.cursor = 'pointer';
+                viewBoardItem.style.color = '#000';
+                viewBoardItem.onclick = () => {
+                    viewBoard(userId);
+                    contextMenu.classList.add('hidden');
+                };
+            } else {
+                viewBoardItem.style.display = 'none';
+            }
+            
             // Position and show context menu
             contextMenu.style.left = event.pageX + 'px';
             contextMenu.style.top = event.pageY + 'px';
@@ -6004,19 +6354,32 @@ body.theme-flashcard button:hover {
             if (!userId) userId = getUserId();
             if (database) {
                 return new Promise((resolve) => {
-                    database.ref(`boards/${userId}`).once('value', (snapshot) => {
+                    // First check userData (for logged-in users)
+                    database.ref(`userData/${userId}/board`).once('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
                             resolve(data);
                         } else {
-                            const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
-                            resolve(boards[userId] || { text: '', images: [] });
+                            // Fallback to old boards path
+                            database.ref(`boards/${userId}`).once('value', (snapshot2) => {
+                                const data2 = snapshot2.val();
+                                if (data2) {
+                                    resolve(data2);
+                                } else {
+                                    // Fallback to localStorage
+                                    const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
+                                    const localBoard = boards[userId] || JSON.parse(localStorage.getItem(`board_${userId}`) || 'null');
+                                    resolve(localBoard || { text: '', images: [] });
+                                }
+                            });
                         }
                     });
                 });
             } else {
+                // Check localStorage
                 const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
-                return Promise.resolve(boards[userId] || { text: '', images: [] });
+                const localBoard = boards[userId] || JSON.parse(localStorage.getItem(`board_${userId}`) || 'null');
+                return Promise.resolve(localBoard || { text: '', images: [] });
             }
         }
         
@@ -6026,7 +6389,17 @@ body.theme-flashcard button:hover {
             const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
             boards[userId] = boardObj;
             localStorage.setItem('userBoards', JSON.stringify(boards));
-            if (database) database.ref(`boards/${userId}`).set(boardObj);
+            localStorage.setItem(`board_${userId}`, JSON.stringify(boardObj));
+            
+            if (database) {
+                // Save to both old path (for compatibility) and new path (for logged-in users)
+                database.ref(`boards/${userId}`).set(boardObj);
+                
+                // Also save to userData if this is a logged-in user
+                if (isLoggedIn() && userId === localStorage.getItem('loggedInUsername')) {
+                    database.ref(`userData/${userId}/board`).set(boardObj);
+                }
+            }
         }
         
         function openBoardEditor() {
@@ -6212,7 +6585,11 @@ body.theme-flashcard button:hover {
                 const hasColorPalette = colorPalettes.hasOwnProperty(command);
                 
                 // Handle navigation commands
-                if (command === 'reset') {
+                if (command === 'logout') {
+                    handleLogout();
+                    commandInput.value = '';
+                    return;
+                } else if (command === 'reset') {
                     if (resetConfirm) {
                         // Second time - actually reset EVERYTHING
                         resetEverything();
@@ -13595,8 +13972,21 @@ body.theme-flashcard button:hover {
                     frames.push(frameData);
                     framesEl.textContent = frames.length;
                 }
-                // Clear canvas for next frame
+                // Clear canvas but keep previous frame as transparent background
+                // Get current canvas data
+                const currentImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                // Clear canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Draw previous frame with transparency (50% opacity)
+                if (frames.length > 0) {
+                    const prevImg = new Image();
+                    prevImg.onload = () => {
+                        ctx.globalAlpha = 0.3; // Make previous frame 30% transparent
+                        ctx.drawImage(prevImg, 0, 0);
+                        ctx.globalAlpha = 1.0; // Reset opacity
+                    };
+                    prevImg.src = frames[frames.length - 1];
+                }
                 currentFrame = null;
             };
             
@@ -14218,6 +14608,13 @@ body.theme-flashcard button:hover {
             
             saveBtn.addEventListener('click', () => {
                 localStorage.setItem(notesKey, textarea.value);
+                // Sync to Firebase if logged in
+                if (isLoggedIn()) {
+                    const username = localStorage.getItem('loggedInUsername');
+                    if (database) {
+                        database.ref(`userData/${username}/notes`).set(textarea.value);
+                    }
+                }
                 alert('Notes saved!');
             });
             
@@ -14336,6 +14733,13 @@ body.theme-flashcard button:hover {
                         if (title) {
                             events.push({ date, title, id: Date.now() });
                             localStorage.setItem(eventsKey, JSON.stringify(events));
+                            // Sync to Firebase if logged in
+                            if (isLoggedIn()) {
+                                const username = localStorage.getItem('loggedInUsername');
+                                if (database) {
+                                    database.ref(`userData/${username}/calendarEvents`).set(events);
+                                }
+                            }
                             renderCalendar();
                         }
                     }
@@ -14355,6 +14759,13 @@ body.theme-flashcard button:hover {
                                     const id = parseInt(btn.getAttribute('data-id'));
                                     events = events.filter(e => e.id !== id);
                                     localStorage.setItem(eventsKey, JSON.stringify(events));
+                                    // Sync to Firebase if logged in
+                                    if (isLoggedIn()) {
+                                        const username = localStorage.getItem('loggedInUsername');
+                                        if (database) {
+                                            database.ref(`userData/${username}/calendarEvents`).set(events);
+                                        }
+                                    }
                                     renderCalendar();
                                 });
                             });
@@ -14388,8 +14799,8 @@ body.theme-flashcard button:hover {
             window.className = 'win95-window';
             window.style.left = '150px';
             window.style.top = '100px';
-            window.style.width = '350px';
-            window.style.height = '300px';
+            window.style.width = '800px';
+            window.style.height = '600px';
             window.style.zIndex = windowZIndex;
             
             const header = document.createElement('div');
@@ -14411,81 +14822,12 @@ body.theme-flashcard button:hover {
             
             const content = document.createElement('div');
             content.className = 'win95-window-content';
-            content.style.padding = '20px';
-            content.style.textAlign = 'center';
+            content.style.padding = '0';
+            content.style.overflow = 'hidden';
             
             content.innerHTML = `
-                <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Cooper City, FL</div>
-                <div id="weather-loading" style="font-size: 12px; color: #666;">Loading weather...</div>
-                <div id="weather-content" style="display: none;">
-                    <div id="weather-temp" style="font-size: 48px; font-weight: bold; margin: 20px 0;">--°F</div>
-                    <div id="weather-desc" style="font-size: 14px; margin-bottom: 10px;">--</div>
-                    <div id="weather-details" style="font-size: 11px; color: #666; margin-top: 20px;">
-                        <div>Feels like: <span id="weather-feels">--</span></div>
-                        <div>Humidity: <span id="weather-humidity">--</span></div>
-                        <div>Wind: <span id="weather-wind">--</span></div>
-                    </div>
-                    <button id="weather-refresh" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-top: 15px;">Refresh</button>
-                </div>
+                <iframe src="https://www.google.com/search?q=waether&ie=UTF-8" style="width: 100%; height: 100%; border: none; min-height: 550px;"></iframe>
             `;
-            
-            function loadWeather() {
-                const loadingEl = content.querySelector('#weather-loading');
-                const contentEl = content.querySelector('#weather-content');
-                const tempEl = content.querySelector('#weather-temp');
-                const descEl = content.querySelector('#weather-desc');
-                const feelsEl = content.querySelector('#weather-feels');
-                const humidityEl = content.querySelector('#weather-humidity');
-                const windEl = content.querySelector('#weather-wind');
-                
-                // Using OpenWeatherMap API (free tier)
-                // Note: In production, you'd want to use your own API key
-                const apiKey = 'demo'; // Replace with actual API key
-                const city = 'Cooper City,FL,US';
-                const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=imperial&appid=${apiKey}`;
-                
-                // Fallback to mock data if API fails
-                setTimeout(() => {
-                    loadingEl.style.display = 'none';
-                    contentEl.style.display = 'block';
-                    
-                    // Mock data for Cooper City, FL (typical Florida weather)
-                    const mockData = {
-                        temp: Math.floor(Math.random() * 10) + 75, // 75-85°F
-                        feels: Math.floor(Math.random() * 10) + 78,
-                        desc: ['Sunny', 'Partly Cloudy', 'Mostly Sunny'][Math.floor(Math.random() * 3)],
-                        humidity: Math.floor(Math.random() * 20) + 60, // 60-80%
-                        wind: Math.floor(Math.random() * 5) + 5 // 5-10 mph
-                    };
-                    
-                    tempEl.textContent = `${mockData.temp}°F`;
-                    descEl.textContent = mockData.desc;
-                    feelsEl.textContent = `${mockData.feels}°F`;
-                    humidityEl.textContent = `${mockData.humidity}%`;
-                    windEl.textContent = `${mockData.wind} mph`;
-                    
-                    // Try to fetch real data (will fail silently if no API key)
-                    fetch(url).then(r => r.json()).then(data => {
-                        if (data.main) {
-                            tempEl.textContent = `${Math.round(data.main.temp)}°F`;
-                            descEl.textContent = data.weather[0].main;
-                            feelsEl.textContent = `${Math.round(data.main.feels_like)}°F`;
-                            humidityEl.textContent = `${data.main.humidity}%`;
-                            windEl.textContent = `${Math.round(data.wind.speed)} mph`;
-                        }
-                    }).catch(() => {
-                        // Use mock data if API fails
-                    });
-                }, 500);
-            }
-            
-            content.querySelector('#weather-refresh').addEventListener('click', () => {
-                content.querySelector('#weather-loading').style.display = 'block';
-                content.querySelector('#weather-content').style.display = 'none';
-                loadWeather();
-            });
-            
-            loadWeather();
             
             closeBtn.onclick = () => {
                 window.remove();
@@ -14667,6 +15009,13 @@ body.theme-flashcard button:hover {
                     if (name) {
                         files.push({ id: Date.now(), name, type: 'folder', folder: currentFolder });
                         localStorage.setItem(filesKey, JSON.stringify(files));
+                        // Sync to Firebase if logged in
+                        if (isLoggedIn()) {
+                            const username = localStorage.getItem('loggedInUsername');
+                            if (database) {
+                                database.ref(`userData/${username}/files`).set(files);
+                            }
+                        }
                         renderFiles();
                     }
                 });
@@ -14681,6 +15030,13 @@ body.theme-flashcard button:hover {
                         reader.onload = (e) => {
                             files.push({ id: Date.now(), name: file.name, type: 'file', folder: currentFolder, data: e.target.result, size: file.size });
                             localStorage.setItem(filesKey, JSON.stringify(files));
+                            // Sync to Firebase if logged in
+                            if (isLoggedIn()) {
+                                const username = localStorage.getItem('loggedInUsername');
+                                if (database) {
+                                    database.ref(`userData/${username}/files`).set(files);
+                                }
+                            }
                             renderFiles();
                         };
                         reader.readAsDataURL(file);
@@ -14716,6 +15072,13 @@ body.theme-flashcard button:hover {
                         if (confirm('Delete this item?')) {
                             files = files.filter(f => f.id !== id);
                             localStorage.setItem(filesKey, JSON.stringify(files));
+                            // Sync to Firebase if logged in
+                            if (isLoggedIn()) {
+                                const username = localStorage.getItem('loggedInUsername');
+                                if (database) {
+                                    database.ref(`userData/${username}/files`).set(files);
+                                }
+                            }
                             renderFiles();
                         }
                     });
@@ -14913,7 +15276,8 @@ body.theme-flashcard button:hover {
                         <option value="plain">Plain Text</option>
                     </select>
                     <button id="code-save" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-right: 5px;">Save</button>
-                    <button id="code-load" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Load</button>
+                    <button id="code-load" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-right: 5px;">Load</button>
+                    <button id="code-run" style="background: #008080; border: 2px outset #008080; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; color: #fff;">Run</button>
                 </div>
                 <textarea id="code-editor" style="width: 100%; height: 380px; border: 2px inset #c0c0c0; padding: 5px; font-family: 'Courier New', monospace; font-size: 12px; resize: none; background: #1e1e1e; color: #d4d4d4;">${localStorage.getItem(codeKey) || '// Start coding here...\n'}</textarea>
             `;
@@ -14923,9 +15287,17 @@ body.theme-flashcard button:hover {
             const langSelect = content.querySelector('#code-language');
             const saveBtn = content.querySelector('#code-save');
             const loadBtn = content.querySelector('#code-load');
+            const runBtn = content.querySelector('#code-run');
             
             saveBtn.addEventListener('click', () => {
                 localStorage.setItem(codeKey, editor.value);
+                // Sync to Firebase if logged in
+                if (isLoggedIn()) {
+                    const username = localStorage.getItem('loggedInUsername');
+                    if (database) {
+                        database.ref(`userData/${username}/code`).set(editor.value);
+                    }
+                }
                 alert('Code saved!');
             });
             
@@ -14935,6 +15307,46 @@ body.theme-flashcard button:hover {
                     editor.value = saved;
                 } else {
                     alert('No saved code found.');
+                }
+            });
+            
+            runBtn.addEventListener('click', () => {
+                const code = editor.value;
+                const language = langSelect.value;
+                
+                if (!code.trim()) {
+                    alert('Please enter some code first!');
+                    return;
+                }
+                
+                const newTab = window.open('', '_blank');
+                if (!newTab) {
+                    alert('Please allow popups to run code in a new tab.');
+                    return;
+                }
+                
+                if (language === 'javascript') {
+                    // Run JavaScript in console
+                    newTab.document.open();
+                    newTab.document.write('<!DOCTYPE html><html><head><title>JavaScript Console</title><style>body{font-family:monospace;padding:20px;background:#1e1e1e;color:#d4d4d4}#console{background:#000;padding:10px;border:1px solid #444;min-height:400px;white-space:pre-wrap}</style></head><body><h2>JavaScript Console Output</h2><div id="console"></div><script>const consoleDiv=document.getElementById("console");const originalLog=console.log;const originalError=console.error;const originalWarn=console.warn;console.log=function(...args){consoleDiv.textContent+=args.join(" ")+"\\n";originalLog.apply(console,args)};console.error=function(...args){consoleDiv.textContent+="ERROR: "+args.join(" ")+"\\n";originalError.apply(console,args)};console.warn=function(...args){consoleDiv.textContent+="WARN: "+args.join(" ")+"\\n";originalWarn.apply(console,args)};try{');
+                    newTab.document.write(code);
+                    newTab.document.write('}catch(e){console.error(e.toString())}</script></body></html>');
+                    newTab.document.close();
+                } else if (language === 'html') {
+                    // Run HTML in elements
+                    newTab.document.write(code);
+                } else if (language === 'css') {
+                    // Run CSS in style tag
+                    const escapedCss = escapeHtml(code);
+                    newTab.document.write('<!DOCTYPE html><html><head><title>CSS Preview</title><style>' + escapedCss + '</style></head><body><h1>CSS Preview</h1><p>This is a paragraph with your CSS applied.</p><div style="padding:20px;background:#f0f0f0;margin:10px">Styled div</div></body></html>');
+                } else if (language === 'python') {
+                    // Python - show in console (can't actually run Python in browser)
+                    const escapedPython = escapeHtml(code);
+                    newTab.document.write('<!DOCTYPE html><html><head><title>Python Code</title><style>body{font-family:monospace;padding:20px;background:#1e1e1e;color:#d4d4d4}pre{background:#000;padding:10px;border:1px solid #444}</style></head><body><h2>Python Code (Display Only)</h2><p>Note: Python cannot run directly in the browser. Use a Python interpreter or online service.</p><pre>' + escapedPython + '</pre></body></html>');
+                } else {
+                    // Plain text
+                    const escapedText = escapeHtml(code);
+                    newTab.document.write('<!DOCTYPE html><html><head><title>Plain Text</title><style>body{font-family:monospace;padding:20px;background:#fff}pre{background:#f0f0f0;padding:10px;border:1px solid #ccc}</style></head><body><pre>' + escapedText + '</pre></body></html>');
                 }
             });
             
