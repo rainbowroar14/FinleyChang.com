@@ -3504,6 +3504,7 @@ body.theme-flashcard button:hover {
         </div>
         <div class="profile-menu" id="profileMenu">
             <div class="profile-menu-item" onclick="showWhoami(); document.getElementById('profileMenu').classList.remove('show');">View Profile</div>
+            <div class="profile-menu-item" onclick="viewBoard(); document.getElementById('profileMenu').classList.remove('show');">View My Board</div>
             <div class="profile-menu-item logout" onclick="logout()">Logout</div>
         </div>
     </div>
@@ -4286,7 +4287,14 @@ body.theme-flashcard button:hover {
                     { name: 'whoami [id]', desc: 'Display another user\'s profile by ID' },
                     { name: 'iam [bio]', desc: 'Set your bio/profile text' },
                     { name: 'boardedit', desc: 'Edit your personal board (text and images)' },
+                    { name: 'board', desc: 'View your personal board' },
+                    { name: 'myboard', desc: 'View your personal board' },
+                    { name: 'viewboard', desc: 'View your personal board' },
                     { name: 'edit', desc: 'Edit your profile settings' },
+                ],
+                'Admin': [
+                    { name: 'timeout [username] [minutes]', desc: 'Timeout a user for specified minutes (Admin only)', isAdmin: true },
+                    { name: 'clear', desc: 'Clear all chat messages (Admin only)', isAdmin: true },
                 ]
             };
             
@@ -4294,6 +4302,10 @@ body.theme-flashcard button:hover {
             Object.keys(commandDefinitions).forEach(category => {
                 const commands = commandDefinitions[category];
                 const visibleCommands = commands.filter(cmd => {
+                    // Hide admin commands if not admin
+                    if (cmd.isAdmin && !isAdmin()) {
+                        return false;
+                    }
                     // Hide goose commands if not unlocked
                     if (cmd.isGoose && !unlockedCommands.has(cmd.name)) {
                         return false;
@@ -7216,6 +7228,11 @@ body.theme-flashcard button:hover {
                 } else if (command === 'edit') {
                     resetConfirm = false;
                     openEditMenu();
+                } else if (command === 'board' || command === 'myboard' || command === 'viewboard') {
+                    resetConfirm = false;
+                    viewBoard();
+                    showCommandFeedback('board', 'Viewing your board', true);
+                    commandInput.value = '';
                 } else if (command === 'boardedit') {
                     resetConfirm = false;
                     openBoardEditor();
