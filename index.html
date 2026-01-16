@@ -6585,6 +6585,14 @@ body.theme-flashcard button:hover {
                 };
             }
             
+            // Set up View Board click handler
+            viewBoardItem.onclick = () => {
+                viewBoard(userId);
+                contextMenu.classList.add('hidden');
+            };
+            viewBoardItem.style.cursor = 'pointer';
+            viewBoardItem.style.color = '#000';
+            
             // Position and show context menu
             contextMenu.style.left = event.pageX + 'px';
             contextMenu.style.top = event.pageY + 'px';
@@ -13250,12 +13258,20 @@ body.theme-flashcard button:hover {
                     
                     // Attach event listeners to all join buttons
                     listEl.querySelectorAll('.join-lobby-btn').forEach(btn => {
-                        btn.onclick = () => {
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             const lobbyId = btn.getAttribute('data-lobby-id');
-                            if (lobbyId) {
-                                joinLobbyInternal(lobbyId, false);
+                            if (lobbyId && !btn.disabled) {
+                                // Use a closure to ensure joinLobbyInternal is accessible
+                                const joinFunc = joinLobbyInternal;
+                                if (typeof joinFunc === 'function') {
+                                    joinFunc(lobbyId, false);
+                                } else {
+                                    console.error('joinLobbyInternal function not found');
+                                }
                             }
-                        };
+                        });
                     });
                 }
                 
