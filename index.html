@@ -3873,7 +3873,13 @@ body.theme-flashcard button:hover {
         <div class="chat-container">
             <div class="chat-header">
                 <h2 id="privateChatTitle">💬 Private Chat</h2>
-                <button class="chat-back-btn" id="privateChatBackBtn">← Back to Friends</button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="color: #c9d1d9; font-size: 12px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="checkbox" id="privateChatNotificationsToggle" style="cursor: pointer;">
+                        Notifications
+                    </label>
+                    <button class="chat-back-btn" id="privateChatBackBtn">← Back to Friends</button>
+                </div>
             </div>
             <div class="chat-messages" id="privateChatMessages"></div>
             <div class="chat-input-container">
@@ -5338,8 +5344,44 @@ body.theme-flashcard button:hover {
         }
         
         function getUserAvatar(userId) {
+            // First check localStorage
             const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
-            return avatars[userId] || '👤';
+            if (avatars[userId]) {
+                return avatars[userId];
+            }
+            
+            // If Firebase is available, try to get from there
+            if (database) {
+                // Try to get from Firebase (async, but we'll cache it)
+                database.ref(`users/${userId}/avatar`).once('value', (snapshot) => {
+                    const avatar = snapshot.val();
+                    if (avatar) {
+                        // Cache it in localStorage
+                        avatars[userId] = avatar;
+                        localStorage.setItem('userAvatars', JSON.stringify(avatars));
+                    }
+                });
+            }
+            
+            return '👤';
+        }
+        
+        // Load all user avatars from Firebase on init
+        function loadUserAvatarsFromFirebase() {
+            if (database) {
+                database.ref('users').once('value', (snapshot) => {
+                    const users = snapshot.val() || {};
+                    const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
+                    
+                    Object.entries(users).forEach(([userId, userData]) => {
+                        if (userData.avatar) {
+                            avatars[userId] = userData.avatar;
+                        }
+                    });
+                    
+                    localStorage.setItem('userAvatars', JSON.stringify(avatars));
+                });
+            }
         }
         
         function setUserAvatar(userId, emoji) {
@@ -5746,9 +5788,23 @@ body.theme-flashcard button:hover {
             currentPrivateChatWith = friendId;
             const title = document.getElementById('privateChatTitle');
             const avatar = getUserAvatar(friendId);
+            const displayName = localStorage.getItem(`displayName_${friendId}`) || friendId;
             if (title) {
-                title.textContent = `💬 Private Chat with ${avatar} ${friendId}`;
+                title.textContent = `💬 Private Chat with ${avatar} ${escapeHtml(displayName)}`;
             }
+            
+            // Setup notification toggle
+            const notificationToggle = document.getElementById('privateChatNotificationsToggle');
+            if (notificationToggle) {
+                const notificationsEnabled = localStorage.getItem(`privateChatNotifications_${friendId}`) !== 'false';
+                notificationToggle.checked = notificationsEnabled;
+                notificationToggle.onchange = (e) => {
+                    localStorage.setItem(`privateChatNotifications_${friendId}`, e.target.checked ? 'true' : 'false');
+                    // Re-setup notifications
+                    setupPrivateChatNotifications();
+                };
+            }
+            
             showPage('privateChatPage');
             loadPrivateChatMessages(friendId);
         }
@@ -6062,7 +6118,7 @@ body.theme-flashcard button:hover {
             
             messageDiv.innerHTML = `
                 <div class="chat-message-header">
-                    <span class="${userClass}" onclick="showWhoami('${escapeHtml(message.userId)}')">
+                    <span class="${userClass}" id="chat-user-${escapeHtml(message.userId)}" data-user-id="${escapeHtml(message.userId)}">
                         <span class="chat-message-icon">${userAvatar}</span>
                         ${escapeHtml(displayName)}
                     </span>
@@ -6071,8 +6127,104 @@ body.theme-flashcard button:hover {
                 <div class="chat-message-text">${escapeHtml(message.text)}</div>
             `;
             
+            // Add right-click context menu for username
+            const usernameSpan = messageDiv.querySelector(`#chat-user-${escapeHtml(message.userId)}`);
+            if (usernameSpan && message.userId !== (localStorage.getItem('loggedInUsername') || getUserId())) {
+                usernameSpan.style.cursor = 'pointer';
+                usernameSpan.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    showChatUserContextMenu(e, message.userId);
+                });
+                usernameSpan.addEventListener('click', () => {
+                    showWhoami(message.userId);
+                });
+            } else if (usernameSpan) {
+                usernameSpan.addEventListener('click', () => {
+                    showWhoami(message.userId);
+                });
+            }
+            
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function showChatUserContextMenu(event, userId) {
+            let chatContextMenu = document.getElementById('chatUserContextMenu');
+            if (!chatContextMenu) {
+                // Create context menu if it doesn't exist
+                const menu = document.createElement('div');
+                menu.id = 'chatUserContextMenu';
+                menu.className = 'context-menu hidden';
+                menu.style.cssText = 'position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);';
+                menu.innerHTML = `
+                    <div class="context-menu-item" id="chatAddFriendItem" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: "MS Sans Serif", Arial, sans-serif;">Add Friend</div>
+                    <div class="context-menu-item" id="chatViewBoardItem" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: "MS Sans Serif", Arial, sans-serif;">View Board</div>
+                `;
+                document.body.appendChild(menu);
+                chatContextMenu = menu;
+            }
+            const addFriendItem = document.getElementById('chatAddFriendItem');
+            const viewBoardItem = document.getElementById('chatViewBoardItem');
+            const currentUserId = localStorage.getItem('loggedInUsername') || getUserId();
+            const friends = getFriends();
+            const isFriend = friends.includes(userId);
+            const isOwnProfile = userId === currentUserId;
+            
+            // Hide other context menus
+            document.querySelectorAll('.context-menu').forEach(menu => {
+                if (menu.id !== 'chatUserContextMenu') {
+                    menu.classList.add('hidden');
+                }
+            });
+            
+            // Update context menu items
+            if (isFriend || isOwnProfile) {
+                addFriendItem.textContent = isOwnProfile ? 'Your Profile' : 'Already Friends';
+                addFriendItem.style.cursor = 'default';
+                addFriendItem.style.color = '#666';
+                addFriendItem.onclick = null;
+            } else {
+                addFriendItem.textContent = 'Add Friend';
+                addFriendItem.style.cursor = 'pointer';
+                addFriendItem.style.color = '#000';
+                addFriendItem.onclick = () => {
+                    const result = sendFriendRequest(userId);
+                    if (result.success) {
+                        alert(result.message);
+                    } else {
+                        alert(result.message || 'Failed to send friend request');
+                    }
+                    chatContextMenu.classList.add('hidden');
+                };
+            }
+            
+            // View Board option
+            if (isFriend || isOwnProfile) {
+                viewBoardItem.style.display = 'block';
+                viewBoardItem.onclick = () => {
+                    viewBoard(userId);
+                    chatContextMenu.classList.add('hidden');
+                };
+            } else {
+                viewBoardItem.style.display = 'none';
+            }
+            
+            // Position and show context menu
+            chatContextMenu.style.left = event.pageX + 'px';
+            chatContextMenu.style.top = event.pageY + 'px';
+            chatContextMenu.classList.remove('hidden');
+            
+            // Hide menu when clicking elsewhere
+            const hideMenu = (e) => {
+                if (!chatContextMenu.contains(e.target)) {
+                    chatContextMenu.classList.add('hidden');
+                    document.removeEventListener('click', hideMenu);
+                }
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', hideMenu);
+            }, 100);
         }
         
         function toggleChatHeader() {
@@ -6109,7 +6261,7 @@ body.theme-flashcard button:hover {
             // Check if user is FinleyMain
             const currentUsername = localStorage.getItem('loggedInUsername') || getUserId();
             if (currentUsername !== 'FinleyMain' && currentUsername.toLowerCase() !== 'finleymain') {
-                alert('Only FinleyMain can clear chat messages!');
+                alert('You don\'t have permission to do that');
                 return;
             }
             
