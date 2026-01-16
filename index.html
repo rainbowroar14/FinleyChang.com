@@ -3051,6 +3051,7 @@ body.theme-flashcard button:hover {
                 <!-- Context Menu for Online Users -->
                 <div id="onlineUserContextMenu" class="context-menu hidden" style="position: fixed; background: #c0c0c0; border: 2px outset #c0c0c0; padding: 2px; z-index: 2000; min-width: 150px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
                     <div class="context-menu-item" id="addFriendContextItem" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">Add Friend</div>
+                    <div class="context-menu-item" id="viewBoardContextItem" style="padding: 4px 20px; cursor: pointer; font-size: 11px; font-family: 'MS Sans Serif', Arial, sans-serif;">View Board</div>
                 </div>
             </div>
             <div class="chat-messages" id="chatMessages"></div>
@@ -3085,6 +3086,46 @@ body.theme-flashcard button:hover {
             <div class="chat-input-container">
                 <input type="text" class="chat-input" id="privateChatInput" placeholder="Type a message..." maxlength="500">
                 <button class="chat-send-btn" id="privateChatSendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Board View Page -->
+    <div class="page hidden" id="boardViewPage">
+        <div style="padding: 20px; max-width: 800px; margin: 0 auto; background: #0d1117; min-height: 100vh; color: #c9d1d9;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="boardViewTitle" style="color: #58a6ff; margin: 0;">📋 Board</h2>
+                <button onclick="showPage('mainPage')" style="background: #238636; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">Back</button>
+            </div>
+            <div id="boardContent" style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; min-height: 400px;">
+                <div style="text-align: center; color: #666; padding: 40px;">Loading board...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Board Edit Page -->
+    <div class="page hidden" id="boardEditPage">
+        <div style="padding: 20px; max-width: 800px; margin: 0 auto; background: #0d1117; min-height: 100vh; color: #c9d1d9;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #58a6ff; margin: 0;">✏️ Edit Your Board</h2>
+                <button onclick="showPage('mainPage')" style="background: #238636; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">Back</button>
+            </div>
+            <div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-weight: bold;">Text Content:</label>
+                    <textarea id="boardTextInput" placeholder="Write something on your board..." style="width: 100%; min-height: 200px; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 14px; font-family: inherit; resize: vertical;"></textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-weight: bold;">Upload Images:</label>
+                    <input type="file" id="boardImageInput" accept="image/*" multiple style="display: none;">
+                    <button onclick="document.getElementById('boardImageInput').click()" style="background: #238636; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-bottom: 10px;">Choose Images</button>
+                    <div id="boardImagesPreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;"></div>
+                </div>
+                <div id="boardExistingImages" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: #c9d1d9; font-weight: bold;">Current Images:</label>
+                    <div id="boardExistingImagesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;"></div>
+                </div>
+                <button onclick="saveBoard()" style="background: #238636; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;">Save Board</button>
             </div>
         </div>
     </div>
@@ -3359,10 +3400,11 @@ body.theme-flashcard button:hover {
                 ],
                 'Actions': [
                     { name: 'honk', desc: 'Play honk sound', isGoose: true },
-                    { name: 'clock', desc: 'Toggle clock (true/false)' },
                     { name: 'whoami', desc: 'Display your user profile' },
                     { name: 'whoami [id]', desc: 'Display another user\'s profile by ID' },
                     { name: 'iam [bio]', desc: 'Set your bio/profile text' },
+                    { name: 'friend [id]', desc: 'Add a user as a friend' },
+                    { name: 'friends', desc: 'View your friends list' },
                 ],
                 'Themes': [
                     { name: 'theme 1995', desc: 'Windows 95 grey boxed look' },
@@ -3387,6 +3429,8 @@ body.theme-flashcard button:hover {
                     { name: 'whoami', desc: 'Display your user profile' },
                     { name: 'whoami [id]', desc: 'Display another user\'s profile by ID' },
                     { name: 'iam [bio]', desc: 'Set your bio/profile text' },
+                    { name: 'boardedit', desc: 'Edit your personal board (text and images)' },
+                    { name: 'edit', desc: 'Edit your profile settings' },
                 ]
             };
             
@@ -5160,8 +5204,13 @@ body.theme-flashcard button:hover {
         function showOnlineUserContextMenu(event, userId, isAlreadyFriend) {
             const contextMenu = document.getElementById('onlineUserContextMenu');
             const addFriendItem = document.getElementById('addFriendContextItem');
+            const viewBoardItem = document.getElementById('viewBoardContextItem');
+            const currentUserId = getUserId();
+            const friends = getFriends();
+            const isFriend = friends.includes(userId);
+            const isOwnProfile = userId === currentUserId;
             
-            if (!contextMenu || !addFriendItem) return;
+            if (!contextMenu || !addFriendItem || !viewBoardItem) return;
             
             // Hide other context menus
             document.querySelectorAll('.context-menu').forEach(menu => {
@@ -5228,6 +5277,141 @@ body.theme-flashcard button:hover {
                 document.addEventListener('click', hideMenu);
             }, 100);
         }
+        
+        // Board System
+        function getBoard(userId) {
+            if (!userId) userId = getUserId();
+            if (database) {
+                return new Promise((resolve) => {
+                    database.ref(`boards/${userId}`).once('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            resolve(data);
+                        } else {
+                            const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
+                            resolve(boards[userId] || { text: '', images: [] });
+                        }
+                    });
+                });
+            } else {
+                const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
+                return Promise.resolve(boards[userId] || { text: '', images: [] });
+            }
+        }
+        
+        function saveBoardData(userId, boardData) {
+            if (!userId) userId = getUserId();
+            const boardObj = { text: boardData.text || '', images: boardData.images || [], updatedAt: Date.now() };
+            const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
+            boards[userId] = boardObj;
+            localStorage.setItem('userBoards', JSON.stringify(boards));
+            if (database) database.ref(`boards/${userId}`).set(boardObj);
+        }
+        
+        function openBoardEditor() {
+            const userId = getUserId();
+            showPage('boardEditPage');
+            getBoard(userId).then(board => {
+                const textInput = document.getElementById('boardTextInput');
+                const existingImagesContainer = document.getElementById('boardExistingImagesContainer');
+                const previewContainer = document.getElementById('boardImagesPreview');
+                if (textInput) textInput.value = board.text || '';
+                if (previewContainer) previewContainer.innerHTML = '';
+                if (existingImagesContainer) {
+                    existingImagesContainer.innerHTML = '';
+                    if (board.images && board.images.length > 0) {
+                        board.images.forEach((imageData, index) => {
+                            const imgDiv = document.createElement('div');
+                            imgDiv.style.position = 'relative';
+                            imgDiv.innerHTML = `<img src="${imageData}" alt="Board image" style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; border: 1px solid #30363d;"><button onclick="removeBoardImage(${index})" style="position: absolute; top: 5px; right: 5px; background: #f85149; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; line-height: 1;">×</button>`;
+                            existingImagesContainer.appendChild(imgDiv);
+                        });
+                    } else {
+                        existingImagesContainer.innerHTML = '<div style="color: #666; font-size: 12px;">No images yet</div>';
+                    }
+                }
+            });
+            const imageInput = document.getElementById('boardImageInput');
+            if (imageInput) {
+                imageInput.onchange = (e) => {
+                    const files = Array.from(e.target.files);
+                    const previewContainer = document.getElementById('boardImagesPreview');
+                    files.forEach(file => {
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                const imgDiv = document.createElement('div');
+                                imgDiv.style.position = 'relative';
+                                imgDiv.innerHTML = `<img src="${event.target.result}" alt="Preview" style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; border: 1px solid #30363d;"><div style="position: absolute; top: 5px; left: 5px; background: #238636; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">New</div>`;
+                                if (previewContainer) previewContainer.appendChild(imgDiv);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                };
+            }
+        }
+        
+        window.removeBoardImage = (index) => {
+            const userId = getUserId();
+            getBoard(userId).then(board => {
+                const images = board.images || [];
+                images.splice(index, 1);
+                saveBoardData(userId, { text: board.text, images: images });
+                openBoardEditor();
+            });
+        };
+        
+        function saveBoardToStorage() {
+            const userId = getUserId();
+            const textInput = document.getElementById('boardTextInput');
+            const previewContainer = document.getElementById('boardImagesPreview');
+            const text = textInput ? textInput.value : '';
+            getBoard(userId).then(board => {
+                const existingImages = board.images || [];
+                const newImages = [];
+                if (previewContainer) {
+                    previewContainer.querySelectorAll('img').forEach(img => {
+                        if (img.src && !existingImages.includes(img.src)) newImages.push(img.src);
+                    });
+                }
+                saveBoardData(userId, { text, images: [...existingImages, ...newImages] });
+                alert('Board saved successfully!');
+                showPage('mainPage');
+            });
+        }
+        window.saveBoard = saveBoardToStorage;
+        
+        function viewBoard(userId) {
+            if (!userId) userId = getUserId();
+            const currentUserId = getUserId();
+            const friends = getFriends();
+            if (userId !== currentUserId && !friends.includes(userId)) {
+                alert('You can only view boards of friends or your own board!');
+                return;
+            }
+            showPage('boardViewPage');
+            const titleEl = document.getElementById('boardViewTitle');
+            const contentEl = document.getElementById('boardContent');
+            if (titleEl) titleEl.textContent = userId === currentUserId ? '📋 Your Board' : `📋 ${escapeHtml(userId)}'s Board`;
+            if (contentEl) contentEl.innerHTML = '<div style="text-align: center; color: #666; padding: 40px;">Loading board...</div>';
+            getBoard(userId).then(board => {
+                if (contentEl) {
+                    let html = '';
+                    if (board.text && board.text.trim()) html += `<div style="margin-bottom: 20px; padding: 15px; background: #0d1117; border-radius: 6px; border: 1px solid #30363d; white-space: pre-wrap; line-height: 1.6; color: #c9d1d9;">${escapeHtml(board.text)}</div>`;
+                    if (board.images && board.images.length > 0) {
+                        html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">';
+                        board.images.forEach(imageData => {
+                            html += `<img src="${imageData}" alt="Board image" style="width: 100%; height: auto; border-radius: 6px; border: 1px solid #30363d; cursor: pointer;" onclick="window.open('${imageData}', '_blank')">`;
+                        });
+                        html += '</div>';
+                    }
+                    if (!board.text && (!board.images || board.images.length === 0)) html = '<div style="text-align: center; color: #666; padding: 40px;">This board is empty.</div>';
+                    contentEl.innerHTML = html;
+                }
+            });
+        }
+        window.viewBoard = viewBoard;
         
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -5718,6 +5902,12 @@ body.theme-flashcard button:hover {
                 } else if (command === 'edit') {
                     resetConfirm = false;
                     openEditMenu();
+                } else if (command === 'boardedit') {
+                    resetConfirm = false;
+                    openBoardEditor();
+                    showCommandFeedback('boardedit', 'Board editor opened', true);
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Edit your board';
                 } else if (command.startsWith('friend ')) {
                     resetConfirm = false;
                     const friendId = command.substring(7).trim();
