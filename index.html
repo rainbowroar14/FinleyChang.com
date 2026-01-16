@@ -5865,36 +5865,78 @@ body.theme-flashcard button:hover {
             
             const friends = getFriends();
             
-            if (friends.length === 0) {
-                friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [id]" to add someone!</div>';
-            } else {
-                friendsList.innerHTML = '';
-                friends.forEach(friendId => {
-                    const friendItem = document.createElement('div');
-                    friendItem.className = 'friend-item';
-                    
-                    const avatar = getUserAvatar(friendId);
-                    const bio = getUserBio(friendId) || 'No bio';
-                    
-                    friendItem.innerHTML = `
-                        <div class="friend-avatar">${avatar}</div>
-                        <div class="friend-info">
-                            <div class="friend-name">${friendId}</div>
-                            <div class="friend-bio">${bio.substring(0, 50)}${bio.length > 50 ? '...' : ''}</div>
-                        </div>
-                    `;
-                    
-                    friendItem.onclick = () => {
-                        openPrivateChat(friendId);
-                        closeFriendsList();
-                    };
-                    
-                    friendsList.appendChild(friendItem);
-                });
-            }
+            // Get pending friend requests
+            getPendingFriendRequests().then(pendingRequests => {
+                let html = '';
+                
+                // Show pending requests section
+                if (pendingRequests.length > 0) {
+                    html += '<div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #30363d;">';
+                    html += '<h3 style="color: #58a6ff; font-size: 16px; margin-bottom: 10px;">📬 Pending Friend Requests</h3>';
+                    pendingRequests.forEach(request => {
+                        const avatar = getUserAvatar(request.from);
+                        const bio = getUserBio(request.from) || 'No bio';
+                        html += `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: #161b22; border-radius: 6px; border: 1px solid #30363d;">
+                                <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                                    <div style="font-size: 24px;">${avatar}</div>
+                                    <div>
+                                        <div style="color: #c9d1d9; font-weight: bold; font-size: 14px;">${escapeHtml(request.from)}</div>
+                                        <div style="color: #8b949e; font-size: 12px;">${escapeHtml(bio.substring(0, 40))}${bio.length > 40 ? '...' : ''}</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="acceptFriendRequestFromList('${request.from}')" style="background: #238636; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Accept</button>
+                                    <button onclick="declineFriendRequestFromList('${request.from}')" style="background: #f85149; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Decline</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                // Show friends section
+                html += '<h3 style="color: #58a6ff; font-size: 16px; margin-bottom: 10px;">👥 My Friends</h3>';
+                if (friends.length === 0 && pendingRequests.length === 0) {
+                    html += '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Send friend requests using "friend [id]" command!</div>';
+                } else if (friends.length === 0) {
+                    html += '<div style="color: #8b949e; text-align: center; padding: 20px;">No friends yet.</div>';
+                } else {
+                    friends.forEach(friendId => {
+                        const avatar = getUserAvatar(friendId);
+                        const bio = getUserBio(friendId) || 'No bio';
+                        html += `
+                            <div class="friend-item" onclick="openPrivateChat('${friendId}'); closeFriendsList();" style="cursor: pointer;">
+                                <div class="friend-avatar">${avatar}</div>
+                                <div class="friend-info">
+                                    <div class="friend-name">${escapeHtml(friendId)}</div>
+                                    <div class="friend-bio">${escapeHtml(bio.substring(0, 50))}${bio.length > 50 ? '...' : ''}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                friendsList.innerHTML = html;
+            });
             
             modal.classList.add('show');
         }
+        
+        // Helper functions for friend request buttons
+        function acceptFriendRequestFromList(fromUserId) {
+            acceptFriendRequest(fromUserId);
+            openFriendsList(); // Refresh the list
+        }
+        
+        function declineFriendRequestFromList(fromUserId) {
+            declineFriendRequest(fromUserId);
+            openFriendsList(); // Refresh the list
+        }
+        
+        // Make functions globally accessible
+        window.acceptFriendRequestFromList = acceptFriendRequestFromList;
+        window.declineFriendRequestFromList = declineFriendRequestFromList;
         
         function closeFriendsList() {
             const modal = document.getElementById('friendsModal');
@@ -6034,7 +6076,122 @@ body.theme-flashcard button:hover {
             return friends;
         }
         
+        // Friend Request System
+        function sendFriendRequest(toUserId) {
+            const fromUserId = getUserId();
+            if (fromUserId === toUserId) return false;
+            
+            const friends = getFriends();
+            if (friends.includes(toUserId)) return false; // Already friends
+            
+            if (database) {
+                // Check if request already exists
+                database.ref(`friendRequests/${toUserId}/${fromUserId}`).once('value', (snapshot) => {
+                    if (!snapshot.exists()) {
+                        // Send request
+                        database.ref(`friendRequests/${toUserId}/${fromUserId}`).set({
+                            from: fromUserId,
+                            to: toUserId,
+                            timestamp: Date.now(),
+                            status: 'pending'
+                        });
+                    }
+                });
+            } else {
+                // localStorage fallback
+                const requests = JSON.parse(localStorage.getItem('friendRequests') || '{}');
+                if (!requests[toUserId]) requests[toUserId] = {};
+                if (!requests[toUserId][fromUserId]) {
+                    requests[toUserId][fromUserId] = {
+                        from: fromUserId,
+                        to: toUserId,
+                        timestamp: Date.now(),
+                        status: 'pending'
+                    };
+                    localStorage.setItem('friendRequests', JSON.stringify(requests));
+                }
+            }
+            return true;
+        }
+        
+        function getPendingFriendRequests() {
+            const userId = getUserId();
+            if (database) {
+                return new Promise((resolve) => {
+                    database.ref(`friendRequests/${userId}`).once('value', (snapshot) => {
+                        const requests = snapshot.val() || {};
+                        const pending = Object.values(requests).filter(r => r.status === 'pending');
+                        resolve(pending);
+                    });
+                });
+            } else {
+                const requests = JSON.parse(localStorage.getItem('friendRequests') || '{}');
+                const userRequests = requests[userId] || {};
+                return Promise.resolve(Object.values(userRequests).filter(r => r.status === 'pending'));
+            }
+        }
+        
+        function acceptFriendRequest(fromUserId) {
+            const toUserId = getUserId();
+            
+            // Add both users as friends
+            const myFriends = getFriends();
+            if (!myFriends.includes(fromUserId)) {
+                myFriends.push(fromUserId);
+                localStorage.setItem('friends', JSON.stringify(myFriends));
+                
+                if (database) {
+                    database.ref(`users/${toUserId}/friends`).set(myFriends);
+                }
+            }
+            
+            // Also add to the other user's friends list
+            if (database) {
+                database.ref(`users/${fromUserId}/friends`).once('value', (snapshot) => {
+                    const theirFriends = snapshot.val() || [];
+                    if (!theirFriends.includes(toUserId)) {
+                        theirFriends.push(toUserId);
+                        database.ref(`users/${fromUserId}/friends`).set(theirFriends);
+                    }
+                });
+            } else {
+                // For localStorage, we can't directly update other user's data
+                // They'll get updated when they log in
+            }
+            
+            // Remove the request
+            if (database) {
+                database.ref(`friendRequests/${toUserId}/${fromUserId}`).remove();
+            } else {
+                const requests = JSON.parse(localStorage.getItem('friendRequests') || '{}');
+                if (requests[toUserId] && requests[toUserId][fromUserId]) {
+                    delete requests[toUserId][fromUserId];
+                    localStorage.setItem('friendRequests', JSON.stringify(requests));
+                }
+            }
+            
+            return true;
+        }
+        
+        function declineFriendRequest(fromUserId) {
+            const toUserId = getUserId();
+            
+            // Remove the request
+            if (database) {
+                database.ref(`friendRequests/${toUserId}/${fromUserId}`).remove();
+            } else {
+                const requests = JSON.parse(localStorage.getItem('friendRequests') || '{}');
+                if (requests[toUserId] && requests[toUserId][fromUserId]) {
+                    delete requests[toUserId][fromUserId];
+                    localStorage.setItem('friendRequests', JSON.stringify(requests));
+                }
+            }
+            
+            return true;
+        }
+        
         function addFriend(friendId) {
+            // This is now only used internally when accepting requests
             const friends = getFriends();
             if (!friends.includes(friendId)) {
                 friends.push(friendId);
@@ -6088,36 +6245,78 @@ body.theme-flashcard button:hover {
             
             const friends = getFriends();
             
-            if (friends.length === 0) {
-                friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [id]" to add someone!</div>';
-            } else {
-                friendsList.innerHTML = '';
-                friends.forEach(friendId => {
-                    const friendItem = document.createElement('div');
-                    friendItem.className = 'friend-item';
-                    
-                    const avatar = getUserAvatar(friendId);
-                    const bio = getUserBio(friendId) || 'No bio';
-                    
-                    friendItem.innerHTML = `
-                        <div class="friend-avatar">${avatar}</div>
-                        <div class="friend-info">
-                            <div class="friend-name">${friendId}</div>
-                            <div class="friend-bio">${bio.substring(0, 50)}${bio.length > 50 ? '...' : ''}</div>
-                        </div>
-                    `;
-                    
-                    friendItem.onclick = () => {
-                        openPrivateChat(friendId);
-                        closeFriendsList();
-                    };
-                    
-                    friendsList.appendChild(friendItem);
-                });
-            }
+            // Get pending friend requests
+            getPendingFriendRequests().then(pendingRequests => {
+                let html = '';
+                
+                // Show pending requests section
+                if (pendingRequests.length > 0) {
+                    html += '<div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #30363d;">';
+                    html += '<h3 style="color: #58a6ff; font-size: 16px; margin-bottom: 10px;">📬 Pending Friend Requests</h3>';
+                    pendingRequests.forEach(request => {
+                        const avatar = getUserAvatar(request.from);
+                        const bio = getUserBio(request.from) || 'No bio';
+                        html += `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: #161b22; border-radius: 6px; border: 1px solid #30363d;">
+                                <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                                    <div style="font-size: 24px;">${avatar}</div>
+                                    <div>
+                                        <div style="color: #c9d1d9; font-weight: bold; font-size: 14px;">${escapeHtml(request.from)}</div>
+                                        <div style="color: #8b949e; font-size: 12px;">${escapeHtml(bio.substring(0, 40))}${bio.length > 40 ? '...' : ''}</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="acceptFriendRequestFromList('${request.from}')" style="background: #238636; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Accept</button>
+                                    <button onclick="declineFriendRequestFromList('${request.from}')" style="background: #f85149; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Decline</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                // Show friends section
+                html += '<h3 style="color: #58a6ff; font-size: 16px; margin-bottom: 10px;">👥 My Friends</h3>';
+                if (friends.length === 0 && pendingRequests.length === 0) {
+                    html += '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Send friend requests using "friend [id]" command!</div>';
+                } else if (friends.length === 0) {
+                    html += '<div style="color: #8b949e; text-align: center; padding: 20px;">No friends yet.</div>';
+                } else {
+                    friends.forEach(friendId => {
+                        const avatar = getUserAvatar(friendId);
+                        const bio = getUserBio(friendId) || 'No bio';
+                        html += `
+                            <div class="friend-item" onclick="openPrivateChat('${friendId}'); closeFriendsList();" style="cursor: pointer;">
+                                <div class="friend-avatar">${avatar}</div>
+                                <div class="friend-info">
+                                    <div class="friend-name">${escapeHtml(friendId)}</div>
+                                    <div class="friend-bio">${escapeHtml(bio.substring(0, 50))}${bio.length > 50 ? '...' : ''}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                friendsList.innerHTML = html;
+            });
             
             modal.classList.add('show');
         }
+        
+        // Helper functions for friend request buttons
+        function acceptFriendRequestFromList(fromUserId) {
+            acceptFriendRequest(fromUserId);
+            openFriendsList(); // Refresh the list
+        }
+        
+        function declineFriendRequestFromList(fromUserId) {
+            declineFriendRequest(fromUserId);
+            openFriendsList(); // Refresh the list
+        }
+        
+        // Make functions globally accessible
+        window.acceptFriendRequestFromList = acceptFriendRequestFromList;
+        window.declineFriendRequestFromList = declineFriendRequestFromList;
         
         function closeFriendsList() {
             const modal = document.getElementById('friendsModal');
@@ -6551,21 +6750,21 @@ body.theme-flashcard button:hover {
                 addFriendItem.style.color = '#666';
                 addFriendItem.onclick = null;
             } else {
-                addFriendItem.textContent = 'Add Friend';
+                addFriendItem.textContent = 'Send Friend Request';
                 addFriendItem.style.cursor = 'pointer';
                 addFriendItem.style.color = '#000';
                 addFriendItem.onclick = () => {
-                    // Verify user exists before adding
+                    // Verify user exists before sending request
                     if (database) {
                         database.ref(`users/${userId}`).once('value', (snapshot) => {
                             if (snapshot.exists()) {
                                 const userData = snapshot.val();
                                 const userBio = userData.bio || '(No bio)';
-                                if (addFriend(userId)) {
-                                    alert(`Added ${userId} as a friend!\nBio: ${userBio.substring(0, 50)}`);
+                                if (sendFriendRequest(userId)) {
+                                    alert(`Friend request sent to ${userId}!\nThey need to accept it before you become friends.\nBio: ${userBio.substring(0, 50)}`);
                                     loadOnlineUsers(); // Refresh the list
                                 } else {
-                                    alert(`Failed to add ${userId} as a friend. They might already be your friend.`);
+                                    alert(`Could not send friend request to ${userId}.`);
                                 }
                             } else {
                                 alert(`User ${userId} not found. They may have disconnected.`);
@@ -6573,12 +6772,12 @@ body.theme-flashcard button:hover {
                             contextMenu.classList.add('hidden');
                         });
                     } else {
-                        // No Firebase, just add directly
-                        if (addFriend(userId)) {
-                            alert(`Added ${userId} as a friend!`);
+                        // No Firebase, use localStorage
+                        if (sendFriendRequest(userId)) {
+                            alert(`Friend request sent to ${userId}!\nThey need to accept it before you become friends.`);
                             loadOnlineUsers(); // Refresh the list
                         } else {
-                            alert(`Failed to add ${userId} as a friend.`);
+                            alert(`Could not send friend request to ${userId}.`);
                         }
                         contextMenu.classList.add('hidden');
                     }
@@ -7255,7 +7454,13 @@ body.theme-flashcard button:hover {
                     } else if (friendId === getUserId()) {
                         showCommandFeedback('friend', 'You cannot add yourself as a friend!', false);
                     } else {
-                        // Check if user exists and get their info to verify
+                        const friends = getFriends();
+                        if (friends.includes(friendId)) {
+                            showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                            return;
+                        }
+                        
+                        // Check if user exists and send friend request
                         if (database) {
                             database.ref(`users/${friendId}`).once('value', (snapshot) => {
                                 if (snapshot.exists()) {
@@ -7264,26 +7469,22 @@ body.theme-flashcard button:hover {
                                     const isOnline = userData.online || (Date.now() - (userData.lastSeen || 0) < 60000);
                                     const status = isOnline ? '🟢 Online' : '⚫ Offline';
                                     
-                                    if (addFriend(friendId)) {
-                                        showCommandFeedback('friend', `Added ${friendId} (${status}) as a friend! Bio: ${userBio.substring(0, 30)}`, true);
+                                    if (sendFriendRequest(friendId)) {
+                                        showCommandFeedback('friend', `Friend request sent to ${friendId} (${status})! They need to accept it.`, true);
                                     } else {
-                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                                        showCommandFeedback('friend', `Could not send friend request to ${friendId}`, false);
                                     }
                                 } else {
-                                    // User doesn't exist in Firebase, but still allow adding (might be offline)
-                                    if (addFriend(friendId)) {
-                                        showCommandFeedback('friend', `Added ${friendId} as a friend! (User not currently online)`, true);
-                                    } else {
-                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
-                                    }
+                                    // User doesn't exist in Firebase
+                                    showCommandFeedback('friend', `User ${friendId} not found. They may not be registered.`, false);
                                 }
                             });
                         } else {
-                            // No Firebase, just add directly
-                            if (addFriend(friendId)) {
-                                showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
+                            // No Firebase, use localStorage
+                            if (sendFriendRequest(friendId)) {
+                                showCommandFeedback('friend', `Friend request sent to ${friendId}! They need to accept it.`, true);
                             } else {
-                                showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                                showCommandFeedback('friend', `Could not send friend request to ${friendId}`, false);
                             }
                         }
                     }
