@@ -3349,6 +3349,9 @@ body.theme-flashcard button:hover {
     </style>
 </head>
 <body>
+    <!-- Login/Username button in top left -->
+    <div id="loginButton" style="position: fixed; top: 20px; left: 20px; z-index: 10000; padding: 10px 20px; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: all 0.2s;" onclick="handleLoginButtonClick()">Login</div>
+    
     <!-- Main page with FinHub title -->
     <div class="page" id="mainPage">
         <div class="finhub-title">
@@ -3699,9 +3702,12 @@ body.theme-flashcard button:hover {
             <h2>✏️ Edit Profile</h2>
             <div class="edit-form">
                 <div class="edit-field">
-                    <label>User ID:</label>
-                    <input type="text" id="editUserId" placeholder="Your user ID" maxlength="20">
-                    <small>3-20 characters (letters, numbers, _, -)</small>
+                    <label>Display Name:</label>
+                    <input type="text" id="editDisplayName" placeholder="Your display name" maxlength="30">
+                    <small>This is how others see you (username is used for login)</small>
+                </div>
+                <div class="edit-field" style="color: #8b949e; font-size: 12px; margin-top: -10px;">
+                    <small>Username: <span id="editUsernameDisplay"></span> (cannot be changed)</small>
                 </div>
                 <div class="edit-field">
                     <label>Bio:</label>
@@ -4822,6 +4828,10 @@ body.theme-flashcard button:hover {
             localStorage.setItem('termsAccepted', 'true');
             localStorage.setItem('termsVersion', '1.0');
             hideTermsModal();
+            // Redirect to login page after accepting terms
+            if (typeof showPage === 'function') {
+                showPage('loginPage');
+            }
         }
         
         function rejectTerms() {
@@ -4833,21 +4843,24 @@ body.theme-flashcard button:hover {
         
         function openEditMenu() {
             const modal = document.getElementById('editModal');
-            const userIdInput = document.getElementById('editUserId');
+            const displayNameInput = document.getElementById('editDisplayName');
+            const usernameDisplay = document.getElementById('editUsernameDisplay');
             const bioInput = document.getElementById('editBio');
             const emojiPreview = document.getElementById('emojiPreview');
             const emojiGrid = document.getElementById('emojiGrid');
             
             if (!modal) return;
             
-            const currentUserId = getUserId();
-            const currentBio = getUserBio(currentUserId) || '';
-            const currentAvatar = getUserAvatar(currentUserId);
+            const currentUsername = localStorage.getItem('loggedInUsername') || getUserId();
+            const currentBio = getUserBio(currentUsername) || '';
+            const currentAvatar = getUserAvatar(currentUsername);
+            const currentDisplayName = localStorage.getItem('displayName') || currentUsername;
             
             // Populate fields
-            userIdInput.value = currentUserId;
-            bioInput.value = currentBio;
-            emojiPreview.textContent = currentAvatar;
+            if (displayNameInput) displayNameInput.value = currentDisplayName;
+            if (usernameDisplay) usernameDisplay.textContent = currentUsername;
+            if (bioInput) bioInput.value = currentBio;
+            if (emojiPreview) emojiPreview.textContent = currentAvatar;
             updateBioCharCount();
             
             // Populate emoji grid
@@ -4883,65 +4896,46 @@ body.theme-flashcard button:hover {
         }
         
         function saveEditProfile() {
-            const userIdInput = document.getElementById('editUserId');
+            const displayNameInput = document.getElementById('editDisplayName');
             const bioInput = document.getElementById('editBio');
             const emojiPreview = document.getElementById('emojiPreview');
             
-            if (!userIdInput || !bioInput || !emojiPreview) return;
+            if (!displayNameInput || !bioInput || !emojiPreview) return;
             
-            const newUserId = userIdInput.value.trim();
+            const newDisplayName = displayNameInput.value.trim();
             const newBio = bioInput.value.trim();
             const newAvatar = emojiPreview.textContent;
             
-            // Validate user ID
-            if (newUserId.length < 3 || newUserId.length > 20) {
-                showCommandFeedback('edit', 'User ID must be 3-20 characters', false);
+            // Validate display name
+            if (!newDisplayName || newDisplayName.length === 0) {
+                showCommandFeedback('edit', 'Display name cannot be empty', false);
                 return;
             }
             
-            const validIdPattern = /^[a-zA-Z0-9_-]+$/;
-            if (!validIdPattern.test(newUserId)) {
-                showCommandFeedback('edit', 'User ID can only contain letters, numbers, _, and -', false);
+            if (newDisplayName.length > 30) {
+                showCommandFeedback('edit', 'Display name must be 30 characters or less', false);
                 return;
             }
             
-            const oldUserId = getUserId();
-            
-            // Change user ID if different
-            if (newUserId !== oldUserId) {
-                const result = setUserId(newUserId);
-                if (result === false) {
-                    showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
-                    return;
-                } else if (result === true) {
-                    finishSaving(newUserId, newBio, newAvatar);
-                } else {
-                    // Promise result
-                    result.then((success) => {
-                        if (success) {
-                            finishSaving(newUserId, newBio, newAvatar);
-                        } else {
-                            showCommandFeedback('edit', 'User ID already taken. Choose a different one.', false);
-                        }
-                    });
-                    return;
-                }
-            } else {
-                finishSaving(newUserId, newBio, newAvatar);
-            }
+            const username = localStorage.getItem('loggedInUsername') || getUserId();
+            finishSaving(username, newDisplayName, newBio, newAvatar);
         }
         
-        function finishSaving(userId, bio, avatar) {
+        function finishSaving(username, displayName, bio, avatar) {
+            // Save display name
+            localStorage.setItem('displayName', displayName);
+            
             // Save bio
-            setUserBio(userId, bio);
+            setUserBio(username, bio);
             
             // Save avatar
-            setUserAvatar(userId, avatar);
+            setUserAvatar(username, avatar);
             
             // Sync to Firebase if available
             if (database) {
                 try {
-                    database.ref(`users/${userId}`).update({
+                    database.ref(`users/${username}`).update({
+                        displayName: displayName,
                         bio: bio,
                         avatar: avatar,
                         lastSeen: Date.now()
@@ -5238,30 +5232,90 @@ body.theme-flashcard button:hover {
             localStorage.setItem('userAvatars', JSON.stringify(avatars));
         }
         
-        // Friends System
+        // Friends System with Friend Requests
         function getFriends() {
             const friends = JSON.parse(localStorage.getItem('friends') || '[]');
             return friends;
         }
         
-        function addFriend(friendId) {
+        function getFriendRequests() {
+            const requests = JSON.parse(localStorage.getItem('friendRequests') || '[]');
+            return requests;
+        }
+        
+        function sendFriendRequest(toUsername) {
+            const username = localStorage.getItem('loggedInUsername') || getUserId();
+            if (toUsername === username) {
+                return { success: false, message: 'You cannot send a friend request to yourself!' };
+            }
+            
             const friends = getFriends();
-            if (!friends.includes(friendId)) {
-                friends.push(friendId);
+            if (friends.includes(toUsername)) {
+                return { success: false, message: 'You are already friends with this user!' };
+            }
+            
+            // Check if request already sent
+            const requests = getFriendRequests();
+            if (requests.some(r => r.from === username && r.to === toUsername)) {
+                return { success: false, message: 'Friend request already sent!' };
+            }
+            
+            // Send request
+            if (database) {
+                database.ref(`friendRequests/${toUsername}`).push({
+                    from: username,
+                    to: toUsername,
+                    timestamp: Date.now()
+                });
+            }
+            
+            return { success: true, message: `Friend request sent to ${toUsername}!` };
+        }
+        
+        function acceptFriendRequest(fromUsername) {
+            const username = localStorage.getItem('loggedInUsername') || getUserId();
+            const friends = getFriends();
+            
+            if (!friends.includes(fromUsername)) {
+                friends.push(fromUsername);
                 localStorage.setItem('friends', JSON.stringify(friends));
                 
-                // Sync to Firebase if available
+                // Also add current user to their friend list
                 if (database) {
-                    try {
-                        const userId = getUserId();
-                        database.ref(`users/${userId}/friends`).set(friends);
-                    } catch (e) {
-                        console.warn('Could not sync friends to Firebase:', e);
-                    }
+                    database.ref(`users/${fromUsername}/friends`).once('value', (snapshot) => {
+                        const theirFriends = snapshot.val() || [];
+                        if (!theirFriends.includes(username)) {
+                            theirFriends.push(username);
+                            database.ref(`users/${fromUsername}/friends`).set(theirFriends);
+                        }
+                    });
+                    database.ref(`users/${username}/friends`).set(friends);
                 }
-                return true;
             }
-            return false;
+            
+            // Remove request
+            removeFriendRequest(fromUsername);
+            
+            return true;
+        }
+        
+        function removeFriendRequest(fromUsername) {
+            const username = localStorage.getItem('loggedInUsername') || getUserId();
+            if (database) {
+                database.ref(`friendRequests/${username}`).once('value', (snapshot) => {
+                    snapshot.forEach((child) => {
+                        const data = child.val();
+                        if (data.from === fromUsername) {
+                            child.ref.remove();
+                        }
+                    });
+                });
+            }
+        }
+        
+        function addFriend(friendId) {
+            // Legacy function - now redirects to send request
+            return sendFriendRequest(friendId);
         }
         
         function removeFriend(friendId) {
@@ -5296,38 +5350,145 @@ body.theme-flashcard button:hover {
             
             if (!modal || !friendsList) return;
             
+            const username = localStorage.getItem('loggedInUsername') || getUserId();
             const friends = getFriends();
             
-            if (friends.length === 0) {
-                friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [id]" to add someone!</div>';
-            } else {
-                friendsList.innerHTML = '';
-                friends.forEach(friendId => {
-                    const friendItem = document.createElement('div');
-                    friendItem.className = 'friend-item';
+            friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 20px;">Loading...</div>';
+            
+            // Load friend requests from Firebase
+            if (database) {
+                database.ref(`friendRequests/${username}`).once('value', (snapshot) => {
+                    const requests = [];
+                    snapshot.forEach((child) => {
+                        const data = child.val();
+                        if (data && data.from) {
+                            requests.push(data.from);
+                        }
+                    });
                     
-                    const avatar = getUserAvatar(friendId);
-                    const bio = getUserBio(friendId) || 'No bio';
+                    friendsList.innerHTML = '';
                     
-                    friendItem.innerHTML = `
-                        <div class="friend-avatar">${avatar}</div>
-                        <div class="friend-info">
-                            <div class="friend-name">${friendId}</div>
-                            <div class="friend-bio">${bio.substring(0, 50)}${bio.length > 50 ? '...' : ''}</div>
-                        </div>
-                    `;
+                    // Show pending friend requests first
+                    if (requests.length > 0) {
+                        const requestsTitle = document.createElement('div');
+                        requestsTitle.style.cssText = 'color: #58a6ff; font-weight: bold; margin: 15px 0 10px 0; padding: 10px; background: #161b22; border-radius: 6px;';
+                        requestsTitle.textContent = `📬 Friend Requests (${requests.length})`;
+                        friendsList.appendChild(requestsTitle);
+                        
+                        requests.forEach(fromUsername => {
+                            const requestItem = document.createElement('div');
+                            requestItem.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; background: #161b22; border: 1px solid #30363d; border-radius: 6px;';
+                            
+                            const avatar = getUserAvatar(fromUsername);
+                            const bio = getUserBio(fromUsername) || 'No bio';
+                            const displayName = localStorage.getItem(`displayName_${fromUsername}`) || fromUsername;
+                            
+                            requestItem.innerHTML = `
+                                <div style="display: flex; align-items: center; flex: 1;">
+                                    <div class="friend-avatar">${avatar}</div>
+                                    <div class="friend-info" style="margin-left: 10px;">
+                                        <div class="friend-name">${escapeHtml(displayName)} <span style="color: #8b949e; font-size: 12px;">(@${escapeHtml(fromUsername)})</span></div>
+                                        <div class="friend-bio">${escapeHtml(bio.substring(0, 50))}${bio.length > 50 ? '...' : ''}</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="acceptFriendRequestHandler('${escapeHtml(fromUsername)}')" style="background: #238636; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Accept</button>
+                                    <button onclick="denyFriendRequestHandler('${escapeHtml(fromUsername)}')" style="background: #f85149; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Deny</button>
+                                </div>
+                            `;
+                            
+                            friendsList.appendChild(requestItem);
+                        });
+                        
+                        const divider = document.createElement('div');
+                        divider.style.cssText = 'height: 1px; background: #30363d; margin: 20px 0;';
+                        friendsList.appendChild(divider);
+                    }
                     
-                    friendItem.onclick = () => {
-                        openPrivateChat(friendId);
-                        closeFriendsList();
-                    };
-                    
-                    friendsList.appendChild(friendItem);
+                    // Show existing friends
+                    if (friends.length === 0 && requests.length === 0) {
+                        friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [username]" to send a friend request!</div>';
+                    } else if (friends.length > 0) {
+                        if (requests.length > 0) {
+                            const friendsTitle = document.createElement('div');
+                            friendsTitle.style.cssText = 'color: #58a6ff; font-weight: bold; margin: 15px 0 10px 0; padding: 10px; background: #161b22; border-radius: 6px;';
+                            friendsTitle.textContent = `👥 Friends (${friends.length})`;
+                            friendsList.appendChild(friendsTitle);
+                        }
+                        
+                        friends.forEach(friendId => {
+                            const friendItem = document.createElement('div');
+                            friendItem.className = 'friend-item';
+                            
+                            const avatar = getUserAvatar(friendId);
+                            const bio = getUserBio(friendId) || 'No bio';
+                            const displayName = localStorage.getItem(`displayName_${friendId}`) || friendId;
+                            
+                            friendItem.innerHTML = `
+                                <div class="friend-avatar">${avatar}</div>
+                                <div class="friend-info">
+                                    <div class="friend-name">${escapeHtml(displayName)} <span style="color: #8b949e; font-size: 12px;">(@${escapeHtml(friendId)})</span></div>
+                                    <div class="friend-bio">${escapeHtml(bio.substring(0, 50))}${bio.length > 50 ? '...' : ''}</div>
+                                </div>
+                            `;
+                            
+                            friendItem.onclick = () => {
+                                openPrivateChat(friendId);
+                                closeFriendsList();
+                            };
+                            
+                            friendsList.appendChild(friendItem);
+                        });
+                    }
                 });
+            } else {
+                // Fallback without Firebase
+                if (friends.length === 0) {
+                    friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [username]" to send a friend request!</div>';
+                } else {
+                    friendsList.innerHTML = '';
+                    friends.forEach(friendId => {
+                        const friendItem = document.createElement('div');
+                        friendItem.className = 'friend-item';
+                        
+                        const avatar = getUserAvatar(friendId);
+                        const bio = getUserBio(friendId) || 'No bio';
+                        const displayName = localStorage.getItem(`displayName_${friendId}`) || friendId;
+                        
+                        friendItem.innerHTML = `
+                            <div class="friend-avatar">${avatar}</div>
+                            <div class="friend-info">
+                                <div class="friend-name">${escapeHtml(displayName)} <span style="color: #8b949e; font-size: 12px;">(@${escapeHtml(friendId)})</span></div>
+                                <div class="friend-bio">${escapeHtml(bio.substring(0, 50))}${bio.length > 50 ? '...' : ''}</div>
+                            </div>
+                        `;
+                        
+                        friendItem.onclick = () => {
+                            openPrivateChat(friendId);
+                            closeFriendsList();
+                        };
+                        
+                        friendsList.appendChild(friendItem);
+                    });
+                }
             }
             
             modal.classList.add('show');
         }
+        
+        function acceptFriendRequestHandler(fromUsername) {
+            if (acceptFriendRequest(fromUsername)) {
+                openFriendsList(); // Refresh list
+            }
+        }
+        
+        function denyFriendRequestHandler(fromUsername) {
+            removeFriendRequest(fromUsername);
+            openFriendsList(); // Refresh list
+        }
+        
+        window.acceptFriendRequestHandler = acceptFriendRequestHandler;
+        window.denyFriendRequestHandler = denyFriendRequestHandler;
         
         function closeFriendsList() {
             const modal = document.getElementById('friendsModal');
@@ -5340,8 +5501,9 @@ body.theme-flashcard button:hover {
             currentPrivateChatWith = friendId;
             const title = document.getElementById('privateChatTitle');
             const avatar = getUserAvatar(friendId);
+            const displayName = localStorage.getItem(`displayName_${friendId}`) || friendId;
             if (title) {
-                title.textContent = `💬 Private Chat with ${avatar} ${friendId}`;
+                title.textContent = `💬 Private Chat with ${avatar} ${escapeHtml(displayName)}`;
             }
             showPage('privateChatPage');
             loadPrivateChatMessages(friendId);
@@ -5462,102 +5624,7 @@ body.theme-flashcard button:hover {
         
         // Friends System
         let currentPrivateChatWith = null;
-        function getFriends() {
-            const friends = JSON.parse(localStorage.getItem('friends') || '[]');
-            return friends;
-        }
-        
-        function addFriend(friendId) {
-            const friends = getFriends();
-            if (!friends.includes(friendId)) {
-                friends.push(friendId);
-                localStorage.setItem('friends', JSON.stringify(friends));
-                
-                // Sync to Firebase if available
-                if (database) {
-                    try {
-                        const userId = getUserId();
-                        database.ref(`users/${userId}/friends`).set(friends);
-                    } catch (e) {
-                        console.warn('Could not sync friends to Firebase:', e);
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-        
-        function removeFriend(friendId) {
-            const friends = getFriends();
-            const index = friends.indexOf(friendId);
-            if (index > -1) {
-                friends.splice(index, 1);
-                localStorage.setItem('friends', JSON.stringify(friends));
-                
-                // Sync to Firebase if available
-                if (database) {
-                    try {
-                        const userId = getUserId();
-                        database.ref(`users/${userId}/friends`).set(friends);
-                    } catch (e) {
-                        console.warn('Could not sync friends to Firebase:', e);
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-        
-        function isFriend(userId) {
-            const friends = getFriends();
-            return friends.includes(userId);
-        }
-        
-        function openFriendsList() {
-            const modal = document.getElementById('friendsModal');
-            const friendsList = document.getElementById('friendsList');
-            
-            if (!modal || !friendsList) return;
-            
-            const friends = getFriends();
-            
-            if (friends.length === 0) {
-                friendsList.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">No friends yet. Use "friend [id]" to add someone!</div>';
-            } else {
-                friendsList.innerHTML = '';
-                friends.forEach(friendId => {
-                    const friendItem = document.createElement('div');
-                    friendItem.className = 'friend-item';
-                    
-                    const avatar = getUserAvatar(friendId);
-                    const bio = getUserBio(friendId) || 'No bio';
-                    
-                    friendItem.innerHTML = `
-                        <div class="friend-avatar">${avatar}</div>
-                        <div class="friend-info">
-                            <div class="friend-name">${friendId}</div>
-                            <div class="friend-bio">${bio.substring(0, 50)}${bio.length > 50 ? '...' : ''}</div>
-                        </div>
-                    `;
-                    
-                    friendItem.onclick = () => {
-                        openPrivateChat(friendId);
-                        closeFriendsList();
-                    };
-                    
-                    friendsList.appendChild(friendItem);
-                });
-            }
-            
-            modal.classList.add('show');
-        }
-        
-        function closeFriendsList() {
-            const modal = document.getElementById('friendsModal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
+        // REMOVED - Duplicate functions, using the ones defined earlier
         
         function openPrivateChat(friendId) {
             currentPrivateChatWith = friendId;
@@ -5855,6 +5922,15 @@ body.theme-flashcard button:hover {
         
         function sendChatMessage(text) {
             if (!text || !text.trim()) return;
+            
+            // Check if user is logged in
+            if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
+                alert('Please log in to send chat messages!');
+                if (typeof showPage === 'function') {
+                    showPage('loginPage');
+                }
+                return;
+            }
             
             const userId = getUserId();
             const message = {
@@ -6174,6 +6250,32 @@ body.theme-flashcard button:hover {
             
             const chatInput = document.getElementById('chatInput');
             const chatSendBtn = document.getElementById('chatSendBtn');
+            
+            // Function to update chat UI based on login status
+            function updateChatUI() {
+                if (chatInput && chatSendBtn) {
+                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
+                    if (!loggedIn) {
+                        chatInput.disabled = true;
+                        chatInput.placeholder = 'Please log in to chat...';
+                        chatSendBtn.disabled = true;
+                        chatSendBtn.style.opacity = '0.5';
+                        chatSendBtn.style.cursor = 'not-allowed';
+                    } else {
+                        chatInput.disabled = false;
+                        chatInput.placeholder = 'Type a message...';
+                        chatSendBtn.disabled = false;
+                        chatSendBtn.style.opacity = '1';
+                        chatSendBtn.style.cursor = 'pointer';
+                    }
+                }
+            }
+            
+            // Update UI on load
+            updateChatUI();
+            
+            // Update UI when login status changes (check periodically)
+            setInterval(updateChatUI, 1000);
             
             if (chatInput && chatSendBtn) {
                 chatSendBtn.onclick = () => {
@@ -6659,42 +6761,16 @@ body.theme-flashcard button:hover {
                     commandInput.placeholder = 'Edit your board';
                 } else if (command.startsWith('friend ')) {
                     resetConfirm = false;
-                    const friendId = command.substring(7).trim();
-                    if (!friendId) {
-                        showCommandFeedback('friend', 'Please provide a user ID. Usage: friend [user id]', false);
-                    } else if (friendId === getUserId()) {
-                        showCommandFeedback('friend', 'You cannot add yourself as a friend!', false);
+                    const username = command.substring(7).trim();
+                    if (!username) {
+                        showCommandFeedback('friend', 'Please provide a username. Usage: friend [username]', false);
                     } else {
-                        // Check if user exists and get their info to verify
-                        if (database) {
-                            database.ref(`users/${friendId}`).once('value', (snapshot) => {
-                                if (snapshot.exists()) {
-                                    const userData = snapshot.val();
-                                    const userBio = userData.bio || '(No bio)';
-                                    const isOnline = userData.online || (Date.now() - (userData.lastSeen || 0) < 60000);
-                                    const status = isOnline ? '🟢 Online' : '⚫ Offline';
-                                    
-                                    if (addFriend(friendId)) {
-                                        showCommandFeedback('friend', `Added ${friendId} (${status}) as a friend! Bio: ${userBio.substring(0, 30)}`, true);
-                                    } else {
-                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
-                                    }
-                                } else {
-                                    // User doesn't exist in Firebase, but still allow adding (might be offline)
-                                    if (addFriend(friendId)) {
-                                        showCommandFeedback('friend', `Added ${friendId} as a friend! (User not currently online)`, true);
-                                    } else {
-                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
-                                    }
-                                }
-                            });
+                        // Send friend request
+                        const result = sendFriendRequest(username);
+                        if (result.success) {
+                            showCommandFeedback('friend', result.message, true);
                         } else {
-                            // No Firebase, just add directly
-                            if (addFriend(friendId)) {
-                                showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
-                            } else {
-                                showCommandFeedback('friend', `${friendId} is already your friend!`, false);
-                            }
+                            showCommandFeedback('friend', result.message || 'Failed to send friend request', false);
                         }
                     }
                 } else if (command === 'friends') {
@@ -6702,6 +6778,15 @@ body.theme-flashcard button:hover {
                     openFriendsList();
                 } else if (command === 'chat') {
                     resetConfirm = false;
+                    // Check if logged in
+                    const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
+                    if (!loggedIn) {
+                        showCommandFeedback('chat', 'Please log in to use chat!', false);
+                        if (typeof showPage === 'function') {
+                            showPage('loginPage');
+                        }
+                        return;
+                    }
                     const chatPage = document.getElementById('chatPage');
                     if (chatPage && !chatPage.classList.contains('hidden')) {
                         // Chat is open, close it
@@ -16998,6 +17083,13 @@ body.theme-flashcard button:hover {
                 console.error('Error updating visit counter:', e);
             }
             
+            // Update login button
+            try {
+                updateLoginButton();
+            } catch (e) {
+                console.error('Error updating login button:', e);
+            }
+            
             // Ensure command bar is visible (unless on remote desktop or blocked)
             try {
                 const commandBar = document.querySelector('.command-bar');
@@ -17014,6 +17106,53 @@ body.theme-flashcard button:hover {
             }
         }
         
+        // Update login button based on login status
+        function updateLoginButton() {
+            const loginButton = document.getElementById('loginButton');
+            if (!loginButton) return;
+            
+            const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
+            const username = localStorage.getItem('loggedInUsername');
+            
+            if (loggedIn && username) {
+                loginButton.textContent = username;
+                loginButton.style.background = '#58a6ff';
+                loginButton.title = 'Click to logout or view profile';
+            } else {
+                loginButton.textContent = 'Login';
+                loginButton.style.background = '#238636';
+                loginButton.title = 'Click to login';
+            }
+        }
+        
+        // Handle login button click
+        function handleLoginButtonClick() {
+            const loggedIn = (typeof isLoggedIn === 'function' && isLoggedIn()) || localStorage.getItem('loggedInUsername');
+            
+            if (loggedIn) {
+                // Show logout confirmation or user menu
+                if (confirm('Do you want to logout?')) {
+                    if (typeof logoutUser === 'function') {
+                        logoutUser();
+                    } else if (typeof handleLogout === 'function') {
+                        handleLogout();
+                    } else {
+                        localStorage.removeItem('loggedInUsername');
+                        window.location.reload();
+                    }
+                    updateLoginButton();
+                }
+            } else {
+                // Go to login page
+                if (typeof showPage === 'function') {
+                    showPage('loginPage');
+                }
+            }
+        }
+        
+        // Make function globally accessible
+        window.handleLoginButtonClick = handleLoginButtonClick;
+        
         // Initialize on DOM ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeOnLoad);
@@ -17021,6 +17160,9 @@ body.theme-flashcard button:hover {
             // DOM already loaded
             initializeOnLoad();
         }
+        
+        // Update login button periodically to reflect login status changes
+        setInterval(updateLoginButton, 1000);
         
         // Check if blocked on page load
         if (checkBlocked()) {
