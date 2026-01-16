@@ -5981,6 +5981,24 @@ body.theme-flashcard button:hover {
                 };
             }
             
+            // Set up View Board button
+            if (isFriend || isOwnProfile) {
+                viewBoardItem.style.display = 'block';
+                viewBoardItem.style.cursor = 'pointer';
+                viewBoardItem.style.color = '#000';
+                viewBoardItem.onclick = () => {
+                    if (typeof viewBoard === 'function') {
+                        viewBoard(userId);
+                    } else if (typeof window.viewBoard === 'function') {
+                        window.viewBoard(userId);
+                    }
+                    contextMenu.classList.add('hidden');
+                };
+            } else {
+                viewBoardItem.style.display = 'none';
+                viewBoardItem.onclick = null;
+            }
+            
             // Position and show context menu
             contextMenu.style.left = event.pageX + 'px';
             contextMenu.style.top = event.pageY + 'px';
@@ -6004,13 +6022,23 @@ body.theme-flashcard button:hover {
             if (!userId) userId = getUserId();
             if (database) {
                 return new Promise((resolve) => {
-                    database.ref(`boards/${userId}`).once('value', (snapshot) => {
+                    // Try new path first (userData/{username}/board)
+                    database.ref(`userData/${userId}/board`).once('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
                             resolve(data);
                         } else {
-                            const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
-                            resolve(boards[userId] || { text: '', images: [] });
+                            // Try legacy path (boards/{userId})
+                            database.ref(`boards/${userId}`).once('value', (snapshot2) => {
+                                const data2 = snapshot2.val();
+                                if (data2) {
+                                    resolve(data2);
+                                } else {
+                                    // Fallback to localStorage
+                                    const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
+                                    resolve(boards[userId] || { text: '', images: [] });
+                                }
+                            });
                         }
                     });
                 });
