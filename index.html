@@ -2667,6 +2667,7 @@ body.theme-flashcard button:hover {
     <div class="page minesweeper-page hidden" id="minesweeperPage" oncontextmenu="return false;">
         <button id="restart-btn">Restart Game</button>
         <div id="message">Flags Remaining: 10</div>
+        <div id="minesweeper-timer-display" style="font-size: 16px; margin: 10px 0; font-weight: bold;">Time: <span id="minesweeper-timer-text">0</span>s</div>
         <div id="minesweeper-game-container">
             <div class="minesweeper-grid" id="minesweeper-grid"></div>
         </div>
@@ -3577,16 +3578,13 @@ body.theme-flashcard button:hover {
             }));
         }
         
-        // Reset everything - clears all progress
+        // Reset everything - clears ALL progress and data
         function resetEverything() {
-            // Mark reset as used - can only use once
-            resetUsed = true;
-            sessionStorage.setItem('resetUsed', 'true');
+            // Clear ALL localStorage - this removes EVERYTHING
+            localStorage.clear();
             
-            // Clear all localStorage
-            localStorage.removeItem('globalData');
-            localStorage.removeItem('coinflipData');
-            localStorage.removeItem('achievements');
+            // Clear ALL sessionStorage
+            sessionStorage.clear();
             
             // Reset all variables
             globalMoney = 0;
@@ -3595,6 +3593,7 @@ body.theme-flashcard button:hover {
             unlockedCommands = new Set(); // Reset goose command unlocks
             isGooseMode = false;
             resetConfirm = false;
+            resetUsed = false; // Allow reset to be used again after page reload
             
             // Reset coinflip data
             coinflipStreak = 0;
@@ -3646,14 +3645,26 @@ body.theme-flashcard button:hover {
                 letter.style.color = '';
             });
             
+            // Reset desktop state (if exists)
+            try {
+                if (typeof saveDesktopState === 'function') {
+                    // Will be reset when desktop initializes
+                }
+            } catch(e) {}
+            
+            // Reset command history
+            if (typeof commandHistory !== 'undefined') {
+                commandHistory = [];
+            }
+            
+            // Clear all input fields if they exist
+            const commandInputEl = document.getElementById('commandInput');
+            if (commandInputEl) {
+                commandInputEl.value = '';
+            }
+            
             // Go back to main page
             showPage('mainPage');
-            
-            // Show success message
-            commandInput.placeholder = '✅ Everything has been reset!';
-            setTimeout(() => {
-                commandInput.placeholder = 'Type a color or "home"...';
-            }, 3000);
         }
         
         // Update all money displays across all pages
@@ -5182,29 +5193,28 @@ body.theme-flashcard button:hover {
                 
                 // Handle navigation commands
                 if (command === 'reset') {
-                    // Check if reset has already been used
-                    if (sessionStorage.getItem('resetUsed') === 'true') {
-                        commandInput.value = '';
-                        commandInput.placeholder = 'Reset can only be used once per session!';
-                        setTimeout(() => {
-                            commandInput.placeholder = 'Type a color or "home"...';
-                        }, 2000);
-                    } else if (resetConfirm) {
-                        // Second time - actually reset
+                    if (resetConfirm) {
+                        // Second time - actually reset EVERYTHING
                         resetEverything();
                         commandInput.value = '';
                         resetConfirm = false;
-                            } else {
+                        showCommandFeedback('reset', '⚠️ EVERYTHING HAS BEEN RESET! Page will reload...', true);
+                        // Reload page after a short delay to ensure everything is cleared
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
                         // First time - ask for confirmation
                         resetConfirm = true;
                         commandInput.value = '';
-                        commandInput.placeholder = '⚠️ Type "reset" again to confirm - THIS WILL DELETE ALL PROGRESS!';
+                        commandInput.placeholder = '⚠️ Type "reset" again to confirm - THIS WILL DELETE EVERYTHING!';
+                        showCommandFeedback('reset', '⚠️ WARNING: This will clear ALL data including desktop, changelog, suggestions, achievements, money, friends, messages, and MORE!', false);
                         setTimeout(() => {
                             resetConfirm = false;
                             if (commandInput.placeholder.includes('confirm')) {
                                 commandInput.placeholder = 'Type a color or "home"...';
                             }
-                        }, 5000);
+                        }, 10000);
                     }
                 } else if (command === 'home') {
                     resetConfirm = false; // Clear reset confirmation if other command is used
@@ -5731,11 +5741,16 @@ body.theme-flashcard button:hover {
         const gridEl = document.getElementById('minesweeper-grid');
         const messageEl = document.getElementById('message');
         const restartBtn = document.getElementById('restart-btn');
+        const timerEl = document.getElementById('minesweeper-timer-text');
 
         let board = [];
         let isGameOver = false;
         let flagsRemaining = NUM_MINES;
         let revealedCount = 0;
+        let gameStarted = false;
+        let gameWon = false;
+        let timer = 0;
+        let timerInterval = null;
 
         function createBoard() {
             board = Array(GRID_SIZE).fill(0).map(() => 
@@ -5786,6 +5801,25 @@ body.theme-flashcard button:hover {
             if (isGameOver || r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE || board[r][c].isRevealed || board[r][c].isFlagged) {
                 return;
             }
+            
+            // Start timer on first click
+            if (!gameStarted) {
+                gameStarted = true;
+                timer = 0;
+                if (timerEl) timerEl.textContent = timer;
+                timerInterval = setInterval(() => {
+                    if (isGameOver || gameWon) {
+                        if (timerInterval) {
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                        }
+                        return;
+                    }
+                    timer++;
+                    if (timerEl) timerEl.textContent = timer;
+                }, 1000);
+            }
+            
             const cell = board[r][c];
             cell.isRevealed = true;
             revealedCount++;
@@ -5867,11 +5901,19 @@ body.theme-flashcard button:hover {
 
         function gameOver(win) {
             isGameOver = true;
+            gameWon = win;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
             if (!messageEl) return;
             if (win) {
-                messageEl.innerHTML = '🎉 YOU WIN! 🎉';
+                messageEl.innerHTML = `🎉 YOU WIN! 🎉 Time: ${timer}s`;
                 messageEl.style.color = 'green';
-                    } else {
+                // Save score to leaderboard
+                const userId = getUserId() || 'Anonymous';
+                saveMinesweeperPageScore(timer, userId);
+            } else {
                 messageEl.innerHTML = '💣 GAME OVER! 💣';
                 messageEl.style.color = 'red';
                 board.flat().forEach(cell => {
@@ -5882,11 +5924,45 @@ body.theme-flashcard button:hover {
                 });
             }
         }
+        
+        // Save score to Firebase leaderboard (for page version)
+        function saveMinesweeperPageScore(time, userId) {
+            if (database) {
+                const scoreData = {
+                    userId: userId,
+                    time: time,
+                    timestamp: Date.now()
+                };
+                database.ref('minesweeperLeaderboard').push(scoreData);
+            } else {
+                // localStorage fallback
+                const saved = localStorage.getItem('minesweeperLeaderboard');
+                const scores = saved ? JSON.parse(saved) : [];
+                scores.push({
+                    id: 'score_' + Date.now(),
+                    userId: userId,
+                    time: time,
+                    timestamp: Date.now()
+                });
+                // Keep only top 50
+                scores.sort((a, b) => a.time - b.time);
+                scores.splice(50);
+                localStorage.setItem('minesweeperLeaderboard', JSON.stringify(scores));
+            }
+        }
 
         function initGame() {
             isGameOver = false;
+            gameStarted = false;
+            gameWon = false;
             flagsRemaining = NUM_MINES;
             revealedCount = 0;
+            timer = 0;
+            if (timerEl) timerEl.textContent = timer;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
             if (messageEl) {
                 messageEl.style.color = 'black';
             }
@@ -7632,6 +7708,24 @@ body.theme-flashcard button:hover {
                         const y = Math.random() * 200 + 50;
                         addDesktopIcon('passwordgame', 'Password Game', x, y);
                         alert('Password Game installed successfully!');
+                    };
+                }
+                
+                const installPaintV2Btn = document.getElementById('install-paintv2');
+                if (installPaintV2Btn) {
+                    installPaintV2Btn.onclick = () => {
+                        // Check if already installed
+                        const alreadyInstalled = desktopIcons.some(icon => icon.type === 'paintv2');
+                        if (alreadyInstalled) {
+                            alert('Paint v2 is already installed!');
+                            return;
+                        }
+                        
+                        // Add Paint v2 icon to desktop
+                        const x = Math.random() * 200 + 50;
+                        const y = Math.random() * 200 + 50;
+                        addDesktopIcon('paintv2', 'Paint v2', x, y);
+                        alert('Paint v2 installed successfully!');
                     };
                 }
                 
