@@ -13235,6 +13235,13 @@ body.theme-flashcard button:hover {
                     const fixedLobbyIds = ['lobby1', 'lobby2', 'lobby3', 'lobby4', 'lobby5'];
                     let html = '';
                     
+                    // Filter out players that are null or empty strings
+                    function getValidPlayers(lobby) {
+                        if (!lobby) return [];
+                        const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
+                        return players.filter(p => p && p.trim() !== '');
+                    }
+                    
                     fixedLobbyIds.forEach((lobbyId, index) => {
                         const lobbyNum = index + 1;
                         const lobby = lobbiesData[lobbyId];
@@ -13242,7 +13249,7 @@ body.theme-flashcard button:hover {
                         if (lobby) {
                             const hasPassword = lobby.lobbyPassword && lobby.lobbyPassword.length > 0;
                             const hostName = lobby.hostName || lobby.host || 'None';
-                            const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
+                            const players = getValidPlayers(lobby);
                             const isFull = players.length >= 2;
                             const isGameStarted = lobby.gameStarted || false;
                             const statusText = isGameStarted ? ' (Game in progress)' : isFull ? ' (Full)' : ' (Open)';
@@ -13302,9 +13309,50 @@ body.theme-flashcard button:hover {
                             database.ref('passwordGameLobbies').off('value', lobbyListener);
                         }
                         
+                        // Cleanup function to remove old/inactive lobbies
+                        function cleanupOldLobbies(lobbiesData) {
+                            const fixedLobbyIds = ['lobby1', 'lobby2', 'lobby3', 'lobby4', 'lobby5'];
+                            const currentTime = Date.now();
+                            const maxInactiveTime = 30 * 60 * 1000; // 30 minutes
+                            
+                            Object.keys(lobbiesData).forEach(lobbyId => {
+                                const lobby = lobbiesData[lobbyId];
+                                const isFixed = fixedLobbyIds.includes(lobbyId);
+                                
+                                // Get player count
+                                const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
+                                const playerCount = players.filter(p => p && p.trim() !== '').length;
+                                const createdAt = lobby.createdAt || 0;
+                                const age = currentTime - createdAt;
+                                const isOld = age > maxInactiveTime;
+                                const isEmpty = playerCount === 0;
+                                const isGameFinished = lobby.gameStarted === false && isOld;
+                                
+                                // Clean up non-fixed lobbies that are old and empty, or old finished games
+                                if (!isFixed) {
+                                    if ((isEmpty && isOld) || (isGameFinished && isOld)) {
+                                        database.ref(`passwordGameLobbies/${lobbyId}`).remove();
+                                    }
+                                } else {
+                                    // For fixed lobbies, reset them if they're empty and old (but don't delete)
+                                    if (isEmpty && isOld && !lobby.gameStarted) {
+                                        database.ref(`passwordGameLobbies/${lobbyId}`).update({
+                                            host: null,
+                                            hostName: null,
+                                            players: [],
+                                            password: '',
+                                            gameStarted: false
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                        
                         // Set up listener for all lobbies
                         lobbyListener = (snapshot) => {
                             const allLobbies = snapshot.val() || {};
+                            // Clean up old lobbies before rendering
+                            cleanupOldLobbies(allLobbies);
                             renderLobbies(allLobbies);
                         };
                         
