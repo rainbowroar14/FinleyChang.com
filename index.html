@@ -13163,14 +13163,28 @@ body.theme-flashcard button:hover {
                     if (lobbies.length === 0) {
                         listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
                     } else {
-                        let html = '';
+                        listEl.innerHTML = '';
                         lobbies.forEach(lobby => {
                             const hasPassword = lobby.lobbyPassword && lobby.lobbyPassword.length > 0;
                             const hostName = lobby.hostName || lobby.host || 'Unknown';
                             const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
-                            html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div><div style="font-size: 10px; color: #666;">Players: ${players.length}/2 ${hasPassword ? '🔒' : ''}</div><button onclick="window.passwordJoinLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
+                            
+                            const lobbyDiv = document.createElement('div');
+                            lobbyDiv.style.cssText = 'border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;';
+                            lobbyDiv.innerHTML = `
+                                <div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div>
+                                <div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div>
+                                <div style="font-size: 10px; color: #666;">Players: ${players.length}/2 ${hasPassword ? '🔒' : ''}</div>
+                                <button class="password-join-btn" data-lobby-id="${escapeHtml(lobby.id)}" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button>
+                            `;
+                            
+                            const joinBtn = lobbyDiv.querySelector('.password-join-btn');
+                            joinBtn.onclick = () => {
+                                joinLobbyInternal(lobby.id, false);
+                            };
+                            
+                            listEl.appendChild(lobbyDiv);
                         });
-                        listEl.innerHTML = html;
                     }
                 }
                 
@@ -13477,7 +13491,9 @@ body.theme-flashcard button:hover {
                     }
                 }
                 
+                // Set global function for backwards compatibility
                 window.passwordJoinLobby = (lobbyId) => joinLobbyInternal(lobbyId, false);
+                
                 content.querySelector('#create-lobby').onclick = createLobby;
                 content.querySelector('#refresh-password-lobbies').onclick = () => {
                     if (database) {
@@ -13819,8 +13835,12 @@ body.theme-flashcard button:hover {
             // Make join function globally accessible - update each time showPaintV2Lobbies is called
             // Lobby system
             function showPaintV2Lobbies() {
-                // Make sure the global join function is accessible when buttons are created
-                window.paintV2JoinLobby = (lobbyId) => joinLobbyInternal(lobbyId);
+                // Make sure the global join function is accessible when buttons are created (for backwards compatibility)
+                window.paintV2JoinLobby = (lobbyId) => {
+                    if (typeof joinLobbyInternal === 'function') {
+                        joinLobbyInternal(lobbyId);
+                    }
+                };
                 
                 windowZIndex++;
                 const lobbyWindow = document.createElement('div');
@@ -13864,14 +13884,28 @@ body.theme-flashcard button:hover {
                     if (lobbies.length === 0) {
                         listEl.innerHTML = '<div style="font-size: 11px; color: #666; text-align: center; margin: 10px 0;">No available lobbies. Create one!</div>';
                     } else {
-                        let html = '';
+                        listEl.innerHTML = '';
                         lobbies.forEach(lobby => {
                             const hasPassword = lobby.password && lobby.password.length > 0;
                             const hostName = lobby.hostName || lobby.host || 'Unknown';
                             const maxPlayers = lobby.maxPlayers || 10;
-                            html += `<div style="border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;"><div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div><div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div><div style="font-size: 10px; color: #666;">Players: ${lobby.playerCount}/${maxPlayers} ${hasPassword ? '🔒' : ''}</div><button onclick="window.paintV2JoinLobby('${lobby.id}')" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button></div>`;
+                            
+                            const lobbyDiv = document.createElement('div');
+                            lobbyDiv.style.cssText = 'border: 1px inset #c0c0c0; padding: 8px; margin: 5px 0; background: #fff;';
+                            lobbyDiv.innerHTML = `
+                                <div style="font-size: 11px; font-weight: bold;">Lobby ${lobby.id.substring(0, 6)}</div>
+                                <div style="font-size: 10px; color: #666;">Host: ${escapeHtml(hostName)}</div>
+                                <div style="font-size: 10px; color: #666;">Players: ${lobby.playerCount}/${maxPlayers} ${hasPassword ? '🔒' : ''}</div>
+                                <button class="paintv2-join-btn" data-lobby-id="${escapeHtml(lobby.id)}" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 8px; cursor: pointer; font-size: 10px; margin-top: 5px;">Join</button>
+                            `;
+                            
+                            const joinBtn = lobbyDiv.querySelector('.paintv2-join-btn');
+                            joinBtn.onclick = () => {
+                                joinLobbyInternal(lobby.id);
+                            };
+                            
+                            listEl.appendChild(lobbyDiv);
                         });
-                        listEl.innerHTML = html;
                     }
                 }
                 
