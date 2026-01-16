@@ -3558,45 +3558,6 @@ body.theme-flashcard button:hover {
         <p id="limboError" style="color: #f85149; font-size: 16px; margin-top: 20px; min-height: 24px;"></p>
     </div>
     
-    <!-- Login page -->
-    <div class="page login-page hidden" id="loginPage">
-        <div style="max-width: 400px; margin: 0 auto; padding: 40px; background: #161b22; border: 2px solid #30363d; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
-            <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 30px; text-align: center;">Clever Portal</h1>
-            <div id="login-form">
-                <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 20px; text-align: center;">Login</h2>
-                <div style="margin-bottom: 15px;">
-                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Username:</label>
-                    <input type="text" id="login-username" placeholder="Enter username" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Password:</label>
-                    <input type="password" id="login-password" placeholder="Enter password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
-                </div>
-                <button id="login-submit-btn" onclick="handleLogin()" style="width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 15px;">Login</button>
-                <button onclick="showRegisterForm()" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #58a6ff; border: 2px solid #58a6ff; border-radius: 8px; cursor: pointer;">Create Account</button>
-                <p id="login-error" style="color: #f85149; font-size: 14px; margin-top: 15px; text-align: center; min-height: 20px;"></p>
-            </div>
-            <div id="register-form" style="display: none;">
-                <h2 style="color: #c9d1d9; font-size: 24px; margin-bottom: 20px; text-align: center;">Register</h2>
-                <div style="margin-bottom: 15px;">
-                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Username (3-20 chars, alphanumeric):</label>
-                    <input type="text" id="register-username" placeholder="Choose username" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Password:</label>
-                    <input type="password" id="register-password" placeholder="Choose password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 5px;">Confirm Password:</label>
-                    <input type="password" id="register-password-confirm" placeholder="Confirm password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 2px solid #30363d; border-radius: 8px; color: #c9d1d9; box-sizing: border-box;">
-                </div>
-                <button id="register-submit-btn" onclick="handleRegister()" style="width: 100%; padding: 15px; font-size: 18px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 15px;">Register</button>
-                <button onclick="showLoginForm()" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #58a6ff; border: 2px solid #58a6ff; border-radius: 8px; cursor: pointer;">Back to Login</button>
-                <p id="register-error" style="color: #f85149; font-size: 14px; margin-top: 15px; text-align: center; min-height: 20px;"></p>
-            </div>
-        </div>
-    </div>
-    
     <!-- Panic Menu page -->
     <div class="page panicmenu-page hidden" id="panicmenuPage">
         <h1 style="color: #c9d1d9; font-size: 36px; margin-bottom: 20px;">Panic Menu</h1>
@@ -4603,12 +4564,6 @@ body.theme-flashcard button:hover {
         
         // Navigation system
         function showPage(pageId) {
-            // Check if login is required (all pages except loginPage)
-            if (pageId !== 'loginPage' && !isLoggedIn()) {
-                showPage('loginPage');
-                return;
-            }
-            
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.add('hidden');
             });
@@ -4617,7 +4572,7 @@ body.theme-flashcard button:hover {
             // Show/hide command bar based on page
             const commandBar = document.querySelector('.command-bar');
             if (commandBar) {
-                if (pageId === 'remoteDesktopPage' || pageId === 'loginPage') {
+                if (pageId === 'remoteDesktopPage') {
                     commandBar.style.display = 'none';
                 } else {
                     commandBar.style.display = 'flex';
@@ -5009,81 +4964,105 @@ body.theme-flashcard button:hover {
         }
         
         // Initialize command history toggle
-        // REMOVED - Now handled in initializeOnLoad() to prevent conflicts
-        
-        // Set up edit modal buttons (these can be set up immediately, not in DOMContentLoaded)
-        const editSaveBtn = document.getElementById('editSaveBtn');
-        const editCancelBtn = document.getElementById('editCancelBtn');
-        const editBio = document.getElementById('editBio');
-        
-        if (editSaveBtn) {
-            editSaveBtn.addEventListener('click', saveEditProfile);
-        }
-        if (editCancelBtn) {
-            editCancelBtn.addEventListener('click', closeEditMenu);
-        }
-        if (editBio) {
-            editBio.addEventListener('input', updateBioCharCount);
-        }
-        
-        // Close edit modal when clicking outside
-        const editModal = document.getElementById('editModal');
-        if (editModal) {
-            editModal.addEventListener('click', (e) => {
-                if (e.target === editModal) {
-                    closeEditMenu();
-                }
-            });
-        }
-        
-        // Friends modal
-        const friendsCloseBtn = document.getElementById('friendsCloseBtn');
-        if (friendsCloseBtn) {
-            friendsCloseBtn.addEventListener('click', closeFriendsList);
-        }
-        
-        const friendsModal = document.getElementById('friendsModal');
-        if (friendsModal) {
-            friendsModal.addEventListener('click', (e) => {
-                if (e.target === friendsModal) {
-                    closeFriendsList();
-                }
-            });
-        }
-        
-        // Private chat
-        const privateChatBackBtn = document.getElementById('privateChatBackBtn');
-        if (privateChatBackBtn) {
-            privateChatBackBtn.addEventListener('click', () => {
-                showPage('mainPage');
-                openFriendsList();
-            });
-        }
-        
-        const privateChatSendBtn = document.getElementById('privateChatSendBtn');
-        const privateChatInput = document.getElementById('privateChatInput');
-        
-        if (privateChatSendBtn && privateChatInput) {
-            privateChatSendBtn.onclick = () => {
-                if (currentPrivateChatWith) {
-                    const text = privateChatInput.value;
-                    if (text.trim()) {
-                        sendPrivateMessage(text, currentPrivateChatWith);
-                        privateChatInput.value = '';
-                    }
-                }
-            };
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('commandHistoryToggle');
+            if (toggle) {
+                toggle.addEventListener('click', toggleCommandHistory);
+            }
             
-            privateChatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && currentPrivateChatWith) {
-                    const text = privateChatInput.value;
-                    if (text.trim()) {
-                        sendPrivateMessage(text, currentPrivateChatWith);
-                        privateChatInput.value = '';
+            // Load history from localStorage
+            loadCommandHistory();
+            
+            // Check terms agreement
+            checkTermsAgreement();
+            
+            // Terms modal buttons
+            const agreeBtn = document.getElementById('termsAgreeBtn');
+            const disagreeBtn = document.getElementById('termsDisagreeBtn');
+            if (agreeBtn) {
+                agreeBtn.addEventListener('click', acceptTerms);
+            }
+            if (disagreeBtn) {
+                disagreeBtn.addEventListener('click', rejectTerms);
+            }
+            
+            // Edit modal buttons
+            const editSaveBtn = document.getElementById('editSaveBtn');
+            const editCancelBtn = document.getElementById('editCancelBtn');
+            const editBio = document.getElementById('editBio');
+            
+            if (editSaveBtn) {
+                editSaveBtn.addEventListener('click', saveEditProfile);
+            }
+            if (editCancelBtn) {
+                editCancelBtn.addEventListener('click', closeEditMenu);
+            }
+            if (editBio) {
+                editBio.addEventListener('input', updateBioCharCount);
+            }
+            
+            // Close edit modal when clicking outside
+            const editModal = document.getElementById('editModal');
+            if (editModal) {
+                editModal.addEventListener('click', (e) => {
+                    if (e.target === editModal) {
+                        closeEditMenu();
                     }
-                }
-            });
-        }
+                });
+            }
+            
+            // Friends modal
+            const friendsCloseBtn = document.getElementById('friendsCloseBtn');
+            if (friendsCloseBtn) {
+                friendsCloseBtn.addEventListener('click', closeFriendsList);
+            }
+            
+            const friendsModal = document.getElementById('friendsModal');
+            if (friendsModal) {
+                friendsModal.addEventListener('click', (e) => {
+                    if (e.target === friendsModal) {
+                        closeFriendsList();
+                    }
+                });
+            }
+            
+            // Private chat
+            const privateChatBackBtn = document.getElementById('privateChatBackBtn');
+            if (privateChatBackBtn) {
+                privateChatBackBtn.addEventListener('click', () => {
+                    showPage('mainPage');
+                    openFriendsList();
+                });
+            }
+            
+            const privateChatSendBtn = document.getElementById('privateChatSendBtn');
+            const privateChatInput = document.getElementById('privateChatInput');
+            
+            if (privateChatSendBtn && privateChatInput) {
+                privateChatSendBtn.onclick = () => {
+                    if (currentPrivateChatWith) {
+                        const text = privateChatInput.value;
+                        if (text.trim()) {
+                            sendPrivateMessage(text, currentPrivateChatWith);
+                            privateChatInput.value = '';
+                        }
+                    }
+                };
+                
+                privateChatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && currentPrivateChatWith) {
+                        const text = privateChatInput.value;
+                        if (text.trim()) {
+                            sendPrivateMessage(text, currentPrivateChatWith);
+                            privateChatInput.value = '';
+                        }
+                    }
+                });
+            }
+            
+            // Update visit counter
+            updateVisitCounter();
+        });
         
         // Load command history from localStorage
         function loadCommandHistory() {
@@ -5142,35 +5121,8 @@ body.theme-flashcard button:hover {
             console.log('ℹ️ Running in offline mode (localStorage). To enable online chat, configure Firebase.');
         }
         
-        // User Profile System with Login
-        let currentUsername = null;
-        
-        // Simple password hashing (for demo - in production use proper hashing)
-        function hashPassword(password) {
-            let hash = 0;
-            for (let i = 0; i < password.length; i++) {
-                const char = password.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32bit integer
-            }
-            return hash.toString(36);
-        }
-        
-        // Check if user is logged in
-        function isLoggedIn() {
-            const loggedInUser = localStorage.getItem('loggedInUsername');
-            return loggedInUser !== null;
-        }
-        
-        // Get current username (logged in user or fallback to userId)
+        // User Profile System
         function getUserId() {
-            const loggedInUser = localStorage.getItem('loggedInUsername');
-            if (loggedInUser) {
-                currentUsername = loggedInUser;
-                return loggedInUser;
-            }
-            
-            // Fallback to old system if not logged in
             let userId = localStorage.getItem('userId');
             if (!userId) {
                 // Generate a more unique ID using timestamp + random to avoid collisions
@@ -5196,240 +5148,6 @@ body.theme-flashcard button:hover {
             }
             return userId;
         }
-        
-        // Login function
-        function handleLogin() {
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-            const errorEl = document.getElementById('login-error');
-            
-            if (!username || !password) {
-                errorEl.textContent = 'Please enter both username and password';
-                return;
-            }
-            
-            // Validate username format
-            const validIdPattern = /^[a-zA-Z0-9_-]{3,20}$/;
-            if (!validIdPattern.test(username)) {
-                errorEl.textContent = 'Username must be 3-20 characters (alphanumeric, _, -)';
-                return;
-            }
-            
-            if (database) {
-                database.ref(`accounts/${username}`).once('value', (snapshot) => {
-                    if (!snapshot.exists()) {
-                        errorEl.textContent = 'Username not found';
-                        return;
-                    }
-                    
-                    const accountData = snapshot.val();
-                    const passwordHash = hashPassword(password);
-                    
-                    if (accountData.passwordHash === passwordHash) {
-                        // Login successful
-                        localStorage.setItem('loggedInUsername', username);
-                        currentUsername = username;
-                        
-                        // Load user data from Firebase
-                        loadUserData(username);
-                        
-                        // Hide login page and show main page
-                        showPage('mainPage');
-                        errorEl.textContent = '';
-                        document.getElementById('login-username').value = '';
-                        document.getElementById('login-password').value = '';
-                    } else {
-                        errorEl.textContent = 'Incorrect password';
-                    }
-                });
-            } else {
-                errorEl.textContent = 'Database not available. Please check your connection.';
-            }
-        }
-        
-        // Register function
-        function handleRegister() {
-            const username = document.getElementById('register-username').value.trim();
-            const password = document.getElementById('register-password').value;
-            const passwordConfirm = document.getElementById('register-password-confirm').value;
-            const errorEl = document.getElementById('register-error');
-            
-            if (!username || !password || !passwordConfirm) {
-                errorEl.textContent = 'Please fill in all fields';
-                return;
-            }
-            
-            // Validate username format
-            const validIdPattern = /^[a-zA-Z0-9_-]{3,20}$/;
-            if (!validIdPattern.test(username)) {
-                errorEl.textContent = 'Username must be 3-20 characters (alphanumeric, _, -)';
-                return;
-            }
-            
-            if (password.length < 4) {
-                errorEl.textContent = 'Password must be at least 4 characters';
-                return;
-            }
-            
-            if (password !== passwordConfirm) {
-                errorEl.textContent = 'Passwords do not match';
-                return;
-            }
-            
-            if (database) {
-                // Check if username already exists
-                database.ref(`accounts/${username}`).once('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        errorEl.textContent = 'Username already taken';
-                        return;
-                    }
-                    
-                    // Create account
-                    const passwordHash = hashPassword(password);
-                    database.ref(`accounts/${username}`).set({
-                        username: username,
-                        passwordHash: passwordHash,
-                        createdAt: Date.now()
-                    }).then(() => {
-                        // Auto-login after registration
-                        localStorage.setItem('loggedInUsername', username);
-                        currentUsername = username;
-                        
-                        // Initialize user data
-                        initializeUserData(username);
-                        
-                        // Hide register form and show main page
-                        showPage('mainPage');
-                        errorEl.textContent = '';
-                        document.getElementById('register-username').value = '';
-                        document.getElementById('register-password').value = '';
-                        document.getElementById('register-password-confirm').value = '';
-                    }).catch((error) => {
-                        errorEl.textContent = 'Registration failed: ' + error.message;
-                    });
-                });
-            } else {
-                errorEl.textContent = 'Database not available. Please check your connection.';
-            }
-        }
-        
-        // Show register form
-        function showRegisterForm() {
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('register-form').style.display = 'block';
-            document.getElementById('login-error').textContent = '';
-            document.getElementById('register-error').textContent = '';
-        }
-        
-        // Show login form
-        function showLoginForm() {
-            document.getElementById('register-form').style.display = 'none';
-            document.getElementById('login-form').style.display = 'block';
-            document.getElementById('login-error').textContent = '';
-            document.getElementById('register-error').textContent = '';
-        }
-        
-        // Logout function
-        function handleLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('loggedInUsername');
-                currentUsername = null;
-                showPage('loginPage');
-            }
-        }
-        
-        // Load user data from Firebase
-        function loadUserData(username) {
-            if (!database) return;
-            
-            database.ref(`userData/${username}`).once('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    
-                    // Load all user data into localStorage
-                    if (userData.notes) {
-                        localStorage.setItem(`notes_${username}`, userData.notes);
-                    }
-                    if (userData.code) {
-                        localStorage.setItem(`code_${username}`, userData.code);
-                    }
-                    if (userData.calendarEvents) {
-                        localStorage.setItem(`calendar_events_${username}`, JSON.stringify(userData.calendarEvents));
-                    }
-                    if (userData.files) {
-                        localStorage.setItem(`files_${username}`, JSON.stringify(userData.files));
-                    }
-                    if (userData.desktopIcons) {
-                        localStorage.setItem('desktopIcons', JSON.stringify(userData.desktopIcons));
-                    }
-                    if (userData.bio) {
-                        const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
-                        bios[username] = userData.bio;
-                        localStorage.setItem('userBios', JSON.stringify(bios));
-                    }
-                    if (userData.avatar) {
-                        const avatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
-                        avatars[username] = userData.avatar;
-                        localStorage.setItem('userAvatars', JSON.stringify(avatars));
-                    }
-                    if (userData.friends) {
-                        localStorage.setItem('friends', JSON.stringify(userData.friends));
-                    }
-                    if (userData.board) {
-                        localStorage.setItem(`board_${username}`, JSON.stringify(userData.board));
-                    }
-                }
-            });
-        }
-        
-        // Save user data to Firebase
-        function saveUserDataToFirebase(username) {
-            if (!database || !username) return;
-            
-            const userData = {
-                notes: localStorage.getItem(`notes_${username}`) || '',
-                code: localStorage.getItem(`code_${username}`) || '',
-                calendarEvents: JSON.parse(localStorage.getItem(`calendar_events_${username}`) || '[]'),
-                files: JSON.parse(localStorage.getItem(`files_${username}`) || '[]'),
-                desktopIcons: JSON.parse(localStorage.getItem('desktopIcons') || '[]'),
-                bio: (JSON.parse(localStorage.getItem('userBios') || '{}'))[username] || '',
-                avatar: (JSON.parse(localStorage.getItem('userAvatars') || '{}'))[username] || '',
-                friends: JSON.parse(localStorage.getItem('friends') || '[]'),
-                board: JSON.parse(localStorage.getItem(`board_${username}`) || '{}'),
-                lastSynced: Date.now()
-            };
-            
-            database.ref(`userData/${username}`).set(userData);
-        }
-        
-        // Initialize user data structure
-        function initializeUserData(username) {
-            if (!database) return;
-            
-            const userData = {
-                notes: '',
-                code: '',
-                calendarEvents: [],
-                files: [],
-                desktopIcons: [],
-                bio: '',
-                avatar: '',
-                friends: [],
-                board: {},
-                createdAt: Date.now(),
-                lastSynced: Date.now()
-            };
-            
-            database.ref(`userData/${username}`).set(userData);
-        }
-        
-        // Auto-save user data periodically
-        setInterval(() => {
-            if (isLoggedIn()) {
-                const username = localStorage.getItem('loggedInUsername');
-                saveUserDataToFirebase(username);
-            }
-        }, 30000); // Save every 30 seconds
         
         function setUserId(newUserId) {
             if (!newUserId || newUserId.trim() === '') {
@@ -6263,19 +5981,6 @@ body.theme-flashcard button:hover {
                 };
             }
             
-            // Set up View Board button
-            if (isFriend || isOwnProfile) {
-                viewBoardItem.style.display = 'block';
-                viewBoardItem.style.cursor = 'pointer';
-                viewBoardItem.style.color = '#000';
-                viewBoardItem.onclick = () => {
-                    viewBoard(userId);
-                    contextMenu.classList.add('hidden');
-                };
-            } else {
-                viewBoardItem.style.display = 'none';
-            }
-            
             // Position and show context menu
             contextMenu.style.left = event.pageX + 'px';
             contextMenu.style.top = event.pageY + 'px';
@@ -6299,32 +6004,19 @@ body.theme-flashcard button:hover {
             if (!userId) userId = getUserId();
             if (database) {
                 return new Promise((resolve) => {
-                    // First check userData (for logged-in users)
-                    database.ref(`userData/${userId}/board`).once('value', (snapshot) => {
+                    database.ref(`boards/${userId}`).once('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
                             resolve(data);
                         } else {
-                            // Fallback to old boards path
-                            database.ref(`boards/${userId}`).once('value', (snapshot2) => {
-                                const data2 = snapshot2.val();
-                                if (data2) {
-                                    resolve(data2);
-                                } else {
-                                    // Fallback to localStorage
-                                    const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
-                                    const localBoard = boards[userId] || JSON.parse(localStorage.getItem(`board_${userId}`) || 'null');
-                                    resolve(localBoard || { text: '', images: [] });
-                                }
-                            });
+                            const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
+                            resolve(boards[userId] || { text: '', images: [] });
                         }
                     });
                 });
             } else {
-                // Check localStorage
                 const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
-                const localBoard = boards[userId] || JSON.parse(localStorage.getItem(`board_${userId}`) || 'null');
-                return Promise.resolve(localBoard || { text: '', images: [] });
+                return Promise.resolve(boards[userId] || { text: '', images: [] });
             }
         }
         
@@ -6334,17 +6026,7 @@ body.theme-flashcard button:hover {
             const boards = JSON.parse(localStorage.getItem('userBoards') || '{}');
             boards[userId] = boardObj;
             localStorage.setItem('userBoards', JSON.stringify(boards));
-            localStorage.setItem(`board_${userId}`, JSON.stringify(boardObj));
-            
-            if (database) {
-                // Save to both old path (for compatibility) and new path (for logged-in users)
-                database.ref(`boards/${userId}`).set(boardObj);
-                
-                // Also save to userData if this is a logged-in user
-                if (isLoggedIn() && userId === localStorage.getItem('loggedInUsername')) {
-                    database.ref(`userData/${userId}/board`).set(boardObj);
-                }
-            }
+            if (database) database.ref(`boards/${userId}`).set(boardObj);
         }
         
         function openBoardEditor() {
@@ -6459,535 +6141,78 @@ body.theme-flashcard button:hover {
         }
         
         // Initialize chat when page loads
-        // REMOVED - Now handled in initializeOnLoad() to prevent conflicts
+        document.addEventListener('DOMContentLoaded', () => {
+            initChat();
+            
+            const chatInput = document.getElementById('chatInput');
+            const chatSendBtn = document.getElementById('chatSendBtn');
+            
+            if (chatInput && chatSendBtn) {
+                chatSendBtn.onclick = () => {
+                    const text = chatInput.value;
+                    if (text.trim()) {
+                        sendChatMessage(text);
+                        chatInput.value = '';
+                    }
+                };
+                
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        chatSendBtn.click();
+                    }
+                });
+            }
+        });
         
         // Load clock setting on page load
         loadClockSetting();
         
-        // Command input handler - MOVED TO initializeOnLoad() to prevent glitch
-        // All command handling is now in initializeOnLoad() function
+        // Command input handler
+        const commandInput = document.getElementById('commandInput');
         
-        // processCommand function to handle all commands
-        function processCommand(fullCommand) {
-            if (!fullCommand || !fullCommand.trim()) return;
-            
-            const command = fullCommand.toLowerCase().trim();
-            const commandInput = document.getElementById('commandInput');
-            if (!commandInput) return;
-            
-            const hasColorPalette = typeof colorPalettes !== 'undefined' && colorPalettes.hasOwnProperty(command);
-            
-            // Handle all commands
-            if (command === 'logout' && typeof handleLogout === 'function') {
-                handleLogout();
-                commandInput.value = '';
-            } else if (command === 'reset') {
-                if (typeof resetConfirm !== 'undefined' && resetConfirm) {
-                    if (typeof resetEverything === 'function') {
-                        resetEverything();
-                    }
-                    commandInput.value = '';
-                    if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('reset', '⚠️ EVERYTHING HAS BEEN RESET! Page will reload...', true);
-                    }
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
-                } else {
-                    if (typeof resetConfirm !== 'undefined') resetConfirm = true;
-                    commandInput.value = '';
-                    commandInput.placeholder = '⚠️ Type "reset" again to confirm - THIS WILL DELETE EVERYTHING!';
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('reset', '⚠️ WARNING: This will clear ALL data including desktop, changelog, suggestions, achievements, money, friends, messages, and MORE!', false);
-                    }
-                    setTimeout(() => {
-                        if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                        if (commandInput.placeholder.includes('confirm')) {
-                            commandInput.placeholder = 'Type a color or "home"...';
-                        }
-                    }, 10000);
+        // Semicolon key to focus command bar (works even when paper app is active)
+        document.addEventListener('keydown', (e) => {
+            // Only trigger if semicolon is pressed and not already typing in command input
+            if (e.key === ';' && document.activeElement !== commandInput) {
+                const activeEl = document.activeElement;
+                
+                // Block semicolon only if in a regular input/textarea (not contentEditable like paper app)
+                const isRegularInput = activeEl && (
+                    (activeEl.tagName === 'INPUT' && activeEl.id !== 'commandInput') || 
+                    activeEl.tagName === 'TEXTAREA'
+                );
+                
+                // Allow semicolon from anywhere except regular inputs/textareas
+                // This includes paper app (contentEditable) and other places
+                if (!isRegularInput) {
+                    e.preventDefault();
+                    commandInput.focus();
+                    commandInput.select(); // Select any existing text
                 }
-            } else if (command === 'home' && typeof showPage === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('homePage');
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('home', 'Navigated to home page', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'back' && typeof showPage === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('mainPage');
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('back', 'Returned to main page', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Type a color or "home"...';
-            } else if (command === 'sweeper' && typeof showPage === 'function' && typeof initMinesweeper === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('minesweeperPage');
-                initMinesweeper();
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('sweeper', 'Minesweeper game opened', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'pong' && typeof showPage === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('pongPage');
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('pong', 'Pong game opened', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'sandboxles' && typeof showPage === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('sandboxelsPage');
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('sandboxles', 'Sandboxels opened', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'paint' && typeof showPage === 'function' && typeof initPaint === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('paintPage');
-                initPaint();
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('paint', 'Paint game opened', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if ((command === 'drawing board' || command === 'drawingboard' || command === 'collab') && typeof showPage === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('drawingBoardPage');
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('drawing board', 'Collaborative drawing board opened', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if ((command === 'remote desktop' || command === 'remotedesktop' || command === 'desktop') && typeof showPage === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('remoteDesktopPage');
-                setTimeout(() => {
-                    if (typeof initRemoteDesktop === 'function') {
-                        initRemoteDesktop();
-                    }
-                }, 100);
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('remote desktop', 'Remote desktop opened', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'snake') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                // Execute snake game JavaScript
-                (function() {
-                    if(window.snakeGameActive) return;
-                    window.snakeGameActive = true;
-
-                    const snakeColor = '#00FF00';
-                    const headColor = '#FFFF00';
-                    const snakeSpeed = 80;
-                    const snakeSize = 20;
-                    const maxLength = 50;
-
-                    let snake = [{x: 100, y: 100}];
-                    let direction = 'right';
-                    let grow = 0;
-
-                    const canvas = document.createElement('canvas');
-                    canvas.style.position = 'fixed';
-                    canvas.style.top = '0';
-                    canvas.style.left = '0';
-                    canvas.style.zIndex = '9999';
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                    document.body.appendChild(canvas);
-                    const ctx = canvas.getContext('2d');
-
-                    if (!ctx.roundRect) {
-                        ctx.roundRect = function(x, y, width, height, radius) {
-                            this.beginPath();
-                            this.moveTo(x + radius, y);
-                            this.lineTo(x + width - radius, y);
-                            this.quadraticCurveTo(x + width, y, x + width, y + radius);
-                            this.lineTo(x + width, y + height - radius);
-                            this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-                            this.lineTo(x + radius, y + height);
-                            this.quadraticCurveTo(x, y + height, x, y + height - radius);
-                            this.lineTo(x, y + radius);
-                            this.quadraticCurveTo(x, y, x + radius, y);
-                            this.closePath();
-                        };
-                    }
-
-                    window.addEventListener('keydown', e => {
-                        if(e.key === 'ArrowUp' && direction !== 'down') direction = 'up';
-                        if(e.key === 'ArrowDown' && direction !== 'up') direction = 'down';
-                        if(e.key === 'ArrowLeft' && direction !== 'right') direction = 'left';
-                        if(e.key === 'ArrowRight' && direction !== 'left') direction = 'right';
-                        if(e.key === 'Escape') {
-                            canvas.remove();
-                            window.snakeGameActive = false;
-                        }
-                    });
-
-                    function wrapWords() {
-                        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-                        const textNodes = [];
-                        while(walker.nextNode) textNodes.push(walker.currentNode);
-
-                        textNodes.forEach(node => {
-                            if(node.nodeValue.trim() === '') return;
-                            const words = node.nodeValue.split(/(\s+)/);
-                            const fragment = document.createDocumentFragment();
-                            words.forEach(word => {
-                                if(word.trim() === '') {
-                                    fragment.appendChild(document.createTextNode(word));
-                                } else {
-                                    const span = document.createElement('span');
-                                    span.textContent = word;
-                                    span.style.display = 'inline-block';
-                                    fragment.appendChild(span);
-                                }
-                            });
-                            node.parentNode.replaceChild(fragment, node);
-                        });
-                    }
-
-                    wrapWords();
-
-                    function moveSnake() {
-                        const head = {...snake[0]};
-                        const step = 10;
-                        if(direction === 'up') head.y -= step;
-                        if(direction === 'down') head.y += step;
-                        if(direction === 'left') head.x -= step;
-                        if(direction === 'right') head.x += step;
-
-                        snake.unshift(head);
-
-                        if(grow > 0) grow--;
-                        else snake.pop();
-
-                        if(snake.length > maxLength) snake.pop();
-
-                        const elements = Array.from(document.body.querySelectorAll('span')).filter(el => el !== canvas);
-                        for(let el of elements) {
-                            const rect = el.getBoundingClientRect();
-                            const padding = 4;
-                            if(head.x + padding < rect.right && head.x + snakeSize - padding > rect.left &&
-                               head.y + padding < rect.bottom && head.y + snakeSize - padding > rect.top) {
-                                el.style.visibility = 'hidden';
-                                grow += 1;
-                                break;
-                            }
-                        }
-                    }
-
-                    function drawSnake() {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                        for(let i = 0; i < snake.length; i++) {
-                            const seg = snake[i];
-                            const t = i / snake.length;
-                            ctx.fillStyle = `rgba(${Math.floor(0 + t*255)}, ${Math.floor(255 - t*100)}, 0, 1)`;
-                            ctx.beginPath();
-                            ctx.roundRect(seg.x, seg.y, snakeSize, snakeSize, 6);
-                            ctx.fill();
-                        }
-
-                        const head = snake[0];
-                        ctx.fillStyle = headColor;
-                        ctx.beginPath();
-                        ctx.roundRect(head.x, head.y, snakeSize, snakeSize, 8);
-                        ctx.fill();
-                    }
-
-                    function gameLoop() {
-                        moveSnake();
-                        drawSnake();
-                    }
-
-                    setInterval(gameLoop, snakeSpeed);
-                    console.log("Snake game started! Arrow keys move. Snake eats one word at a time, hitbox improved. Press ESC to exit.");
-                })();
-                if (typeof commandsUsed !== 'undefined') commandsUsed.add('snake');
-                commandInput.value = '';
-                commandInput.placeholder = 'Snake game started! Press ESC to exit.';
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 3000);
-            } else if (command === 'finley' && typeof transformToFinHubMode === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                transformToFinHubMode();
-                commandInput.value = '';
-                commandInput.placeholder = 'Welcome back to FinHub!';
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 2000);
-            } else if (command === 'coinflip' && typeof showPage === 'function' && typeof resetCoinFlip === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('coinflipPage');
-                resetCoinFlip();
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'clicker' && typeof showPage === 'function' && typeof updateAllMoneyDisplays === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('clickerPage');
-                updateAllMoneyDisplays();
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if ((command === 'achievements' || command === 'ach') && typeof showPage === 'function' && typeof renderAchievements === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('achievementsPage');
-                renderAchievements();
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'changelog' && typeof showPage === 'function' && typeof loadChangelog === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('changelogPage');
-                loadChangelog();
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'suggest' && typeof showPage === 'function' && typeof loadSuggestions === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('suggestionsPage');
-                loadSuggestions();
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'party' && typeof openPartyGUI === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                openPartyGUI();
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if ((command === 'background' || command === 'bg') && typeof showPage === 'function' && typeof initBackground === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showPage('backgroundPage');
-                initBackground();
-                commandInput.value = '';
-                commandInput.placeholder = 'Type "back" to return';
-            } else if (command === 'cmds' && typeof toggleCommandsMenu === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                toggleCommandsMenu();
-                commandInput.value = '';
-                commandInput.placeholder = 'Commands menu toggled!';
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 2000);
-            } else if (command === 'clock') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                const wasEnabled = typeof clockEnabled !== 'undefined' ? clockEnabled : false;
-                if (typeof clockEnabled !== 'undefined' && clockEnabled) {
-                    if (typeof hideClock === 'function') hideClock();
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('clock', `Clock: ${wasEnabled} → false`, true);
-                    }
-                } else {
-                    if (typeof showClock === 'function') showClock();
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('clock', `Clock: ${wasEnabled} → true`, true);
-                    }
-                }
-                commandInput.value = '';
-                commandInput.placeholder = `Clock: ${typeof clockEnabled !== 'undefined' ? clockEnabled : false}`;
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 2000);
-            } else if (command.startsWith('whoami ')) {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                const targetId = command.substring(7).trim();
-                if (typeof showWhoami === 'function') {
-                    showWhoami(targetId);
-                }
-            } else if (command === 'whoami' && typeof showWhoami === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                showWhoami();
-            } else if (command === 'edit' && typeof openEditMenu === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                openEditMenu();
-            } else if (command === 'boardedit' && typeof openBoardEditor === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                openBoardEditor();
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('boardedit', 'Board editor opened', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Edit your board';
-            } else if (command.startsWith('friend ')) {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                const friendId = command.substring(7).trim();
-                if (!friendId) {
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('friend', 'Please provide a user ID. Usage: friend [user id]', false);
-                    }
-                } else if (friendId === getUserId()) {
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('friend', 'You cannot add yourself as a friend!', false);
-                    }
-                } else {
-                    if (database && typeof addFriend === 'function') {
-                        database.ref(`users/${friendId}`).once('value', (snapshot) => {
-                            if (snapshot.exists()) {
-                                const userData = snapshot.val();
-                                const userBio = userData.bio || '(No bio)';
-                                const isOnline = userData.online || (Date.now() - (userData.lastSeen || 0) < 60000);
-                                const status = isOnline ? '🟢 Online' : '⚫ Offline';
-                                
-                                if (addFriend(friendId)) {
-                                    if (typeof showCommandFeedback === 'function') {
-                                        showCommandFeedback('friend', `Added ${friendId} (${status}) as a friend! Bio: ${userBio.substring(0, 30)}`, true);
-                                    }
-                                } else {
-                                    if (typeof showCommandFeedback === 'function') {
-                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
-                                    }
-                                }
-                            } else {
-                                if (addFriend(friendId)) {
-                                    if (typeof showCommandFeedback === 'function') {
-                                        showCommandFeedback('friend', `Added ${friendId} as a friend! (User not currently online)`, true);
-                                    }
-                                } else {
-                                    if (typeof showCommandFeedback === 'function') {
-                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
-                                    }
-                                }
-                            }
-                        });
-                    } else if (typeof addFriend === 'function') {
-                        if (addFriend(friendId)) {
-                            if (typeof showCommandFeedback === 'function') {
-                                showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
-                            }
-                        } else {
-                            if (typeof showCommandFeedback === 'function') {
-                                showCommandFeedback('friend', `${friendId} is already your friend!`, false);
-                            }
-                        }
-                    }
-                }
-            } else if (command === 'friends' && typeof openFriendsList === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                openFriendsList();
-            } else if (command === 'chat' && typeof showPage === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                const chatPage = document.getElementById('chatPage');
-                if (chatPage && !chatPage.classList.contains('hidden')) {
-                    showPage('mainPage');
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('chat', 'Chat closed!', true);
-                    }
-                } else {
-                    showPage('chatPage');
-                    if (typeof loadChatMessages === 'function') loadChatMessages();
-                    if (typeof loadOnlineUsers === 'function') loadOnlineUsers();
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('chat', 'Chat opened!', true);
-                    }
-                }
-            } else if (command.startsWith('setid ') || command.startsWith('setuserid ')) {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                const newId = command.startsWith('setid ') ? command.substring(6).trim() : command.substring(10).trim();
-                if (!newId) {
-                    if (typeof showCommandFeedback === 'function') {
-                        showCommandFeedback('setid', 'Please provide a user ID. Usage: setid [your new id]', false);
-                    }
-                } else if (typeof setUserId === 'function') {
-                    const result = setUserId(newId);
-                    if (result === false) {
-                        if (typeof showCommandFeedback === 'function') {
-                            showCommandFeedback('setid', 'Invalid ID or ID already taken. Use 3-20 characters (letters, numbers, _, -)', false);
-                        }
-                    } else if (result === true) {
-                        if (typeof showCommandFeedback === 'function') {
-                            showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
-                        }
-                    } else if (result && typeof result.then === 'function') {
-                        result.then((success) => {
-                            if (typeof showCommandFeedback === 'function') {
-                                showCommandFeedback('setid', success ? `User ID changed to: ${newId}` : 'ID already taken by another user. Choose a different ID.', success);
-                            }
-                        });
-                    }
-                }
-            } else if (command.startsWith('iam ') && typeof setBio === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                const bioText = command.substring(4).trim();
-                setBio(bioText);
-            } else if (command === 'flashcard' || command === 'fc') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                if (typeof createFlashcard === 'function') {
-                    createFlashcard();
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Flashcard created!';
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 2000);
-            } else if (command.startsWith('theme ') && typeof applyTheme === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                const themeName = command.substring(6).trim().toLowerCase();
-                applyTheme(themeName);
-                commandInput.value = '';
-                commandInput.placeholder = `Theme changed to ${themeName}!`;
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 2000);
-            } else if (command === 'rainbow' && typeof applyRainbowColors === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                applyRainbowColors();
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback('rainbow', 'Rainbow colors applied!', true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Rainbow colors applied!';
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 2000);
-            } else if (hasColorPalette && typeof changeAllColors === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                changeAllColors(command);
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback(command, `Changed to ${command}!`, true);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = `Changed to ${command}!`;
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 2000);
-            } else if (hasColorPalette && typeof applyTheme === 'function') {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                applyTheme(command, true);
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback(command, `Theme changed to ${command}`, true);
-                }
-                commandInput.value = '';
-            } else {
-                if (typeof resetConfirm !== 'undefined') resetConfirm = false;
-                if (typeof showCommandFeedback === 'function') {
-                    showCommandFeedback(command, 'Command not found. Type "cmds" for help.', false);
-                }
-                commandInput.value = '';
-                commandInput.placeholder = 'Command not found. Try: cmds, home, back, or a color name...';
-                setTimeout(() => {
-                    commandInput.placeholder = 'Type a color or "home"...';
-                }, 2000);
             }
-        }
+        });
         
-        // OLD CODE REMOVED - was causing glitch
-        // All command handling is now in processCommand() function above
+        commandInput.addEventListener('keydown', (e) => {
+            // Disable commands when on remote desktop
+            const remoteDesktopPage = document.getElementById('remoteDesktopPage');
+            if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
+                // Allow semicolon to work, but block other commands
+                if (e.key !== ';' && e.key !== 'Enter') {
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    showCommandFeedback('command', 'Commands disabled on desktop. Use ; to exit.', false);
+                    return;
+                }
+            }
+            
+            if (e.key === 'Enter') {
                 const command = commandInput.value.toLowerCase().trim();
                 const hasColorPalette = colorPalettes.hasOwnProperty(command);
                 
                 // Handle navigation commands
-                if (command === 'logout') {
-                    handleLogout();
-                    commandInput.value = '';
-                    return;
-                } else if (command === 'reset') {
+                if (command === 'reset') {
                     if (resetConfirm) {
                         // Second time - actually reset EVERYTHING
                         resetEverything();
@@ -7202,6 +6427,371 @@ body.theme-flashcard button:hover {
 
                         setInterval(gameLoop, snakeSpeed);
 
+                        console.log("Snake game started! Arrow keys move. Snake eats one word at a time, hitbox improved. Press ESC to exit.");
+                    })();
+                    commandsUsed.add('snake');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Snake game started! Press ESC to exit.';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 3000);
+                } else if (command === 'finley') {
+                    resetConfirm = false;
+                    transformToFinHubMode();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Welcome back to FinHub!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'coinflip') {
+                    resetConfirm = false;
+                    showPage('coinflipPage');
+                    resetCoinFlip();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'clicker') {
+                    resetConfirm = false;
+                    showPage('clickerPage');
+                    updateAllMoneyDisplays();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'achievements' || command === 'ach') {
+                    resetConfirm = false;
+                    showPage('achievementsPage');
+                    renderAchievements();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'changelog') {
+                    resetConfirm = false;
+                    showPage('changelogPage');
+                    loadChangelog();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'suggest') {
+                    resetConfirm = false;
+                    showPage('suggestionsPage');
+                    loadSuggestions();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'party') {
+                    resetConfirm = false;
+                    openPartyGUI();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'background' || command === 'bg') {
+                    resetConfirm = false;
+                    showPage('backgroundPage');
+                    initBackground();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'goose') {
+                    resetConfirm = false; // Clear reset confirmation if other command is used
+                    transformToGooseMode();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Honk! GooseHub activated!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'honk') {
+                    resetConfirm = false; // Clear reset confirmation if other command is used
+                    if (unlockedCommands.has('honk')) {
+                        playHonkSound();
+                        showCommandFeedback('honk', 'HONK! 🦢', true);
+                        commandInput.value = '';
+                        commandInput.placeholder = 'HONK! 🦢';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                                    } else {
+                        showCommandFeedback('honk', 'Command not unlocked yet! Use "goose" first.', false);
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Honk command not unlocked yet! Use "goose" first.';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
+                } else if (command === 'gooserain') {
+                    resetConfirm = false;
+                    if (unlockedCommands.has('gooserain')) {
+                        showPage('gooserainPage');
+                        initGooseRain();
+                        showCommandFeedback('gooserain', 'Goose rain activated!', true);
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Type "back" to return';
+                    } else {
+                        showCommandFeedback('gooserain', 'Command not unlocked yet! Use "goose" first.', false);
+                        commandInput.value = '';
+                        commandInput.placeholder = 'Goose rain not unlocked yet! Use "goose" first.';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
+                } else if (command === 'stones') {
+                    resetConfirm = false;
+                    showPage('stonesPage');
+                    initStones();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'wooper') {
+                    resetConfirm = false;
+                    applyWooperColors();
+                    unlockCommand('wooperbird');
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Wooper colors applied! 🐟';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'wooperbird') {
+                    resetConfirm = false;
+                    if (unlockedCommands.has('wooperbird')) {
+                        spawnWooperbirdGoose();
+                        showCommandFeedback('wooperbird', 'WooperBird dropped! 🐦', true);
+                        commandInput.value = '';
+                        commandInput.placeholder = 'WooperBird dropped! 🐦';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    } else {
+                        showCommandFeedback('wooperbird', 'Command not unlocked yet! Use "wooper" first.', false);
+                        commandInput.value = '';
+                        commandInput.placeholder = 'WooperBird not unlocked yet! Use "wooper" first.';
+                        setTimeout(() => {
+                            commandInput.placeholder = 'Type a color or "home"...';
+                        }, 2000);
+                    }
+                } else if (command === 'panicmenu' || command === 'panic') {
+                    resetConfirm = false;
+                    showPage('panicmenuPage');
+                    initPanicMenu();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Type "back" to return';
+                } else if (command === 'jumpscare') {
+                    resetConfirm = false;
+                    triggerJumpscare();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'BOO! 👻';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === '67') {
+                    resetConfirm = false;
+                    // Get current count
+                    let count67 = parseInt(localStorage.getItem('count67') || '0');
+                    count67++;
+                    localStorage.setItem('count67', count67.toString());
+                    
+                    commandInput.value = '';
+                    commandInput.placeholder = 'DONT SAY THAT';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                    
+                    // Block after 3 uses
+                    if (count67 >= 3) {
+                        localStorage.setItem('isBlocked', 'true');
+                        showPage('limboPage');
+                        const commandBar = document.querySelector('.command-bar');
+                        if (commandBar) commandBar.style.display = 'none';
+                    }
+                } else if (command === 'cmds') {
+                    resetConfirm = false;
+                    toggleCommandsMenu();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Commands menu toggled!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'clock') {
+                    resetConfirm = false;
+                    const wasEnabled = clockEnabled;
+                    if (clockEnabled) {
+                        hideClock();
+                        showCommandFeedback('clock', `Clock: ${wasEnabled} → false`, true);
+                    } else {
+                        showClock();
+                        showCommandFeedback('clock', `Clock: ${wasEnabled} → true`, true);
+                    }
+                    commandInput.value = '';
+                    commandInput.placeholder = `Clock: ${clockEnabled}`;
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command.startsWith('whoami ')) {
+                    resetConfirm = false;
+                    const targetId = command.substring(7).trim();
+                    showWhoami(targetId);
+                } else if (command === 'edit') {
+                    resetConfirm = false;
+                    openEditMenu();
+                } else if (command === 'boardedit') {
+                    resetConfirm = false;
+                    openBoardEditor();
+                    showCommandFeedback('boardedit', 'Board editor opened', true);
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Edit your board';
+                } else if (command.startsWith('friend ')) {
+                    resetConfirm = false;
+                    const friendId = command.substring(7).trim();
+                    if (!friendId) {
+                        showCommandFeedback('friend', 'Please provide a user ID. Usage: friend [user id]', false);
+                    } else if (friendId === getUserId()) {
+                        showCommandFeedback('friend', 'You cannot add yourself as a friend!', false);
+                    } else {
+                        // Check if user exists and get their info to verify
+                        if (database) {
+                            database.ref(`users/${friendId}`).once('value', (snapshot) => {
+                                if (snapshot.exists()) {
+                                    const userData = snapshot.val();
+                                    const userBio = userData.bio || '(No bio)';
+                                    const isOnline = userData.online || (Date.now() - (userData.lastSeen || 0) < 60000);
+                                    const status = isOnline ? '🟢 Online' : '⚫ Offline';
+                                    
+                                    if (addFriend(friendId)) {
+                                        showCommandFeedback('friend', `Added ${friendId} (${status}) as a friend! Bio: ${userBio.substring(0, 30)}`, true);
+                                    } else {
+                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                                    }
+                                } else {
+                                    // User doesn't exist in Firebase, but still allow adding (might be offline)
+                                    if (addFriend(friendId)) {
+                                        showCommandFeedback('friend', `Added ${friendId} as a friend! (User not currently online)`, true);
+                                    } else {
+                                        showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                                    }
+                                }
+                            });
+                        } else {
+                            // No Firebase, just add directly
+                            if (addFriend(friendId)) {
+                                showCommandFeedback('friend', `Added ${friendId} as a friend!`, true);
+                            } else {
+                                showCommandFeedback('friend', `${friendId} is already your friend!`, false);
+                            }
+                        }
+                    }
+                } else if (command === 'friends') {
+                    resetConfirm = false;
+                    openFriendsList();
+                } else if (command === 'chat') {
+                    resetConfirm = false;
+                    const chatPage = document.getElementById('chatPage');
+                    if (chatPage && !chatPage.classList.contains('hidden')) {
+                        // Chat is open, close it
+                        showPage('mainPage');
+                        showCommandFeedback('chat', 'Chat closed!', true);
+                    } else {
+                        // Chat is closed, open it
+                        showPage('chatPage');
+                        loadChatMessages();
+                        loadOnlineUsers();
+                        showCommandFeedback('chat', 'Chat opened!', true);
+                    }
+                } else if (command === 'whoami') {
+                    resetConfirm = false;
+                    showWhoami();
+                } else if (command.startsWith('setid ') || command.startsWith('setuserid ')) {
+                    resetConfirm = false;
+                    const newId = command.startsWith('setid ') ? command.substring(6).trim() : command.substring(10).trim();
+                    if (!newId) {
+                        showCommandFeedback('setid', 'Please provide a user ID. Usage: setid [your new id]', false);
+                    } else {
+                        const result = setUserId(newId);
+                        if (result === false) {
+                            showCommandFeedback('setid', 'Invalid ID or ID already taken. Use 3-20 characters (letters, numbers, _, -)', false);
+                        } else if (result === true) {
+                            showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
+                        } else {
+                            // Promise result
+                            result.then((success) => {
+                                if (success) {
+                                    showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
+                                } else {
+                                    showCommandFeedback('setid', 'ID already taken by another user. Choose a different ID.', false);
+                                }
+                            });
+                        }
+                    }
+                } else if (command.startsWith('setid ') || command.startsWith('setuserid ')) {
+                    resetConfirm = false;
+                    const newId = command.startsWith('setid ') ? command.substring(6).trim() : command.substring(10).trim();
+                    if (!newId) {
+                        showCommandFeedback('setid', 'Please provide a user ID. Usage: setid [your new id]', false);
+                    } else {
+                        const result = setUserId(newId);
+                        if (result === false) {
+                            showCommandFeedback('setid', 'Invalid ID or ID already taken. Use 3-20 characters (letters, numbers, _, -)', false);
+                        } else if (result === true) {
+                            showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
+                        } else {
+                            // Promise result
+                            result.then((success) => {
+                                if (success) {
+                                    showCommandFeedback('setid', `User ID changed to: ${newId}`, true);
+                                } else {
+                                    showCommandFeedback('setid', 'ID already taken by another user. Choose a different ID.', false);
+                                }
+                            });
+                        }
+                    }
+                } else if (command.startsWith('iam ')) {
+                    resetConfirm = false;
+                    const bioText = command.substring(4).trim();
+                    setBio(bioText);
+                } else if (command === 'stars') {
+                    resetConfirm = false;
+                    spawnMoreStars(50);
+                    commandInput.value = '';
+                    commandInput.placeholder = 'More stars spawned!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'flashcard' || command === 'fc') {
+                    resetConfirm = false;
+                    createFlashcard();
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Flashcard created!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command.startsWith('theme ')) {
+                    resetConfirm = false;
+                    const themeName = command.substring(6).trim().toLowerCase();
+                    applyTheme(themeName);
+                    commandInput.value = '';
+                    commandInput.placeholder = `Theme changed to ${themeName}!`;
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (command === 'rainbow') {
+                    resetConfirm = false;
+                    applyRainbowColors();
+                    showCommandFeedback('rainbow', 'Rainbow colors applied!', true);
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Rainbow colors applied!';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else if (hasColorPalette) {
+                    resetConfirm = false;
+                    changeAllColors(command);
+                    showCommandFeedback(command, `Changed to ${command}!`, true);
+                    commandInput.value = '';
+                    commandInput.placeholder = `Changed to ${command}!`;
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                } else {
+                    resetConfirm = false; // Clear reset confirmation if invalid command
+                    showCommandFeedback(command, 'Command not found. Try: cmds, home, back, or a color name...', false);
+                    commandInput.value = '';
+                    commandInput.placeholder = 'Command not found. Try: cmds, home, back, or a color name...';
+                    setTimeout(() => {
+                        commandInput.placeholder = 'Type a color or "home"...';
+                    }, 2000);
+                }
+            }
+        });
+        
         // Minesweeper game code
         const GRID_SIZE = 10;
         const NUM_MINES = 10;
@@ -14005,21 +13595,8 @@ body.theme-flashcard button:hover {
                     frames.push(frameData);
                     framesEl.textContent = frames.length;
                 }
-                // Clear canvas but keep previous frame as transparent background
-                // Get current canvas data
-                const currentImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                // Clear canvas
+                // Clear canvas for next frame
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                // Draw previous frame with transparency (50% opacity)
-                if (frames.length > 0) {
-                    const prevImg = new Image();
-                    prevImg.onload = () => {
-                        ctx.globalAlpha = 0.3; // Make previous frame 30% transparent
-                        ctx.drawImage(prevImg, 0, 0);
-                        ctx.globalAlpha = 1.0; // Reset opacity
-                    };
-                    prevImg.src = frames[frames.length - 1];
-                }
                 currentFrame = null;
             };
             
@@ -14641,13 +14218,6 @@ body.theme-flashcard button:hover {
             
             saveBtn.addEventListener('click', () => {
                 localStorage.setItem(notesKey, textarea.value);
-                // Sync to Firebase if logged in
-                if (isLoggedIn()) {
-                    const username = localStorage.getItem('loggedInUsername');
-                    if (database) {
-                        database.ref(`userData/${username}/notes`).set(textarea.value);
-                    }
-                }
                 alert('Notes saved!');
             });
             
@@ -14766,13 +14336,6 @@ body.theme-flashcard button:hover {
                         if (title) {
                             events.push({ date, title, id: Date.now() });
                             localStorage.setItem(eventsKey, JSON.stringify(events));
-                            // Sync to Firebase if logged in
-                            if (isLoggedIn()) {
-                                const username = localStorage.getItem('loggedInUsername');
-                                if (database) {
-                                    database.ref(`userData/${username}/calendarEvents`).set(events);
-                                }
-                            }
                             renderCalendar();
                         }
                     }
@@ -14792,13 +14355,6 @@ body.theme-flashcard button:hover {
                                     const id = parseInt(btn.getAttribute('data-id'));
                                     events = events.filter(e => e.id !== id);
                                     localStorage.setItem(eventsKey, JSON.stringify(events));
-                                    // Sync to Firebase if logged in
-                                    if (isLoggedIn()) {
-                                        const username = localStorage.getItem('loggedInUsername');
-                                        if (database) {
-                                            database.ref(`userData/${username}/calendarEvents`).set(events);
-                                        }
-                                    }
                                     renderCalendar();
                                 });
                             });
@@ -14832,8 +14388,8 @@ body.theme-flashcard button:hover {
             window.className = 'win95-window';
             window.style.left = '150px';
             window.style.top = '100px';
-            window.style.width = '800px';
-            window.style.height = '600px';
+            window.style.width = '350px';
+            window.style.height = '300px';
             window.style.zIndex = windowZIndex;
             
             const header = document.createElement('div');
@@ -14855,12 +14411,81 @@ body.theme-flashcard button:hover {
             
             const content = document.createElement('div');
             content.className = 'win95-window-content';
-            content.style.padding = '0';
-            content.style.overflow = 'hidden';
+            content.style.padding = '20px';
+            content.style.textAlign = 'center';
             
             content.innerHTML = `
-                <iframe src="https://www.google.com/search?q=waether&ie=UTF-8" style="width: 100%; height: 100%; border: none; min-height: 550px;"></iframe>
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Cooper City, FL</div>
+                <div id="weather-loading" style="font-size: 12px; color: #666;">Loading weather...</div>
+                <div id="weather-content" style="display: none;">
+                    <div id="weather-temp" style="font-size: 48px; font-weight: bold; margin: 20px 0;">--°F</div>
+                    <div id="weather-desc" style="font-size: 14px; margin-bottom: 10px;">--</div>
+                    <div id="weather-details" style="font-size: 11px; color: #666; margin-top: 20px;">
+                        <div>Feels like: <span id="weather-feels">--</span></div>
+                        <div>Humidity: <span id="weather-humidity">--</span></div>
+                        <div>Wind: <span id="weather-wind">--</span></div>
+                    </div>
+                    <button id="weather-refresh" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-top: 15px;">Refresh</button>
+                </div>
             `;
+            
+            function loadWeather() {
+                const loadingEl = content.querySelector('#weather-loading');
+                const contentEl = content.querySelector('#weather-content');
+                const tempEl = content.querySelector('#weather-temp');
+                const descEl = content.querySelector('#weather-desc');
+                const feelsEl = content.querySelector('#weather-feels');
+                const humidityEl = content.querySelector('#weather-humidity');
+                const windEl = content.querySelector('#weather-wind');
+                
+                // Using OpenWeatherMap API (free tier)
+                // Note: In production, you'd want to use your own API key
+                const apiKey = 'demo'; // Replace with actual API key
+                const city = 'Cooper City,FL,US';
+                const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=imperial&appid=${apiKey}`;
+                
+                // Fallback to mock data if API fails
+                setTimeout(() => {
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+                    
+                    // Mock data for Cooper City, FL (typical Florida weather)
+                    const mockData = {
+                        temp: Math.floor(Math.random() * 10) + 75, // 75-85°F
+                        feels: Math.floor(Math.random() * 10) + 78,
+                        desc: ['Sunny', 'Partly Cloudy', 'Mostly Sunny'][Math.floor(Math.random() * 3)],
+                        humidity: Math.floor(Math.random() * 20) + 60, // 60-80%
+                        wind: Math.floor(Math.random() * 5) + 5 // 5-10 mph
+                    };
+                    
+                    tempEl.textContent = `${mockData.temp}°F`;
+                    descEl.textContent = mockData.desc;
+                    feelsEl.textContent = `${mockData.feels}°F`;
+                    humidityEl.textContent = `${mockData.humidity}%`;
+                    windEl.textContent = `${mockData.wind} mph`;
+                    
+                    // Try to fetch real data (will fail silently if no API key)
+                    fetch(url).then(r => r.json()).then(data => {
+                        if (data.main) {
+                            tempEl.textContent = `${Math.round(data.main.temp)}°F`;
+                            descEl.textContent = data.weather[0].main;
+                            feelsEl.textContent = `${Math.round(data.main.feels_like)}°F`;
+                            humidityEl.textContent = `${data.main.humidity}%`;
+                            windEl.textContent = `${Math.round(data.wind.speed)} mph`;
+                        }
+                    }).catch(() => {
+                        // Use mock data if API fails
+                    });
+                }, 500);
+            }
+            
+            content.querySelector('#weather-refresh').addEventListener('click', () => {
+                content.querySelector('#weather-loading').style.display = 'block';
+                content.querySelector('#weather-content').style.display = 'none';
+                loadWeather();
+            });
+            
+            loadWeather();
             
             closeBtn.onclick = () => {
                 window.remove();
@@ -15042,13 +14667,6 @@ body.theme-flashcard button:hover {
                     if (name) {
                         files.push({ id: Date.now(), name, type: 'folder', folder: currentFolder });
                         localStorage.setItem(filesKey, JSON.stringify(files));
-                        // Sync to Firebase if logged in
-                        if (isLoggedIn()) {
-                            const username = localStorage.getItem('loggedInUsername');
-                            if (database) {
-                                database.ref(`userData/${username}/files`).set(files);
-                            }
-                        }
                         renderFiles();
                     }
                 });
@@ -15063,13 +14681,6 @@ body.theme-flashcard button:hover {
                         reader.onload = (e) => {
                             files.push({ id: Date.now(), name: file.name, type: 'file', folder: currentFolder, data: e.target.result, size: file.size });
                             localStorage.setItem(filesKey, JSON.stringify(files));
-                            // Sync to Firebase if logged in
-                            if (isLoggedIn()) {
-                                const username = localStorage.getItem('loggedInUsername');
-                                if (database) {
-                                    database.ref(`userData/${username}/files`).set(files);
-                                }
-                            }
                             renderFiles();
                         };
                         reader.readAsDataURL(file);
@@ -15105,13 +14716,6 @@ body.theme-flashcard button:hover {
                         if (confirm('Delete this item?')) {
                             files = files.filter(f => f.id !== id);
                             localStorage.setItem(filesKey, JSON.stringify(files));
-                            // Sync to Firebase if logged in
-                            if (isLoggedIn()) {
-                                const username = localStorage.getItem('loggedInUsername');
-                                if (database) {
-                                    database.ref(`userData/${username}/files`).set(files);
-                                }
-                            }
                             renderFiles();
                         }
                     });
@@ -15309,8 +14913,7 @@ body.theme-flashcard button:hover {
                         <option value="plain">Plain Text</option>
                     </select>
                     <button id="code-save" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-right: 5px;">Save</button>
-                    <button id="code-load" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; margin-right: 5px;">Load</button>
-                    <button id="code-run" style="background: #008080; border: 2px outset #008080; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold; color: #fff;">Run</button>
+                    <button id="code-load" style="background: #c0c0c0; border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px; font-weight: bold;">Load</button>
                 </div>
                 <textarea id="code-editor" style="width: 100%; height: 380px; border: 2px inset #c0c0c0; padding: 5px; font-family: 'Courier New', monospace; font-size: 12px; resize: none; background: #1e1e1e; color: #d4d4d4;">${localStorage.getItem(codeKey) || '// Start coding here...\n'}</textarea>
             `;
@@ -15320,17 +14923,9 @@ body.theme-flashcard button:hover {
             const langSelect = content.querySelector('#code-language');
             const saveBtn = content.querySelector('#code-save');
             const loadBtn = content.querySelector('#code-load');
-            const runBtn = content.querySelector('#code-run');
             
             saveBtn.addEventListener('click', () => {
                 localStorage.setItem(codeKey, editor.value);
-                // Sync to Firebase if logged in
-                if (isLoggedIn()) {
-                    const username = localStorage.getItem('loggedInUsername');
-                    if (database) {
-                        database.ref(`userData/${username}/code`).set(editor.value);
-                    }
-                }
                 alert('Code saved!');
             });
             
@@ -15340,46 +14935,6 @@ body.theme-flashcard button:hover {
                     editor.value = saved;
                 } else {
                     alert('No saved code found.');
-                }
-            });
-            
-            runBtn.addEventListener('click', () => {
-                const code = editor.value;
-                const language = langSelect.value;
-                
-                if (!code.trim()) {
-                    alert('Please enter some code first!');
-                    return;
-                }
-                
-                const newTab = window.open('', '_blank');
-                if (!newTab) {
-                    alert('Please allow popups to run code in a new tab.');
-                    return;
-                }
-                
-                if (language === 'javascript') {
-                    // Run JavaScript in console
-                    newTab.document.open();
-                    newTab.document.write('<!DOCTYPE html><html><head><title>JavaScript Console</title><style>body{font-family:monospace;padding:20px;background:#1e1e1e;color:#d4d4d4}#console{background:#000;padding:10px;border:1px solid #444;min-height:400px;white-space:pre-wrap}</style></head><body><h2>JavaScript Console Output</h2><div id="console"></div><script>const consoleDiv=document.getElementById("console");const originalLog=console.log;const originalError=console.error;const originalWarn=console.warn;console.log=function(...args){consoleDiv.textContent+=args.join(" ")+"\\n";originalLog.apply(console,args)};console.error=function(...args){consoleDiv.textContent+="ERROR: "+args.join(" ")+"\\n";originalError.apply(console,args)};console.warn=function(...args){consoleDiv.textContent+="WARN: "+args.join(" ")+"\\n";originalWarn.apply(console,args)};try{');
-                    newTab.document.write(code);
-                    newTab.document.write('}catch(e){console.error(e.toString())}</script></body></html>');
-                    newTab.document.close();
-                } else if (language === 'html') {
-                    // Run HTML in elements
-                    newTab.document.write(code);
-                } else if (language === 'css') {
-                    // Run CSS in style tag
-                    const escapedCss = escapeHtml(code);
-                    newTab.document.write('<!DOCTYPE html><html><head><title>CSS Preview</title><style>' + escapedCss + '</style></head><body><h1>CSS Preview</h1><p>This is a paragraph with your CSS applied.</p><div style="padding:20px;background:#f0f0f0;margin:10px">Styled div</div></body></html>');
-                } else if (language === 'python') {
-                    // Python - show in console (can't actually run Python in browser)
-                    const escapedPython = escapeHtml(code);
-                    newTab.document.write('<!DOCTYPE html><html><head><title>Python Code</title><style>body{font-family:monospace;padding:20px;background:#1e1e1e;color:#d4d4d4}pre{background:#000;padding:10px;border:1px solid #444}</style></head><body><h2>Python Code (Display Only)</h2><p>Note: Python cannot run directly in the browser. Use a Python interpreter or online service.</p><pre>' + escapedPython + '</pre></body></html>');
-                } else {
-                    // Plain text
-                    const escapedText = escapeHtml(code);
-                    newTab.document.write('<!DOCTYPE html><html><head><title>Plain Text</title><style>body{font-family:monospace;padding:20px;background:#fff}pre{background:#f0f0f0;padding:10px;border:1px solid #ccc}</style></head><body><pre>' + escapedText + '</pre></body></html>');
                 }
             });
             
@@ -17303,54 +16858,29 @@ body.theme-flashcard button:hover {
         
         // Initialize everything on page load - ensure proper order
         function initializeOnLoad() {
-            // STEP 1: Clean up ALL existing handlers first to prevent duplicates
+            // Clean up any existing handlers first to prevent duplicates
             try {
-                // Matrix theme
                 if (typeof matrixKeyHandler !== 'undefined' && matrixKeyHandler) {
                     document.removeEventListener('keydown', matrixKeyHandler);
                     matrixKeyHandler = null;
                 }
-                // Firework theme
                 if (typeof fireworkKeyHandler !== 'undefined' && fireworkKeyHandler) {
                     document.removeEventListener('keydown', fireworkKeyHandler);
                     fireworkKeyHandler = null;
                 }
-                // Pirate theme
                 if (typeof pirateClickHandler !== 'undefined' && pirateClickHandler) {
-                    document.removeEventListener('click', pirateClickHandler, true);
+                    document.removeEventListener('click', pirateClickHandler);
                     pirateClickHandler = null;
                 }
-                if (typeof pirateInterval !== 'undefined' && pirateInterval) {
-                    clearInterval(pirateInterval);
-                    pirateInterval = null;
-                }
-                // Minecraft theme
                 if (typeof minecraftKeyHandler !== 'undefined' && minecraftKeyHandler) {
                     document.removeEventListener('keydown', minecraftKeyHandler);
                     minecraftKeyHandler = null;
-                }
-                // MLG theme
-                if (typeof mlgKeyHandler !== 'undefined' && mlgKeyHandler) {
-                    document.removeEventListener('keydown', mlgKeyHandler);
-                    mlgKeyHandler = null;
-                }
-                if (typeof mlgClickHandler !== 'undefined' && mlgClickHandler) {
-                    document.removeEventListener('click', mlgClickHandler, true);
-                    mlgClickHandler = null;
-                }
-                if (typeof mlgMouseHandler !== 'undefined' && mlgMouseHandler) {
-                    document.removeEventListener('mousemove', mlgMouseHandler);
-                    mlgMouseHandler = null;
-                }
-                if (typeof mlgEmojiInterval !== 'undefined' && mlgEmojiInterval) {
-                    clearInterval(mlgEmojiInterval);
-                    mlgEmojiInterval = null;
                 }
             } catch (e) {
                 console.error('Error cleaning up handlers:', e);
             }
             
-            // STEP 2: Clean up ALL existing theme elements
+            // Clean up any existing theme elements
             try {
                 if (typeof cleanupMatrixColumns === 'function') cleanupMatrixColumns();
                 if (typeof cleanupFireworks === 'function') cleanupFireworks();
@@ -17358,126 +16888,19 @@ body.theme-flashcard button:hover {
                 if (typeof cleanupPaperDrawing === 'function') cleanupPaperDrawing();
                 if (typeof cleanupSpaceStars === 'function') cleanupSpaceStars();
                 if (typeof cleanupOceanFish === 'function') cleanupOceanFish();
-                if (typeof cleanupClouds === 'function') cleanupClouds();
-                if (typeof cleanupFlashcards === 'function') cleanupFlashcards();
-                if (typeof cleanupMLGEffects === 'function') cleanupMLGEffects();
             } catch (e) {
                 console.error('Error cleaning up theme elements:', e);
             }
             
-            // STEP 3: Check login status (but continue initialization)
-            try {
-                if (!isLoggedIn()) {
-                    showPage('loginPage');
-                } else {
-                    // Load user data if logged in
-                    const username = localStorage.getItem('loggedInUsername');
-                    if (username && typeof loadUserData === 'function') {
-                        loadUserData(username);
-                    }
-                }
-            } catch (e) {
-                console.error('Error checking login:', e);
-            }
-            
-            // STEP 4: Load data
+            // Load data
             try {
                 if (typeof loadGlobalData === 'function') loadGlobalData();
                 if (typeof loadCoinflipData === 'function') loadCoinflipData();
-                if (typeof loadCommandHistory === 'function') loadCommandHistory();
             } catch (e) {
                 console.error('Error loading data:', e);
             }
             
-            // STEP 5: Initialize chat
-            try {
-                if (typeof initChat === 'function') {
-                    initChat();
-                }
-                
-                // Set up chat handlers
-                const chatInput = document.getElementById('chatInput');
-                const chatSendBtn = document.getElementById('chatSendBtn');
-                if (chatInput && chatSendBtn) {
-                    chatSendBtn.onclick = () => {
-                        const text = chatInput.value;
-                        if (text.trim() && typeof sendChatMessage === 'function') {
-                            sendChatMessage(text);
-                            chatInput.value = '';
-                        }
-                    };
-                    chatInput.addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter') {
-                            chatSendBtn.click();
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Error initializing chat:', e);
-            }
-            
-            // STEP 6: Set up login/register Enter key handlers
-            try {
-                const loginPassword = document.getElementById('login-password');
-                const registerPasswordConfirm = document.getElementById('register-password-confirm');
-                
-                if (loginPassword) {
-                    loginPassword.addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter' && typeof handleLogin === 'function') {
-                            handleLogin();
-                        }
-                    });
-                }
-                
-                if (registerPasswordConfirm) {
-                    registerPasswordConfirm.addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter' && typeof handleRegister === 'function') {
-                            handleRegister();
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Error setting up login handlers:', e);
-            }
-            
-            // STEP 7: Set up command history toggle
-            try {
-                const toggle = document.getElementById('commandHistoryToggle');
-                if (toggle && typeof toggleCommandHistory === 'function') {
-                    toggle.addEventListener('click', toggleCommandHistory);
-                }
-            } catch (e) {
-                console.error('Error setting up command history:', e);
-            }
-            
-            // STEP 8: Check terms agreement
-            try {
-                if (typeof checkTermsAgreement === 'function') {
-                    checkTermsAgreement();
-                }
-                
-                const agreeBtn = document.getElementById('termsAgreeBtn');
-                const disagreeBtn = document.getElementById('termsDisagreeBtn');
-                if (agreeBtn && typeof acceptTerms === 'function') {
-                    agreeBtn.addEventListener('click', acceptTerms);
-                }
-                if (disagreeBtn && typeof rejectTerms === 'function') {
-                    disagreeBtn.addEventListener('click', rejectTerms);
-                }
-            } catch (e) {
-                console.error('Error setting up terms:', e);
-            }
-            
-            // STEP 8.5: Update visit counter
-            try {
-                if (typeof updateVisitCounter === 'function') {
-                    updateVisitCounter();
-                }
-            } catch (e) {
-                console.error('Error updating visit counter:', e);
-            }
-            
-            // STEP 9: Load and apply theme (this will set up handlers properly)
+            // Load and apply theme (this will set up handlers properly)
             try {
                 if (typeof loadTheme === 'function') {
                     loadTheme();
@@ -17493,7 +16916,7 @@ body.theme-flashcard button:hover {
                 console.error('Error loading theme:', e);
             }
             
-            // STEP 10: Initialize remote desktop if needed
+            // Initialize remote desktop if needed
             try {
                 if (typeof initRemoteDesktop === 'function' && document.getElementById('remoteDesktop')) {
                     initRemoteDesktop();
@@ -17502,105 +16925,14 @@ body.theme-flashcard button:hover {
                 console.error('Error initializing remote desktop:', e);
             }
             
-            // STEP 11: Set up command input handler (CRITICAL - must work even on login page)
-            try {
-                // Use setTimeout to ensure DOM is fully ready
-                setTimeout(() => {
-                    const commandInput = document.getElementById('commandInput');
-                    if (commandInput) {
-                        // Create handler function
-                        const commandHandler = function(e) {
-                            if (e.key !== 'Enter') return;
-                            
-                            // Disable commands when on remote desktop
-                            const remoteDesktopPage = document.getElementById('remoteDesktopPage');
-                            if (remoteDesktopPage && !remoteDesktopPage.classList.contains('hidden')) {
-                                e.preventDefault();
-                                if (typeof showCommandFeedback === 'function') {
-                                    showCommandFeedback('command', 'Commands disabled on desktop. Use ; to exit.', false);
-                                }
-                                return;
-                            }
-                            
-                            e.preventDefault();
-                            const input = e.target;
-                            if (!input) return;
-                            
-                            const fullCommand = input.value.trim();
-                            if (!fullCommand) return;
-                            
-                            const command = fullCommand.toLowerCase();
-                            
-                            // Try to use processCommand if available
-                            if (typeof processCommand === 'function') {
-                                processCommand(fullCommand);
-                            } else {
-                                // Fallback: basic commands
-                                if (command === 'home' && typeof showPage === 'function') {
-                                    showPage('homePage');
-                                    input.value = '';
-                                } else if (command === 'back' && typeof showPage === 'function') {
-                                    showPage('mainPage');
-                                    input.value = '';
-                                } else {
-                                    console.log('Command:', command, '- processCommand not available yet');
-                                    input.value = '';
-                                }
-                            }
-                        };
-                        
-                        // Remove any existing listeners by cloning (cleanest way)
-                        const newInput = commandInput.cloneNode(true);
-                        commandInput.parentNode.replaceChild(newInput, commandInput);
-                        
-                        // Add the handler
-                        newInput.addEventListener('keydown', commandHandler);
-                        
-                        // Also handle Enter key
-                        newInput.addEventListener('keypress', commandHandler);
-                    }
-                }, 100);
-            } catch (e) {
-                console.error('Error setting up command input:', e);
-            }
-            
-            // STEP 12: Set up semicolon key handler for command bar
-            try {
-                const commandInput = document.getElementById('commandInput');
-                if (commandInput) {
-                    document.addEventListener('keydown', (e) => {
-                        // Only trigger if semicolon is pressed and not already typing in command input
-                        if (e.key === ';' && document.activeElement !== commandInput) {
-                            const activeEl = document.activeElement;
-                            
-                            // Block semicolon only if in a regular input/textarea (not contentEditable like paper app)
-                            const isRegularInput = activeEl && (
-                                (activeEl.tagName === 'INPUT' && activeEl.id !== 'commandInput') || 
-                                activeEl.tagName === 'TEXTAREA'
-                            );
-                            
-                            // Allow semicolon from anywhere except regular inputs/textareas
-                            if (!isRegularInput) {
-                                e.preventDefault();
-                                commandInput.focus();
-                                commandInput.select();
-                            }
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Error setting up semicolon handler:', e);
-            }
-            
-            // STEP 13: Ensure command bar is visible (unless on remote desktop or blocked)
+            // Ensure command bar is visible (unless on remote desktop or blocked)
             try {
                 const commandBar = document.querySelector('.command-bar');
                 if (commandBar) {
                     const currentPage = document.querySelector('.page:not(.hidden)');
                     const isRemoteDesktop = currentPage && currentPage.id === 'remoteDesktopPage';
-                    const isLoginPage = currentPage && currentPage.id === 'loginPage';
                     const isBlocked = localStorage.getItem('isBlocked') === 'true';
-                    if (!isRemoteDesktop && !isLoginPage && !isBlocked) {
+                    if (!isRemoteDesktop && !isBlocked) {
                         commandBar.style.display = 'flex';
                     }
                 }
@@ -17609,7 +16941,7 @@ body.theme-flashcard button:hover {
             }
         }
         
-        // Initialize on DOM ready - SINGLE POINT OF ENTRY
+        // Initialize on DOM ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeOnLoad);
         } else {
