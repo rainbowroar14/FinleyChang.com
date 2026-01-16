@@ -14774,6 +14774,21 @@ body.theme-flashcard button:hover {
             } catch (e) {
                 console.error('Error initializing remote desktop:', e);
             }
+            
+            // Ensure command bar is visible (unless on remote desktop or blocked)
+            try {
+                const commandBar = document.querySelector('.command-bar');
+                if (commandBar) {
+                    const currentPage = document.querySelector('.page:not(.hidden)');
+                    const isRemoteDesktop = currentPage && currentPage.id === 'remoteDesktopPage';
+                    const isBlocked = localStorage.getItem('isBlocked') === 'true';
+                    if (!isRemoteDesktop && !isBlocked) {
+                        commandBar.style.display = 'flex';
+                    }
+                }
+            } catch (e) {
+                console.error('Error showing command bar:', e);
+            }
         }
         
         // Initialize on DOM ready
