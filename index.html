@@ -659,6 +659,91 @@
             font-style: italic;
         }
         
+        /* Profile display in top left */
+        .profile-display {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            min-width: 150px;
+        }
+        
+        .profile-display:hover {
+            background: rgba(22, 27, 34, 0.95);
+            border-color: #58a6ff;
+        }
+        
+        .profile-display .profile-username {
+            font-weight: bold;
+            color: #58a6ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .profile-display .profile-username::before {
+            content: '👤';
+            font-size: 16px;
+        }
+        
+        .profile-display .profile-admin-badge {
+            background: #f85149;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+        
+        .profile-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            background: rgba(13, 17, 23, 0.98);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 5px 0;
+            min-width: 180px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            display: none;
+            z-index: 1001;
+        }
+        
+        .profile-menu.show {
+            display: block;
+        }
+        
+        .profile-menu-item {
+            padding: 10px 15px;
+            color: #c9d1d9;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        
+        .profile-menu-item:hover {
+            background: rgba(48, 54, 61, 0.5);
+        }
+        
+        .profile-menu-item.logout {
+            color: #f85149;
+        }
+        
+        .profile-menu-item.logout:hover {
+            background: rgba(248, 81, 73, 0.1);
+        }
+        
         /* Clock display in top left */
         .clock-display {
             position: fixed;
@@ -3350,7 +3435,46 @@ body.theme-flashcard button:hover {
 </head>
 <body>
     <!-- Main page with FinHub title -->
-    <div class="page" id="mainPage">
+    <!-- Login page (must be first, blocks all access) -->
+    <div class="page login-page" id="loginPage" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #0d1117; color: #c9d1d9;">
+        <div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+            <h1 style="color: #c9d1d9; font-size: 32px; margin-bottom: 10px; text-align: center;">Login</h1>
+            <p style="color: #8b949e; font-size: 14px; margin-bottom: 30px; text-align: center;">You must login to access this website</p>
+            <div id="loginError" style="color: #f85149; font-size: 14px; margin-bottom: 15px; min-height: 20px; text-align: center;"></div>
+            <div style="margin-bottom: 20px;">
+                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Username:</label>
+                <input type="text" id="loginUsername" placeholder="Enter username" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Password:</label>
+                <input type="password" id="loginPassword" placeholder="Enter password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
+            </div>
+            <button id="loginSubmitBtn" onclick="attemptLogin()" style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 15px; transition: background 0.2s;">Login</button>
+            <button id="registerBtn" onclick="showRegisterForm()" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #58a6ff; border: 1px solid #30363d; border-radius: 6px; cursor: pointer; transition: all 0.2s;">Create Account</button>
+        </div>
+        <!-- Register form (hidden by default) -->
+        <div id="registerForm" style="display: none; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.3); margin-top: 20px;">
+            <h2 style="color: #c9d1d9; font-size: 28px; margin-bottom: 10px; text-align: center;">Create Account</h2>
+            <p style="color: #8b949e; font-size: 14px; margin-bottom: 30px; text-align: center;">Choose a unique username and password</p>
+            <div id="registerError" style="color: #f85149; font-size: 14px; margin-bottom: 15px; min-height: 20px; text-align: center;"></div>
+            <div style="margin-bottom: 20px;">
+                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Username (3-20 characters):</label>
+                <input type="text" id="registerUsername" placeholder="Enter username" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Password (min 4 characters):</label>
+                <input type="password" id="registerPassword" placeholder="Enter password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="color: #c9d1d9; font-size: 14px; display: block; margin-bottom: 8px;">Confirm Password:</label>
+                <input type="password" id="registerPasswordConfirm" placeholder="Confirm password" style="width: 100%; padding: 12px; font-size: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; box-sizing: border-box;">
+            </div>
+            <button id="registerSubmitBtn" onclick="attemptRegister()" style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 15px;">Register</button>
+            <button onclick="showLoginForm()" style="width: 100%; padding: 12px; font-size: 14px; background: transparent; color: #58a6ff; border: 1px solid #30363d; border-radius: 6px; cursor: pointer;">Back to Login</button>
+        </div>
+    </div>
+    
+    <div class="page hidden" id="mainPage">
         <div class="finhub-title">
             <!-- Big F made of small letters -->
             <div class="big-letter letter-f" id="letter-f"></div>
@@ -3371,6 +3495,18 @@ body.theme-flashcard button:hover {
         <!-- Canvas for wooperbird goose on main page -->
         <canvas id="wooperbirdCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;"></canvas>
                 </div>
+    
+    <!-- Profile display in top left (visible on all pages) -->
+    <div class="profile-display" id="profileDisplay" style="display: none;" onclick="toggleProfileMenu(event)">
+        <div class="profile-username" id="profileUsername">
+            <span id="profileUsernameText"></span>
+            <span class="profile-admin-badge" id="profileAdminBadge" style="display: none;">ADMIN</span>
+        </div>
+        <div class="profile-menu" id="profileMenu">
+            <div class="profile-menu-item" onclick="showWhoami(); document.getElementById('profileMenu').classList.remove('show');">View Profile</div>
+            <div class="profile-menu-item logout" onclick="logout()">Logout</div>
+        </div>
+    </div>
     
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
@@ -5087,6 +5223,368 @@ body.theme-flashcard button:hover {
             localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
         }
         
+        // Login System
+        // Simple password hashing function
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash.toString(36);
+        }
+        
+        // Check if user is logged in
+        function isLoggedIn() {
+            return localStorage.getItem('loggedInUsername') !== null;
+        }
+        
+        // Get logged in username
+        function getLoggedInUsername() {
+            return localStorage.getItem('loggedInUsername') || null;
+        }
+        
+        // Check if user is admin
+        function isAdmin() {
+            return getLoggedInUsername() === 'finleymain';
+        }
+        
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('registerError').textContent = '';
+        }
+        
+        // Show register form
+        function showRegisterForm() {
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('registerError').textContent = '';
+        }
+        
+        // Attempt to register new user
+        function attemptRegister() {
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            const errorEl = document.getElementById('registerError');
+            
+            // Validation
+            if (!username || username.length < 3 || username.length > 20) {
+                errorEl.textContent = 'Username must be 3-20 characters';
+                return;
+            }
+            
+            const validIdPattern = /^[a-zA-Z0-9_-]+$/;
+            if (!validIdPattern.test(username)) {
+                errorEl.textContent = 'Username can only contain letters, numbers, _, and -';
+                return;
+            }
+            
+            if (!password || password.length < 4) {
+                errorEl.textContent = 'Password must be at least 4 characters';
+                return;
+            }
+            
+            if (password !== passwordConfirm) {
+                errorEl.textContent = 'Passwords do not match';
+                return;
+            }
+            
+            // Check for duplicate username
+            if (database) {
+                database.ref(`userAccounts/${username}`).once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        errorEl.textContent = 'Username already taken';
+                        return;
+                    }
+                    
+                    // Create account
+                    const hashedPassword = hashPassword(password);
+                    database.ref(`userAccounts/${username}`).set({
+                        username: username,
+                        passwordHash: hashedPassword,
+                        createdAt: Date.now(),
+                        isAdmin: username === 'finleymain'
+                    }).then(() => {
+                        // Auto-login after registration
+                        localStorage.setItem('loggedInUsername', username);
+                        localStorage.setItem('userPasswordHash', hashedPassword);
+                        showMainContent();
+                    }).catch((error) => {
+                        errorEl.textContent = 'Registration failed: ' + error.message;
+                    });
+                });
+            } else {
+                // Fallback to localStorage
+                const accounts = JSON.parse(localStorage.getItem('userAccounts') || '{}');
+                if (accounts[username]) {
+                    errorEl.textContent = 'Username already taken';
+                    return;
+                }
+                
+                const hashedPassword = hashPassword(password);
+                accounts[username] = {
+                    username: username,
+                    passwordHash: hashedPassword,
+                    createdAt: Date.now(),
+                    isAdmin: username === 'finleymain'
+                };
+                localStorage.setItem('userAccounts', JSON.stringify(accounts));
+                localStorage.setItem('loggedInUsername', username);
+                localStorage.setItem('userPasswordHash', hashedPassword);
+                showMainContent();
+            }
+        }
+        
+        // Check if user is timed out
+        function checkUserTimeout(username) {
+            if (database) {
+                return new Promise((resolve) => {
+                    database.ref(`userTimeouts/${username}`).once('value', (snapshot) => {
+                        if (!snapshot.exists()) {
+                            resolve(null);
+                            return;
+                        }
+                        const timeout = snapshot.val();
+                        if (Date.now() < timeout.timeoutUntil) {
+                            resolve(timeout);
+                        } else {
+                            // Timeout expired, remove it
+                            database.ref(`userTimeouts/${username}`).remove();
+                            resolve(null);
+                        }
+                    });
+                });
+            } else {
+                const timeouts = JSON.parse(localStorage.getItem('userTimeouts') || '{}');
+                if (timeouts[username]) {
+                    const timeout = timeouts[username];
+                    if (Date.now() < timeout.timeoutUntil) {
+                        return timeout;
+                    } else {
+                        // Timeout expired, remove it
+                        delete timeouts[username];
+                        localStorage.setItem('userTimeouts', JSON.stringify(timeouts));
+                        return null;
+                    }
+                }
+                return null;
+            }
+        }
+        
+        // Attempt to login
+        function attemptLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            
+            if (!username || !password) {
+                errorEl.textContent = 'Please enter both username and password';
+                return;
+            }
+            
+            const hashedPassword = hashPassword(password);
+            
+            if (database) {
+                // Check timeout first
+                checkUserTimeout(username).then((timeout) => {
+                    if (timeout) {
+                        const minutesLeft = Math.ceil((timeout.timeoutUntil - Date.now()) / (60 * 1000));
+                        errorEl.textContent = `You are timed out for ${minutesLeft} more minute(s)`;
+                        return;
+                    }
+                    
+                    database.ref(`userAccounts/${username}`).once('value', (snapshot) => {
+                        if (!snapshot.exists()) {
+                            errorEl.textContent = 'Invalid username or password';
+                            return;
+                        }
+                        
+                        const account = snapshot.val();
+                        if (account.passwordHash !== hashedPassword) {
+                            errorEl.textContent = 'Invalid username or password';
+                            return;
+                        }
+                        
+                        // Login successful
+                        localStorage.setItem('loggedInUsername', username);
+                        localStorage.setItem('userPasswordHash', hashedPassword);
+                        showMainContent();
+                    });
+                });
+            } else {
+                // Check timeout first (localStorage)
+                const timeout = checkUserTimeout(username);
+                if (timeout) {
+                    const minutesLeft = Math.ceil((timeout.timeoutUntil - Date.now()) / (60 * 1000));
+                    errorEl.textContent = `You are timed out for ${minutesLeft} more minute(s)`;
+                    return;
+                }
+                
+                // Fallback to localStorage
+                const accounts = JSON.parse(localStorage.getItem('userAccounts') || '{}');
+                if (!accounts[username] || accounts[username].passwordHash !== hashedPassword) {
+                    errorEl.textContent = 'Invalid username or password';
+                    return;
+                }
+                
+                localStorage.setItem('loggedInUsername', username);
+                localStorage.setItem('userPasswordHash', hashedPassword);
+                showMainContent();
+            }
+        }
+        
+        // Show main content after login
+        function showMainContent() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainPage').classList.remove('hidden');
+            // Update profile display
+            updateProfileDisplay();
+            // Initialize everything that needs the user to be logged in
+            if (typeof initChat === 'function') initChat();
+            if (typeof loadOnlineUsers === 'function') loadOnlineUsers();
+        }
+        
+        // Update profile display with username and admin badge
+        function updateProfileDisplay() {
+            const profileDisplay = document.getElementById('profileDisplay');
+            const profileUsernameText = document.getElementById('profileUsernameText');
+            const profileAdminBadge = document.getElementById('profileAdminBadge');
+            
+            if (!profileDisplay || !profileUsernameText) return;
+            
+            const username = getLoggedInUsername();
+            if (username) {
+                profileDisplay.style.display = 'block';
+                profileUsernameText.textContent = username;
+                
+                // Show admin badge if user is admin
+                if (isAdmin()) {
+                    profileAdminBadge.style.display = 'inline-block';
+                } else {
+                    profileAdminBadge.style.display = 'none';
+                }
+            } else {
+                profileDisplay.style.display = 'none';
+            }
+        }
+        
+        // Toggle profile menu
+        function toggleProfileMenu(e) {
+            if (e) {
+                e.stopPropagation();
+            }
+            const profileMenu = document.getElementById('profileMenu');
+            if (profileMenu) {
+                profileMenu.classList.toggle('show');
+            }
+        }
+        
+        // Close profile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const profileDisplay = document.getElementById('profileDisplay');
+            const profileMenu = document.getElementById('profileMenu');
+            if (profileDisplay && profileMenu && !profileDisplay.contains(e.target)) {
+                profileMenu.classList.remove('show');
+            }
+        });
+        
+        // Logout function
+        function logout() {
+            // Clear login data
+            localStorage.removeItem('loggedInUsername');
+            localStorage.removeItem('userPasswordHash');
+            
+            // Hide profile display
+            const profileDisplay = document.getElementById('profileDisplay');
+            if (profileDisplay) {
+                profileDisplay.style.display = 'none';
+            }
+            
+            // Redirect to login page
+            checkLoginStatus();
+            
+            // Clear form fields
+            const loginUsername = document.getElementById('loginUsername');
+            const loginPassword = document.getElementById('loginPassword');
+            if (loginUsername) loginUsername.value = '';
+            if (loginPassword) loginPassword.value = '';
+        }
+        
+        // Block access until logged in
+        function checkLoginStatus() {
+            if (!isLoggedIn()) {
+                // Hide all pages except login
+                document.querySelectorAll('.page').forEach(page => {
+                    if (page.id !== 'loginPage') {
+                        page.classList.add('hidden');
+                    }
+                });
+                document.getElementById('loginPage').style.display = 'flex';
+            } else {
+                // Check if user is timed out
+                const username = getLoggedInUsername();
+                if (username) {
+                    if (database) {
+                        checkUserTimeout(username).then((timeout) => {
+                            if (timeout) {
+                                // User is timed out, log them out
+                                localStorage.removeItem('loggedInUsername');
+                                localStorage.removeItem('userPasswordHash');
+                                const minutesLeft = Math.ceil((timeout.timeoutUntil - Date.now()) / (60 * 1000));
+                                document.getElementById('loginError').textContent = `You are timed out for ${minutesLeft} more minute(s)`;
+                                checkLoginStatus();
+                            } else {
+                                showMainContent();
+                            }
+                        });
+                    } else {
+                        const timeout = checkUserTimeout(username);
+                        if (timeout) {
+                            // User is timed out, log them out
+                            localStorage.removeItem('loggedInUsername');
+                            localStorage.removeItem('userPasswordHash');
+                            const minutesLeft = Math.ceil((timeout.timeoutUntil - Date.now()) / (60 * 1000));
+                            document.getElementById('loginError').textContent = `You are timed out for ${minutesLeft} more minute(s)`;
+                            checkLoginStatus();
+                        } else {
+                            showMainContent();
+                        }
+                    }
+                } else {
+                    showMainContent();
+                }
+            }
+        }
+        
+        // Allow Enter key to submit login/register
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginUsername = document.getElementById('loginUsername');
+            const loginPassword = document.getElementById('loginPassword');
+            const registerUsername = document.getElementById('registerUsername');
+            const registerPassword = document.getElementById('registerPassword');
+            const registerPasswordConfirm = document.getElementById('registerPasswordConfirm');
+            
+            if (loginUsername && loginPassword) {
+                loginPassword.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') attemptLogin();
+                });
+            }
+            
+            if (registerPasswordConfirm) {
+                registerPasswordConfirm.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') attemptRegister();
+                });
+            }
+            
+            // Check login status on page load
+            checkLoginStatus();
+        });
+        
         // Firebase Configuration
         // Your Firebase config for online chat and profile sharing
         const firebaseConfig = {
@@ -5123,6 +5621,13 @@ body.theme-flashcard button:hover {
         
         // User Profile System
         function getUserId() {
+            // Use logged-in username if available, otherwise fall back to old system
+            const loggedInUsername = getLoggedInUsername();
+            if (loggedInUsername) {
+                return loggedInUsername;
+            }
+            
+            // Fallback for backwards compatibility (shouldn't happen if login is required)
             let userId = localStorage.getItem('userId');
             if (!userId) {
                 // Generate a more unique ID using timestamp + random to avoid collisions
@@ -5163,45 +5668,95 @@ body.theme-flashcard button:hover {
             const oldUserId = getUserId();
             const newUserIdTrimmed = newUserId.trim();
             
-            // Don't allow changing to someone else's ID if they exist in Firebase
+            // If same username, no change needed
+            if (newUserIdTrimmed === oldUserId) {
+                return true;
+            }
+            
+            // Check if new username is already taken in userAccounts
             if (database) {
                 return new Promise((resolve) => {
-                    database.ref(`users/${newUserIdTrimmed}`).once('value', (snapshot) => {
-                        if (snapshot.exists() && newUserIdTrimmed !== oldUserId) {
-                            resolve(false); // ID already taken
-                        } else {
-                            // Update localStorage
-                            localStorage.setItem('userId', newUserIdTrimmed);
-                            
-                            // Migrate bio if exists
-                            const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
-                            if (bios[oldUserId]) {
-                                bios[newUserIdTrimmed] = bios[oldUserId];
-                                delete bios[oldUserId];
-                                localStorage.setItem('userBios', JSON.stringify(bios));
+                    // Check userAccounts first
+                    database.ref(`userAccounts/${newUserIdTrimmed}`).once('value', (accountSnapshot) => {
+                        if (accountSnapshot.exists() && newUserIdTrimmed !== oldUserId) {
+                            resolve(false); // Username already taken
+                            return;
+                        }
+                        
+                        // Check users table for backwards compatibility
+                        database.ref(`users/${newUserIdTrimmed}`).once('value', (snapshot) => {
+                            if (snapshot.exists() && newUserIdTrimmed !== oldUserId) {
+                                resolve(false); // ID already taken
+                                return;
                             }
                             
-                            // Update Firebase if connected
-                            const userRef = database.ref(`users/${oldUserId}`);
-                            userRef.once('value', (oldSnapshot) => {
-                                const oldData = oldSnapshot.val();
-                                if (oldData) {
-                                    // Move data to new ID
-                                    database.ref(`users/${newUserIdTrimmed}`).set({
-                                        ...oldData,
-                                        id: newUserIdTrimmed
+                            // Get old account data
+                            database.ref(`userAccounts/${oldUserId}`).once('value', (oldAccountSnapshot) => {
+                                const oldAccount = oldAccountSnapshot.val();
+                                
+                                if (oldAccount) {
+                                    // Update account with new username (keep password)
+                                    database.ref(`userAccounts/${newUserIdTrimmed}`).set({
+                                        ...oldAccount,
+                                        username: newUserIdTrimmed,
+                                        isAdmin: newUserIdTrimmed === 'finleymain'
                                     });
-                                    // Remove old ID
-                                    userRef.remove();
+                                    // Remove old account
+                                    database.ref(`userAccounts/${oldUserId}`).remove();
                                 }
+                                
+                                // Update localStorage
+                                localStorage.setItem('loggedInUsername', newUserIdTrimmed);
+                                localStorage.setItem('userId', newUserIdTrimmed);
+                                
+                                // Migrate bio if exists
+                                const bios = JSON.parse(localStorage.getItem('userBios') || '{}');
+                                if (bios[oldUserId]) {
+                                    bios[newUserIdTrimmed] = bios[oldUserId];
+                                    delete bios[oldUserId];
+                                    localStorage.setItem('userBios', JSON.stringify(bios));
+                                }
+                                
+                                // Update Firebase users table if connected
+                                const userRef = database.ref(`users/${oldUserId}`);
+                                userRef.once('value', (oldSnapshot) => {
+                                    const oldData = oldSnapshot.val();
+                                    if (oldData) {
+                                        // Move data to new ID
+                                        database.ref(`users/${newUserIdTrimmed}`).set({
+                                            ...oldData,
+                                            id: newUserIdTrimmed
+                                        });
+                                        // Remove old ID
+                                        userRef.remove();
+                                    }
+                                });
+                                
+                                resolve(true);
                             });
-                            
-                            resolve(true);
-                        }
+                        });
                     });
                 });
             } else {
-                // Just update localStorage if no Firebase
+                // Check localStorage userAccounts
+                const accounts = JSON.parse(localStorage.getItem('userAccounts') || '{}');
+                if (accounts[newUserIdTrimmed] && newUserIdTrimmed !== oldUserId) {
+                    return false; // Username already taken
+                }
+                
+                // Update account if exists
+                if (accounts[oldUserId]) {
+                    accounts[newUserIdTrimmed] = {
+                        ...accounts[oldUserId],
+                        username: newUserIdTrimmed,
+                        isAdmin: newUserIdTrimmed === 'finleymain'
+                    };
+                    delete accounts[oldUserId];
+                    localStorage.setItem('userAccounts', JSON.stringify(accounts));
+                }
+                
+                // Update localStorage
+                localStorage.setItem('loggedInUsername', newUserIdTrimmed);
                 localStorage.setItem('userId', newUserIdTrimmed);
                 
                 // Migrate bio
@@ -6809,6 +7364,52 @@ body.theme-flashcard button:hover {
                     setTimeout(() => {
                         commandInput.placeholder = 'Type a color or "home"...';
                     }, 2000);
+                } else if (command.startsWith('timeout ') && isAdmin()) {
+                    resetConfirm = false;
+                    const parts = command.substring(8).trim().split(' ');
+                    if (parts.length < 2) {
+                        showCommandFeedback('timeout', 'Usage: timeout [username] [minutes]', false);
+                    } else {
+                        const targetUsername = parts[0];
+                        const minutes = parseInt(parts[1]);
+                        if (isNaN(minutes) || minutes < 1) {
+                            showCommandFeedback('timeout', 'Invalid timeout duration. Must be a positive number of minutes.', false);
+                        } else {
+                            const timeoutUntil = Date.now() + (minutes * 60 * 1000);
+                            if (database) {
+                                database.ref(`userTimeouts/${targetUsername}`).set({
+                                    timeoutUntil: timeoutUntil,
+                                    timedOutBy: getLoggedInUsername(),
+                                    timedOutAt: Date.now(),
+                                    durationMinutes: minutes
+                                }).then(() => {
+                                    showCommandFeedback('timeout', `Timed out ${targetUsername} for ${minutes} minute(s)`, true);
+                                });
+                            } else {
+                                const timeouts = JSON.parse(localStorage.getItem('userTimeouts') || '{}');
+                                timeouts[targetUsername] = {
+                                    timeoutUntil: timeoutUntil,
+                                    timedOutBy: getLoggedInUsername(),
+                                    timedOutAt: Date.now(),
+                                    durationMinutes: minutes
+                                };
+                                localStorage.setItem('userTimeouts', JSON.stringify(timeouts));
+                                showCommandFeedback('timeout', `Timed out ${targetUsername} for ${minutes} minute(s)`, true);
+                            }
+                        }
+                    }
+                } else if (command === 'clear' && isAdmin()) {
+                    resetConfirm = false;
+                    if (database) {
+                        database.ref('messages').remove().then(() => {
+                            showCommandFeedback('clear', 'Chat cleared!', true);
+                            loadChatMessages();
+                        });
+                    } else {
+                        localStorage.setItem('chatMessages', JSON.stringify([]));
+                        showCommandFeedback('clear', 'Chat cleared!', true);
+                        loadChatMessages();
+                    }
                 } else if (hasColorPalette) {
                     resetConfirm = false;
                     changeAllColors(command);
