@@ -3504,6 +3504,7 @@ body.theme-flashcard button:hover {
         </div>
         <div class="profile-menu" id="profileMenu">
             <div class="profile-menu-item" onclick="showWhoami(); document.getElementById('profileMenu').classList.remove('show');">View Profile</div>
+            <div class="profile-menu-item" onclick="viewBoard(); document.getElementById('profileMenu').classList.remove('show');">View My Board</div>
             <div class="profile-menu-item logout" onclick="logout()">Logout</div>
         </div>
     </div>
@@ -4286,7 +4287,14 @@ body.theme-flashcard button:hover {
                     { name: 'whoami [id]', desc: 'Display another user\'s profile by ID' },
                     { name: 'iam [bio]', desc: 'Set your bio/profile text' },
                     { name: 'boardedit', desc: 'Edit your personal board (text and images)' },
+                    { name: 'board', desc: 'View your personal board' },
+                    { name: 'myboard', desc: 'View your personal board' },
+                    { name: 'viewboard', desc: 'View your personal board' },
                     { name: 'edit', desc: 'Edit your profile settings' },
+                ],
+                'Admin': [
+                    { name: 'timeout [username] [minutes]', desc: 'Timeout a user for specified minutes (Admin only)', isAdmin: true },
+                    { name: 'clear', desc: 'Clear all chat messages (Admin only)', isAdmin: true },
                 ]
             };
             
@@ -4294,6 +4302,10 @@ body.theme-flashcard button:hover {
             Object.keys(commandDefinitions).forEach(category => {
                 const commands = commandDefinitions[category];
                 const visibleCommands = commands.filter(cmd => {
+                    // Hide admin commands if not admin
+                    if (cmd.isAdmin && !isAdmin()) {
+                        return false;
+                    }
                     // Hide goose commands if not unlocked
                     if (cmd.isGoose && !unlockedCommands.has(cmd.name)) {
                         return false;
@@ -6573,6 +6585,14 @@ body.theme-flashcard button:hover {
                 };
             }
             
+            // Set up View Board click handler
+            viewBoardItem.onclick = () => {
+                viewBoard(userId);
+                contextMenu.classList.add('hidden');
+            };
+            viewBoardItem.style.cursor = 'pointer';
+            viewBoardItem.style.color = '#000';
+            
             // Position and show context menu
             contextMenu.style.left = event.pageX + 'px';
             contextMenu.style.top = event.pageY + 'px';
@@ -7216,6 +7236,11 @@ body.theme-flashcard button:hover {
                 } else if (command === 'edit') {
                     resetConfirm = false;
                     openEditMenu();
+                } else if (command === 'board' || command === 'myboard' || command === 'viewboard') {
+                    resetConfirm = false;
+                    viewBoard();
+                    showCommandFeedback('board', 'Viewing your board', true);
+                    commandInput.value = '';
                 } else if (command === 'boardedit') {
                     resetConfirm = false;
                     openBoardEditor();
@@ -13210,6 +13235,13 @@ body.theme-flashcard button:hover {
                     const fixedLobbyIds = ['lobby1', 'lobby2', 'lobby3', 'lobby4', 'lobby5'];
                     let html = '';
                     
+                    // Filter out players that are null or empty strings
+                    function getValidPlayers(lobby) {
+                        if (!lobby) return [];
+                        const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
+                        return players.filter(p => p && p.trim() !== '');
+                    }
+                    
                     fixedLobbyIds.forEach((lobbyId, index) => {
                         const lobbyNum = index + 1;
                         const lobby = lobbiesData[lobbyId];
@@ -13217,7 +13249,7 @@ body.theme-flashcard button:hover {
                         if (lobby) {
                             const hasPassword = lobby.lobbyPassword && lobby.lobbyPassword.length > 0;
                             const hostName = lobby.hostName || lobby.host || 'None';
-                            const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
+                            const players = getValidPlayers(lobby);
                             const isFull = players.length >= 2;
                             const isGameStarted = lobby.gameStarted || false;
                             const statusText = isGameStarted ? ' (Game in progress)' : isFull ? ' (Full)' : ' (Open)';
@@ -13233,12 +13265,20 @@ body.theme-flashcard button:hover {
                     
                     // Attach event listeners to all join buttons
                     listEl.querySelectorAll('.join-lobby-btn').forEach(btn => {
-                        btn.onclick = () => {
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             const lobbyId = btn.getAttribute('data-lobby-id');
-                            if (lobbyId) {
-                                joinLobbyInternal(lobbyId, false);
+                            if (lobbyId && !btn.disabled) {
+                                // Use a closure to ensure joinLobbyInternal is accessible
+                                const joinFunc = joinLobbyInternal;
+                                if (typeof joinFunc === 'function') {
+                                    joinFunc(lobbyId, false);
+                                } else {
+                                    console.error('joinLobbyInternal function not found');
+                                }
                             }
-                        };
+                        });
                     });
                 }
                 
@@ -13269,9 +13309,50 @@ body.theme-flashcard button:hover {
                             database.ref('passwordGameLobbies').off('value', lobbyListener);
                         }
                         
+                        // Cleanup function to remove old/inactive lobbies
+                        function cleanupOldLobbies(lobbiesData) {
+                            const fixedLobbyIds = ['lobby1', 'lobby2', 'lobby3', 'lobby4', 'lobby5'];
+                            const currentTime = Date.now();
+                            const maxInactiveTime = 30 * 60 * 1000; // 30 minutes
+                            
+                            Object.keys(lobbiesData).forEach(lobbyId => {
+                                const lobby = lobbiesData[lobbyId];
+                                const isFixed = fixedLobbyIds.includes(lobbyId);
+                                
+                                // Get player count
+                                const players = Array.isArray(lobby.players) ? lobby.players : Object.keys(lobby.players || {});
+                                const playerCount = players.filter(p => p && p.trim() !== '').length;
+                                const createdAt = lobby.createdAt || 0;
+                                const age = currentTime - createdAt;
+                                const isOld = age > maxInactiveTime;
+                                const isEmpty = playerCount === 0;
+                                const isGameFinished = lobby.gameStarted === false && isOld;
+                                
+                                // Clean up non-fixed lobbies that are old and empty, or old finished games
+                                if (!isFixed) {
+                                    if ((isEmpty && isOld) || (isGameFinished && isOld)) {
+                                        database.ref(`passwordGameLobbies/${lobbyId}`).remove();
+                                    }
+                                } else {
+                                    // For fixed lobbies, reset them if they're empty and old (but don't delete)
+                                    if (isEmpty && isOld && !lobby.gameStarted) {
+                                        database.ref(`passwordGameLobbies/${lobbyId}`).update({
+                                            host: null,
+                                            hostName: null,
+                                            players: [],
+                                            password: '',
+                                            gameStarted: false
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                        
                         // Set up listener for all lobbies
                         lobbyListener = (snapshot) => {
                             const allLobbies = snapshot.val() || {};
+                            // Clean up old lobbies before rendering
+                            cleanupOldLobbies(allLobbies);
                             renderLobbies(allLobbies);
                         };
                         
