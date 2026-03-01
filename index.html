@@ -170,14 +170,226 @@
             color: #ffa657;
             border: 1px solid #ffa657;
         }
+        
+        /* Login Page Styles */
+        .login-page {
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        .login-container {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+        }
+        
+        .login-container h2 {
+            color: #c9d1d9;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .login-tab {
+            flex: 1;
+            padding: 10px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #8b949e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-tab.active {
+            background: #1f6feb;
+            color: #fff;
+            border-color: #1f6feb;
+        }
+        
+        .login-tab:hover {
+            background: #30363d;
+            color: #c9d1d9;
+        }
+        
+        .login-tab.active:hover {
+            background: #1f6feb;
+        }
+        
+        .login-form {
+            display: none;
+        }
+        
+        .login-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #c9d1d9;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #1f6feb;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #238636;
+            border: 1px solid #238636;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            background: #2ea043;
+            border-color: #2ea043;
+        }
+        
+        .login-btn:disabled {
+            background: #30363d;
+            border-color: #30363d;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .error-message {
+            color: #f85149;
+            font-size: 14px;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+        
+        .success-message {
+            color: #3fb950;
+            font-size: 14px;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+        
+        .user-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(22, 27, 34, 0.9);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: #c9d1d9;
+            font-size: 14px;
+            z-index: 1000;
+        }
+        
+        .user-info .username {
+            color: #58a6ff;
+            font-weight: 500;
+        }
+        
+        .logout-btn {
+            margin-left: 10px;
+            padding: 4px 8px;
+            background: #da3633;
+            border: 1px solid #da3633;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .logout-btn:hover {
+            background: #f85149;
+            border-color: #f85149;
+        }
     </style>
 </head>
 <body>
     <!-- Firebase Connection Status -->
     <div class="firebase-status checking" id="firebaseStatus">Checking connection...</div>
     
+    <!-- User Info (shown when logged in) -->
+    <div class="user-info hidden" id="userInfo">
+        Logged in as: <span class="username" id="loggedInUsername"></span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+    
+    <!-- Login Page -->
+    <div class="page login-page" id="loginPage">
+        <div class="login-container">
+            <h2>Welcome to FinHub</h2>
+            <div class="login-tabs">
+                <div class="login-tab active" onclick="switchTab('login')">Login</div>
+                <div class="login-tab" onclick="switchTab('signup')">Sign Up</div>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="login-form active" id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+                </div>
+                <button class="login-btn" onclick="handleLogin()">Login</button>
+                <div class="error-message" id="loginError"></div>
+            </div>
+            
+            <!-- Sign Up Form -->
+            <div class="login-form" id="signupForm">
+                <div class="form-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" placeholder="Choose a username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" placeholder="Choose a password" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="signupPasswordConfirm">Confirm Password</label>
+                    <input type="password" id="signupPasswordConfirm" placeholder="Confirm your password" autocomplete="new-password">
+                </div>
+                <button class="login-btn" onclick="handleSignup()">Sign Up</button>
+                <div class="error-message" id="signupError"></div>
+                <div class="success-message" id="signupSuccess"></div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Main page with FinHub title -->
-    <div class="page" id="mainPage">
+    <div class="page hidden" id="mainPage">
         <div class="finhub-title">
             <div class="big-letter letter-f" id="letter-f"></div>
             <div class="big-letter letter-i" id="letter-i"></div>
@@ -351,6 +563,212 @@
             generateBigLetter('letter-h', letterPatterns.h);
             generateBigLetter('letter-u', letterPatterns.u);
             generateBigLetter('letter-b', letterPatterns.b);
+        });
+        
+        // ============================================
+        // AUTHENTICATION SYSTEM
+        // ============================================
+        
+        // Simple password hashing (for basic security)
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash.toString();
+        }
+        
+        // Switch between login and signup tabs
+        function switchTab(tab) {
+            const loginTab = document.querySelector('.login-tab:first-child');
+            const signupTab = document.querySelector('.login-tab:last-child');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+                document.getElementById('loginError').textContent = '';
+                document.getElementById('signupError').textContent = '';
+                document.getElementById('signupSuccess').textContent = '';
+            } else {
+                signupTab.classList.add('active');
+                loginTab.classList.remove('active');
+                signupForm.classList.add('active');
+                loginForm.classList.remove('active');
+                document.getElementById('loginError').textContent = '';
+                document.getElementById('signupError').textContent = '';
+                document.getElementById('signupSuccess').textContent = '';
+            }
+        }
+        
+        // Handle Sign Up
+        async function handleSignup() {
+            const username = document.getElementById('signupUsername').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+            const errorEl = document.getElementById('signupError');
+            const successEl = document.getElementById('signupSuccess');
+            
+            errorEl.textContent = '';
+            successEl.textContent = '';
+            
+            // Validation
+            if (!username || !password || !passwordConfirm) {
+                errorEl.textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            if (username.length < 3) {
+                errorEl.textContent = 'Username must be at least 3 characters';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters';
+                return;
+            }
+            
+            if (password !== passwordConfirm) {
+                errorEl.textContent = 'Passwords do not match';
+                return;
+            }
+            
+            if (!database) {
+                errorEl.textContent = 'Firebase not connected. Please wait...';
+                return;
+            }
+            
+            // Check if username already exists
+            const userExists = await readFromFirebase(`userAccounts/${username}`);
+            if (userExists) {
+                errorEl.textContent = 'Username already exists';
+                return;
+            }
+            
+            // Create account
+            const passwordHash = hashPassword(password);
+            const userData = {
+                username: username,
+                passwordHash: passwordHash,
+                createdAt: Date.now()
+            };
+            
+            const success = await writeToFirebase(`userAccounts/${username}`, userData);
+            
+            if (success) {
+                successEl.textContent = 'Account created! You can now login.';
+                // Clear form
+                document.getElementById('signupUsername').value = '';
+                document.getElementById('signupPassword').value = '';
+                document.getElementById('signupPasswordConfirm').value = '';
+                // Switch to login tab after 1 second
+                setTimeout(() => {
+                    switchTab('login');
+                }, 1000);
+            } else {
+                errorEl.textContent = 'Failed to create account. Please try again.';
+            }
+        }
+        
+        // Handle Login
+        async function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            
+            errorEl.textContent = '';
+            
+            // Validation
+            if (!username || !password) {
+                errorEl.textContent = 'Please enter username and password';
+                return;
+            }
+            
+            if (!database) {
+                errorEl.textContent = 'Firebase not connected. Please wait...';
+                return;
+            }
+            
+            // Check credentials
+            const userData = await readFromFirebase(`userAccounts/${username}`);
+            
+            if (!userData) {
+                errorEl.textContent = 'Invalid username or password';
+                return;
+            }
+            
+            const passwordHash = hashPassword(password);
+            if (userData.passwordHash !== passwordHash) {
+                errorEl.textContent = 'Invalid username or password';
+                return;
+            }
+            
+            // Login successful
+            localStorage.setItem('loggedInUsername', username);
+            localStorage.setItem('loginTime', Date.now().toString());
+            
+            // Show main page
+            showMainPage();
+        }
+        
+        // Logout
+        function logout() {
+            localStorage.removeItem('loggedInUsername');
+            localStorage.removeItem('loginTime');
+            showLoginPage();
+        }
+        
+        // Check login status
+        function checkLoginStatus() {
+            const username = localStorage.getItem('loggedInUsername');
+            if (username) {
+                showMainPage();
+            } else {
+                showLoginPage();
+            }
+        }
+        
+        // Show login page
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+        }
+        
+        // Show main page
+        function showMainPage() {
+            const username = localStorage.getItem('loggedInUsername');
+            if (username) {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('mainPage').classList.remove('hidden');
+                document.getElementById('userInfo').classList.remove('hidden');
+                document.getElementById('loggedInUsername').textContent = username;
+            } else {
+                showLoginPage();
+            }
+        }
+        
+        // Allow Enter key to submit forms
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginPassword = document.getElementById('loginPassword');
+            const signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
+            
+            if (loginPassword) {
+                loginPassword.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') handleLogin();
+                });
+            }
+            
+            if (signupPasswordConfirm) {
+                signupPasswordConfirm.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') handleSignup();
+                });
+            }
         });
         
         // Firebase Configuration
@@ -560,6 +978,8 @@
             // Initial check after a short delay to allow Firebase to initialize
             setTimeout(() => {
                 checkFirebaseConnection();
+                // Check login status after Firebase is ready
+                checkLoginStatus();
             }, 1000);
             
             // Recheck every 10 seconds
