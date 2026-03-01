@@ -228,6 +228,138 @@
             console.log('ℹ️ Running in offline mode (localStorage). To enable online features, configure Firebase.');
         }
         
+        // ============================================
+        // FIREBASE REALTIME DATABASE FUNCTIONS
+        // ============================================
+        
+        // 1. WRITE DATA (Save data to Firebase)
+        function writeToFirebase(path, data) {
+            if (!database) {
+                console.error('Firebase not connected');
+                return Promise.reject('Firebase not connected');
+            }
+            return database.ref(path).set(data)
+                .then(() => {
+                    console.log('✅ Data written to:', path);
+                    return true;
+                })
+                .catch((error) => {
+                    console.error('❌ Error writing to Firebase:', error);
+                    return false;
+                });
+        }
+        
+        // 2. READ DATA ONCE (Get data once)
+        function readFromFirebase(path) {
+            if (!database) {
+                console.error('Firebase not connected');
+                return Promise.reject('Firebase not connected');
+            }
+            return database.ref(path).once('value')
+                .then((snapshot) => {
+                    return snapshot.val();
+                })
+                .catch((error) => {
+                    console.error('❌ Error reading from Firebase:', error);
+                    return null;
+                });
+        }
+        
+        // 3. LISTEN TO CHANGES (Real-time updates)
+        function listenToFirebase(path, callback) {
+            if (!database) {
+                console.error('Firebase not connected');
+                return null;
+            }
+            const ref = database.ref(path);
+            ref.on('value', (snapshot) => {
+                const data = snapshot.val();
+                callback(data);
+            });
+            // Return the ref so you can stop listening later with: ref.off('value')
+            return ref;
+        }
+        
+        // 4. UPDATE DATA (Update specific fields without overwriting)
+        function updateFirebase(path, updates) {
+            if (!database) {
+                console.error('Firebase not connected');
+                return Promise.reject('Firebase not connected');
+            }
+            return database.ref(path).update(updates)
+                .then(() => {
+                    console.log('✅ Data updated at:', path);
+                    return true;
+                })
+                .catch((error) => {
+                    console.error('❌ Error updating Firebase:', error);
+                    return false;
+                });
+        }
+        
+        // 5. PUSH DATA (Add to a list - Firebase generates unique ID)
+        function pushToFirebase(path, data) {
+            if (!database) {
+                console.error('Firebase not connected');
+                return Promise.reject('Firebase not connected');
+            }
+            return database.ref(path).push(data)
+                .then((ref) => {
+                    console.log('✅ Data pushed to:', path, 'with ID:', ref.key);
+                    return ref.key;
+                })
+                .catch((error) => {
+                    console.error('❌ Error pushing to Firebase:', error);
+                    return null;
+                });
+        }
+        
+        // 6. DELETE DATA
+        function deleteFromFirebase(path) {
+            if (!database) {
+                console.error('Firebase not connected');
+                return Promise.reject('Firebase not connected');
+            }
+            return database.ref(path).remove()
+                .then(() => {
+                    console.log('✅ Data deleted from:', path);
+                    return true;
+                })
+                .catch((error) => {
+                    console.error('❌ Error deleting from Firebase:', error);
+                    return false;
+                });
+        }
+        
+        // ============================================
+        // EXAMPLE USAGE (Uncomment to test)
+        // ============================================
+        
+        /*
+        // Example 1: Write data
+        writeToFirebase('test/message', { text: 'Hello Firebase!', timestamp: Date.now() });
+        
+        // Example 2: Read data once
+        readFromFirebase('test/message').then(data => {
+            console.log('Read data:', data);
+        });
+        
+        // Example 3: Listen to real-time changes
+        const listener = listenToFirebase('test/message', (data) => {
+            console.log('Real-time update:', data);
+        });
+        // To stop listening: listener.off('value');
+        
+        // Example 4: Update data
+        updateFirebase('test/message', { text: 'Updated message!' });
+        
+        // Example 5: Push to a list
+        pushToFirebase('test/messages', { text: 'New message', user: 'User1' });
+        
+        // Example 6: Delete data
+        deleteFromFirebase('test/message');
+        */
+        
         // Check connection status on page load
         document.addEventListener('DOMContentLoaded', () => {
             // Initial check after a short delay to allow Firebase to initialize
