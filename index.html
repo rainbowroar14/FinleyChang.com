@@ -153,9 +153,43 @@
             margin-top: 10px;
             font-style: italic;
         }
+        
+        /* Firebase Connection Status */
+        .firebase-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .firebase-status.connected {
+            background: rgba(63, 185, 80, 0.2);
+            color: #3fb950;
+            border: 1px solid #3fb950;
+        }
+        
+        .firebase-status.disconnected {
+            background: rgba(248, 81, 73, 0.2);
+            color: #f85149;
+            border: 1px solid #f85149;
+        }
+        
+        .firebase-status.checking {
+            background: rgba(255, 166, 87, 0.2);
+            color: #ffa657;
+            border: 1px solid #ffa657;
+        }
     </style>
 </head>
 <body>
+    <!-- Firebase Connection Status -->
+    <div class="firebase-status checking" id="firebaseStatus">Checking connection...</div>
+    
     <!-- Main page with FinHub title -->
     <div class="page" id="mainPage">
         <div class="finhub-title">
@@ -366,6 +400,43 @@
         
         // Initialize Firebase
         let firebaseApp, database;
+        
+        // Function to check Firebase connection status
+        function checkFirebaseConnection() {
+            const statusEl = document.getElementById('firebaseStatus');
+            if (!statusEl) return;
+            
+            statusEl.classList.remove('connected', 'disconnected');
+            statusEl.classList.add('checking');
+            statusEl.textContent = 'Checking connection...';
+            
+            if (database) {
+                // Try to read from Firebase to verify connection
+                const testRef = database.ref('.info/connected');
+                testRef.once('value', (snapshot) => {
+                    if (snapshot.val() === true) {
+                        statusEl.classList.remove('checking', 'disconnected');
+                        statusEl.classList.add('connected');
+                        statusEl.textContent = '✅ Connected to Firebase';
+                    } else {
+                        statusEl.classList.remove('checking', 'connected');
+                        statusEl.classList.add('disconnected');
+                        statusEl.textContent = '❌ Disconnected from Firebase';
+                    }
+                }).catch((error) => {
+                    statusEl.classList.remove('checking', 'connected');
+                    statusEl.classList.add('disconnected');
+                    statusEl.textContent = '❌ Connection failed';
+                    console.error('Firebase connection check failed:', error);
+                });
+            } else {
+                statusEl.classList.remove('checking', 'connected');
+                statusEl.classList.add('disconnected');
+                statusEl.textContent = '❌ Firebase not initialized';
+            }
+        }
+        
+        // Initialize Firebase
         if (firebaseConfig && typeof firebase !== 'undefined') {
             try {
                 if (!firebase.apps || firebase.apps.length === 0) {
@@ -384,6 +455,19 @@
             database = null;
             console.log('ℹ️ Running in offline mode (localStorage). To enable online features, configure Firebase.');
         }
+        
+        // Check connection status on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial check after a short delay to allow Firebase to initialize
+            setTimeout(() => {
+                checkFirebaseConnection();
+            }, 1000);
+            
+            // Recheck every 10 seconds
+            setInterval(() => {
+                checkFirebaseConnection();
+            }, 10000);
+        });
     </script>
 </body>
 </html>
