@@ -296,6 +296,338 @@
             background: #f85149;
             border-color: #f85149;
         }
+        
+        /* Sidebar Buttons */
+        .sidebar-buttons {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+        
+        .sidebar-btn {
+            padding: 15px 20px;
+            background: rgba(22, 27, 34, 0.9);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .sidebar-btn:hover {
+            background: rgba(33, 38, 45, 0.95);
+            border-color: #1f6feb;
+            color: #fff;
+            transform: translateX(5px);
+        }
+        
+        /* Chat Interface */
+        .chat-container {
+            position: fixed;
+            left: 180px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 600px;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+        }
+        
+        .chat-container.active {
+            display: flex;
+        }
+        
+        .chat-header {
+            padding: 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h3 {
+            color: #c9d1d9;
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        
+        .close-btn:hover {
+            color: #f85149;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .chat-message {
+            padding: 10px;
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 6px;
+            border-left: 3px solid #58a6ff;
+        }
+        
+        .chat-message .username {
+            color: #58a6ff;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        
+        .chat-message .text {
+            color: #c9d1d9;
+        }
+        
+        .chat-message .timestamp {
+            color: #6e7681;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+        
+        .chat-input-container {
+            padding: 15px;
+            border-top: 1px solid #30363d;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #1f6feb;
+        }
+        
+        .chat-send-btn {
+            padding: 10px 20px;
+            background: #238636;
+            border: 1px solid #238636;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .chat-send-btn:hover {
+            background: #2ea043;
+        }
+        
+        /* Friends Interface */
+        .friends-container {
+            position: fixed;
+            left: 180px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 600px;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+        }
+        
+        .friends-container.active {
+            display: flex;
+        }
+        
+        .friends-header {
+            padding: 15px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .friends-header h3 {
+            color: #c9d1d9;
+            margin: 0 0 15px 0;
+        }
+        
+        .add-friend-input {
+            width: 100%;
+            padding: 10px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .add-friend-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: #238636;
+            border: 1px solid #238636;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .friends-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .friend-item {
+            padding: 10px;
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .friend-item .username {
+            color: #c9d1d9;
+            font-weight: 500;
+        }
+        
+        .friend-item .chat-btn {
+            padding: 5px 15px;
+            background: #1f6feb;
+            border: 1px solid #1f6feb;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        /* Friend Requests Panel (Right Side) */
+        .friend-requests-panel {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            max-height: 600px;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+        }
+        
+        .friend-requests-panel.has-requests {
+            display: flex;
+        }
+        
+        .friend-requests-header {
+            padding: 15px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .friend-requests-header h3 {
+            color: #c9d1d9;
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .friend-requests-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .friend-request-item {
+            padding: 12px;
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 6px;
+            border-left: 3px solid #ffa657;
+        }
+        
+        .friend-request-item .username {
+            color: #ffa657;
+            font-weight: 500;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .friend-request-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .accept-btn {
+            flex: 1;
+            padding: 6px;
+            background: #238636;
+            border: 1px solid #238636;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .decline-btn {
+            flex: 1;
+            padding: 6px;
+            background: #da3633;
+            border: 1px solid #da3633;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        /* Private Chat */
+        .private-chat-container {
+            position: fixed;
+            left: 180px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 600px;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+        }
+        
+        .private-chat-container.active {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -354,6 +686,58 @@
     
     <!-- Main page with FinHub title -->
     <div class="page hidden" id="mainPage">
+        <!-- Sidebar Buttons -->
+        <div class="sidebar-buttons">
+            <div class="sidebar-btn" onclick="toggleChat()">💬 Chat</div>
+            <div class="sidebar-btn" onclick="toggleFriends()">👥 Friends</div>
+        </div>
+        
+        <!-- Global Chat -->
+        <div class="chat-container" id="globalChat">
+            <div class="chat-header">
+                <h3>Global Chat</h3>
+                <button class="close-btn" onclick="toggleChat()">×</button>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button class="chat-send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        
+        <!-- Friends Interface -->
+        <div class="friends-container" id="friendsContainer">
+            <div class="friends-header">
+                <h3>Friends</h3>
+                <input type="text" class="add-friend-input" id="addFriendInput" placeholder="Enter username to add friend..." onkeypress="if(event.key === 'Enter') sendFriendRequest()">
+                <button class="add-friend-btn" onclick="sendFriendRequest()">Send Friend Request</button>
+            </div>
+            <div class="friends-list" id="friendsList">
+                <p style="color: #8b949e; text-align: center; padding: 20px;">No friends yet. Add someone!</p>
+            </div>
+        </div>
+        
+        <!-- Private Chat -->
+        <div class="private-chat-container" id="privateChat">
+            <div class="chat-header">
+                <h3 id="privateChatTitle">Private Chat</h3>
+                <button class="close-btn" onclick="closePrivateChat()">×</button>
+            </div>
+            <div class="chat-messages" id="privateChatMessages"></div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="privateChatInput" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendPrivateMessage()">
+                <button class="chat-send-btn" onclick="sendPrivateMessage()">Send</button>
+            </div>
+        </div>
+        
+        <!-- Friend Requests Panel (Right Side) -->
+        <div class="friend-requests-panel" id="friendRequestsPanel">
+            <div class="friend-requests-header">
+                <h3>Friend Requests</h3>
+            </div>
+            <div class="friend-requests-list" id="friendRequestsList"></div>
+        </div>
+        
         <div class="finhub-title" id="finhubTitle">
             <span class="title-letter f" data-letter="F">F</span>
             <span class="title-letter i" data-letter="I">I</span>
@@ -377,48 +761,421 @@
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
             const titleContainer = document.getElementById('finhubTitle');
-            const letters = titleContainer.querySelectorAll('.title-letter');
-            
-            // Track mouse position
-            document.addEventListener('mousemove', (e) => {
-                letters.forEach((letter) => {
-                    const rect = letter.getBoundingClientRect();
-                    const letterCenterX = rect.left + rect.width / 2;
-                    const letterCenterY = rect.top + rect.height / 2;
-                    
-                    // Calculate distance from mouse to letter center
-                    const distanceX = e.clientX - letterCenterX;
-                    const distanceY = e.clientY - letterCenterY;
-                    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-                    
-                    // Maximum effect distance (200px)
-                    const maxDistance = 200;
-                    const proximity = Math.max(0, 1 - (distance / maxDistance));
-                    
-                    // Apply effects based on proximity
-                    const scale = 1 + (proximity * 0.3); // Scale up to 1.3x
-                    const rotate = proximity * 15 * (Math.random() > 0.5 ? 1 : -1); // Rotate up to 15deg
-                    const translateY = -proximity * 20; // Move up
-                    
-                    // Apply transform
-                    letter.style.transform = `scale(${scale}) rotate(${rotate}deg) translateY(${translateY}px)`;
-                    
-                    // Add glow effect
-                    const glowIntensity = proximity * 0.8;
-                    letter.style.filter = `drop-shadow(0 0 ${glowIntensity * 20}px currentColor)`;
-                    letter.style.opacity = 0.7 + (proximity * 0.3);
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                
+                // Track mouse position
+                document.addEventListener('mousemove', (e) => {
+                    letters.forEach((letter) => {
+                        const rect = letter.getBoundingClientRect();
+                        const letterCenterX = rect.left + rect.width / 2;
+                        const letterCenterY = rect.top + rect.height / 2;
+                        
+                        // Calculate distance from mouse to letter center
+                        const distanceX = e.clientX - letterCenterX;
+                        const distanceY = e.clientY - letterCenterY;
+                        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                        
+                        // Maximum effect distance (200px)
+                        const maxDistance = 200;
+                        const proximity = Math.max(0, 1 - (distance / maxDistance));
+                        
+                        // Apply effects based on proximity
+                        const scale = 1 + (proximity * 0.3); // Scale up to 1.3x
+                        const rotate = proximity * 15 * (Math.random() > 0.5 ? 1 : -1); // Rotate up to 15deg
+                        const translateY = -proximity * 20; // Move up
+                        
+                        // Apply transform
+                        letter.style.transform = `scale(${scale}) rotate(${rotate}deg) translateY(${translateY}px)`;
+                        
+                        // Add glow effect
+                        const glowIntensity = proximity * 0.8;
+                        letter.style.filter = `drop-shadow(0 0 ${glowIntensity * 20}px currentColor)`;
+                        letter.style.opacity = 0.7 + (proximity * 0.3);
+                    });
                 });
-            });
-            
-            // Reset when mouse leaves
-            document.addEventListener('mouseleave', () => {
-                letters.forEach((letter) => {
-                    letter.style.transform = 'scale(1) rotate(0deg) translateY(0px)';
-                    letter.style.filter = 'none';
-                    letter.style.opacity = '1';
+                
+                // Reset when mouse leaves
+                document.addEventListener('mouseleave', () => {
+                    letters.forEach((letter) => {
+                        letter.style.transform = 'scale(1) rotate(0deg) translateY(0px)';
+                        letter.style.filter = 'none';
+                        letter.style.opacity = '1';
+                    });
                 });
-            });
+            }
+            
+            // Initialize chat and friends
+            initChatAndFriends();
         });
+        
+        // ============================================
+        // CHAT AND FRIENDS SYSTEM
+        // ============================================
+        
+        let currentPrivateChatUser = null;
+        let globalChatListener = null;
+        let friendRequestsListener = null;
+        let friendsListener = null;
+        
+        function initChatAndFriends() {
+            const username = localStorage.getItem('loggedInUsername');
+            if (!username || !database) return;
+            
+            // Load friend requests
+            loadFriendRequests();
+            
+            // Load friends list
+            loadFriends();
+            
+            // Listen for new friend requests
+            if (database) {
+                friendRequestsListener = listenToFirebase(`friendRequests/${username}`, (requests) => {
+                    updateFriendRequestsUI(requests);
+                });
+            }
+        }
+        
+        // Toggle Chat
+        function toggleChat() {
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const privateChat = document.getElementById('privateChat');
+            
+            if (chat.classList.contains('active')) {
+                chat.classList.remove('active');
+            } else {
+                chat.classList.add('active');
+                friends.classList.remove('active');
+                privateChat.classList.remove('active');
+                loadGlobalChat();
+            }
+        }
+        
+        // Toggle Friends
+        function toggleFriends() {
+            const friends = document.getElementById('friendsContainer');
+            const chat = document.getElementById('globalChat');
+            const privateChat = document.getElementById('privateChat');
+            
+            if (friends.classList.contains('active')) {
+                friends.classList.remove('active');
+            } else {
+                friends.classList.add('active');
+                chat.classList.remove('active');
+                privateChat.classList.remove('active');
+            }
+        }
+        
+        // Send Global Chat Message
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            const username = localStorage.getItem('loggedInUsername');
+            
+            if (!message || !username || !database) return;
+            
+            const messageData = {
+                username: username,
+                text: message,
+                timestamp: Date.now()
+            };
+            
+            pushToFirebase('messages', messageData).then(() => {
+                input.value = '';
+            });
+        }
+        
+        // Load Global Chat
+        function loadGlobalChat() {
+            if (!database) return;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            // Load recent messages
+            readFromFirebase('messages').then((messages) => {
+                if (messages) {
+                    const messageArray = Object.entries(messages)
+                        .map(([id, msg]) => ({ id, ...msg }))
+                        .sort((a, b) => a.timestamp - b.timestamp)
+                        .slice(-50); // Last 50 messages
+                    
+                    messageArray.forEach(msg => {
+                        addMessageToUI(msg);
+                    });
+                }
+            });
+            
+            // Listen for new messages
+            if (globalChatListener) {
+                globalChatListener.off('value');
+            }
+            
+            globalChatListener = listenToFirebase('messages', (messages) => {
+                if (messages) {
+                    const messageArray = Object.entries(messages)
+                        .map(([id, msg]) => ({ id, ...msg }))
+                        .sort((a, b) => a.timestamp - b.timestamp)
+                        .slice(-50);
+                    
+                    messagesContainer.innerHTML = '';
+                    messageArray.forEach(msg => {
+                        addMessageToUI(msg);
+                    });
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            });
+        }
+        
+        function addMessageToUI(message) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = 'chat-message';
+            const date = new Date(message.timestamp);
+            div.innerHTML = `
+                <span class="username">${message.username}:</span>
+                <span class="text">${message.text}</span>
+                <div class="timestamp">${date.toLocaleTimeString()}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Send Friend Request
+        function sendFriendRequest() {
+            const input = document.getElementById('addFriendInput');
+            const targetUsername = input.value.trim().toLowerCase();
+            const username = localStorage.getItem('loggedInUsername');
+            
+            if (!targetUsername || !username || !database) return;
+            
+            if (targetUsername === username.toLowerCase()) {
+                alert('You cannot add yourself as a friend!');
+                return;
+            }
+            
+            // Check if user exists
+            readFromFirebase(`userAccounts/${targetUsername}`).then((user) => {
+                if (!user) {
+                    alert('User not found!');
+                    return;
+                }
+                
+                // Check if already friends
+                readFromFirebase(`friends/${username}/${targetUsername}`).then((isFriend) => {
+                    if (isFriend) {
+                        alert('You are already friends with this user!');
+                        return;
+                    }
+                    
+                    // Check if request already sent
+                    readFromFirebase(`friendRequests/${targetUsername}/${username}`).then((existing) => {
+                        if (existing) {
+                            alert('Friend request already sent!');
+                            return;
+                        }
+                        
+                        // Send friend request
+                        writeToFirebase(`friendRequests/${targetUsername}/${username}`, {
+                            from: username,
+                            to: targetUsername,
+                            timestamp: Date.now()
+                        }).then(() => {
+                            input.value = '';
+                            alert('Friend request sent!');
+                        });
+                    });
+                });
+            });
+        }
+        
+        // Load Friend Requests
+        function loadFriendRequests() {
+            const username = localStorage.getItem('loggedInUsername');
+            if (!username || !database) return;
+            
+            readFromFirebase(`friendRequests/${username}`).then((requests) => {
+                updateFriendRequestsUI(requests);
+            });
+        }
+        
+        function updateFriendRequestsUI(requests) {
+            const panel = document.getElementById('friendRequestsPanel');
+            const list = document.getElementById('friendRequestsList');
+            
+            if (!requests || Object.keys(requests).length === 0) {
+                panel.classList.remove('has-requests');
+                return;
+            }
+            
+            panel.classList.add('has-requests');
+            list.innerHTML = '';
+            
+            Object.entries(requests).forEach(([fromUsername, requestData]) => {
+                const div = document.createElement('div');
+                div.className = 'friend-request-item';
+                div.innerHTML = `
+                    <span class="username">${requestData.from || fromUsername}</span>
+                    <div class="friend-request-buttons">
+                        <button class="accept-btn" onclick="acceptFriendRequest('${requestData.from || fromUsername}')">Accept</button>
+                        <button class="decline-btn" onclick="declineFriendRequest('${requestData.from || fromUsername}')">Decline</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        // Accept Friend Request
+        function acceptFriendRequest(fromUsername) {
+            const username = localStorage.getItem('loggedInUsername');
+            if (!username || !database) return;
+            
+            // Add to both users' friends lists
+            writeToFirebase(`friends/${username}/${fromUsername}`, true);
+            writeToFirebase(`friends/${fromUsername}/${username}`, true);
+            
+            // Remove friend request
+            deleteFromFirebase(`friendRequests/${username}/${fromUsername}`);
+            
+            loadFriends();
+        }
+        
+        // Decline Friend Request
+        function declineFriendRequest(fromUsername) {
+            const username = localStorage.getItem('loggedInUsername');
+            if (!username || !database) return;
+            
+            deleteFromFirebase(`friendRequests/${username}/${fromUsername}`);
+        }
+        
+        // Load Friends List
+        function loadFriends() {
+            const username = localStorage.getItem('loggedInUsername');
+            if (!username || !database) return;
+            
+            readFromFirebase(`friends/${username}`).then((friends) => {
+                const list = document.getElementById('friendsList');
+                
+                if (!friends || Object.keys(friends).length === 0) {
+                    list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friends yet. Add someone!</p>';
+                    return;
+                }
+                
+                list.innerHTML = '';
+                Object.keys(friends).forEach((friendUsername) => {
+                    const div = document.createElement('div');
+                    div.className = 'friend-item';
+                    div.innerHTML = `
+                        <span class="username">${friendUsername}</span>
+                        <button class="chat-btn" onclick="openPrivateChat('${friendUsername}')">Chat</button>
+                    `;
+                    list.appendChild(div);
+                });
+            });
+        }
+        
+        // Open Private Chat
+        function openPrivateChat(friendUsername) {
+            currentPrivateChatUser = friendUsername;
+            const privateChat = document.getElementById('privateChat');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            
+            document.getElementById('privateChatTitle').textContent = `Chat with ${friendUsername}`;
+            privateChat.classList.add('active');
+            chat.classList.remove('active');
+            friends.classList.remove('active');
+            
+            loadPrivateChat(friendUsername);
+        }
+        
+        // Close Private Chat
+        function closePrivateChat() {
+            const privateChat = document.getElementById('privateChat');
+            privateChat.classList.remove('active');
+            currentPrivateChatUser = null;
+        }
+        
+        // Load Private Chat Messages
+        function loadPrivateChat(friendUsername) {
+            const username = localStorage.getItem('loggedInUsername');
+            if (!username || !database) return;
+            
+            const messagesContainer = document.getElementById('privateChatMessages');
+            messagesContainer.innerHTML = '';
+            
+            // Create chat ID (alphabetically sorted usernames)
+            const chatId = [username, friendUsername].sort().join('_');
+            
+            // Load messages
+            readFromFirebase(`privateChats/${chatId}/messages`).then((messages) => {
+                if (messages) {
+                    const messageArray = Object.entries(messages)
+                        .map(([id, msg]) => ({ id, ...msg }))
+                        .sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    messageArray.forEach(msg => {
+                        addPrivateMessageToUI(msg, username);
+                    });
+                }
+            });
+            
+            // Listen for new messages
+            listenToFirebase(`privateChats/${chatId}/messages`, (messages) => {
+                if (messages) {
+                    const messageArray = Object.entries(messages)
+                        .map(([id, msg]) => ({ id, ...msg }))
+                        .sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    messagesContainer.innerHTML = '';
+                    messageArray.forEach(msg => {
+                        addPrivateMessageToUI(msg, username);
+                    });
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            });
+        }
+        
+        function addPrivateMessageToUI(message, currentUsername) {
+            const container = document.getElementById('privateChatMessages');
+            const div = document.createElement('div');
+            div.className = 'chat-message';
+            const isOwn = message.username === currentUsername;
+            div.style.borderLeftColor = isOwn ? '#3fb950' : '#58a6ff';
+            const date = new Date(message.timestamp);
+            div.innerHTML = `
+                <span class="username">${message.username}:</span>
+                <span class="text">${message.text}</span>
+                <div class="timestamp">${date.toLocaleTimeString()}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Send Private Message
+        function sendPrivateMessage() {
+            if (!currentPrivateChatUser) return;
+            
+            const input = document.getElementById('privateChatInput');
+            const message = input.value.trim();
+            const username = localStorage.getItem('loggedInUsername');
+            
+            if (!message || !username || !database) return;
+            
+            // Create chat ID
+            const chatId = [username, currentPrivateChatUser].sort().join('_');
+            
+            const messageData = {
+                username: username,
+                text: message,
+                timestamp: Date.now()
+            };
+            
+            pushToFirebase(`privateChats/${chatId}/messages`, messageData).then(() => {
+                input.value = '';
+            });
+        }
         
         // ============================================
         // AUTHENTICATION SYSTEM
