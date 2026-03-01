@@ -945,41 +945,45 @@
         // Send Friend Request
         function sendFriendRequest() {
             const input = document.getElementById('addFriendInput');
-            const targetUsername = input.value.trim().toLowerCase();
+            const targetUsernameInput = input.value.trim();
+            const targetUsernameLower = targetUsernameInput.toLowerCase();
             const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username.toLowerCase();
             
-            if (!targetUsername || !username || !database) return;
+            if (!targetUsernameInput || !username || !database) return;
             
-            if (targetUsername === username.toLowerCase()) {
+            if (targetUsernameLower === usernameLower) {
                 alert('You cannot add yourself as a friend!');
                 return;
             }
             
-            // Check if user exists
-            readFromFirebase(`userAccounts/${targetUsername}`).then((user) => {
+            // Check if user exists (use lowercase for lookup)
+            readFromFirebase(`userAccounts/${targetUsernameLower}`).then((user) => {
                 if (!user) {
-                    alert('User not found!');
+                    alert('User not found! Make sure the username is correct.');
                     return;
                 }
                 
-                // Check if already friends
-                readFromFirebase(`friends/${username}/${targetUsername}`).then((isFriend) => {
+                // Check if already friends (use lowercase for storage)
+                readFromFirebase(`friends/${usernameLower}/${targetUsernameLower}`).then((isFriend) => {
                     if (isFriend) {
                         alert('You are already friends with this user!');
                         return;
                     }
                     
-                    // Check if request already sent
-                    readFromFirebase(`friendRequests/${targetUsername}/${username}`).then((existing) => {
+                    // Check if request already sent (use lowercase)
+                    readFromFirebase(`friendRequests/${targetUsernameLower}/${usernameLower}`).then((existing) => {
                         if (existing) {
                             alert('Friend request already sent!');
                             return;
                         }
                         
-                        // Send friend request
-                        writeToFirebase(`friendRequests/${targetUsername}/${username}`, {
+                        // Send friend request (use lowercase for storage, but keep original usernames for display)
+                        writeToFirebase(`friendRequests/${targetUsernameLower}/${usernameLower}`, {
                             from: username,
-                            to: targetUsername,
+                            fromLower: usernameLower,
+                            to: user.username || targetUsernameInput,
+                            toLower: targetUsernameLower,
                             timestamp: Date.now()
                         }).then(() => {
                             input.value = '';
@@ -992,10 +996,10 @@
         
         // Load Friend Requests
         function loadFriendRequests() {
-            const username = localStorage.getItem('loggedInUsername');
-            if (!username || !database) return;
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
             
-            readFromFirebase(`friendRequests/${username}`).then((requests) => {
+            readFromFirebase(`friendRequests/${usernameLower}`).then((requests) => {
                 updateFriendRequestsUI(requests);
             });
         }
@@ -1012,14 +1016,15 @@
             panel.classList.add('has-requests');
             list.innerHTML = '';
             
-            Object.entries(requests).forEach(([fromUsername, requestData]) => {
+            Object.entries(requests).forEach(([fromUsernameLower, requestData]) => {
+                const displayName = requestData.from || fromUsernameLower;
                 const div = document.createElement('div');
                 div.className = 'friend-request-item';
                 div.innerHTML = `
-                    <span class="username">${requestData.from || fromUsername}</span>
+                    <span class="username">${displayName}</span>
                     <div class="friend-request-buttons">
-                        <button class="accept-btn" onclick="acceptFriendRequest('${requestData.from || fromUsername}')">Accept</button>
-                        <button class="decline-btn" onclick="declineFriendRequest('${requestData.from || fromUsername}')">Decline</button>
+                        <button class="accept-btn" onclick="acceptFriendRequest('${fromUsernameLower}', '${displayName}')">Accept</button>
+                        <button class="decline-btn" onclick="declineFriendRequest('${fromUsernameLower}')">Decline</button>
                     </div>
                 `;
                 list.appendChild(div);
@@ -1027,34 +1032,40 @@
         }
         
         // Accept Friend Request
-        function acceptFriendRequest(fromUsername) {
-            const username = localStorage.getItem('loggedInUsername');
-            if (!username || !database) return;
+        function acceptFriendRequest(fromUsernameLower, displayName) {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
             
-            // Add to both users' friends lists
-            writeToFirebase(`friends/${username}/${fromUsername}`, true);
-            writeToFirebase(`friends/${fromUsername}/${username}`, true);
+            // Add to both users' friends lists (use lowercase for storage)
+            writeToFirebase(`friends/${usernameLower}/${fromUsernameLower}`, {
+                username: displayName,
+                usernameLower: fromUsernameLower
+            });
+            writeToFirebase(`friends/${fromUsernameLower}/${usernameLower}`, {
+                username: localStorage.getItem('loggedInUsername'),
+                usernameLower: usernameLower
+            });
             
             // Remove friend request
-            deleteFromFirebase(`friendRequests/${username}/${fromUsername}`);
+            deleteFromFirebase(`friendRequests/${usernameLower}/${fromUsernameLower}`);
             
             loadFriends();
         }
         
         // Decline Friend Request
-        function declineFriendRequest(fromUsername) {
-            const username = localStorage.getItem('loggedInUsername');
-            if (!username || !database) return;
+        function declineFriendRequest(fromUsernameLower) {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
             
-            deleteFromFirebase(`friendRequests/${username}/${fromUsername}`);
+            deleteFromFirebase(`friendRequests/${usernameLower}/${fromUsernameLower}`);
         }
         
         // Load Friends List
         function loadFriends() {
-            const username = localStorage.getItem('loggedInUsername');
-            if (!username || !database) return;
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
             
-            readFromFirebase(`friends/${username}`).then((friends) => {
+            readFromFirebase(`friends/${usernameLower}`).then((friends) => {
                 const list = document.getElementById('friendsList');
                 
                 if (!friends || Object.keys(friends).length === 0) {
@@ -1063,12 +1074,13 @@
                 }
                 
                 list.innerHTML = '';
-                Object.keys(friends).forEach((friendUsername) => {
+                Object.entries(friends).forEach(([friendUsernameLower, friendData]) => {
+                    const displayName = friendData?.username || friendUsernameLower;
                     const div = document.createElement('div');
                     div.className = 'friend-item';
                     div.innerHTML = `
-                        <span class="username">${friendUsername}</span>
-                        <button class="chat-btn" onclick="openPrivateChat('${friendUsername}')">Chat</button>
+                        <span class="username">${displayName}</span>
+                        <button class="chat-btn" onclick="openPrivateChat('${friendUsernameLower}', '${displayName}')">Chat</button>
                     `;
                     list.appendChild(div);
                 });
@@ -1076,18 +1088,18 @@
         }
         
         // Open Private Chat
-        function openPrivateChat(friendUsername) {
-            currentPrivateChatUser = friendUsername;
+        function openPrivateChat(friendUsernameLower, displayName) {
+            currentPrivateChatUser = friendUsernameLower;
             const privateChat = document.getElementById('privateChat');
             const chat = document.getElementById('globalChat');
             const friends = document.getElementById('friendsContainer');
             
-            document.getElementById('privateChatTitle').textContent = `Chat with ${friendUsername}`;
+            document.getElementById('privateChatTitle').textContent = `Chat with ${displayName || friendUsernameLower}`;
             privateChat.classList.add('active');
             chat.classList.remove('active');
             friends.classList.remove('active');
             
-            loadPrivateChat(friendUsername);
+            loadPrivateChat(friendUsernameLower);
         }
         
         // Close Private Chat
@@ -1098,15 +1110,15 @@
         }
         
         // Load Private Chat Messages
-        function loadPrivateChat(friendUsername) {
-            const username = localStorage.getItem('loggedInUsername');
-            if (!username || !database) return;
+        function loadPrivateChat(friendUsernameLower) {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
             
             const messagesContainer = document.getElementById('privateChatMessages');
             messagesContainer.innerHTML = '';
             
-            // Create chat ID (alphabetically sorted usernames)
-            const chatId = [username, friendUsername].sort().join('_');
+            // Create chat ID (alphabetically sorted lowercase usernames)
+            const chatId = [usernameLower, friendUsernameLower].sort().join('_');
             
             // Load messages
             readFromFirebase(`privateChats/${chatId}/messages`).then((messages) => {
@@ -1130,22 +1142,23 @@
                     
                     messagesContainer.innerHTML = '';
                     messageArray.forEach(msg => {
-                        addPrivateMessageToUI(msg, username);
+                        addPrivateMessageToUI(msg, usernameLower);
                     });
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 }
             });
         }
         
-        function addPrivateMessageToUI(message, currentUsername) {
+        function addPrivateMessageToUI(message, currentUsernameLower) {
             const container = document.getElementById('privateChatMessages');
             const div = document.createElement('div');
             div.className = 'chat-message';
-            const isOwn = message.username === currentUsername;
+            const currentUsername = localStorage.getItem('loggedInUsername');
+            const isOwn = message.username === currentUsername || message.usernameLower === currentUsernameLower;
             div.style.borderLeftColor = isOwn ? '#3fb950' : '#58a6ff';
             const date = new Date(message.timestamp);
             div.innerHTML = `
-                <span class="username">${message.username}:</span>
+                <span class="username">${message.username || message.usernameLower}:</span>
                 <span class="text">${message.text}</span>
                 <div class="timestamp">${date.toLocaleTimeString()}</div>
             `;
@@ -1160,14 +1173,16 @@
             const input = document.getElementById('privateChatInput');
             const message = input.value.trim();
             const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
             
             if (!message || !username || !database) return;
             
-            // Create chat ID
-            const chatId = [username, currentPrivateChatUser].sort().join('_');
+            // Create chat ID (alphabetically sorted lowercase usernames)
+            const chatId = [usernameLower, currentPrivateChatUser].sort().join('_');
             
             const messageData = {
                 username: username,
+                usernameLower: usernameLower,
                 text: message,
                 timestamp: Date.now()
             };
@@ -1255,22 +1270,26 @@
                 return;
             }
             
-            // Check if username already exists
-            const userExists = await readFromFirebase(`userAccounts/${username}`);
+            // Store username in lowercase for consistency
+            const usernameLower = username.toLowerCase();
+            
+            // Check if username already exists (case-insensitive)
+            const userExists = await readFromFirebase(`userAccounts/${usernameLower}`);
             if (userExists) {
                 errorEl.textContent = 'Username already exists';
                 return;
             }
             
-            // Create account
+            // Create account (store with lowercase key, but keep original username in data)
             const passwordHash = hashPassword(password);
             const userData = {
-                username: username,
+                username: username, // Keep original casing for display
+                usernameLower: usernameLower, // Store lowercase version
                 passwordHash: passwordHash,
                 createdAt: Date.now()
             };
             
-            const success = await writeToFirebase(`userAccounts/${username}`, userData);
+            const success = await writeToFirebase(`userAccounts/${usernameLower}`, userData);
             
             if (success) {
                 successEl.textContent = 'Account created! You can now login.';
@@ -1306,8 +1325,11 @@
                 return;
             }
             
+            // Use lowercase for lookup (but keep original for display)
+            const usernameLower = username.toLowerCase();
+            
             // Check credentials
-            const userData = await readFromFirebase(`userAccounts/${username}`);
+            const userData = await readFromFirebase(`userAccounts/${usernameLower}`);
             
             if (!userData) {
                 errorEl.textContent = 'Invalid username or password';
@@ -1320,8 +1342,9 @@
                 return;
             }
             
-            // Login successful
-            localStorage.setItem('loggedInUsername', username);
+            // Login successful - store original username for display
+            localStorage.setItem('loggedInUsername', userData.username || username);
+            localStorage.setItem('loggedInUsernameLower', usernameLower);
             localStorage.setItem('loginTime', Date.now().toString());
             
             // Show main page
