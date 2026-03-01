@@ -73,85 +73,31 @@
         .finhub-title {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 30px;
-            flex-wrap: wrap;
             justify-content: center;
+            flex-wrap: wrap;
         }
         
-        .big-letter {
-            display: grid;
-            font-family: 'Courier New', monospace;
-            font-size: 8px;
+        .title-letter {
+            font-size: 72px;
+            font-weight: bold;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1;
-            color: #c9d1d9;
-            gap: 0;
         }
         
-        .big-letter .small-letter {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            text-align: center;
-        }
-        
-        /* Big F made of small letters - 3 thick, 2x tall */
-        .letter-f {
-            grid-template-columns: repeat(21, 8px);
-            grid-template-rows: repeat(20, 8px);
-        }
-        
-        /* Big i made of small letters - 3 thick, 2x tall */
-        .letter-i {
-            grid-template-columns: repeat(9, 8px);
-            grid-template-rows: repeat(20, 8px);
-        }
-        
-        /* Big n made of small letters - 3 thick, 2x tall */
-        .letter-n {
-            grid-template-columns: repeat(21, 8px);
-            grid-template-rows: repeat(20, 8px);
-        }
-        
-        /* Big H made of small letters - 3 thick, 2x tall */
-        .letter-h {
-            grid-template-columns: repeat(21, 8px);
-            grid-template-rows: repeat(20, 8px);
-        }
-        
-        /* Big u made of small letters - 3 thick, 2x tall */
-        .letter-u {
-            grid-template-columns: repeat(21, 8px);
-            grid-template-rows: repeat(20, 8px);
-        }
-        
-        /* Big b made of small letters - 3 thick, 2x tall */
-        .letter-b {
-            grid-template-columns: repeat(21, 8px);
-            grid-template-rows: repeat(20, 8px);
-        }
-        
-        /* Colors for small letters */
-        .small-letter.f { color: #58a6ff; }
-        .small-letter.i { color: #f0883e; }
-        .small-letter.n { color: #bc8cff; }
-        .small-letter.l { color: #3fb950; }
-        .small-letter.e { color: #f85149; }
-        .small-letter.y { color: #ffa657; }
+        .title-letter.f { color: #58a6ff; }
+        .title-letter.i { color: #f0883e; }
+        .title-letter.n { color: #bc8cff; }
+        .title-letter.h { color: #3fb950; }
+        .title-letter.u { color: #f85149; }
+        .title-letter.b { color: #ffa657; }
         
         .subtitle {
             color: #8b949e;
             font-size: 18px;
             text-align: center;
             margin-top: 20px;
-        }
-        
-        .letters-source {
-            color: #6e7681;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 10px;
-            font-style: italic;
         }
         
         /* Firebase Connection Status */
@@ -193,18 +139,12 @@
     <!-- Main page with FinHub title -->
     <div class="page" id="mainPage">
         <div class="finhub-title">
-            <!-- Big F made of small letters -->
-            <div class="big-letter letter-f" id="letter-f"></div>
-            <!-- Big i made of small letters -->
-            <div class="big-letter letter-i" id="letter-i"></div>
-            <!-- Big n made of small letters -->
-            <div class="big-letter letter-n" id="letter-n"></div>
-            <!-- Big H made of small letters -->
-            <div class="big-letter letter-h" id="letter-h"></div>
-            <!-- Big u made of small letters -->
-            <div class="big-letter letter-u" id="letter-u"></div>
-            <!-- Big b made of small letters -->
-            <div class="big-letter letter-b" id="letter-b"></div>
+            <div class="title-letter f">F</div>
+            <div class="title-letter i">I</div>
+            <div class="title-letter n">N</div>
+            <div class="title-letter h">H</div>
+            <div class="title-letter u">U</div>
+            <div class="title-letter b">B</div>
         </div>
         
         <p class="subtitle">Built with code, powered by Finley</p>
@@ -218,173 +158,6 @@
     </div>
     
     <script>
-        // Generate the big letters from small letters
-        function generateBigLetter(letterId, letter, pattern) {
-            const container = document.getElementById(letterId);
-            if (!container) return;
-            
-            container.innerHTML = '';
-            for (let row of pattern) {
-                for (let char of row) {
-                    const span = document.createElement('span');
-                    span.className = 'small-letter';
-                    if (char === 'X') {
-                        span.textContent = letter;
-                        span.classList.add(letter.toLowerCase());
-                    } else {
-                        span.textContent = ' ';
-                    }
-                    container.appendChild(span);
-                }
-            }
-        }
-        
-        // Letter patterns (X = letter, space = empty)
-        const letterPatterns = {
-            'f': [
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 ',
-                'XXX                 '
-            ],
-            'i': [
-                'XXXXXXXXX',
-                'XXXXXXXXX',
-                'XXXXXXXXX',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                '   XXX   ',
-                'XXXXXXXXX',
-                'XXXXXXXXX',
-                'XXXXXXXXX'
-            ],
-            'n': [
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX  XXX            XXX',
-                'XXX  XXX            XXX',
-                'XXX  XXX            XXX',
-                'XXX   XXX           XXX',
-                'XXX   XXX           XXX',
-                'XXX    XXX          XXX',
-                'XXX    XXX          XXX',
-                'XXX     XXX         XXX',
-                'XXX     XXX         XXX',
-                'XXX      XXX        XXX',
-                'XXX      XXX        XXX',
-                'XXX       XXX       XXX',
-                'XXX       XXX       XXX',
-                'XXX        XXX      XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX'
-            ],
-            'h': [
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX'
-            ],
-            'u': [
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXX                 XXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX'
-            ],
-            'b': [
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXX            XXX   ',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX',
-                'XXXXXXXXXXXXXXXXXXXXX'
-            ]
-        };
-        
-        // Generate all letters on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            generateBigLetter('letter-f', 'F', letterPatterns.f);
-            generateBigLetter('letter-i', 'I', letterPatterns.i);
-            generateBigLetter('letter-n', 'N', letterPatterns.n);
-            generateBigLetter('letter-h', 'H', letterPatterns.h);
-            generateBigLetter('letter-u', 'U', letterPatterns.u);
-            generateBigLetter('letter-b', 'B', letterPatterns.b);
-        });
-        
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyB_jv2W9Hvt0QFJlVN4ZcdrT1mtwP-fWFE",
