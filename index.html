@@ -73,25 +73,65 @@
         .finhub-title {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
             margin-bottom: 30px;
             justify-content: center;
             flex-wrap: wrap;
         }
         
-        .title-letter {
-            font-size: 72px;
-            font-weight: bold;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        .big-letter {
+            display: grid;
+            font-family: 'Courier New', monospace;
+            font-size: 6px;
             line-height: 1;
+            gap: 0;
         }
         
-        .title-letter.f { color: #58a6ff; }
-        .title-letter.i { color: #f0883e; }
-        .title-letter.n { color: #bc8cff; }
-        .title-letter.h { color: #3fb950; }
-        .title-letter.u { color: #f85149; }
-        .title-letter.b { color: #ffa657; }
+        .big-letter .small-letter {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            text-align: center;
+        }
+        
+        /* Colors for small letters from FINLEY */
+        .small-letter.f { color: #58a6ff; }
+        .small-letter.i { color: #f0883e; }
+        .small-letter.n { color: #bc8cff; }
+        .small-letter.l { color: #3fb950; }
+        .small-letter.e { color: #f85149; }
+        .small-letter.y { color: #ffa657; }
+        
+        /* Grid sizes for each big letter */
+        .letter-f {
+            grid-template-columns: repeat(16, 6px);
+            grid-template-rows: repeat(15, 6px);
+        }
+        
+        .letter-i {
+            grid-template-columns: repeat(7, 6px);
+            grid-template-rows: repeat(15, 6px);
+        }
+        
+        .letter-n {
+            grid-template-columns: repeat(16, 6px);
+            grid-template-rows: repeat(15, 6px);
+        }
+        
+        .letter-h {
+            grid-template-columns: repeat(16, 6px);
+            grid-template-rows: repeat(15, 6px);
+        }
+        
+        .letter-u {
+            grid-template-columns: repeat(16, 6px);
+            grid-template-rows: repeat(15, 6px);
+        }
+        
+        .letter-b {
+            grid-template-columns: repeat(16, 6px);
+            grid-template-rows: repeat(15, 6px);
+        }
         
         .subtitle {
             color: #8b949e;
@@ -139,12 +179,12 @@
     <!-- Main page with FinHub title -->
     <div class="page" id="mainPage">
         <div class="finhub-title">
-            <div class="title-letter f">F</div>
-            <div class="title-letter i">I</div>
-            <div class="title-letter n">N</div>
-            <div class="title-letter h">H</div>
-            <div class="title-letter u">U</div>
-            <div class="title-letter b">B</div>
+            <div class="big-letter letter-f" id="letter-f"></div>
+            <div class="big-letter letter-i" id="letter-i"></div>
+            <div class="big-letter letter-n" id="letter-n"></div>
+            <div class="big-letter letter-h" id="letter-h"></div>
+            <div class="big-letter letter-u" id="letter-u"></div>
+            <div class="big-letter letter-b" id="letter-b"></div>
         </div>
         
         <p class="subtitle">Built with code, powered by Finley</p>
@@ -158,6 +198,161 @@
     </div>
     
     <script>
+        // Generate big letters from small letters (FINLEY)
+        const finleyLetters = ['F', 'I', 'N', 'L', 'E', 'Y'];
+        const finleyColors = {
+            'F': '#58a6ff',
+            'I': '#f0883e',
+            'N': '#bc8cff',
+            'L': '#3fb950',
+            'E': '#f85149',
+            'Y': '#ffa657'
+        };
+        
+        function generateBigLetter(letterId, pattern) {
+            const container = document.getElementById(letterId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            for (let row of pattern) {
+                for (let char of row) {
+                    const span = document.createElement('span');
+                    span.className = 'small-letter';
+                    if (char === 'X') {
+                        // Randomly pick a letter from FINLEY
+                        const randomLetter = finleyLetters[Math.floor(Math.random() * finleyLetters.length)];
+                        span.textContent = randomLetter;
+                        span.classList.add(randomLetter.toLowerCase());
+                    } else {
+                        span.textContent = ' ';
+                    }
+                    container.appendChild(span);
+                }
+            }
+        }
+        
+        // Letter patterns (X = filled, space = empty)
+        // F: 16 columns x 15 rows
+        const letterPatterns = {
+            'f': [
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXX             ',
+                'XXX             ',
+                'XXX             ',
+                'XXX             ',
+                'XXX             ',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXX             ',
+                'XXX             ',
+                'XXX             ',
+                'XXX             '
+            ],
+            // I: 7 columns x 15 rows
+            'i': [
+                'XXXXXXX',
+                'XXXXXXX',
+                'XXXXXXX',
+                '  XXX  ',
+                '  XXX  ',
+                '  XXX  ',
+                '  XXX  ',
+                '  XXX  ',
+                '  XXX  ',
+                '  XXX  ',
+                '  XXX  ',
+                '  XXX  ',
+                'XXXXXXX',
+                'XXXXXXX',
+                'XXXXXXX'
+            ],
+            // N: 16 columns x 15 rows
+            'n': [
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX  XXX        XXX',
+                'XXX  XXX        XXX',
+                'XXX   XXX       XXX',
+                'XXX   XXX       XXX',
+                'XXX    XXX      XXX',
+                'XXX    XXX      XXX',
+                'XXX     XXX     XXX',
+                'XXX     XXX     XXX',
+                'XXX      XXX    XXX',
+                'XXX      XXX    XXX',
+                'XXX             XXX',
+                'XXX             XXX'
+            ],
+            // H: 16 columns x 15 rows
+            'h': [
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX'
+            ],
+            // U: 16 columns x 15 rows
+            'u': [
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXX             XXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX'
+            ],
+            // B: 16 columns x 15 rows
+            'b': [
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXX        XXX   ',
+                'XXX        XXX   ',
+                'XXX        XXX   ',
+                'XXX        XXX   ',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX',
+                'XXX        XXX   ',
+                'XXX        XXX   ',
+                'XXX        XXX   ',
+                'XXXXXXXXXXXXXXXX',
+                'XXXXXXXXXXXXXXXX'
+            ]
+        };
+        
+        // Generate all letters on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            generateBigLetter('letter-f', letterPatterns.f);
+            generateBigLetter('letter-i', letterPatterns.i);
+            generateBigLetter('letter-n', letterPatterns.n);
+            generateBigLetter('letter-h', letterPatterns.h);
+            generateBigLetter('letter-u', letterPatterns.u);
+            generateBigLetter('letter-b', letterPatterns.b);
+        });
+        
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyB_jv2W9Hvt0QFJlVN4ZcdrT1mtwP-fWFE",
