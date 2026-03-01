@@ -474,6 +474,52 @@
             margin: 0 0 15px 0;
         }
         
+        .friends-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .friends-tab {
+            flex: 1;
+            padding: 10px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #8b949e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .friends-tab.active {
+            background: #1f6feb;
+            color: #fff;
+            border-color: #1f6feb;
+        }
+        
+        .friends-tab:hover {
+            background: #30363d;
+            color: #c9d1d9;
+        }
+        
+        .friends-tab.active:hover {
+            background: #1f6feb;
+        }
+        
+        .friends-tab-content {
+            display: none;
+        }
+        
+        .friends-tab-content.active {
+            display: block;
+        }
+        
+        .add-friend-section {
+            margin-bottom: 15px;
+        }
+        
         .add-friend-input {
             width: 100%;
             padding: 10px;
@@ -501,6 +547,15 @@
             flex: 1;
             overflow-y: auto;
             padding: 15px;
+        }
+        
+        .friend-requests-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         
         .friend-item {
@@ -709,11 +764,33 @@
         <div class="friends-container" id="friendsContainer">
             <div class="friends-header">
                 <h3>Friends</h3>
-                <input type="text" class="add-friend-input" id="addFriendInput" placeholder="Enter username to add friend..." onkeypress="if(event.key === 'Enter') sendFriendRequest()">
-                <button class="add-friend-btn" onclick="sendFriendRequest()">Send Friend Request</button>
+                <div class="friends-tabs">
+                    <div class="friends-tab active" onclick="switchFriendsTab('friends')">Friends</div>
+                    <div class="friends-tab" onclick="switchFriendsTab('requests')">Friend Requests</div>
+                </div>
+                
+                <!-- Friends Tab Content -->
+                <div class="friends-tab-content active" id="friendsTab">
+                    <div class="add-friend-section">
+                        <input type="text" class="add-friend-input" id="addFriendInput" placeholder="Enter username to add friend..." onkeypress="if(event.key === 'Enter') sendFriendRequest()">
+                        <button class="add-friend-btn" onclick="sendFriendRequest()">Send Friend Request</button>
+                    </div>
+                </div>
+                
+                <!-- Friend Requests Tab Content -->
+                <div class="friends-tab-content" id="requestsTab">
+                    <p style="color: #8b949e; font-size: 14px; margin-bottom: 10px;">Pending friend requests:</p>
+                </div>
             </div>
+            
+            <!-- Friends List -->
             <div class="friends-list" id="friendsList">
                 <p style="color: #8b949e; text-align: center; padding: 20px;">No friends yet. Add someone!</p>
+            </div>
+            
+            <!-- Friend Requests List -->
+            <div class="friend-requests-list" id="friendRequestsListTab" style="display: none;">
+                <p style="color: #8b949e; text-align: center; padding: 20px;">No friend requests</p>
             </div>
         </div>
         
@@ -730,13 +807,6 @@
             </div>
         </div>
         
-        <!-- Friend Requests Panel (Right Side) -->
-        <div class="friend-requests-panel" id="friendRequestsPanel">
-            <div class="friend-requests-header">
-                <h3>Friend Requests</h3>
-            </div>
-            <div class="friend-requests-list" id="friendRequestsList"></div>
-        </div>
         
         <div class="finhub-title" id="finhubTitle">
             <span class="title-letter f" data-letter="F">F</span>
@@ -864,6 +934,35 @@
                 friends.classList.add('active');
                 chat.classList.remove('active');
                 privateChat.classList.remove('active');
+                loadFriends();
+                loadFriendRequests();
+            }
+        }
+        
+        // Switch Friends Tab
+        function switchFriendsTab(tab) {
+            const friendsTab = document.querySelector('.friends-tab:first-child');
+            const requestsTab = document.querySelector('.friends-tab:last-child');
+            const friendsTabContent = document.getElementById('friendsTab');
+            const requestsTabContent = document.getElementById('requestsTab');
+            const friendsList = document.getElementById('friendsList');
+            const friendRequestsList = document.getElementById('friendRequestsListTab');
+            
+            if (tab === 'friends') {
+                friendsTab.classList.add('active');
+                requestsTab.classList.remove('active');
+                friendsTabContent.classList.add('active');
+                requestsTabContent.classList.remove('active');
+                friendsList.style.display = 'block';
+                friendRequestsList.style.display = 'none';
+            } else {
+                requestsTab.classList.add('active');
+                friendsTab.classList.remove('active');
+                requestsTabContent.classList.add('active');
+                friendsTabContent.classList.remove('active');
+                friendsList.style.display = 'none';
+                friendRequestsList.style.display = 'block';
+                loadFriendRequests(); // Refresh requests when switching to this tab
             }
         }
         
@@ -1005,15 +1104,13 @@
         }
         
         function updateFriendRequestsUI(requests) {
-            const panel = document.getElementById('friendRequestsPanel');
-            const list = document.getElementById('friendRequestsList');
+            const list = document.getElementById('friendRequestsListTab');
             
             if (!requests || Object.keys(requests).length === 0) {
-                panel.classList.remove('has-requests');
+                list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friend requests</p>';
                 return;
             }
             
-            panel.classList.add('has-requests');
             list.innerHTML = '';
             
             Object.entries(requests).forEach(([fromUsernameLower, requestData]) => {
@@ -1047,9 +1144,10 @@
             });
             
             // Remove friend request
-            deleteFromFirebase(`friendRequests/${usernameLower}/${fromUsernameLower}`);
-            
-            loadFriends();
+            deleteFromFirebase(`friendRequests/${usernameLower}/${fromUsernameLower}`).then(() => {
+                loadFriends();
+                loadFriendRequests(); // Refresh the requests list
+            });
         }
         
         // Decline Friend Request
@@ -1057,7 +1155,9 @@
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
             if (!usernameLower || !database) return;
             
-            deleteFromFirebase(`friendRequests/${usernameLower}/${fromUsernameLower}`);
+            deleteFromFirebase(`friendRequests/${usernameLower}/${fromUsernameLower}`).then(() => {
+                loadFriendRequests(); // Refresh the requests list
+            });
         }
         
         // Load Friends List
