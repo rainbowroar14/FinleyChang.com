@@ -1120,7 +1120,7 @@
             font-weight: bold;
         }
         
-        /* Minesweeper */
+        /* Minesweeper - Windows 95 Style */
         .minesweeper-controls {
             margin-bottom: 20px;
         }
@@ -1129,62 +1129,100 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            background: rgba(13, 17, 23, 0.5);
-            border-radius: 6px;
-            color: #c9d1d9;
+            padding: 8px 12px;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            font-family: 'MS Sans Serif', 'Segoe UI', sans-serif;
+            font-size: 11px;
+            color: #000;
+            box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
         }
         
         .minesweeper-board {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            gap: 2px;
-            background: #30363d;
-            padding: 2px;
-            border-radius: 4px;
+            gap: 0;
+            background: #c0c0c0;
+            padding: 3px;
+            border: 2px inset #c0c0c0;
             margin-bottom: 20px;
+            box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
         }
         
         .minesweeper-cell {
             aspect-ratio: 1;
-            background: #21262d;
-            border: 1px solid #30363d;
-            border-radius: 2px;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
+            font-family: 'MS Sans Serif', 'Segoe UI', sans-serif;
             user-select: none;
-            transition: background 0.1s;
+            box-shadow: 1px 1px 0 #fff, -1px -1px 0 #808080;
+            min-width: 20px;
+            min-height: 20px;
         }
         
         .minesweeper-cell:hover {
-            background: #30363d;
+            background: #d4d0c8;
+        }
+        
+        .minesweeper-cell:active {
+            border: 2px inset #c0c0c0;
+            box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
         }
         
         .minesweeper-cell.revealed {
-            background: #161b22;
+            background: #c0c0c0;
+            border: 1px solid #808080;
             cursor: default;
+            box-shadow: none;
+            border-style: inset;
         }
         
         .minesweeper-cell.mine {
-            background: #f85149;
+            background: #ff0000;
+            border: 1px solid #800000;
         }
         
         .minesweeper-cell.flagged {
-            background: #ffa657;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
         }
         
-        .minesweeper-cell.number-1 { color: #58a6ff; }
-        .minesweeper-cell.number-2 { color: #3fb950; }
-        .minesweeper-cell.number-3 { color: #f85149; }
-        .minesweeper-cell.number-4 { color: #bc8cff; }
-        .minesweeper-cell.number-5 { color: #f0883e; }
-        .minesweeper-cell.number-6 { color: #ffa657; }
-        .minesweeper-cell.number-7 { color: #c9d1d9; }
-        .minesweeper-cell.number-8 { color: #8b949e; }
+        /* Classic Windows 95 number colors */
+        .minesweeper-cell.number-1 { color: #0000ff; }
+        .minesweeper-cell.number-2 { color: #008000; }
+        .minesweeper-cell.number-3 { color: #ff0000; }
+        .minesweeper-cell.number-4 { color: #000080; }
+        .minesweeper-cell.number-5 { color: #800000; }
+        .minesweeper-cell.number-6 { color: #008080; }
+        .minesweeper-cell.number-7 { color: #000000; }
+        .minesweeper-cell.number-8 { color: #808080; }
+        
+        .minesweeper-reset-btn {
+            padding: 4px 12px;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            color: #000;
+            cursor: pointer;
+            font-family: 'MS Sans Serif', 'Segoe UI', sans-serif;
+            font-size: 11px;
+            font-weight: normal;
+            box-shadow: 1px 1px 0 #fff, -1px -1px 0 #808080;
+        }
+        
+        .minesweeper-reset-btn:hover {
+            background: #d4d0c8;
+        }
+        
+        .minesweeper-reset-btn:active {
+            border: 2px inset #c0c0c0;
+            box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
+        }
         
         /* Paint Textures */
         .texture-selector {
@@ -1518,7 +1556,10 @@
                     <button class="clicker-button" id="clickerButton" onclick="clickClicker()">Click Me!</button>
                 </div>
                 <div class="leaderboard-section">
-                    <h4>Leaderboard</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="margin: 0;">Leaderboard</h4>
+                        <button class="minesweeper-reset-btn" onclick="resetClickerLeaderboard()" style="font-size: 10px; padding: 2px 8px;">Reset</button>
+                    </div>
                     <div class="leaderboard-list" id="clickerLeaderboard">
                         <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
                     </div>
@@ -1537,12 +1578,15 @@
                     <div class="minesweeper-info">
                         <div>Mines: <span id="minesCount">10</span></div>
                         <div>Time: <span id="minesweeperTime">0</span>s</div>
-                        <button class="paint-btn" onclick="resetMinesweeper()">Reset</button>
+                        <button class="minesweeper-reset-btn" onclick="resetMinesweeper()">Reset</button>
                     </div>
                 </div>
                 <div class="minesweeper-board" id="minesweeperBoard"></div>
                 <div class="leaderboard-section">
-                    <h4>Best Times</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="margin: 0;">Best Times</h4>
+                        <button class="minesweeper-reset-btn" onclick="resetMinesweeperLeaderboard()" style="font-size: 10px; padding: 2px 8px;">Reset</button>
+                    </div>
                     <div class="leaderboard-list" id="minesweeperLeaderboard">
                         <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
                     </div>
@@ -3014,6 +3058,33 @@
         
         let clickerScore = 0;
         
+        
+        function clickClicker() {
+            clickerScore++;
+            document.getElementById('clickerScore').textContent = clickerScore;
+            
+            // Save score to Firebase (throttled - only every 10 clicks or on close)
+            if (clickerScore % 10 === 0 || clickerScore === 1) {
+                saveClickerScore();
+            }
+        }
+        
+        function saveClickerScore() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!username || !usernameLower || !database) return;
+            
+            writeToFirebase(`clickerScores/${usernameLower}`, {
+                username: username,
+                usernameLower: usernameLower,
+                score: clickerScore,
+                timestamp: Date.now()
+            }).catch(err => {
+                console.error('Error saving clicker score:', err);
+            });
+        }
+        
         function toggleClicker() {
             const clicker = document.getElementById('clickerContainer');
             const chat = document.getElementById('globalChat');
@@ -3022,6 +3093,8 @@
             const minesweeper = document.getElementById('minesweeperContainer');
             
             if (clicker.classList.contains('active')) {
+                // Save score when closing
+                saveClickerScore();
                 clicker.classList.remove('active');
             } else {
                 clicker.classList.add('active');
@@ -3029,25 +3102,35 @@
                 friends.classList.remove('active');
                 paint.classList.remove('active');
                 minesweeper.classList.remove('active');
+                
+                // Load user's current score
+                loadClickerScore();
                 loadClickerLeaderboard();
             }
         }
         
-        function clickClicker() {
-            clickerScore++;
-            document.getElementById('clickerScore').textContent = clickerScore;
-            
-            // Save score to Firebase
+        function loadClickerScore() {
             const username = localStorage.getItem('loggedInUsername');
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
-            if (usernameLower && database) {
-                writeToFirebase(`clickerScores/${usernameLower}`, {
-                    username: username,
-                    usernameLower: usernameLower,
-                    score: clickerScore,
-                    timestamp: Date.now()
-                });
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) {
+                clickerScore = 0;
+                document.getElementById('clickerScore').textContent = '0';
+                return;
             }
+            
+            readFromFirebase(`clickerScores/${usernameLower}`).then((data) => {
+                if (data && data.score) {
+                    clickerScore = data.score;
+                    document.getElementById('clickerScore').textContent = clickerScore;
+                } else {
+                    clickerScore = 0;
+                    document.getElementById('clickerScore').textContent = '0';
+                }
+            }).catch(() => {
+                clickerScore = 0;
+                document.getElementById('clickerScore').textContent = '0';
+            });
         }
         
         function loadClickerLeaderboard() {
@@ -3063,19 +3146,48 @@
                 }
                 
                 const scoreArray = Object.values(scores)
+                    .filter(entry => entry && entry.username) // Filter out entries with undefined username
                     .sort((a, b) => (b.score || 0) - (a.score || 0))
                     .slice(0, 10);
                 
                 leaderboard.innerHTML = '';
+                if (scoreArray.length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No valid scores yet!</p>';
+                    return;
+                }
+                
                 scoreArray.forEach((entry, index) => {
                     const div = document.createElement('div');
                     div.className = 'leaderboard-item';
+                    const displayName = entry.username || entry.usernameLower || 'Unknown';
                     div.innerHTML = `
                         <span class="rank">#${index + 1}</span>
-                        <span class="username">${entry.username || entry.usernameLower}</span>
+                        <span class="username">${displayName}</span>
                         <span class="score">${entry.score || 0}</span>
                     `;
                     leaderboard.appendChild(div);
+                });
+            }).catch(err => {
+                console.error('Error loading leaderboard:', err);
+                leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
+        }
+        
+        function resetClickerLeaderboard() {
+            if (!confirm('Are you sure you want to reset the clicker leaderboard? This cannot be undone!')) return;
+            
+            if (!database) return;
+            
+            readFromFirebase('clickerScores').then((scores) => {
+                if (!scores) return;
+                
+                const promises = Object.keys(scores).map(key => {
+                    return deleteFromFirebase(`clickerScores/${key}`);
+                });
+                
+                Promise.all(promises).then(() => {
+                    alert('Clicker leaderboard reset!');
+                    loadClickerLeaderboard();
                 });
             });
         }
@@ -3235,7 +3347,11 @@
             }
             
             renderMinesweeperBoard();
-            checkWin();
+            
+            // Only check for win if game is not over
+            if (!minesweeperGameOver) {
+                checkWin();
+            }
         }
         
         function toggleFlag(row, col) {
@@ -3255,26 +3371,35 @@
         }
         
         function checkWin() {
+            // Don't check win if game is already over
+            if (minesweeperGameOver) return;
+            
             let revealedCount = 0;
             for (let i = 0; i < minesweeperSize; i++) {
                 for (let j = 0; j < minesweeperSize; j++) {
-                    if (minesweeperRevealed[i][j]) revealedCount++;
+                    // Only count non-mine cells that are revealed
+                    if (minesweeperRevealed[i][j] && minesweeperBoard[i][j] !== -1) {
+                        revealedCount++;
+                    }
                 }
             }
             
+            // Win condition: all non-mine cells are revealed
             if (revealedCount === minesweeperSize * minesweeperSize - minesweeperMines) {
                 minesweeperGameOver = true;
                 stopMinesweeperTimer();
                 
                 // Save time to leaderboard
                 const username = localStorage.getItem('loggedInUsername');
-                const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
-                if (usernameLower && database) {
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                if (username && usernameLower && database) {
                     writeToFirebase(`minesweeperScores/${usernameLower}`, {
                         username: username,
                         usernameLower: usernameLower,
                         time: minesweeperTimer,
                         timestamp: Date.now()
+                    }).catch(err => {
+                        console.error('Error saving minesweeper score:', err);
                     });
                 }
                 
