@@ -389,18 +389,19 @@
         .command-bar {
             position: fixed;
             bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            max-width: 90%;
-            background: rgba(22, 27, 34, 0.95);
+            left: 20px;
+            width: 400px;
+            max-width: calc(100% - 40px);
+            background: rgba(13, 17, 23, 0.98);
             border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 6px;
+            padding: 8px 12px;
             display: none;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: center;
             z-index: 300;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            font-family: 'Courier New', monospace;
         }
         
         .command-bar.active {
@@ -408,46 +409,49 @@
         }
         
         .command-bar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .command-bar-header h3 {
-            color: #c9d1d9;
-            margin: 0;
-            font-size: 16px;
+            display: none;
         }
         
         .command-input-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
+            width: 100%;
+        }
+        
+        .command-prompt {
+            color: #58a6ff;
+            font-size: 14px;
+            font-weight: bold;
+            user-select: none;
         }
         
         .command-input {
             flex: 1;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            padding: 6px 0;
             color: #c9d1d9;
             font-size: 14px;
             font-family: 'Courier New', monospace;
+            outline: none;
         }
         
         .command-input:focus {
             outline: none;
-            border-color: #58a6ff;
         }
         
         .command-input::placeholder {
             color: #6e7681;
+            font-style: italic;
         }
         
         .command-bar.locked {
             display: none !important;
+        }
+        
+        .command-bar.active .command-input {
+            caret-color: #58a6ff;
         }
         
         .chat-messages {
@@ -1229,13 +1233,9 @@
         
         <!-- Command Bar -->
         <div class="command-bar locked" id="commandBar">
-            <div class="command-bar-header">
-                <h3>⌨️ Command Bar</h3>
-                <button class="close-btn" onclick="toggleCommandBar()">×</button>
-            </div>
             <div class="command-input-container">
-                <input type="text" class="command-input" id="commandInput" placeholder="Type a command... (e.g., COLOR red, SMALL, BIG, NORMAL)" onkeypress="if(event.key === 'Enter') executeCommand()">
-                <button class="chat-send-btn" onclick="executeCommand()">Execute</button>
+                <span class="command-prompt">></span>
+                <input type="text" class="command-input" id="commandInput" placeholder="Type a command... (Press ; to focus)" onkeypress="if(event.key === 'Enter') executeCommand()">
             </div>
         </div>
         
@@ -1357,7 +1357,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.0.0';
+        const APP_VERSION = '1.2.0';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -1690,8 +1690,13 @@
             if (commandBar) {
                 if (unlockedFeatures.has(UNLOCK_TYPES.COMMANDBAR)) {
                     commandBar.classList.remove('locked');
+                    // Auto-show when unlocked
+                    if (!commandBar.classList.contains('active')) {
+                        commandBar.classList.add('active');
+                    }
                 } else {
                     commandBar.classList.add('locked');
+                    commandBar.classList.remove('active');
                 }
             }
         }
@@ -1716,15 +1721,46 @@
         
         function toggleCommandBar() {
             const commandBar = document.getElementById('commandBar');
-            if (commandBar) {
+            if (commandBar && !commandBar.classList.contains('locked')) {
                 if (commandBar.classList.contains('active')) {
                     commandBar.classList.remove('active');
+                    document.getElementById('commandInput').blur();
                 } else {
                     commandBar.classList.add('active');
-                    document.getElementById('commandInput').focus();
+                    setTimeout(() => {
+                        document.getElementById('commandInput').focus();
+                    }, 10);
                 }
             }
         }
+        
+        // Keyboard shortcut for command bar (; key)
+        document.addEventListener('keydown', (e) => {
+            // Only trigger if not typing in an input field
+            if (e.key === ';' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                const commandBar = document.getElementById('commandBar');
+                if (commandBar && !commandBar.classList.contains('locked')) {
+                    if (!commandBar.classList.contains('active')) {
+                        commandBar.classList.add('active');
+                        setTimeout(() => {
+                            document.getElementById('commandInput').focus();
+                        }, 10);
+                    } else {
+                        document.getElementById('commandInput').focus();
+                    }
+                }
+            }
+            
+            // Escape to close command bar
+            if (e.key === 'Escape' && e.target.id === 'commandInput') {
+                const commandBar = document.getElementById('commandBar');
+                if (commandBar) {
+                    commandBar.classList.remove('active');
+                    e.target.blur();
+                }
+            }
+        });
         
         function executeCommand() {
             const input = document.getElementById('commandInput');
