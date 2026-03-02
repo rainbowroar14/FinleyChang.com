@@ -1127,6 +1127,16 @@
             pointer-events: auto;
         }
         
+        /* Click-themed background pattern */
+        .theme-background.active.clicker-theme {
+            background: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(88, 166, 255, 0.03) 2px, rgba(88, 166, 255, 0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(88, 166, 255, 0.03) 2px, rgba(88, 166, 255, 0.03) 4px),
+                radial-gradient(circle at 20% 30%, rgba(88, 166, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(88, 166, 255, 0.1) 0%, transparent 50%),
+                #0d1117;
+        }
+        
         /* Ensure main content is above theme background */
         .page {
             position: relative;
@@ -1304,11 +1314,23 @@
         }
         
         .minesweeper-cell.revealed {
-            background: #c0c0c0;
+            background: #d4d0c8;
             border: 1px solid #808080;
             cursor: default;
-            box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2), inset -1px -1px 1px rgba(255, 255, 255, 0.3);
+            box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3), inset -1px -1px 1px rgba(255, 255, 255, 0.4);
             border-style: inset;
+        }
+        
+        .minesweeper-cell.revealed.number-1,
+        .minesweeper-cell.revealed.number-2,
+        .minesweeper-cell.revealed.number-3,
+        .minesweeper-cell.revealed.number-4,
+        .minesweeper-cell.revealed.number-5,
+        .minesweeper-cell.revealed.number-6,
+        .minesweeper-cell.revealed.number-7,
+        .minesweeper-cell.revealed.number-8 {
+            background: #e8e8e8;
+            font-weight: bold;
         }
         
         .minesweeper-cell.mine {
@@ -3656,9 +3678,10 @@
         // ============================================
         
         let unlockedThemes = new Set(['default']);
-        let themeClickableLogoSize = 72;
         let themeCursors = [];
         let themeMinesweeperInstance = null;
+        let themeLetterClicks = 0; // Track clicks on FINHUB letters
+        let themeLetterSizes = {}; // Track size of each letter
         
         function toggleThemes() {
             const themes = document.getElementById('themeContainer');
@@ -3766,6 +3789,7 @@
             const bg = document.getElementById('themeBackground');
             bg.innerHTML = '';
             bg.classList.remove('active');
+            bg.classList.remove('clicker-theme');
             
             // Clear cursors
             themeCursors.forEach(cursor => {
@@ -3773,8 +3797,20 @@
             });
             themeCursors = [];
             
-            // Reset clickable logo size
-            themeClickableLogoSize = 72;
+            // Reset FINHUB letters
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach(letter => {
+                    letter.style.fontSize = '72px';
+                    letter.style.transform = 'scale(1)';
+                    letter.style.opacity = '1';
+                    letter.style.cursor = 'default';
+                    letter.onclick = null;
+                });
+            }
+            themeLetterClicks = 0;
+            themeLetterSizes = {};
             
             // Clear minesweeper state
             themeMinesweeperBoard = [];
@@ -3784,23 +3820,126 @@
         function applyClicker100Theme() {
             const bg = document.getElementById('themeBackground');
             bg.classList.add('active');
+            bg.classList.add('clicker-theme');
             
-            // Add clickable logo
-            const logo = document.createElement('div');
-            logo.className = 'theme-clickable-logo';
-            logo.textContent = '🎯';
-            logo.style.fontSize = themeClickableLogoSize + 'px';
-            logo.onclick = () => {
-                themeClickableLogoSize += 5;
-                logo.style.fontSize = themeClickableLogoSize + 'px';
-                totalClicks++;
-            };
-            bg.appendChild(logo);
+            // Add click-themed background (cursor trails, click effects)
+            createClickThemeBackground();
+            
+            // Make FINHUB letters clickable and grow
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach((letter, index) => {
+                    const letterId = letter.dataset.letter || letter.textContent;
+                    themeLetterSizes[letterId] = 72; // Default size
+                    
+                    letter.style.cursor = 'pointer';
+                    letter.style.transition = 'transform 0.2s ease';
+                    
+                    letter.onclick = () => {
+                        themeLetterClicks++;
+                        themeLetterSizes[letterId] += 10;
+                        letter.style.fontSize = themeLetterSizes[letterId] + 'px';
+                        letter.style.transform = 'scale(1.1)';
+                        
+                        // Create click effect
+                        createClickEffect(letter);
+                        
+                        totalClicks++;
+                        
+                        // After 10 clicks, pop and reset
+                        if (themeLetterClicks >= 10) {
+                            themeLetterClicks = 0;
+                            letters.forEach(l => {
+                                const id = l.dataset.letter || l.textContent;
+                                l.style.transform = 'scale(1.5)';
+                                l.style.opacity = '0.8';
+                                setTimeout(() => {
+                                    l.style.fontSize = '72px';
+                                    l.style.transform = 'scale(1)';
+                                    l.style.opacity = '1';
+                                    themeLetterSizes[id] = 72;
+                                }, 300);
+                            });
+                        } else {
+                            setTimeout(() => {
+                                letter.style.transform = 'scale(1)';
+                            }, 200);
+                        }
+                    };
+                });
+            }
             
             // Add moving cursors
             for (let i = 0; i < 5; i++) {
                 createMovingCursor();
             }
+        }
+        
+        function createClickThemeBackground() {
+            const bg = document.getElementById('themeBackground');
+            
+            // Add click trail effect
+            document.addEventListener('click', (e) => {
+                if (currentTheme !== 'clicker100') return;
+                
+                const clickEffect = document.createElement('div');
+                clickEffect.style.position = 'absolute';
+                clickEffect.style.left = e.clientX + 'px';
+                clickEffect.style.top = e.clientY + 'px';
+                clickEffect.style.width = '20px';
+                clickEffect.style.height = '20px';
+                clickEffect.style.borderRadius = '50%';
+                clickEffect.style.background = 'radial-gradient(circle, rgba(88, 166, 255, 0.8), transparent)';
+                clickEffect.style.pointerEvents = 'none';
+                clickEffect.style.zIndex = '1';
+                clickEffect.style.animation = 'clickPulse 0.6s ease-out forwards';
+                bg.appendChild(clickEffect);
+                
+                setTimeout(() => {
+                    clickEffect.remove();
+                }, 600);
+            });
+            
+            // Add CSS animation for click effect
+            if (!document.getElementById('clickThemeStyles')) {
+                const style = document.createElement('style');
+                style.id = 'clickThemeStyles';
+                style.textContent = `
+                    @keyframes clickPulse {
+                        0% {
+                            transform: scale(0);
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: scale(3);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        function createClickEffect(element) {
+            const rect = element.getBoundingClientRect();
+            const effect = document.createElement('div');
+            effect.style.position = 'absolute';
+            effect.style.left = (rect.left + rect.width / 2) + 'px';
+            effect.style.top = (rect.top + rect.height / 2) + 'px';
+            effect.style.width = '30px';
+            effect.style.height = '30px';
+            effect.style.borderRadius = '50%';
+            effect.style.background = 'radial-gradient(circle, rgba(88, 166, 255, 0.6), transparent)';
+            effect.style.pointerEvents = 'none';
+            effect.style.zIndex = '1000';
+            effect.style.transform = 'translate(-50%, -50%)';
+            effect.style.animation = 'clickPulse 0.4s ease-out forwards';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 400);
         }
         
         function createMovingCursor() {
