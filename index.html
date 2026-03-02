@@ -683,6 +683,243 @@
         .private-chat-container.active {
             display: flex;
         }
+        
+        /* Paint Game */
+        .paint-container {
+            position: fixed;
+            left: 180px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 800px;
+            height: 600px;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+        }
+        
+        .paint-container.active {
+            display: flex;
+        }
+        
+        .paint-header {
+            padding: 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .paint-header h3 {
+            color: #c9d1d9;
+            margin: 0;
+        }
+        
+        .paint-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .paint-btn {
+            padding: 8px 16px;
+            background: #238636;
+            border: 1px solid #238636;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .paint-btn:hover {
+            background: #2ea043;
+        }
+        
+        .paint-btn.secondary {
+            background: #1f6feb;
+            border-color: #1f6feb;
+        }
+        
+        .paint-btn.secondary:hover {
+            background: #388bfd;
+        }
+        
+        .paint-tools {
+            padding: 10px 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: rgba(13, 17, 23, 0.5);
+        }
+        
+        .tool-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .tool-group label {
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+        
+        .color-picker {
+            width: 40px;
+            height: 30px;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .brush-size {
+            width: 80px;
+            padding: 5px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            color: #c9d1d9;
+        }
+        
+        .clear-btn {
+            padding: 6px 12px;
+            background: #da3633;
+            border: 1px solid #da3633;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .clear-btn:hover {
+            background: #f85149;
+        }
+        
+        .paint-canvas-container {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            overflow: hidden;
+        }
+        
+        .paint-canvas {
+            border: 2px solid #30363d;
+            border-radius: 4px;
+            cursor: crosshair;
+            background: #fff;
+        }
+        
+        /* Invite Friends Modal */
+        .invite-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .invite-modal.active {
+            display: flex;
+        }
+        
+        .invite-modal-content {
+            background: rgba(22, 27, 34, 0.98);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            width: 400px;
+            max-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .invite-modal-header {
+            padding: 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .invite-modal-header h3 {
+            color: #c9d1d9;
+            margin: 0;
+        }
+        
+        .invite-friends-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .invite-friend-item {
+            padding: 12px;
+            background: rgba(13, 17, 23, 0.5);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .invite-friend-item:hover {
+            background: rgba(33, 38, 45, 0.8);
+            border-color: #1f6feb;
+        }
+        
+        .invite-friend-item.selected {
+            background: rgba(31, 111, 235, 0.2);
+            border-color: #1f6feb;
+        }
+        
+        .invite-friend-item .username {
+            color: #c9d1d9;
+            font-weight: 500;
+        }
+        
+        .invite-modal-footer {
+            padding: 15px;
+            border-top: 1px solid #30363d;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .invite-btn {
+            padding: 8px 20px;
+            background: #238636;
+            border: 1px solid #238636;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .invite-btn:hover {
+            background: #2ea043;
+        }
+        
+        .invite-btn:disabled {
+            background: #30363d;
+            border-color: #30363d;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -745,6 +982,7 @@
         <div class="sidebar-buttons">
             <div class="sidebar-btn" onclick="toggleChat()">💬 Chat</div>
             <div class="sidebar-btn" onclick="toggleFriends()">👥 Friends</div>
+            <div class="sidebar-btn" onclick="togglePaint()">🎨 Paint</div>
         </div>
         
         <!-- Global Chat -->
@@ -791,6 +1029,50 @@
             <!-- Friend Requests List -->
             <div class="friend-requests-list" id="friendRequestsListTab" style="display: none;">
                 <p style="color: #8b949e; text-align: center; padding: 20px;">No friend requests</p>
+            </div>
+        </div>
+        
+        <!-- Paint Game -->
+        <div class="paint-container" id="paintContainer">
+            <div class="paint-header">
+                <h3>Paint Game</h3>
+                <div class="paint-controls">
+                    <button class="paint-btn secondary" onclick="openInviteModal()">Invite</button>
+                    <button class="paint-btn" onclick="startPaintGame()">Play</button>
+                    <button class="close-btn" onclick="togglePaint()">×</button>
+                </div>
+            </div>
+            <div class="paint-tools" id="paintTools" style="display: none;">
+                <div class="tool-group">
+                    <label>Color:</label>
+                    <input type="color" class="color-picker" id="colorPicker" value="#000000">
+                </div>
+                <div class="tool-group">
+                    <label>Brush Size:</label>
+                    <input type="range" class="brush-size" id="brushSize" min="1" max="50" value="5">
+                    <span id="brushSizeValue" style="color: #c9d1d9; min-width: 30px;">5</span>
+                </div>
+                <button class="clear-btn" onclick="clearCanvas()">Clear</button>
+            </div>
+            <div class="paint-canvas-container">
+                <canvas id="paintCanvas" class="paint-canvas" width="750" height="500"></canvas>
+            </div>
+        </div>
+        
+        <!-- Invite Friends Modal -->
+        <div class="invite-modal" id="inviteModal">
+            <div class="invite-modal-content">
+                <div class="invite-modal-header">
+                    <h3>Invite Friends to Paint</h3>
+                    <button class="close-btn" onclick="closeInviteModal()">×</button>
+                </div>
+                <div class="invite-friends-list" id="inviteFriendsList">
+                    <p style="color: #8b949e; text-align: center; padding: 20px;">Loading friends...</p>
+                </div>
+                <div class="invite-modal-footer">
+                    <button class="paint-btn secondary" onclick="closeInviteModal()">Cancel</button>
+                    <button class="invite-btn" id="sendInviteBtn" onclick="sendPaintInvites()" disabled>Send Invites</button>
+                </div>
             </div>
         </div>
         
@@ -890,6 +1172,7 @@
         
         function initChatAndFriends() {
             const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
             if (!username || !database) return;
             
             // Load friend requests
@@ -898,10 +1181,20 @@
             // Load friends list
             loadFriends();
             
-            // Listen for new friend requests
-            if (database) {
-                friendRequestsListener = listenToFirebase(`friendRequests/${username}`, (requests) => {
-                    updateFriendRequestsUI(requests);
+            // Listen for new friend requests and paint invites
+            if (database && usernameLower) {
+                // Listen for friend requests
+                friendRequestsListener = listenToFirebase(`friendRequests/${usernameLower}`, (requests) => {
+                    readFromFirebase(`paintInvites/${usernameLower}`).then((paintInvites) => {
+                        updateFriendRequestsUI(requests, paintInvites);
+                    });
+                });
+                
+                // Listen for paint invites
+                listenToFirebase(`paintInvites/${usernameLower}`, (paintInvites) => {
+                    readFromFirebase(`friendRequests/${usernameLower}`).then((requests) => {
+                        updateFriendRequestsUI(requests, paintInvites);
+                    });
                 });
             }
         }
@@ -1098,33 +1391,87 @@
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
             if (!usernameLower || !database) return;
             
-            readFromFirebase(`friendRequests/${usernameLower}`).then((requests) => {
-                updateFriendRequestsUI(requests);
+            Promise.all([
+                readFromFirebase(`friendRequests/${usernameLower}`),
+                readFromFirebase(`paintInvites/${usernameLower}`)
+            ]).then(([friendRequests, paintInvites]) => {
+                updateFriendRequestsUI(friendRequests, paintInvites);
             });
         }
         
-        function updateFriendRequestsUI(requests) {
+        function updateFriendRequestsUI(friendRequests, paintInvites) {
             const list = document.getElementById('friendRequestsListTab');
             
-            if (!requests || Object.keys(requests).length === 0) {
-                list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friend requests</p>';
+            const hasFriendRequests = friendRequests && Object.keys(friendRequests).length > 0;
+            const hasPaintInvites = paintInvites && Object.keys(paintInvites).length > 0;
+            
+            if (!hasFriendRequests && !hasPaintInvites) {
+                list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friend requests or invites</p>';
                 return;
             }
             
             list.innerHTML = '';
             
-            Object.entries(requests).forEach(([fromUsernameLower, requestData]) => {
-                const displayName = requestData.from || fromUsernameLower;
-                const div = document.createElement('div');
-                div.className = 'friend-request-item';
-                div.innerHTML = `
-                    <span class="username">${displayName}</span>
-                    <div class="friend-request-buttons">
-                        <button class="accept-btn" onclick="acceptFriendRequest('${fromUsernameLower}', '${displayName}')">Accept</button>
-                        <button class="decline-btn" onclick="declineFriendRequest('${fromUsernameLower}')">Decline</button>
-                    </div>
-                `;
-                list.appendChild(div);
+            // Show friend requests
+            if (hasFriendRequests) {
+                Object.entries(friendRequests).forEach(([fromUsernameLower, requestData]) => {
+                    const displayName = requestData.from || fromUsernameLower;
+                    const div = document.createElement('div');
+                    div.className = 'friend-request-item';
+                    div.innerHTML = `
+                        <span class="username">${displayName}</span>
+                        <div class="friend-request-buttons">
+                            <button class="accept-btn" onclick="acceptFriendRequest('${fromUsernameLower}', '${displayName}')">Accept</button>
+                            <button class="decline-btn" onclick="declineFriendRequest('${fromUsernameLower}')">Decline</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+            
+            // Show paint invites
+            if (hasPaintInvites) {
+                Object.entries(paintInvites).forEach(([fromUsernameLower, inviteData]) => {
+                    const displayName = inviteData.from || fromUsernameLower;
+                    const div = document.createElement('div');
+                    div.className = 'friend-request-item';
+                    div.style.borderLeftColor = '#ffa657';
+                    div.innerHTML = `
+                        <div>
+                            <span class="username">${displayName}</span>
+                            <div style="color: #8b949e; font-size: 12px; margin-top: 5px;">🎨 Invited you to Paint</div>
+                        </div>
+                        <div class="friend-request-buttons">
+                            <button class="accept-btn" onclick="acceptPaintInvite('${fromUsernameLower}', '${displayName}')">Join</button>
+                            <button class="decline-btn" onclick="declinePaintInvite('${fromUsernameLower}')">Decline</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        }
+        
+        // Accept Paint Invite
+        function acceptPaintInvite(fromUsernameLower, displayName) {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
+            
+            // Remove invite
+            deleteFromFirebase(`paintInvites/${usernameLower}/${fromUsernameLower}`).then(() => {
+                // Open paint game
+                togglePaint();
+                startPaintGame();
+                loadFriendRequests(); // Refresh requests
+            });
+        }
+        
+        // Decline Paint Invite
+        function declinePaintInvite(fromUsernameLower) {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
+            
+            deleteFromFirebase(`paintInvites/${usernameLower}/${fromUsernameLower}`).then(() => {
+                loadFriendRequests(); // Refresh requests
             });
         }
         
@@ -1289,6 +1636,184 @@
             
             pushToFirebase(`privateChats/${chatId}/messages`, messageData).then(() => {
                 input.value = '';
+            });
+        }
+        
+        // ============================================
+        // PAINT GAME SYSTEM
+        // ============================================
+        
+        let paintCanvas, paintCtx;
+        let isDrawing = false;
+        let selectedFriendsForInvite = [];
+        
+        // Toggle Paint Game
+        function togglePaint() {
+            const paint = document.getElementById('paintContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const privateChat = document.getElementById('privateChat');
+            
+            if (paint.classList.contains('active')) {
+                paint.classList.remove('active');
+            } else {
+                paint.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                privateChat.classList.remove('active');
+                
+                // Initialize canvas if not already done
+                if (!paintCanvas) {
+                    paintCanvas = document.getElementById('paintCanvas');
+                    paintCtx = paintCanvas.getContext('2d');
+                    paintCtx.lineCap = 'round';
+                    paintCtx.lineJoin = 'round';
+                }
+            }
+        }
+        
+        // Start Paint Game
+        function startPaintGame() {
+            const tools = document.getElementById('paintTools');
+            tools.style.display = 'flex';
+            
+            if (!paintCanvas) {
+                paintCanvas = document.getElementById('paintCanvas');
+                paintCtx = paintCanvas.getContext('2d');
+                paintCtx.lineCap = 'round';
+                paintCtx.lineJoin = 'round';
+            }
+            
+            // Set up drawing event listeners
+            paintCanvas.addEventListener('mousedown', startDrawing);
+            paintCanvas.addEventListener('mousemove', draw);
+            paintCanvas.addEventListener('mouseup', stopDrawing);
+            paintCanvas.addEventListener('mouseout', stopDrawing);
+            
+            // Update brush size display
+            const brushSize = document.getElementById('brushSize');
+            const brushSizeValue = document.getElementById('brushSizeValue');
+            brushSize.addEventListener('input', (e) => {
+                brushSizeValue.textContent = e.target.value;
+            });
+        }
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = paintCanvas.getBoundingClientRect();
+            paintCtx.beginPath();
+            paintCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = paintCanvas.getBoundingClientRect();
+            const color = document.getElementById('colorPicker').value;
+            const brushSize = document.getElementById('brushSize').value;
+            
+            paintCtx.strokeStyle = color;
+            paintCtx.lineWidth = brushSize;
+            paintCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            paintCtx.stroke();
+        }
+        
+        function stopDrawing() {
+            if (isDrawing) {
+                paintCtx.beginPath();
+                isDrawing = false;
+            }
+        }
+        
+        function clearCanvas() {
+            if (paintCtx) {
+                paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+            }
+        }
+        
+        // Open Invite Modal
+        function openInviteModal() {
+            const modal = document.getElementById('inviteModal');
+            modal.classList.add('active');
+            loadFriendsForInvite();
+        }
+        
+        // Close Invite Modal
+        function closeInviteModal() {
+            const modal = document.getElementById('inviteModal');
+            modal.classList.remove('active');
+            selectedFriendsForInvite = [];
+        }
+        
+        // Load Friends for Invite
+        function loadFriendsForInvite() {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
+            
+            const list = document.getElementById('inviteFriendsList');
+            list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading friends...</p>';
+            
+            readFromFirebase(`friends/${usernameLower}`).then((friends) => {
+                if (!friends || Object.keys(friends).length === 0) {
+                    list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friends to invite</p>';
+                    return;
+                }
+                
+                list.innerHTML = '';
+                Object.entries(friends).forEach(([friendUsernameLower, friendData]) => {
+                    const displayName = friendData?.username || friendUsernameLower;
+                    const div = document.createElement('div');
+                    div.className = 'invite-friend-item';
+                    div.dataset.usernameLower = friendUsernameLower;
+                    div.innerHTML = `
+                        <span class="username">${displayName}</span>
+                        <span style="color: #8b949e; font-size: 12px;">Click to select</span>
+                    `;
+                    div.addEventListener('click', () => toggleFriendSelection(friendUsernameLower, div));
+                    list.appendChild(div);
+                });
+            });
+        }
+        
+        // Toggle Friend Selection
+        function toggleFriendSelection(friendUsernameLower, element) {
+            const index = selectedFriendsForInvite.indexOf(friendUsernameLower);
+            if (index > -1) {
+                selectedFriendsForInvite.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                selectedFriendsForInvite.push(friendUsernameLower);
+                element.classList.add('selected');
+            }
+            
+            // Update send button
+            const sendBtn = document.getElementById('sendInviteBtn');
+            sendBtn.disabled = selectedFriendsForInvite.length === 0;
+        }
+        
+        // Send Paint Invites
+        function sendPaintInvites() {
+            if (selectedFriendsForInvite.length === 0) return;
+            
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
+            
+            if (!username || !database) return;
+            
+            // Send invite to each selected friend
+            const promises = selectedFriendsForInvite.map(friendUsernameLower => {
+                return writeToFirebase(`paintInvites/${friendUsernameLower}/${usernameLower}`, {
+                    from: username,
+                    fromLower: usernameLower,
+                    toLower: friendUsernameLower,
+                    type: 'paint',
+                    timestamp: Date.now()
+                });
+            });
+            
+            Promise.all(promises).then(() => {
+                alert(`Invites sent to ${selectedFriendsForInvite.length} friend(s)!`);
+                closeInviteModal();
+                selectedFriendsForInvite = [];
             });
         }
         
