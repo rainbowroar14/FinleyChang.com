@@ -1043,6 +1043,138 @@
             gap: 20px;
         }
         
+        /* Theme Container */
+        .theme-container {
+            position: fixed;
+            left: 180px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 500px;
+            max-height: 80vh;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+        }
+        
+        .theme-container.active {
+            display: flex;
+        }
+        
+        .theme-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+        
+        .theme-item {
+            padding: 20px;
+            background: rgba(13, 17, 23, 0.5);
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .theme-item:hover {
+            border-color: #58a6ff;
+            background: rgba(13, 17, 23, 0.8);
+        }
+        
+        .theme-item.active {
+            border-color: #3fb950;
+            background: rgba(63, 185, 80, 0.1);
+        }
+        
+        .theme-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .theme-item.locked:hover {
+            border-color: #30363d;
+            background: rgba(13, 17, 23, 0.5);
+        }
+        
+        .theme-item h4 {
+            color: #c9d1d9;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        
+        .theme-item p {
+            color: #8b949e;
+            margin: 0;
+            font-size: 12px;
+        }
+        
+        /* Theme Background */
+        .theme-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .theme-background.active {
+            pointer-events: auto;
+        }
+        
+        /* Ensure main content is above theme background */
+        .page {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .sidebar-buttons {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Clicker 100 Theme */
+        .theme-clickable-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+            z-index: 2;
+        }
+        
+        .theme-cursor {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .theme-cursor::before {
+            content: '👆';
+            font-size: 20px;
+        }
+        
+        /* Minesweeper Background Theme */
+        .theme-minesweeper-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            pointer-events: auto;
+        }
+        
         /* Clicker Game */
         .clicker-display {
             text-align: center;
@@ -1179,7 +1311,7 @@
             background: #c0c0c0;
             border: 1px solid #808080;
             cursor: default;
-            box-shadow: none;
+            box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2), inset -1px -1px 1px rgba(255, 255, 255, 0.3);
             border-style: inset;
         }
         
@@ -1454,7 +1586,24 @@
             <div class="sidebar-btn" id="paintBtn" onclick="togglePaint()">🎨 Paint</div>
             <div class="sidebar-btn" id="clickerBtn" onclick="toggleClicker()">🖱️ Clicker</div>
             <div class="sidebar-btn" id="minesweeperBtn" onclick="toggleMinesweeper()">💣 Minesweeper</div>
+            <div class="sidebar-btn" id="themesBtn" onclick="toggleThemes()">🎨 Themes</div>
         </div>
+        
+        <!-- Theme Selector -->
+        <div class="theme-container" id="themeContainer">
+            <div class="game-header">
+                <h3>🎨 Themes</h3>
+                <button class="close-btn" onclick="toggleThemes()">×</button>
+            </div>
+            <div class="game-content">
+                <div class="theme-list" id="themeList">
+                    <p style="color: #8b949e; text-align: center; padding: 20px;">Loading themes...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme Background Elements -->
+        <div id="themeBackground" class="theme-background"></div>
         
         <!-- Command Bar -->
         <div class="command-bar locked" id="commandBar">
@@ -1556,10 +1705,7 @@
                     <button class="clicker-button" id="clickerButton" onclick="clickClicker()">Click Me!</button>
                 </div>
                 <div class="leaderboard-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h4 style="margin: 0;">Leaderboard</h4>
-                        <button class="minesweeper-reset-btn" onclick="resetClickerLeaderboard()" style="font-size: 10px; padding: 2px 8px;">Reset</button>
-                    </div>
+                    <h4>Leaderboard</h4>
                     <div class="leaderboard-list" id="clickerLeaderboard">
                         <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
                     </div>
@@ -1583,10 +1729,7 @@
                 </div>
                 <div class="minesweeper-board" id="minesweeperBoard"></div>
                 <div class="leaderboard-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h4 style="margin: 0;">Best Times</h4>
-                        <button class="minesweeper-reset-btn" onclick="resetMinesweeperLeaderboard()" style="font-size: 10px; padding: 2px 8px;">Reset</button>
-                    </div>
+                    <h4>Best Times</h4>
                     <div class="leaderboard-list" id="minesweeperLeaderboard">
                         <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
                     </div>
@@ -1698,7 +1841,8 @@
             PAINT: 'paint',
             COMMANDBAR: 'commandbar',
             CLICKER: 'clicker',
-            MINESWEEPER: 'minesweeper'
+            MINESWEEPER: 'minesweeper',
+            THEMES: 'themes'
         };
         
         const UNLOCK_INFO = {
@@ -1743,6 +1887,12 @@
                 name: 'Minesweeper',
                 description: 'Change your logo size to unlock minesweeper!',
                 color: '#f85149'
+            },
+            [UNLOCK_TYPES.THEMES]: {
+                icon: '🎨',
+                name: 'Themes',
+                description: 'Get 10 clicks to unlock themes!',
+                color: '#bc8cff'
             }
         };
         
@@ -1755,6 +1905,9 @@
         let hasDrawn = false; // Track if user has drawn to unlock command bar
         let logoColorChanged = false; // Track if logo color has been changed
         let logoSizeChanged = false; // Track if logo size has been changed
+        let totalClicks = 0; // Track total clicks for theme unlocks
+        let currentTheme = 'default'; // Current active theme
+        let hasWonMinesweeper = false; // Track if user has won minesweeper
         
         function initUnlockSystem() {
             const username = localStorage.getItem('loggedInUsername');
@@ -1786,12 +1939,47 @@
                     messageCount = stats.messageCount || 0;
                     friendCount = stats.friendCount || 0;
                     colorChangeCount = stats.colorChangeCount || 0;
+                    totalClicks = stats.totalClicks || 0;
                 }
                 
                 // Check texture unlocks
                 if (colorChangeCount >= 1) unlockTexture('dots');
                 if (colorChangeCount >= 3) unlockTexture('lines');
                 if (colorChangeCount >= 5) unlockTexture('grid');
+                
+                // Check theme unlocks
+                if (totalClicks >= 10) {
+                    checkUnlock(UNLOCK_TYPES.THEMES);
+                }
+                if (totalClicks >= 100) {
+                    unlockTheme('clicker100');
+                }
+            });
+            
+            // Load unlocked themes
+            readFromFirebase(`users/${usernameLower}/themes`).then((themes) => {
+                if (themes) {
+                    Object.keys(themes).forEach(theme => {
+                        if (themes[theme]) {
+                            unlockedThemes.add(theme);
+                        }
+                    });
+                }
+                
+                // Check if won minesweeper
+                readFromFirebase(`users/${usernameLower}/hasWonMinesweeper`).then((won) => {
+                    if (won) {
+                        hasWonMinesweeper = true;
+                        unlockTheme('minesweeper');
+                    }
+                });
+            });
+            
+            // Load current theme
+            readFromFirebase(`users/${usernameLower}/currentTheme`).then((theme) => {
+                if (theme && unlockedThemes.has(theme)) {
+                    applyTheme(theme);
+                }
             });
             
             // Set up FINHUB logo click
@@ -1831,6 +2019,9 @@
                     break;
                 case UNLOCK_TYPES.MINESWEEPER:
                     shouldUnlock = logoSizeChanged; // Unlock after changing logo size
+                    break;
+                case UNLOCK_TYPES.THEMES:
+                    shouldUnlock = totalClicks >= 10; // Unlock after 10 clicks
                     break;
             }
             
@@ -3061,11 +3252,27 @@
         
         function clickClicker() {
             clickerScore++;
+            totalClicks++;
             document.getElementById('clickerScore').textContent = clickerScore;
+            
+            // Check for theme unlocks
+            if (totalClicks === 10) {
+                checkUnlock(UNLOCK_TYPES.THEMES);
+            }
+            if (totalClicks === 100) {
+                unlockTheme('clicker100');
+            }
             
             // Save score to Firebase (throttled - only every 10 clicks or on close)
             if (clickerScore % 10 === 0 || clickerScore === 1) {
                 saveClickerScore();
+            }
+            
+            // Save total clicks
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (usernameLower && database) {
+                writeToFirebase(`users/${usernameLower}/stats/totalClicks`, totalClicks);
             }
         }
         
@@ -3170,25 +3377,6 @@
             }).catch(err => {
                 console.error('Error loading leaderboard:', err);
                 leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
-            });
-        }
-        
-        function resetClickerLeaderboard() {
-            if (!confirm('Are you sure you want to reset the clicker leaderboard? This cannot be undone!')) return;
-            
-            if (!database) return;
-            
-            readFromFirebase('clickerScores').then((scores) => {
-                if (!scores) return;
-                
-                const promises = Object.keys(scores).map(key => {
-                    return deleteFromFirebase(`clickerScores/${key}`);
-                });
-                
-                Promise.all(promises).then(() => {
-                    alert('Clicker leaderboard reset!');
-                    loadClickerLeaderboard();
-                });
             });
         }
         
@@ -3403,6 +3591,17 @@
                     });
                 }
                 
+                // Mark that user has won minesweeper (unlock minesweeper theme)
+                if (!hasWonMinesweeper) {
+                    hasWonMinesweeper = true;
+                    const username = localStorage.getItem('loggedInUsername');
+                    const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                    if (usernameLower && database) {
+                        writeToFirebase(`users/${usernameLower}/hasWonMinesweeper`, true);
+                    }
+                    unlockTheme('minesweeper');
+                }
+                
                 alert(`You Win! Time: ${minesweeperTimer}s`);
                 loadMinesweeperLeaderboard();
             }
@@ -3454,6 +3653,305 @@
                     leaderboard.appendChild(div);
                 });
             });
+        }
+        
+        // ============================================
+        // THEME SYSTEM
+        // ============================================
+        
+        let unlockedThemes = new Set(['default']);
+        let themeClickableLogoSize = 72;
+        let themeCursors = [];
+        let themeMinesweeperInstance = null;
+        
+        function toggleThemes() {
+            const themes = document.getElementById('themeContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            
+            if (themes.classList.contains('active')) {
+                themes.classList.remove('active');
+            } else {
+                themes.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                minesweeper.classList.remove('active');
+                loadThemes();
+            }
+        }
+        
+        function loadThemes() {
+            const themeList = document.getElementById('themeList');
+            themeList.innerHTML = '';
+            
+            const themes = [
+                {
+                    id: 'default',
+                    name: 'Default',
+                    description: 'No theme',
+                    unlocked: true
+                },
+                {
+                    id: 'clicker100',
+                    name: 'Clicker 100',
+                    description: 'Unlock at 100 clicks',
+                    unlocked: unlockedThemes.has('clicker100')
+                },
+                {
+                    id: 'minesweeper',
+                    name: 'Minesweeper',
+                    description: 'Win minesweeper to unlock',
+                    unlocked: unlockedThemes.has('minesweeper')
+                }
+            ];
+            
+            themes.forEach(theme => {
+                const div = document.createElement('div');
+                div.className = `theme-item ${theme.unlocked ? '' : 'locked'} ${currentTheme === theme.id ? 'active' : ''}`;
+                div.innerHTML = `
+                    <h4>${theme.name}</h4>
+                    <p>${theme.description}</p>
+                `;
+                if (theme.unlocked) {
+                    div.onclick = () => applyTheme(theme.id);
+                }
+                themeList.appendChild(div);
+            });
+        }
+        
+        function unlockTheme(themeId) {
+            if (unlockedThemes.has(themeId)) return;
+            
+            unlockedThemes.add(themeId);
+            
+            // Save to Firebase
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (usernameLower && database) {
+                writeToFirebase(`users/${usernameLower}/themes/${themeId}`, true);
+            }
+            
+            // Reload themes if open
+            if (document.getElementById('themeContainer').classList.contains('active')) {
+                loadThemes();
+            }
+        }
+        
+        function applyTheme(themeId) {
+            currentTheme = themeId;
+            
+            // Clear previous theme
+            clearTheme();
+            
+            // Apply new theme
+            if (themeId === 'clicker100') {
+                applyClicker100Theme();
+            } else if (themeId === 'minesweeper') {
+                applyMinesweeperTheme();
+            }
+            
+            // Update theme list
+            loadThemes();
+            
+            // Save current theme
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (usernameLower && database) {
+                writeToFirebase(`users/${usernameLower}/currentTheme`, themeId);
+            }
+        }
+        
+        function clearTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.innerHTML = '';
+            bg.classList.remove('active');
+            
+            // Clear cursors
+            themeCursors.forEach(cursor => {
+                if (cursor.interval) clearInterval(cursor.interval);
+            });
+            themeCursors = [];
+            
+            // Reset clickable logo size
+            themeClickableLogoSize = 72;
+            
+            // Clear minesweeper state
+            themeMinesweeperBoard = [];
+            themeMinesweeperRevealed = [];
+        }
+        
+        function applyClicker100Theme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            
+            // Add clickable logo
+            const logo = document.createElement('div');
+            logo.className = 'theme-clickable-logo';
+            logo.textContent = '🎯';
+            logo.style.fontSize = themeClickableLogoSize + 'px';
+            logo.onclick = () => {
+                themeClickableLogoSize += 5;
+                logo.style.fontSize = themeClickableLogoSize + 'px';
+                totalClicks++;
+            };
+            bg.appendChild(logo);
+            
+            // Add moving cursors
+            for (let i = 0; i < 5; i++) {
+                createMovingCursor();
+            }
+        }
+        
+        function createMovingCursor() {
+            const cursor = document.createElement('div');
+            cursor.className = 'theme-cursor';
+            const bg = document.getElementById('themeBackground');
+            bg.appendChild(cursor);
+            
+            let x = Math.random() * window.innerWidth;
+            let y = Math.random() * window.innerHeight;
+            let dx = (Math.random() - 0.5) * 2;
+            let dy = (Math.random() - 0.5) * 2;
+            
+            cursor.style.left = x + 'px';
+            cursor.style.top = y + 'px';
+            
+            const moveCursor = () => {
+                x += dx;
+                y += dy;
+                
+                if (x < 0 || x > window.innerWidth) dx = -dx;
+                if (y < 0 || y > window.innerHeight) dy = -dy;
+                
+                cursor.style.left = x + 'px';
+                cursor.style.top = y + 'px';
+            };
+            
+            const interval = setInterval(moveCursor, 50);
+            themeCursors.push({ element: cursor, interval: interval });
+        }
+        
+        function applyMinesweeperTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            
+            // Create mini minesweeper game
+            const board = document.createElement('div');
+            board.className = 'theme-minesweeper-bg';
+            board.id = 'themeMinesweeperBoard';
+            bg.appendChild(board);
+            
+            // Initialize mini minesweeper
+            initThemeMinesweeper();
+        }
+        
+        let themeMinesweeperBoard = [];
+        let themeMinesweeperRevealed = [];
+        let themeMinesweeperSize = 15;
+        let themeMinesweeperMines = 20;
+        
+        function initThemeMinesweeper() {
+            const board = document.getElementById('themeMinesweeperBoard');
+            if (!board) return;
+            
+            board.style.display = 'grid';
+            board.style.gridTemplateColumns = `repeat(${themeMinesweeperSize}, 1fr)`;
+            board.style.gap = '1px';
+            board.style.padding = '10px';
+            board.style.background = '#c0c0c0';
+            board.style.opacity = '0.3';
+            
+            themeMinesweeperBoard = [];
+            themeMinesweeperRevealed = [];
+            
+            // Initialize board
+            for (let i = 0; i < themeMinesweeperSize; i++) {
+                themeMinesweeperBoard[i] = [];
+                themeMinesweeperRevealed[i] = [];
+                for (let j = 0; j < themeMinesweeperSize; j++) {
+                    themeMinesweeperBoard[i][j] = 0;
+                    themeMinesweeperRevealed[i][j] = false;
+                }
+            }
+            
+            // Place mines
+            let placed = 0;
+            while (placed < themeMinesweeperMines) {
+                const row = Math.floor(Math.random() * themeMinesweeperSize);
+                const col = Math.floor(Math.random() * themeMinesweeperSize);
+                if (themeMinesweeperBoard[row][col] !== -1) {
+                    themeMinesweeperBoard[row][col] = -1;
+                    placed++;
+                    // Update numbers
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            const nr = row + dr;
+                            const nc = col + dc;
+                            if (nr >= 0 && nr < themeMinesweeperSize && nc >= 0 && nc < themeMinesweeperSize && themeMinesweeperBoard[nr][nc] !== -1) {
+                                themeMinesweeperBoard[nr][nc]++;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            renderThemeMinesweeper();
+        }
+        
+        function renderThemeMinesweeper() {
+            const board = document.getElementById('themeMinesweeperBoard');
+            if (!board) return;
+            
+            board.innerHTML = '';
+            for (let i = 0; i < themeMinesweeperSize; i++) {
+                for (let j = 0; j < themeMinesweeperSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.style.aspectRatio = '1';
+                    cell.style.background = '#c0c0c0';
+                    cell.style.border = '1px outset #c0c0c0';
+                    cell.style.fontSize = '8px';
+                    cell.style.display = 'flex';
+                    cell.style.alignItems = 'center';
+                    cell.style.justifyContent = 'center';
+                    cell.style.cursor = 'pointer';
+                    cell.style.minWidth = '8px';
+                    cell.style.minHeight = '8px';
+                    
+                    if (themeMinesweeperRevealed[i][j]) {
+                        cell.style.border = '1px inset #808080';
+                        if (themeMinesweeperBoard[i][j] === -1) {
+                            cell.textContent = '💣';
+                        } else if (themeMinesweeperBoard[i][j] > 0) {
+                            cell.textContent = themeMinesweeperBoard[i][j];
+                        }
+                    }
+                    
+                    cell.onclick = () => {
+                        if (themeMinesweeperRevealed[i][j]) return;
+                        themeMinesweeperRevealed[i][j] = true;
+                        if (themeMinesweeperBoard[i][j] === 0) {
+                            // Reveal adjacent
+                            for (let dr = -1; dr <= 1; dr++) {
+                                for (let dc = -1; dc <= 1; dc++) {
+                                    const nr = i + dr;
+                                    const nc = j + dc;
+                                    if (nr >= 0 && nr < themeMinesweeperSize && nc >= 0 && nc < themeMinesweeperSize && !themeMinesweeperRevealed[nr][nc]) {
+                                        themeMinesweeperRevealed[nr][nc] = true;
+                                    }
+                                }
+                            }
+                        }
+                        renderThemeMinesweeper(); // Re-render
+                    };
+                    
+                    board.appendChild(cell);
+                }
+            }
         }
         
         // ============================================
