@@ -1177,8 +1177,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.3;
+            opacity: 0.85;
             pointer-events: auto;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .theme-minesweeper-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(192, 192, 192, 0.03) 2px, rgba(192, 192, 192, 0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(192, 192, 192, 0.03) 2px, rgba(192, 192, 192, 0.03) 4px);
+            pointer-events: none;
         }
         
         /* Clicker Game */
@@ -4042,6 +4058,15 @@
             
             // Initialize mini minesweeper
             initThemeMinesweeper();
+            
+            // Auto-resize on window resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    renderThemeMinesweeper();
+                }, 250);
+            });
         }
         
         let themeMinesweeperBoard = [];
@@ -4055,10 +4080,14 @@
             
             board.style.display = 'grid';
             board.style.gridTemplateColumns = `repeat(${themeMinesweeperSize}, 1fr)`;
-            board.style.gap = '1px';
-            board.style.padding = '10px';
-            board.style.background = '#c0c0c0';
-            board.style.opacity = '0.3';
+            board.style.gap = '2px';
+            board.style.padding = '20px';
+            board.style.background = 'transparent';
+            board.style.opacity = '1';
+            board.style.width = '100%';
+            board.style.height = '100%';
+            board.style.overflow = 'auto';
+            board.style.position = 'relative';
             
             themeMinesweeperBoard = [];
             themeMinesweeperRevealed = [];
@@ -4102,44 +4131,116 @@
             if (!board) return;
             
             board.innerHTML = '';
+            
+            // Calculate cell size based on viewport
+            const cellSize = Math.min(
+                Math.floor((window.innerWidth - 40) / themeMinesweeperSize),
+                Math.floor((window.innerHeight - 40) / themeMinesweeperSize),
+                20
+            );
+            
+            // Number colors matching classic Windows Minesweeper
+            const numberColors = {
+                1: '#0000ff',  // Blue
+                2: '#008000',  // Green
+                3: '#ff0000',  // Red
+                4: '#000080',  // Dark Blue
+                5: '#800000',  // Maroon
+                6: '#008080',  // Teal
+                7: '#000000',  // Black
+                8: '#808080'   // Gray
+            };
+            
             for (let i = 0; i < themeMinesweeperSize; i++) {
                 for (let j = 0; j < themeMinesweeperSize; j++) {
                     const cell = document.createElement('div');
-                    cell.style.aspectRatio = '1';
+                    cell.style.width = cellSize + 'px';
+                    cell.style.height = cellSize + 'px';
+                    cell.style.minWidth = cellSize + 'px';
+                    cell.style.minHeight = cellSize + 'px';
                     cell.style.background = '#c0c0c0';
-                    cell.style.border = '1px outset #c0c0c0';
-                    cell.style.fontSize = '8px';
+                    cell.style.borderTop = '2px solid #ffffff';
+                    cell.style.borderLeft = '2px solid #ffffff';
+                    cell.style.borderRight = '2px solid #808080';
+                    cell.style.borderBottom = '2px solid #808080';
+                    cell.style.fontSize = Math.max(8, cellSize * 0.5) + 'px';
+                    cell.style.fontWeight = 'bold';
                     cell.style.display = 'flex';
                     cell.style.alignItems = 'center';
                     cell.style.justifyContent = 'center';
                     cell.style.cursor = 'pointer';
-                    cell.style.minWidth = '8px';
-                    cell.style.minHeight = '8px';
+                    cell.style.transition = 'all 0.1s ease';
+                    cell.style.userSelect = 'none';
+                    
+                    // Hover effect
+                    cell.onmouseenter = () => {
+                        if (!themeMinesweeperRevealed[i][j]) {
+                            cell.style.background = '#d4d4d4';
+                        }
+                    };
+                    cell.onmouseleave = () => {
+                        if (!themeMinesweeperRevealed[i][j]) {
+                            cell.style.background = '#c0c0c0';
+                        }
+                    };
                     
                     if (themeMinesweeperRevealed[i][j]) {
-                        cell.style.border = '1px inset #808080';
+                        // Revealed cell styling
+                        cell.style.background = '#e0e0e0';
+                        cell.style.border = '1px solid #a0a0a0';
+                        cell.style.borderTop = '1px solid #a0a0a0';
+                        cell.style.borderLeft = '1px solid #a0a0a0';
+                        cell.style.borderRight = '1px solid #a0a0a0';
+                        cell.style.borderBottom = '1px solid #a0a0a0';
+                        
                         if (themeMinesweeperBoard[i][j] === -1) {
+                            // Mine
                             cell.textContent = '💣';
+                            cell.style.background = '#ff0000';
+                            cell.style.fontSize = Math.max(10, cellSize * 0.6) + 'px';
                         } else if (themeMinesweeperBoard[i][j] > 0) {
+                            // Number
                             cell.textContent = themeMinesweeperBoard[i][j];
+                            cell.style.color = numberColors[themeMinesweeperBoard[i][j]] || '#000000';
+                            cell.style.fontFamily = 'monospace';
+                        } else {
+                            // Empty revealed cell
+                            cell.style.background = '#e0e0e0';
                         }
                     }
                     
                     cell.onclick = () => {
                         if (themeMinesweeperRevealed[i][j]) return;
+                        
+                        // Click animation
+                        cell.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            cell.style.transform = 'scale(1)';
+                        }, 100);
+                        
                         themeMinesweeperRevealed[i][j] = true;
+                        
                         if (themeMinesweeperBoard[i][j] === 0) {
-                            // Reveal adjacent
-                            for (let dr = -1; dr <= 1; dr++) {
-                                for (let dc = -1; dc <= 1; dc++) {
-                                    const nr = i + dr;
-                                    const nc = j + dc;
-                                    if (nr >= 0 && nr < themeMinesweeperSize && nc >= 0 && nc < themeMinesweeperSize && !themeMinesweeperRevealed[nr][nc]) {
-                                        themeMinesweeperRevealed[nr][nc] = true;
+                            // Reveal adjacent cells recursively
+                            const revealAdjacent = (row, col) => {
+                                for (let dr = -1; dr <= 1; dr++) {
+                                    for (let dc = -1; dc <= 1; dc++) {
+                                        const nr = row + dr;
+                                        const nc = col + dc;
+                                        if (nr >= 0 && nr < themeMinesweeperSize && 
+                                            nc >= 0 && nc < themeMinesweeperSize && 
+                                            !themeMinesweeperRevealed[nr][nc]) {
+                                            themeMinesweeperRevealed[nr][nc] = true;
+                                            if (themeMinesweeperBoard[nr][nc] === 0) {
+                                                revealAdjacent(nr, nc);
+                                            }
+                                        }
                                     }
                                 }
-                            }
+                            };
+                            revealAdjacent(i, j);
                         }
+                        
                         renderThemeMinesweeper(); // Re-render
                     };
                     
