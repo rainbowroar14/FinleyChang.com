@@ -385,6 +385,71 @@
             color: #f85149;
         }
         
+        /* Command Bar */
+        .command-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            max-width: 90%;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            z-index: 300;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .command-bar.active {
+            display: flex;
+        }
+        
+        .command-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .command-bar-header h3 {
+            color: #c9d1d9;
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .command-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .command-input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: #c9d1d9;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .command-input:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+        
+        .command-input::placeholder {
+            color: #6e7681;
+        }
+        
+        .command-bar.locked {
+            display: none !important;
+        }
+        
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -1162,6 +1227,18 @@
             <div class="sidebar-btn" id="paintBtn" onclick="togglePaint()">🎨 Paint</div>
         </div>
         
+        <!-- Command Bar -->
+        <div class="command-bar locked" id="commandBar">
+            <div class="command-bar-header">
+                <h3>⌨️ Command Bar</h3>
+                <button class="close-btn" onclick="toggleCommandBar()">×</button>
+            </div>
+            <div class="command-input-container">
+                <input type="text" class="command-input" id="commandInput" placeholder="Type a command... (e.g., COLOR red, SMALL, BIG, NORMAL)" onkeypress="if(event.key === 'Enter') executeCommand()">
+                <button class="chat-send-btn" onclick="executeCommand()">Execute</button>
+            </div>
+        </div>
+        
         <!-- Global Chat -->
         <div class="chat-container" id="globalChat">
             <div class="chat-header">
@@ -1344,7 +1421,8 @@
             FINHUB: 'finhub',
             CHAT: 'chat',
             FRIENDS: 'friends',
-            PAINT: 'paint'
+            PAINT: 'paint',
+            COMMANDBAR: 'commandbar'
         };
         
         const UNLOCK_INFO = {
@@ -1371,6 +1449,12 @@
                 name: 'Paint',
                 description: 'Get one friend to unlock collaborative painting.',
                 color: '#bc8cff'
+            },
+            [UNLOCK_TYPES.COMMANDBAR]: {
+                icon: '⌨️',
+                name: 'Command Bar',
+                description: 'Draw something to unlock the command bar!',
+                color: '#ffa657'
             }
         };
         
@@ -1380,6 +1464,7 @@
         let colorChangeCount = 0;
         let unlockedTextures = new Set(['solid']);
         let currentTexture = 'solid';
+        let hasDrawn = false; // Track if user has drawn to unlock command bar
         
         function initUnlockSystem() {
             const username = localStorage.getItem('loggedInUsername');
@@ -1448,6 +1533,9 @@
                 case UNLOCK_TYPES.PAINT:
                     shouldUnlock = friendCount >= 1;
                     break;
+                case UNLOCK_TYPES.COMMANDBAR:
+                    shouldUnlock = hasDrawn; // Unlock after drawing
+                    break;
             }
             
             if (shouldUnlock) {
@@ -1514,6 +1602,9 @@
                     break;
                 case UNLOCK_TYPES.PAINT:
                     targetElement = document.getElementById('paintBtn');
+                    break;
+                case UNLOCK_TYPES.COMMANDBAR:
+                    targetElement = document.getElementById('commandBar');
                     break;
             }
             
@@ -1593,6 +1684,16 @@
                     };
                 }
             }
+            
+            // Update command bar visibility
+            const commandBar = document.getElementById('commandBar');
+            if (commandBar) {
+                if (unlockedFeatures.has(UNLOCK_TYPES.COMMANDBAR)) {
+                    commandBar.classList.remove('locked');
+                } else {
+                    commandBar.classList.add('locked');
+                }
+            }
         }
         
         function unlockTexture(texture) {
@@ -1603,6 +1704,157 @@
             if (btn) {
                 btn.classList.remove('locked');
                 btn.title = texture.charAt(0).toUpperCase() + texture.slice(1);
+            }
+        }
+        
+        // ============================================
+        // COMMAND BAR SYSTEM
+        // ============================================
+        
+        let titleColorEffect = null; // Track active color effect (matrix, rainbow)
+        let titleSize = 'normal'; // Track current title size
+        
+        function toggleCommandBar() {
+            const commandBar = document.getElementById('commandBar');
+            if (commandBar) {
+                if (commandBar.classList.contains('active')) {
+                    commandBar.classList.remove('active');
+                } else {
+                    commandBar.classList.add('active');
+                    document.getElementById('commandInput').focus();
+                }
+            }
+        }
+        
+        function executeCommand() {
+            const input = document.getElementById('commandInput');
+            const command = input.value.trim().toUpperCase();
+            
+            if (!command) return;
+            
+            // Clear input
+            input.value = '';
+            
+            // Parse command
+            const parts = command.split(/\s+/);
+            const cmd = parts[0];
+            const arg = parts.slice(1).join(' ').toLowerCase();
+            
+            if (cmd === 'COLOR') {
+                handleColorCommand(arg);
+            } else if (cmd === 'SMALL') {
+                handleSizeCommand('small');
+            } else if (cmd === 'BIG') {
+                handleSizeCommand('big');
+            } else if (cmd === 'NORMAL') {
+                if (arg === 'color') {
+                    handleColorCommand('normal');
+                } else {
+                    handleSizeCommand('normal');
+                }
+            } else {
+                alert(`Unknown command: ${cmd}. Try COLOR [color], SMALL, BIG, or NORMAL`);
+            }
+        }
+        
+        function handleColorCommand(colorArg) {
+            const titleContainer = document.getElementById('finhubTitle');
+            if (!titleContainer) return;
+            
+            const letters = titleContainer.querySelectorAll('.title-letter');
+            
+            // Stop any active effects
+            if (titleColorEffect) {
+                clearInterval(titleColorEffect);
+                titleColorEffect = null;
+            }
+            
+            if (colorArg === 'normal' || colorArg === '') {
+                // Reset to default colors
+                letters.forEach((letter, index) => {
+                    const defaultColors = ['#58a6ff', '#f0883e', '#bc8cff', '#3fb950', '#f85149', '#ffa657'];
+                    letter.style.color = defaultColors[index];
+                    letter.style.textShadow = '';
+                });
+            } else if (colorArg === 'matrix') {
+                // Matrix effect - green characters
+                letters.forEach(letter => {
+                    letter.style.color = '#00ff41';
+                });
+                // Add matrix animation
+                titleColorEffect = setInterval(() => {
+                    letters.forEach(letter => {
+                        const brightness = 0.3 + Math.random() * 0.7;
+                        letter.style.textShadow = `0 0 ${5 + Math.random() * 10}px rgba(0, 255, 65, ${brightness})`;
+                    });
+                }, 100);
+            } else if (colorArg === 'rainbow') {
+                // Rainbow effect - cycling colors
+                let hue = 0;
+                titleColorEffect = setInterval(() => {
+                    letters.forEach((letter, index) => {
+                        const letterHue = (hue + index * 60) % 360;
+                        letter.style.color = `hsl(${letterHue}, 100%, 60%)`;
+                    });
+                    hue = (hue + 2) % 360;
+                }, 50);
+            } else {
+                // Regular color - check if hex code or color name
+                let color = colorArg;
+                
+                // If it's a hex code (starts with #)
+                if (!colorArg.startsWith('#')) {
+                    // Try to convert color name to hex
+                    const colorMap = {
+                        'red': '#ff0000',
+                        'green': '#00ff00',
+                        'blue': '#0000ff',
+                        'yellow': '#ffff00',
+                        'orange': '#ffa500',
+                        'purple': '#800080',
+                        'pink': '#ffc0cb',
+                        'cyan': '#00ffff',
+                        'lime': '#00ff00',
+                        'magenta': '#ff00ff',
+                        'white': '#ffffff',
+                        'black': '#000000',
+                        'gray': '#808080',
+                        'grey': '#808080',
+                        'brown': '#a52a2a',
+                        'gold': '#ffd700',
+                        'silver': '#c0c0c0'
+                    };
+                    color = colorMap[colorArg] || colorArg;
+                }
+                
+                // Apply color to all letters
+                letters.forEach(letter => {
+                    letter.style.color = color;
+                    letter.style.textShadow = '';
+                });
+            }
+        }
+        
+        function handleSizeCommand(size) {
+            const titleContainer = document.getElementById('finhubTitle');
+            if (!titleContainer) return;
+            
+            const letters = titleContainer.querySelectorAll('.title-letter');
+            
+            titleSize = size;
+            
+            if (size === 'small') {
+                letters.forEach(letter => {
+                    letter.style.fontSize = '36px';
+                });
+            } else if (size === 'big') {
+                letters.forEach(letter => {
+                    letter.style.fontSize = '120px';
+                });
+            } else if (size === 'normal') {
+                letters.forEach(letter => {
+                    letter.style.fontSize = '72px';
+                });
             }
         }
         
@@ -2204,7 +2456,8 @@
                 brushSize: parseInt(brushSize),
                 texture: currentTexture,
                 points: [{ x, y }],
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                hasMoved: false // Track if mouse moved during drawing
             };
             
             paintCtx.beginPath();
@@ -2221,6 +2474,9 @@
             const color = document.getElementById('colorPicker').value;
             const brushSize = document.getElementById('brushSize').value;
             
+            // Mark that mouse has moved
+            currentStroke.hasMoved = true;
+            
             // Add point to current stroke
             currentStroke.points.push({ x, y });
             currentStroke.color = color;
@@ -2233,19 +2489,23 @@
         
         function drawWithTexture(ctx, color, brushSize, points, texture) {
             ctx.strokeStyle = color;
-            ctx.lineWidth = brushSize;
+            ctx.fillStyle = color;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             
             if (points.length < 2) return;
             
             if (texture === 'solid') {
+                // Solid line - smooth continuous stroke
+                ctx.lineWidth = brushSize;
                 ctx.beginPath();
                 ctx.moveTo(points[0].x, points[0].y);
                 ctx.lineTo(points[1].x, points[1].y);
                 ctx.stroke();
             } else if (texture === 'dots') {
-                const spacing = Math.max(brushSize * 0.5, 3);
+                // Dots - large, well-spaced circular dots
+                const dotSize = brushSize * 0.8;
+                const spacing = brushSize * 1.5; // Much more spacing between dots
                 const dx = points[1].x - points[0].x;
                 const dy = points[1].y - points[0].y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
@@ -2255,29 +2515,38 @@
                     const t = i / Math.max(steps, 1);
                     const x = points[0].x + dx * t;
                     const y = points[0].y + dy * t;
-                    ctx.fillStyle = color;
                     ctx.beginPath();
-                    ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+                    ctx.arc(x, y, dotSize / 2, 0, Math.PI * 2);
                     ctx.fill();
                 }
             } else if (texture === 'lines') {
-                const spacing = Math.max(brushSize * 0.3, 2);
+                // Lines - diagonal hash marks, clearly visible
+                const lineLength = brushSize * 1.2;
+                const spacing = brushSize * 0.8;
                 const dx = points[1].x - points[0].x;
                 const dy = points[1].y - points[0].y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 const steps = Math.floor(dist / spacing);
                 
+                // Calculate perpendicular direction
+                const perpX = -dy / dist;
+                const perpY = dx / dist;
+                
+                ctx.lineWidth = brushSize * 0.4;
                 for (let i = 0; i <= steps; i++) {
                     const t = i / Math.max(steps, 1);
                     const x = points[0].x + dx * t;
                     const y = points[0].y + dy * t;
+                    // Draw diagonal line at 45 degrees
                     ctx.beginPath();
-                    ctx.moveTo(x - dy * 0.3, y + dx * 0.3);
-                    ctx.lineTo(x + dy * 0.3, y - dx * 0.3);
+                    ctx.moveTo(x - lineLength/2 * (perpX + perpY), y - lineLength/2 * (perpY - perpX));
+                    ctx.lineTo(x + lineLength/2 * (perpX + perpY), y + lineLength/2 * (perpY - perpX));
                     ctx.stroke();
                 }
             } else if (texture === 'grid') {
-                const spacing = Math.max(brushSize * 0.4, 3);
+                // Grid - filled squares in a grid pattern
+                const squareSize = brushSize * 0.6;
+                const spacing = brushSize * 1.0;
                 const dx = points[1].x - points[0].x;
                 const dy = points[1].y - points[0].y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
@@ -2287,9 +2556,9 @@
                     const t = i / Math.max(steps, 1);
                     const x = points[0].x + dx * t;
                     const y = points[0].y + dy * t;
+                    // Draw filled square
                     ctx.beginPath();
-                    ctx.rect(x - spacing/2, y - spacing/2, spacing, spacing);
-                    ctx.stroke();
+                    ctx.fillRect(x - squareSize/2, y - squareSize/2, squareSize, squareSize);
                 }
             }
         }
@@ -2297,12 +2566,63 @@
         function stopDrawing() {
             if (isDrawing) {
                 if (currentStroke && currentStroke.points.length > 0) {
+                    // If mouse didn't move (just a click), draw a single point
+                    if (!currentStroke.hasMoved && currentStroke.points.length === 1) {
+                        const point = currentStroke.points[0];
+                        const color = currentStroke.color;
+                        const brushSize = currentStroke.brushSize;
+                        const texture = currentStroke.texture;
+                        
+                        // Draw a single point based on texture
+                        drawSinglePoint(paintCtx, color, brushSize, point, texture);
+                        
+                        // Add a duplicate point so the stroke has 2 points for saving
+                        currentStroke.points.push({ x: point.x, y: point.y });
+                    }
+                    
                     // Save stroke to local array
                     localStrokes.push(currentStroke);
                     currentStroke = null;
+                    
+                    // Mark that user has drawn and check for command bar unlock
+                    if (!hasDrawn) {
+                        hasDrawn = true;
+                        checkUnlock(UNLOCK_TYPES.COMMANDBAR);
+                    }
                 }
                 paintCtx.beginPath();
                 isDrawing = false;
+            }
+        }
+        
+        function drawSinglePoint(ctx, color, brushSize, point, texture) {
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+            
+            if (texture === 'solid') {
+                // Draw a filled circle for solid
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, brushSize / 2, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (texture === 'dots') {
+                // Draw a single dot (same as dots texture)
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, brushSize * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (texture === 'lines') {
+                // Draw a small X or cross for lines
+                const size = brushSize * 0.6;
+                ctx.lineWidth = brushSize * 0.3;
+                ctx.beginPath();
+                ctx.moveTo(point.x - size/2, point.y - size/2);
+                ctx.lineTo(point.x + size/2, point.y + size/2);
+                ctx.moveTo(point.x - size/2, point.y + size/2);
+                ctx.lineTo(point.x + size/2, point.y - size/2);
+                ctx.stroke();
+            } else if (texture === 'grid') {
+                // Draw a filled square for grid
+                const size = brushSize * 0.5;
+                ctx.fillRect(point.x - size/2, point.y - size/2, size, size);
             }
         }
         
@@ -2319,9 +2639,14 @@
                     const color = stroke.color || '#000000';
                     const brushSize = stroke.brushSize || 5;
                     
-                    // Draw stroke with texture
-                    for (let i = 1; i < stroke.points.length; i++) {
-                        drawWithTexture(paintCtx, color, brushSize, [stroke.points[i-1], stroke.points[i]], texture);
+                    // If it's a single point (click without drag), draw it as a point
+                    if (stroke.points.length === 1 || (!stroke.hasMoved && stroke.points.length === 2 && stroke.points[0].x === stroke.points[1].x && stroke.points[0].y === stroke.points[1].y)) {
+                        drawSinglePoint(paintCtx, color, brushSize, stroke.points[0], texture);
+                    } else {
+                        // Draw stroke with texture
+                        for (let i = 1; i < stroke.points.length; i++) {
+                            drawWithTexture(paintCtx, color, brushSize, [stroke.points[i-1], stroke.points[i]], texture);
+                        }
                     }
                 }
             });
