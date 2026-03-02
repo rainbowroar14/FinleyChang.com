@@ -824,6 +824,162 @@
             background: #fff;
         }
         
+        /* Unlock System */
+        .unlock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        .unlock-overlay.active {
+            display: flex;
+        }
+        
+        .unlock-card {
+            position: absolute;
+            width: 300px;
+            height: 200px;
+            background: rgba(22, 27, 34, 0.95);
+            border: 3px solid #fff;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+            text-align: center;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .unlock-card.phase-1 {
+            transform: scale(1);
+            opacity: 1;
+            border-color: #fff;
+            background: rgba(22, 27, 34, 0.95);
+        }
+        
+        .unlock-card.phase-2 {
+            border-color: currentColor;
+            background: rgba(22, 27, 34, 0.95);
+        }
+        
+        .unlock-card.phase-3 {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+        
+        .unlock-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+            filter: brightness(0) invert(1);
+            transition: filter 0.5s ease;
+        }
+        
+        .unlock-card.phase-2 .unlock-icon {
+            filter: none;
+        }
+        
+        .unlock-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff;
+            transition: color 0.5s ease;
+        }
+        
+        .unlock-card.phase-2 .unlock-name {
+            color: currentColor;
+        }
+        
+        .unlock-description {
+            font-size: 14px;
+            color: #8b949e;
+            transition: color 0.5s ease;
+        }
+        
+        .unlock-card.phase-2 .unlock-description {
+            color: #c9d1d9;
+        }
+        
+        .sidebar-btn.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+            position: relative;
+        }
+        
+        .sidebar-btn.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+        }
+        
+        .sidebar-btn.locked:hover {
+            transform: none;
+            background: rgba(22, 27, 34, 0.9);
+            border-color: #30363d;
+        }
+        
+        /* Paint Textures */
+        .texture-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .texture-btn {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #30363d;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #fff;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .texture-btn:hover {
+            border-color: #1f6feb;
+            transform: scale(1.1);
+        }
+        
+        .texture-btn.active {
+            border-color: #1f6feb;
+            border-width: 3px;
+        }
+        
+        .texture-btn.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .texture-btn.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            font-size: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
         /* Invite Friends Modal */
         .invite-modal {
             position: fixed;
@@ -990,11 +1146,20 @@
     
     <!-- Main page with FinHub title -->
     <div class="page hidden" id="mainPage">
+        <!-- Unlock Overlay -->
+        <div class="unlock-overlay" id="unlockOverlay">
+            <div class="unlock-card" id="unlockCard">
+                <div class="unlock-icon" id="unlockIcon">🎉</div>
+                <div class="unlock-name" id="unlockName">Unlocked!</div>
+                <div class="unlock-description" id="unlockDescription">Description</div>
+            </div>
+        </div>
+        
         <!-- Sidebar Buttons -->
         <div class="sidebar-buttons">
-            <div class="sidebar-btn" onclick="toggleChat()">💬 Chat</div>
-            <div class="sidebar-btn" onclick="toggleFriends()">👥 Friends</div>
-            <div class="sidebar-btn" onclick="togglePaint()">🎨 Paint</div>
+            <div class="sidebar-btn" id="chatBtn" onclick="toggleChat()">💬 Chat</div>
+            <div class="sidebar-btn" id="friendsBtn" onclick="toggleFriends()">👥 Friends</div>
+            <div class="sidebar-btn" id="paintBtn" onclick="togglePaint()">🎨 Paint</div>
         </div>
         
         <!-- Global Chat -->
@@ -1057,12 +1222,19 @@
             <div class="paint-tools" id="paintTools" style="display: none;">
                 <div class="tool-group">
                     <label>Color:</label>
-                    <input type="color" class="color-picker" id="colorPicker" value="#000000">
+                    <input type="color" class="color-picker" id="colorPicker" value="#000000" onchange="onColorChange()">
                 </div>
                 <div class="tool-group">
                     <label>Brush Size:</label>
                     <input type="range" class="brush-size" id="brushSize" min="1" max="50" value="5">
                     <span id="brushSizeValue" style="color: #c9d1d9; min-width: 30px;">5</span>
+                </div>
+                <div class="tool-group texture-selector" id="textureSelector">
+                    <label>Texture:</label>
+                    <div class="texture-btn active" data-texture="solid" title="Solid" style="background: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 4px 4px; background-position: 0 0, 2px 2px;"></div>
+                    <div class="texture-btn locked" data-texture="dots" title="Dots (Unlock by changing colors)" style="background: radial-gradient(circle, #000 1px, transparent 1px); background-size: 4px 4px;"></div>
+                    <div class="texture-btn locked" data-texture="lines" title="Lines (Unlock by changing colors)" style="background: repeating-linear-gradient(0deg, #000, #000 1px, transparent 1px, transparent 4px);"></div>
+                    <div class="texture-btn locked" data-texture="grid" title="Grid (Unlock by changing colors)" style="background: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 4px 4px;"></div>
                 </div>
                 <button class="clear-btn" onclick="clearCanvas()">Clear</button>
             </div>
@@ -1176,7 +1348,287 @@
             
             // Initialize chat and friends
             initChatAndFriends();
+            
+            // Initialize unlock system
+            initUnlockSystem();
         });
+        
+        // ============================================
+        // UNLOCK SYSTEM
+        // ============================================
+        
+        const UNLOCK_TYPES = {
+            FINHUB: 'finhub',
+            CHAT: 'chat',
+            FRIENDS: 'friends',
+            PAINT: 'paint'
+        };
+        
+        const UNLOCK_INFO = {
+            [UNLOCK_TYPES.FINHUB]: {
+                icon: '🚀',
+                name: 'FINHUB',
+                description: 'Welcome to FinHub! Click the logo to unlock.',
+                color: '#58a6ff'
+            },
+            [UNLOCK_TYPES.CHAT]: {
+                icon: '💬',
+                name: 'Chat',
+                description: 'Send your first message to unlock global chat.',
+                color: '#1f6feb'
+            },
+            [UNLOCK_TYPES.FRIENDS]: {
+                icon: '👥',
+                name: 'Friends',
+                description: 'Send a chat message to unlock the friends system.',
+                color: '#3fb950'
+            },
+            [UNLOCK_TYPES.PAINT]: {
+                icon: '🎨',
+                name: 'Paint',
+                description: 'Get one friend to unlock collaborative painting.',
+                color: '#bc8cff'
+            }
+        };
+        
+        let unlockedFeatures = new Set();
+        let messageCount = 0;
+        let friendCount = 0;
+        let colorChangeCount = 0;
+        let unlockedTextures = new Set(['solid']);
+        let currentTexture = 'solid';
+        
+        function initUnlockSystem() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
+            if (!username || !database) return;
+            
+            // Load unlocked features from Firebase
+            readFromFirebase(`users/${usernameLower}/unlocks`).then((unlocks) => {
+                if (unlocks) {
+                    Object.keys(unlocks).forEach(feature => {
+                        if (unlocks[feature]) {
+                            unlockedFeatures.add(feature);
+                        }
+                    });
+                }
+                updateUIUnlocks();
+            });
+            
+            // Load stats
+            readFromFirebase(`users/${usernameLower}/stats`).then((stats) => {
+                if (stats) {
+                    messageCount = stats.messageCount || 0;
+                    friendCount = stats.friendCount || 0;
+                    colorChangeCount = stats.colorChangeCount || 0;
+                }
+                
+                // Check texture unlocks
+                if (colorChangeCount >= 1) unlockTexture('dots');
+                if (colorChangeCount >= 3) unlockTexture('lines');
+                if (colorChangeCount >= 5) unlockTexture('grid');
+            });
+            
+            // Set up FINHUB logo click
+            const finhubTitle = document.getElementById('finhubTitle');
+            if (finhubTitle) {
+                finhubTitle.style.cursor = 'pointer';
+                finhubTitle.addEventListener('click', () => {
+                    checkUnlock(UNLOCK_TYPES.FINHUB);
+                });
+            }
+        }
+        
+        function checkUnlock(type) {
+            if (unlockedFeatures.has(type)) return;
+            
+            let shouldUnlock = false;
+            
+            switch(type) {
+                case UNLOCK_TYPES.FINHUB:
+                    shouldUnlock = true; // Always unlock on click
+                    break;
+                case UNLOCK_TYPES.CHAT:
+                    shouldUnlock = messageCount >= 1;
+                    break;
+                case UNLOCK_TYPES.FRIENDS:
+                    shouldUnlock = messageCount >= 1;
+                    break;
+                case UNLOCK_TYPES.PAINT:
+                    shouldUnlock = friendCount >= 1;
+                    break;
+            }
+            
+            if (shouldUnlock) {
+                unlockFeature(type);
+            }
+        }
+        
+        function unlockFeature(type) {
+            if (unlockedFeatures.has(type)) return;
+            
+            unlockedFeatures.add(type);
+            
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
+            
+            // Save to Firebase
+            if (database && usernameLower) {
+                writeToFirebase(`users/${usernameLower}/unlocks/${type}`, true);
+            }
+            
+            // Show unlock animation
+            showUnlockAnimation(type);
+            
+            // Update UI
+            updateUIUnlocks();
+        }
+        
+        function showUnlockAnimation(type) {
+            const info = UNLOCK_INFO[type];
+            if (!info) return;
+            
+            const overlay = document.getElementById('unlockOverlay');
+            const card = document.getElementById('unlockCard');
+            const icon = document.getElementById('unlockIcon');
+            const name = document.getElementById('unlockName');
+            const desc = document.getElementById('unlockDescription');
+            
+            icon.textContent = info.icon;
+            name.textContent = info.name;
+            desc.textContent = info.description;
+            card.style.color = info.color;
+            
+            overlay.classList.add('active');
+            card.className = 'unlock-card phase-1';
+            
+            // Get target element position
+            let targetElement = null;
+            let targetPosition = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            
+            switch(type) {
+                case UNLOCK_TYPES.FINHUB:
+                    targetElement = document.getElementById('finhubTitle');
+                    break;
+                case UNLOCK_TYPES.CHAT:
+                    targetElement = document.getElementById('chatBtn');
+                    break;
+                case UNLOCK_TYPES.FRIENDS:
+                    targetElement = document.getElementById('friendsBtn');
+                    break;
+                case UNLOCK_TYPES.PAINT:
+                    targetElement = document.getElementById('paintBtn');
+                    break;
+            }
+            
+            if (targetElement) {
+                const rect = targetElement.getBoundingClientRect();
+                targetPosition = {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2
+                };
+            }
+            
+            // Phase 1: Show white outline (0.5s)
+            setTimeout(() => {
+                card.classList.add('phase-2');
+            }, 500);
+            
+            // Phase 2: Fade to color (0.5s)
+            setTimeout(() => {
+                // Phase 3: Glide to position
+                card.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                card.style.left = targetPosition.x + 'px';
+                card.style.top = targetPosition.y + 'px';
+                card.style.transform = 'translate(-50%, -50%) scale(0.3)';
+                card.style.opacity = '0';
+            }, 1000);
+            
+            // Hide overlay
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                card.className = 'unlock-card';
+                card.style.transition = 'all 0.5s ease';
+                card.style.left = '';
+                card.style.top = '';
+                card.style.transform = '';
+                card.style.opacity = '';
+            }, 1800);
+        }
+        
+        function updateUIUnlocks() {
+            const chatBtn = document.getElementById('chatBtn');
+            const friendsBtn = document.getElementById('friendsBtn');
+            const paintBtn = document.getElementById('paintBtn');
+            
+            if (chatBtn) {
+                if (unlockedFeatures.has(UNLOCK_TYPES.CHAT)) {
+                    chatBtn.classList.remove('locked');
+                    chatBtn.onclick = toggleChat;
+                } else {
+                    chatBtn.classList.add('locked');
+                    chatBtn.onclick = () => {
+                        alert('Unlock Chat by sending your first message!');
+                    };
+                }
+            }
+            
+            if (friendsBtn) {
+                if (unlockedFeatures.has(UNLOCK_TYPES.FRIENDS)) {
+                    friendsBtn.classList.remove('locked');
+                    friendsBtn.onclick = toggleFriends;
+                } else {
+                    friendsBtn.classList.add('locked');
+                    friendsBtn.onclick = () => {
+                        alert('Unlock Friends by sending a chat message!');
+                    };
+                }
+            }
+            
+            if (paintBtn) {
+                if (unlockedFeatures.has(UNLOCK_TYPES.PAINT)) {
+                    paintBtn.classList.remove('locked');
+                    paintBtn.onclick = togglePaint;
+                } else {
+                    paintBtn.classList.add('locked');
+                    paintBtn.onclick = () => {
+                        alert('Unlock Paint by getting one friend!');
+                    };
+                }
+            }
+        }
+        
+        function unlockTexture(texture) {
+            if (unlockedTextures.has(texture)) return;
+            
+            unlockedTextures.add(texture);
+            const btn = document.querySelector(`.texture-btn[data-texture="${texture}"]`);
+            if (btn) {
+                btn.classList.remove('locked');
+                btn.title = texture.charAt(0).toUpperCase() + texture.slice(1);
+            }
+        }
+        
+        function onColorChange() {
+            colorChangeCount++;
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
+            
+            if (database && usernameLower) {
+                writeToFirebase(`users/${usernameLower}/stats/colorChangeCount`, colorChangeCount);
+            }
+            
+            // Unlock textures based on color changes
+            if (colorChangeCount >= 1 && !unlockedTextures.has('dots')) {
+                unlockTexture('dots');
+            }
+            if (colorChangeCount >= 3 && !unlockedTextures.has('lines')) {
+                unlockTexture('lines');
+            }
+            if (colorChangeCount >= 5 && !unlockedTextures.has('grid')) {
+                unlockTexture('grid');
+            }
+        }
         
         // ============================================
         // CHAT AND FRIENDS SYSTEM
@@ -1191,6 +1643,9 @@
             const username = localStorage.getItem('loggedInUsername');
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
             if (!username || !database) return;
+            
+            // Initialize unlock system
+            initUnlockSystem();
             
             // Load friend requests
             loadFriendRequests();
@@ -1281,6 +1736,7 @@
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
             
             if (!message || !username || !database) return;
             
@@ -1292,6 +1748,18 @@
             
             pushToFirebase('messages', messageData).then(() => {
                 input.value = '';
+                
+                // Track message count and check unlocks
+                messageCount++;
+                if (database && usernameLower) {
+                    writeToFirebase(`users/${usernameLower}/stats/messageCount`, messageCount);
+                }
+                
+                // Check unlocks
+                if (messageCount === 1) {
+                    checkUnlock(UNLOCK_TYPES.CHAT);
+                    checkUnlock(UNLOCK_TYPES.FRIENDS);
+                }
             });
         }
         
@@ -1522,8 +1990,9 @@
         
         // Accept Friend Request
         function acceptFriendRequest(fromUsernameLower, displayName) {
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
-            if (!usernameLower || !database) return;
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
+            if (!username || !database) return;
             
             // Add to both users' friends lists (use lowercase for storage)
             writeToFirebase(`friends/${usernameLower}/${fromUsernameLower}`, {
@@ -1531,7 +2000,7 @@
                 usernameLower: fromUsernameLower
             });
             writeToFirebase(`friends/${fromUsernameLower}/${usernameLower}`, {
-                username: localStorage.getItem('loggedInUsername'),
+                username: username,
                 usernameLower: usernameLower
             });
             
@@ -1539,6 +2008,19 @@
             deleteFromFirebase(`friendRequests/${usernameLower}/${fromUsernameLower}`).then(() => {
                 loadFriends();
                 loadFriendRequests(); // Refresh the requests list
+                
+                // Track friend count and check unlocks
+                readFromFirebase(`friends/${usernameLower}`).then((friends) => {
+                    friendCount = friends ? Object.keys(friends).length : 0;
+                    if (database && usernameLower) {
+                        writeToFirebase(`users/${usernameLower}/stats/friendCount`, friendCount);
+                    }
+                    
+                    // Check paint unlock
+                    if (friendCount >= 1) {
+                        checkUnlock(UNLOCK_TYPES.PAINT);
+                    }
+                });
             });
         }
         
@@ -1757,7 +2239,51 @@
             paintCanvas.addEventListener('mousedown', startDrawing);
             paintCanvas.addEventListener('mousemove', draw);
             paintCanvas.addEventListener('mouseup', stopDrawing);
-            paintCanvas.addEventListener('mouseout', stopDrawing);
+            paintCanvas.addEventListener('mouseleave', stopDrawing);
+            
+            // Touch events for mobile
+            paintCanvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                paintCanvas.dispatchEvent(mouseEvent);
+            });
+            
+            paintCanvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                paintCanvas.dispatchEvent(mouseEvent);
+            });
+            
+            paintCanvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('mouseup', {});
+                paintCanvas.dispatchEvent(mouseEvent);
+            });
+            
+            paintCanvas.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                stopDrawing();
+            });
+            
+            // Set up texture selector
+            const textureBtns = document.querySelectorAll('.texture-btn');
+            textureBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.classList.contains('locked')) return;
+                    
+                    textureBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTexture = btn.dataset.texture;
+                });
+            });
             
             // Update brush size display
             const brushSize = document.getElementById('brushSize');
@@ -1815,12 +2341,10 @@
             currentStroke.points.push({ x, y });
             currentStroke.color = color;
             currentStroke.brushSize = parseInt(brushSize);
+            currentStroke.texture = currentTexture;
             
-            // Draw locally
-            paintCtx.strokeStyle = color;
-            paintCtx.lineWidth = brushSize;
-            paintCtx.lineTo(x, y);
-            paintCtx.stroke();
+            // Draw locally with texture
+            drawWithTexture(paintCtx, color, brushSize, currentStroke.points.slice(-2), currentTexture);
             
             // Sync to Firebase (throttle updates)
             if (currentStroke.points.length % 3 === 0 || currentStroke.points.length === 2) {
@@ -1828,11 +2352,76 @@
             }
         }
         
+        function drawWithTexture(ctx, color, brushSize, points, texture) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            if (points.length < 2) return;
+            
+            if (texture === 'solid') {
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                ctx.lineTo(points[1].x, points[1].y);
+                ctx.stroke();
+            } else if (texture === 'dots') {
+                const spacing = Math.max(brushSize * 0.5, 3);
+                const dx = points[1].x - points[0].x;
+                const dy = points[1].y - points[0].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const steps = Math.floor(dist / spacing);
+                
+                for (let i = 0; i <= steps; i++) {
+                    const t = i / Math.max(steps, 1);
+                    const x = points[0].x + dx * t;
+                    const y = points[0].y + dy * t;
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (texture === 'lines') {
+                const spacing = Math.max(brushSize * 0.3, 2);
+                const dx = points[1].x - points[0].x;
+                const dy = points[1].y - points[0].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const steps = Math.floor(dist / spacing);
+                
+                for (let i = 0; i <= steps; i++) {
+                    const t = i / Math.max(steps, 1);
+                    const x = points[0].x + dx * t;
+                    const y = points[0].y + dy * t;
+                    ctx.beginPath();
+                    ctx.moveTo(x - dy * 0.3, y + dx * 0.3);
+                    ctx.lineTo(x + dy * 0.3, y - dx * 0.3);
+                    ctx.stroke();
+                }
+            } else if (texture === 'grid') {
+                const spacing = Math.max(brushSize * 0.4, 3);
+                const dx = points[1].x - points[0].x;
+                const dy = points[1].y - points[0].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const steps = Math.floor(dist / spacing);
+                
+                for (let i = 0; i <= steps; i++) {
+                    const t = i / Math.max(steps, 1);
+                    const x = points[0].x + dx * t;
+                    const y = points[0].y + dy * t;
+                    ctx.beginPath();
+                    ctx.rect(x - spacing/2, y - spacing/2, spacing, spacing);
+                    ctx.stroke();
+                }
+            }
+        }
+        
         function stopDrawing() {
-            if (isDrawing && currentStroke) {
-                // Final sync
-                syncStrokeToFirebase();
-                currentStroke = null;
+            if (isDrawing) {
+                if (currentStroke) {
+                    // Final sync
+                    syncStrokeToFirebase();
+                    currentStroke = null;
+                }
                 paintCtx.beginPath();
                 isDrawing = false;
             }
@@ -1900,18 +2489,14 @@
         function drawStrokeOnCanvas(stroke) {
             if (!paintCtx || !stroke.points || stroke.points.length === 0) return;
             
-            paintCtx.beginPath();
-            paintCtx.strokeStyle = stroke.color || '#000000';
-            paintCtx.lineWidth = stroke.brushSize || 5;
-            paintCtx.lineCap = 'round';
-            paintCtx.lineJoin = 'round';
+            const texture = stroke.texture || 'solid';
+            const color = stroke.color || '#000000';
+            const brushSize = stroke.brushSize || 5;
             
-            // Draw the stroke
-            paintCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+            // Draw stroke with texture
             for (let i = 1; i < stroke.points.length; i++) {
-                paintCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                drawWithTexture(paintCtx, color, brushSize, [stroke.points[i-1], stroke.points[i]], texture);
             }
-            paintCtx.stroke();
         }
         
         function loadPaintCanvas() {
