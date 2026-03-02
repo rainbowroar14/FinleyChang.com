@@ -1453,15 +1453,43 @@
         
         // Accept Paint Invite
         function acceptPaintInvite(fromUsernameLower, displayName) {
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
             if (!usernameLower || !database) return;
             
-            // Remove invite
-            deleteFromFirebase(`paintInvites/${usernameLower}/${fromUsernameLower}`).then(() => {
-                // Open paint game
-                togglePaint();
-                startPaintGame();
-                loadFriendRequests(); // Refresh requests
+            // Find the paint session from the invite
+            readFromFirebase(`paintInvites/${usernameLower}/${fromUsernameLower}`).then((invite) => {
+                if (invite && invite.sessionId) {
+                    // Join existing session
+                    currentPaintSession = invite.sessionId;
+                    
+                    // Add user to session participants
+                    readFromFirebase(`paintSessions/${currentPaintSession}`).then((session) => {
+                        if (session) {
+                            const participants = session.participants || {};
+                            participants[usernameLower] = username;
+                            updateFirebase(`paintSessions/${currentPaintSession}`, { participants });
+                        }
+                    });
+                } else {
+                    // If no session ID, create a new one (fallback)
+                    currentPaintSession = `paint_${Date.now()}_${usernameLower}`;
+                    writeToFirebase(`paintSessions/${currentPaintSession}`, {
+                        createdBy: username,
+                        createdByLower: usernameLower,
+                        createdAt: Date.now(),
+                        participants: { [usernameLower]: username }
+                    });
+                }
+                
+                // Remove invite
+                deleteFromFirebase(`paintInvites/${usernameLower}/${fromUsernameLower}`).then(() => {
+                    // Open paint game
+                    togglePaint();
+                    // Start game will load canvas and listen for strokes
+                    startPaintGame();
+                    loadFriendRequests(); // Refresh requests
+                });
             });
         }
         
@@ -1646,6 +1674,10 @@
         let paintCanvas, paintCtx;
         let isDrawing = false;
         let selectedFriendsForInvite = [];
+        let currentPaintSession = null;
+        let paintSessionListener = null;
+        let currentStroke = null;
+        let drawnStrokes = new Set();
         
         // Toggle Paint Game
         function togglePaint() {
@@ -1656,6 +1688,11 @@
             
             if (paint.classList.contains('active')) {
                 paint.classList.remove('active');
+                // Clean up listeners when closing
+                if (paintSessionListener) {
+                    paintSessionListener.off('value');
+                    paintSessionListener = null;
+                }
             } else {
                 paint.classList.add('active');
                 chat.classList.remove('active');
@@ -1684,6 +1721,21 @@
                 paintCtx.lineJoin = 'round';
             }
             
+            // Create or join paint session
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
+            
+            if (!currentPaintSession) {
+                // Create new session
+                currentPaintSession = `paint_${Date.now()}_${usernameLower}`;
+                writeToFirebase(`paintSessions/${currentPaintSession}`, {
+                    createdBy: username,
+                    createdByLower: usernameLower,
+                    createdAt: Date.now(),
+                    participants: { [usernameLower]: username }
+                });
+            }
+            
             // Set up drawing event listeners
             paintCanvas.addEventListener('mousedown', startDrawing);
             paintCanvas.addEventListener('mousemove', draw);
@@ -1696,38 +1748,191 @@
             brushSize.addEventListener('input', (e) => {
                 brushSizeValue.textContent = e.target.value;
             });
+            
+            // Load existing canvas state
+            loadPaintCanvas();
+            
+            // Listen for strokes from other users
+            listenToPaintStrokes();
         }
         
         function startDrawing(e) {
+            if (!currentPaintSession || !database) return;
+            
             isDrawing = true;
             const rect = paintCanvas.getBoundingClientRect();
-            paintCtx.beginPath();
-            paintCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        }
-        
-        function draw(e) {
-            if (!isDrawing) return;
-            const rect = paintCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
             const color = document.getElementById('colorPicker').value;
             const brushSize = document.getElementById('brushSize').value;
             
+            // Start new stroke
+            currentStroke = {
+                id: `stroke_${Date.now()}_${Math.random()}`,
+                username: username,
+                usernameLower: usernameLower,
+                color: color,
+                brushSize: parseInt(brushSize),
+                points: [{ x, y }],
+                timestamp: Date.now()
+            };
+            
+            paintCtx.beginPath();
+            paintCtx.moveTo(x, y);
+        }
+        
+        function draw(e) {
+            if (!isDrawing || !currentStroke) return;
+            
+            const rect = paintCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const color = document.getElementById('colorPicker').value;
+            const brushSize = document.getElementById('brushSize').value;
+            
+            // Add point to current stroke
+            currentStroke.points.push({ x, y });
+            currentStroke.color = color;
+            currentStroke.brushSize = parseInt(brushSize);
+            
+            // Draw locally
             paintCtx.strokeStyle = color;
             paintCtx.lineWidth = brushSize;
-            paintCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            paintCtx.lineTo(x, y);
             paintCtx.stroke();
+            
+            // Sync to Firebase (throttle updates)
+            if (currentStroke.points.length % 3 === 0 || currentStroke.points.length === 2) {
+                syncStrokeToFirebase();
+            }
         }
         
         function stopDrawing() {
-            if (isDrawing) {
+            if (isDrawing && currentStroke) {
+                // Final sync
+                syncStrokeToFirebase();
+                currentStroke = null;
                 paintCtx.beginPath();
                 isDrawing = false;
             }
         }
         
-        function clearCanvas() {
-            if (paintCtx) {
-                paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+        function syncStrokeToFirebase() {
+            if (!currentStroke || !currentPaintSession || !database) return;
+            
+            // Mark as drawn so we don't redraw our own stroke
+            drawnStrokes.add(currentStroke.id);
+            
+            // Update stroke in Firebase
+            writeToFirebase(`paintSessions/${currentPaintSession}/strokes/${currentStroke.id}`, currentStroke);
+        }
+        
+        function listenToPaintStrokes() {
+            if (!currentPaintSession || !database) return;
+            
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            
+            // Stop previous listener
+            if (paintSessionListener) {
+                paintSessionListener.off('value');
             }
+            
+            // Reset drawn strokes when starting new session
+            drawnStrokes.clear();
+            
+            // Mark all currently loaded strokes as drawn
+            readFromFirebase(`paintSessions/${currentPaintSession}/strokes`).then((strokes) => {
+                if (strokes) {
+                    Object.keys(strokes).forEach(strokeId => {
+                        drawnStrokes.add(strokeId);
+                    });
+                }
+            });
+            
+            // Listen for new strokes
+            paintSessionListener = listenToFirebase(`paintSessions/${currentPaintSession}/strokes`, (strokes) => {
+                if (!strokes) {
+                    // Canvas was cleared
+                    paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+                    drawnStrokes.clear();
+                    return;
+                }
+                
+                // Draw new strokes only (avoid redrawing everything)
+                Object.entries(strokes).forEach(([strokeId, stroke]) => {
+                    // Skip if we've already drawn this stroke
+                    if (drawnStrokes.has(strokeId)) return;
+                    
+                    // Skip if it's our own stroke (we already drew it locally)
+                    if (stroke.usernameLower === usernameLower) {
+                        drawnStrokes.add(strokeId);
+                        return;
+                    }
+                    
+                    // Draw the stroke
+                    drawStrokeOnCanvas(stroke);
+                    drawnStrokes.add(strokeId);
+                });
+            });
+        }
+        
+        function drawStrokeOnCanvas(stroke) {
+            if (!paintCtx || !stroke.points || stroke.points.length === 0) return;
+            
+            paintCtx.beginPath();
+            paintCtx.strokeStyle = stroke.color || '#000000';
+            paintCtx.lineWidth = stroke.brushSize || 5;
+            paintCtx.lineCap = 'round';
+            paintCtx.lineJoin = 'round';
+            
+            // Draw the stroke
+            paintCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+            for (let i = 1; i < stroke.points.length; i++) {
+                paintCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+            }
+            paintCtx.stroke();
+        }
+        
+        function loadPaintCanvas() {
+            if (!currentPaintSession || !database) return;
+            
+            // Load all existing strokes
+            readFromFirebase(`paintSessions/${currentPaintSession}/strokes`).then((strokes) => {
+                if (!strokes) {
+                    // Clear canvas if no strokes
+                    paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+                    return;
+                }
+                
+                // Clear canvas first
+                paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+                
+                // Draw all strokes in order
+                const strokeArray = Object.values(strokes).sort((a, b) => a.timestamp - b.timestamp);
+                strokeArray.forEach(stroke => {
+                    drawStrokeOnCanvas(stroke);
+                });
+            });
+        }
+        
+        function clearCanvas() {
+            if (!paintCtx || !currentPaintSession || !database) return;
+            
+            // Clear locally
+            paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+            
+            // Clear in Firebase (delete all strokes)
+            readFromFirebase(`paintSessions/${currentPaintSession}/strokes`).then((strokes) => {
+                if (strokes) {
+                    Object.keys(strokes).forEach(strokeId => {
+                        deleteFromFirebase(`paintSessions/${currentPaintSession}/strokes/${strokeId}`);
+                    });
+                }
+            });
         }
         
         // Open Invite Modal
@@ -1799,13 +2004,25 @@
             
             if (!username || !database) return;
             
-            // Send invite to each selected friend
+            // Make sure we have a paint session
+            if (!currentPaintSession) {
+                currentPaintSession = `paint_${Date.now()}_${usernameLower}`;
+                writeToFirebase(`paintSessions/${currentPaintSession}`, {
+                    createdBy: username,
+                    createdByLower: usernameLower,
+                    createdAt: Date.now(),
+                    participants: { [usernameLower]: username }
+                });
+            }
+            
+            // Send invite to each selected friend (include session ID)
             const promises = selectedFriendsForInvite.map(friendUsernameLower => {
                 return writeToFirebase(`paintInvites/${friendUsernameLower}/${usernameLower}`, {
                     from: username,
                     fromLower: usernameLower,
                     toLower: friendUsernameLower,
                     type: 'paint',
+                    sessionId: currentPaintSession,
                     timestamp: Date.now()
                 });
             });
