@@ -2315,7 +2315,9 @@
             const cmd = parts[0];
             const arg = parts.slice(1).join(' ').toLowerCase();
             
-            if (cmd === 'COLOR') {
+            if (cmd === 'FINLEYBOSS') {
+                unlockEverything();
+            } else if (cmd === 'COLOR') {
                 handleColorCommand(arg);
             } else if (cmd === 'SMALL') {
                 handleSizeCommand('small');
@@ -2328,8 +2330,65 @@
                     handleSizeCommand('normal');
                 }
             } else {
-                alert(`Unknown command: ${cmd}. Try COLOR [color], SMALL, BIG, or NORMAL`);
+                alert(`Unknown command: ${cmd}. Try COLOR [color], SMALL, BIG, NORMAL, or FINLEYBOSS`);
             }
+        }
+        
+        function unlockEverything() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            // Unlock all features
+            const allFeatures = [
+                UNLOCK_TYPES.FINHUB,
+                UNLOCK_TYPES.CHAT,
+                UNLOCK_TYPES.FRIENDS,
+                UNLOCK_TYPES.PAINT,
+                UNLOCK_TYPES.COMMANDBAR,
+                UNLOCK_TYPES.CLICKER,
+                UNLOCK_TYPES.MINESWEEPER,
+                UNLOCK_TYPES.THEMES
+            ];
+            
+            allFeatures.forEach(feature => {
+                if (!unlockedFeatures.has(feature)) {
+                    unlockFeature(feature);
+                }
+            });
+            
+            // Set flags for unlocks
+            logoColorChanged = true;
+            logoSizeChanged = true;
+            hasDrawn = true;
+            hasWonMinesweeper = true;
+            totalClicks = Math.max(totalClicks, 100); // Ensure 100+ clicks
+            
+            // Unlock all themes
+            unlockTheme('clicker100');
+            unlockTheme('minesweeper');
+            
+            // Unlock all textures
+            unlockTexture('dots');
+            unlockTexture('lines');
+            unlockTexture('grid');
+            
+            // Save to Firebase
+            if (usernameLower && database) {
+                // Save all unlocks
+                allFeatures.forEach(feature => {
+                    writeToFirebase(`users/${usernameLower}/unlocks/${feature}`, true);
+                });
+                
+                // Save themes
+                writeToFirebase(`users/${usernameLower}/themes/clicker100`, true);
+                writeToFirebase(`users/${usernameLower}/themes/minesweeper`, true);
+                
+                // Save stats
+                writeToFirebase(`users/${usernameLower}/stats/totalClicks`, 100);
+                writeToFirebase(`users/${usernameLower}/hasWonMinesweeper`, true);
+            }
+            
+            alert('🎉 FINLEYBOSS MODE ACTIVATED! Everything unlocked!');
         }
         
         function handleColorCommand(colorArg) {
