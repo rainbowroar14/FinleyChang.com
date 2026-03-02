@@ -1001,6 +1001,191 @@
             border-color: #30363d;
         }
         
+        /* Game Containers */
+        .game-container {
+            position: fixed;
+            left: 180px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 600px;
+            max-height: 80vh;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+        }
+        
+        .game-container.active {
+            display: flex;
+        }
+        
+        .game-header {
+            padding: 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .game-header h3 {
+            color: #c9d1d9;
+            margin: 0;
+        }
+        
+        .game-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* Clicker Game */
+        .clicker-display {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .clicker-score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 30px;
+        }
+        
+        .clicker-button {
+            padding: 20px 40px;
+            font-size: 24px;
+            background: #238636;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s, background 0.1s;
+        }
+        
+        .clicker-button:hover {
+            background: #2ea043;
+            transform: scale(1.05);
+        }
+        
+        .clicker-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Leaderboard */
+        .leaderboard-section {
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+        }
+        
+        .leaderboard-section h4 {
+            color: #c9d1d9;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        
+        .leaderboard-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .leaderboard-item {
+            padding: 10px;
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .leaderboard-item .rank {
+            color: #8b949e;
+            font-weight: bold;
+            min-width: 30px;
+        }
+        
+        .leaderboard-item .username {
+            color: #c9d1d9;
+            flex: 1;
+        }
+        
+        .leaderboard-item .score {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        
+        /* Minesweeper */
+        .minesweeper-controls {
+            margin-bottom: 20px;
+        }
+        
+        .minesweeper-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 6px;
+            color: #c9d1d9;
+        }
+        
+        .minesweeper-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            background: #30363d;
+            padding: 2px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .minesweeper-cell {
+            aspect-ratio: 1;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            user-select: none;
+            transition: background 0.1s;
+        }
+        
+        .minesweeper-cell:hover {
+            background: #30363d;
+        }
+        
+        .minesweeper-cell.revealed {
+            background: #161b22;
+            cursor: default;
+        }
+        
+        .minesweeper-cell.mine {
+            background: #f85149;
+        }
+        
+        .minesweeper-cell.flagged {
+            background: #ffa657;
+        }
+        
+        .minesweeper-cell.number-1 { color: #58a6ff; }
+        .minesweeper-cell.number-2 { color: #3fb950; }
+        .minesweeper-cell.number-3 { color: #f85149; }
+        .minesweeper-cell.number-4 { color: #bc8cff; }
+        .minesweeper-cell.number-5 { color: #f0883e; }
+        .minesweeper-cell.number-6 { color: #ffa657; }
+        .minesweeper-cell.number-7 { color: #c9d1d9; }
+        .minesweeper-cell.number-8 { color: #8b949e; }
+        
         /* Paint Textures */
         .texture-selector {
             display: flex;
@@ -1229,6 +1414,8 @@
             <div class="sidebar-btn" id="chatBtn" onclick="toggleChat()">💬 Chat</div>
             <div class="sidebar-btn" id="friendsBtn" onclick="toggleFriends()">👥 Friends</div>
             <div class="sidebar-btn" id="paintBtn" onclick="togglePaint()">🎨 Paint</div>
+            <div class="sidebar-btn" id="clickerBtn" onclick="toggleClicker()">🖱️ Clicker</div>
+            <div class="sidebar-btn" id="minesweeperBtn" onclick="toggleMinesweeper()">💣 Minesweeper</div>
         </div>
         
         <!-- Command Bar -->
@@ -1319,6 +1506,49 @@
             </div>
         </div>
         
+        <!-- Clicker Game -->
+        <div class="game-container" id="clickerContainer">
+            <div class="game-header">
+                <h3>🖱️ Clicker Game</h3>
+                <button class="close-btn" onclick="toggleClicker()">×</button>
+            </div>
+            <div class="game-content">
+                <div class="clicker-display">
+                    <div class="clicker-score" id="clickerScore">0</div>
+                    <button class="clicker-button" id="clickerButton" onclick="clickClicker()">Click Me!</button>
+                </div>
+                <div class="leaderboard-section">
+                    <h4>Leaderboard</h4>
+                    <div class="leaderboard-list" id="clickerLeaderboard">
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Minesweeper Game -->
+        <div class="game-container" id="minesweeperContainer">
+            <div class="game-header">
+                <h3>💣 Minesweeper</h3>
+                <button class="close-btn" onclick="toggleMinesweeper()">×</button>
+            </div>
+            <div class="game-content">
+                <div class="minesweeper-controls">
+                    <div class="minesweeper-info">
+                        <div>Mines: <span id="minesCount">10</span></div>
+                        <div>Time: <span id="minesweeperTime">0</span>s</div>
+                        <button class="paint-btn" onclick="resetMinesweeper()">Reset</button>
+                    </div>
+                </div>
+                <div class="minesweeper-board" id="minesweeperBoard"></div>
+                <div class="leaderboard-section">
+                    <h4>Best Times</h4>
+                    <div class="leaderboard-list" id="minesweeperLeaderboard">
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <!-- Private Chat -->
         <div class="private-chat-container" id="privateChat">
@@ -1357,7 +1587,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.2.0';
+        const APP_VERSION = '1.3.0';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -1422,7 +1652,9 @@
             CHAT: 'chat',
             FRIENDS: 'friends',
             PAINT: 'paint',
-            COMMANDBAR: 'commandbar'
+            COMMANDBAR: 'commandbar',
+            CLICKER: 'clicker',
+            MINESWEEPER: 'minesweeper'
         };
         
         const UNLOCK_INFO = {
@@ -1455,6 +1687,18 @@
                 name: 'Command Bar',
                 description: 'Draw something to unlock the command bar!',
                 color: '#ffa657'
+            },
+            [UNLOCK_TYPES.CLICKER]: {
+                icon: '🖱️',
+                name: 'Clicker Game',
+                description: 'Change your logo color to unlock the clicker game!',
+                color: '#f0883e'
+            },
+            [UNLOCK_TYPES.MINESWEEPER]: {
+                icon: '💣',
+                name: 'Minesweeper',
+                description: 'Change your logo size to unlock minesweeper!',
+                color: '#f85149'
             }
         };
         
@@ -1465,6 +1709,8 @@
         let unlockedTextures = new Set(['solid']);
         let currentTexture = 'solid';
         let hasDrawn = false; // Track if user has drawn to unlock command bar
+        let logoColorChanged = false; // Track if logo color has been changed
+        let logoSizeChanged = false; // Track if logo size has been changed
         
         function initUnlockSystem() {
             const username = localStorage.getItem('loggedInUsername');
@@ -1536,6 +1782,12 @@
                 case UNLOCK_TYPES.COMMANDBAR:
                     shouldUnlock = hasDrawn; // Unlock after drawing
                     break;
+                case UNLOCK_TYPES.CLICKER:
+                    shouldUnlock = logoColorChanged; // Unlock after changing logo color
+                    break;
+                case UNLOCK_TYPES.MINESWEEPER:
+                    shouldUnlock = logoSizeChanged; // Unlock after changing logo size
+                    break;
             }
             
             if (shouldUnlock) {
@@ -1605,6 +1857,12 @@
                     break;
                 case UNLOCK_TYPES.COMMANDBAR:
                     targetElement = document.getElementById('commandBar');
+                    break;
+                case UNLOCK_TYPES.CLICKER:
+                    targetElement = document.getElementById('clickerBtn');
+                    break;
+                case UNLOCK_TYPES.MINESWEEPER:
+                    targetElement = document.getElementById('minesweeperBtn');
                     break;
             }
             
@@ -1697,6 +1955,34 @@
                 } else {
                     commandBar.classList.add('locked');
                     commandBar.classList.remove('active');
+                }
+            }
+            
+            // Update clicker button
+            const clickerBtn = document.getElementById('clickerBtn');
+            if (clickerBtn) {
+                if (unlockedFeatures.has(UNLOCK_TYPES.CLICKER)) {
+                    clickerBtn.classList.remove('locked');
+                    clickerBtn.onclick = toggleClicker;
+                } else {
+                    clickerBtn.classList.add('locked');
+                    clickerBtn.onclick = () => {
+                        alert('Unlock Clicker by changing your logo color!');
+                    };
+                }
+            }
+            
+            // Update minesweeper button
+            const minesweeperBtn = document.getElementById('minesweeperBtn');
+            if (minesweeperBtn) {
+                if (unlockedFeatures.has(UNLOCK_TYPES.MINESWEEPER)) {
+                    minesweeperBtn.classList.remove('locked');
+                    minesweeperBtn.onclick = toggleMinesweeper;
+                } else {
+                    minesweeperBtn.classList.add('locked');
+                    minesweeperBtn.onclick = () => {
+                        alert('Unlock Minesweeper by changing your logo size!');
+                    };
                 }
             }
         }
@@ -1812,6 +2098,7 @@
                     letter.style.color = defaultColors[index];
                     letter.style.textShadow = '';
                 });
+                // Don't mark as changed when resetting to normal
             } else if (colorArg === 'matrix') {
                 // Matrix effect - green characters
                 letters.forEach(letter => {
@@ -1868,6 +2155,18 @@
                     letter.style.color = color;
                     letter.style.textShadow = '';
                 });
+                
+                // Mark that logo color has been changed (unlock clicker)
+                if (!logoColorChanged) {
+                    logoColorChanged = true;
+                    checkUnlock(UNLOCK_TYPES.CLICKER);
+                }
+            }
+            
+            // Also mark color changed for matrix and rainbow
+            if ((colorArg === 'matrix' || colorArg === 'rainbow') && !logoColorChanged) {
+                logoColorChanged = true;
+                checkUnlock(UNLOCK_TYPES.CLICKER);
             }
         }
         
@@ -1883,14 +2182,25 @@
                 letters.forEach(letter => {
                     letter.style.fontSize = '36px';
                 });
+                // Mark that logo size has been changed (unlock minesweeper)
+                if (!logoSizeChanged) {
+                    logoSizeChanged = true;
+                    checkUnlock(UNLOCK_TYPES.MINESWEEPER);
+                }
             } else if (size === 'big') {
                 letters.forEach(letter => {
                     letter.style.fontSize = '120px';
                 });
+                // Mark that logo size has been changed (unlock minesweeper)
+                if (!logoSizeChanged) {
+                    logoSizeChanged = true;
+                    checkUnlock(UNLOCK_TYPES.MINESWEEPER);
+                }
             } else if (size === 'normal') {
                 letters.forEach(letter => {
                     letter.style.fontSize = '72px';
                 });
+                // Don't mark as changed when resetting to normal
             }
         }
         
@@ -2698,6 +3008,328 @@
             localStrokes = [];
         }
         
+        // ============================================
+        // CLICKER GAME SYSTEM
+        // ============================================
+        
+        let clickerScore = 0;
+        
+        function toggleClicker() {
+            const clicker = document.getElementById('clickerContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            
+            if (clicker.classList.contains('active')) {
+                clicker.classList.remove('active');
+            } else {
+                clicker.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                minesweeper.classList.remove('active');
+                loadClickerLeaderboard();
+            }
+        }
+        
+        function clickClicker() {
+            clickerScore++;
+            document.getElementById('clickerScore').textContent = clickerScore;
+            
+            // Save score to Firebase
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
+            if (usernameLower && database) {
+                writeToFirebase(`clickerScores/${usernameLower}`, {
+                    username: username,
+                    usernameLower: usernameLower,
+                    score: clickerScore,
+                    timestamp: Date.now()
+                });
+            }
+        }
+        
+        function loadClickerLeaderboard() {
+            if (!database) return;
+            
+            const leaderboard = document.getElementById('clickerLeaderboard');
+            leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase('clickerScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    return;
+                }
+                
+                const scoreArray = Object.values(scores)
+                    .sort((a, b) => (b.score || 0) - (a.score || 0))
+                    .slice(0, 10);
+                
+                leaderboard.innerHTML = '';
+                scoreArray.forEach((entry, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'leaderboard-item';
+                    div.innerHTML = `
+                        <span class="rank">#${index + 1}</span>
+                        <span class="username">${entry.username || entry.usernameLower}</span>
+                        <span class="score">${entry.score || 0}</span>
+                    `;
+                    leaderboard.appendChild(div);
+                });
+            });
+        }
+        
+        // ============================================
+        // MINESWEEPER GAME SYSTEM
+        // ============================================
+        
+        let minesweeperBoard = [];
+        let minesweeperRevealed = [];
+        let minesweeperFlags = [];
+        let minesweeperMines = 10;
+        let minesweeperSize = 10;
+        let minesweeperTimer = 0;
+        let minesweeperTimerInterval = null;
+        let minesweeperGameOver = false;
+        let minesweeperFirstClick = true;
+        
+        function toggleMinesweeper() {
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            
+            if (minesweeper.classList.contains('active')) {
+                minesweeper.classList.remove('active');
+                stopMinesweeperTimer();
+            } else {
+                minesweeper.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                initMinesweeper();
+                loadMinesweeperLeaderboard();
+            }
+        }
+        
+        function initMinesweeper() {
+            minesweeperBoard = [];
+            minesweeperRevealed = [];
+            minesweeperFlags = [];
+            minesweeperGameOver = false;
+            minesweeperFirstClick = true;
+            minesweeperTimer = 0;
+            stopMinesweeperTimer();
+            document.getElementById('minesweeperTime').textContent = '0';
+            
+            // Initialize board
+            for (let i = 0; i < minesweeperSize; i++) {
+                minesweeperBoard[i] = [];
+                minesweeperRevealed[i] = [];
+                minesweeperFlags[i] = [];
+                for (let j = 0; j < minesweeperSize; j++) {
+                    minesweeperBoard[i][j] = 0;
+                    minesweeperRevealed[i][j] = false;
+                    minesweeperFlags[i][j] = false;
+                }
+            }
+            
+            renderMinesweeperBoard();
+        }
+        
+        function placeMines(excludeRow, excludeCol) {
+            let placed = 0;
+            while (placed < minesweeperMines) {
+                const row = Math.floor(Math.random() * minesweeperSize);
+                const col = Math.floor(Math.random() * minesweeperSize);
+                
+                // Don't place mine on first click or if already a mine
+                if ((row === excludeRow && col === excludeCol) || minesweeperBoard[row][col] === -1) {
+                    continue;
+                }
+                
+                minesweeperBoard[row][col] = -1;
+                placed++;
+                
+                // Update numbers around mine
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const nr = row + dr;
+                        const nc = col + dc;
+                        if (nr >= 0 && nr < minesweeperSize && nc >= 0 && nc < minesweeperSize && minesweeperBoard[nr][nc] !== -1) {
+                            minesweeperBoard[nr][nc]++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        function renderMinesweeperBoard() {
+            const board = document.getElementById('minesweeperBoard');
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${minesweeperSize}, 1fr)`;
+            
+            for (let i = 0; i < minesweeperSize; i++) {
+                for (let j = 0; j < minesweeperSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'minesweeper-cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    
+                    if (minesweeperRevealed[i][j]) {
+                        cell.classList.add('revealed');
+                        if (minesweeperBoard[i][j] === -1) {
+                            cell.classList.add('mine');
+                            cell.textContent = '💣';
+                        } else if (minesweeperBoard[i][j] > 0) {
+                            cell.classList.add(`number-${minesweeperBoard[i][j]}`);
+                            cell.textContent = minesweeperBoard[i][j];
+                        }
+                    } else if (minesweeperFlags[i][j]) {
+                        cell.classList.add('flagged');
+                        cell.textContent = '🚩';
+                    }
+                    
+                    cell.addEventListener('click', () => revealCell(i, j));
+                    cell.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        toggleFlag(i, j);
+                    });
+                    
+                    board.appendChild(cell);
+                }
+            }
+        }
+        
+        function revealCell(row, col) {
+            if (minesweeperGameOver || minesweeperRevealed[row][col] || minesweeperFlags[row][col]) return;
+            
+            if (minesweeperFirstClick) {
+                placeMines(row, col);
+                minesweeperFirstClick = false;
+                startMinesweeperTimer();
+            }
+            
+            minesweeperRevealed[row][col] = true;
+            
+            if (minesweeperBoard[row][col] === -1) {
+                // Game over
+                minesweeperGameOver = true;
+                stopMinesweeperTimer();
+                revealAllMines();
+                alert('Game Over! You hit a mine!');
+            } else if (minesweeperBoard[row][col] === 0) {
+                // Reveal adjacent cells
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const nr = row + dr;
+                        const nc = col + dc;
+                        if (nr >= 0 && nr < minesweeperSize && nc >= 0 && nc < minesweeperSize && !minesweeperRevealed[nr][nc]) {
+                            revealCell(nr, nc);
+                        }
+                    }
+                }
+            }
+            
+            renderMinesweeperBoard();
+            checkWin();
+        }
+        
+        function toggleFlag(row, col) {
+            if (minesweeperGameOver || minesweeperRevealed[row][col]) return;
+            minesweeperFlags[row][col] = !minesweeperFlags[row][col];
+            renderMinesweeperBoard();
+        }
+        
+        function revealAllMines() {
+            for (let i = 0; i < minesweeperSize; i++) {
+                for (let j = 0; j < minesweeperSize; j++) {
+                    if (minesweeperBoard[i][j] === -1) {
+                        minesweeperRevealed[i][j] = true;
+                    }
+                }
+            }
+        }
+        
+        function checkWin() {
+            let revealedCount = 0;
+            for (let i = 0; i < minesweeperSize; i++) {
+                for (let j = 0; j < minesweeperSize; j++) {
+                    if (minesweeperRevealed[i][j]) revealedCount++;
+                }
+            }
+            
+            if (revealedCount === minesweeperSize * minesweeperSize - minesweeperMines) {
+                minesweeperGameOver = true;
+                stopMinesweeperTimer();
+                
+                // Save time to leaderboard
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
+                if (usernameLower && database) {
+                    writeToFirebase(`minesweeperScores/${usernameLower}`, {
+                        username: username,
+                        usernameLower: usernameLower,
+                        time: minesweeperTimer,
+                        timestamp: Date.now()
+                    });
+                }
+                
+                alert(`You Win! Time: ${minesweeperTimer}s`);
+                loadMinesweeperLeaderboard();
+            }
+        }
+        
+        function resetMinesweeper() {
+            initMinesweeper();
+        }
+        
+        function startMinesweeperTimer() {
+            minesweeperTimerInterval = setInterval(() => {
+                minesweeperTimer++;
+                document.getElementById('minesweeperTime').textContent = minesweeperTimer;
+            }, 1000);
+        }
+        
+        function stopMinesweeperTimer() {
+            if (minesweeperTimerInterval) {
+                clearInterval(minesweeperTimerInterval);
+                minesweeperTimerInterval = null;
+            }
+        }
+        
+        function loadMinesweeperLeaderboard() {
+            if (!database) return;
+            
+            const leaderboard = document.getElementById('minesweeperLeaderboard');
+            leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase('minesweeperScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    return;
+                }
+                
+                const scoreArray = Object.values(scores)
+                    .sort((a, b) => (a.time || Infinity) - (b.time || Infinity))
+                    .slice(0, 10);
+                
+                leaderboard.innerHTML = '';
+                scoreArray.forEach((entry, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'leaderboard-item';
+                    div.innerHTML = `
+                        <span class="rank">#${index + 1}</span>
+                        <span class="username">${entry.username || entry.usernameLower}</span>
+                        <span class="score">${entry.time || 0}s</span>
+                    `;
+                    leaderboard.appendChild(div);
+                });
+            });
+        }
         
         // ============================================
         // AUTHENTICATION SYSTEM
