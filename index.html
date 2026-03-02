@@ -1374,7 +1374,7 @@
             [UNLOCK_TYPES.CHAT]: {
                 icon: '💬',
                 name: 'Chat',
-                description: 'Send your first message to unlock global chat.',
+                description: 'Click the FinHub logo to unlock chat.',
                 color: '#1f6feb'
             },
             [UNLOCK_TYPES.FRIENDS]: {
@@ -1411,6 +1411,13 @@
                             unlockedFeatures.add(feature);
                         }
                     });
+                }
+                // If FINHUB is unlocked, also unlock CHAT
+                if (unlockedFeatures.has(UNLOCK_TYPES.FINHUB) && !unlockedFeatures.has(UNLOCK_TYPES.CHAT)) {
+                    unlockedFeatures.add(UNLOCK_TYPES.CHAT);
+                    if (database && usernameLower) {
+                        writeToFirebase(`users/${usernameLower}/unlocks/${UNLOCK_TYPES.CHAT}`, true);
+                    }
                 }
                 updateUIUnlocks();
             });
@@ -1449,7 +1456,8 @@
                     shouldUnlock = true; // Always unlock on click
                     break;
                 case UNLOCK_TYPES.CHAT:
-                    shouldUnlock = messageCount >= 1;
+                    // Unlock if FINHUB is unlocked (clicked logo) or if sent 1 message
+                    shouldUnlock = unlockedFeatures.has(UNLOCK_TYPES.FINHUB) || messageCount >= 1;
                     break;
                 case UNLOCK_TYPES.FRIENDS:
                     shouldUnlock = messageCount >= 1;
@@ -1479,6 +1487,11 @@
             
             // Show unlock animation
             showUnlockAnimation(type);
+            
+            // If FINHUB is unlocked, also unlock CHAT
+            if (type === UNLOCK_TYPES.FINHUB && !unlockedFeatures.has(UNLOCK_TYPES.CHAT)) {
+                unlockFeature(UNLOCK_TYPES.CHAT);
+            }
             
             // Update UI
             updateUIUnlocks();
@@ -1562,13 +1575,14 @@
             const paintBtn = document.getElementById('paintBtn');
             
             if (chatBtn) {
-                if (unlockedFeatures.has(UNLOCK_TYPES.CHAT)) {
+                // CHAT is unlocked if FINHUB is unlocked (clicked logo) or CHAT is directly unlocked
+                if (unlockedFeatures.has(UNLOCK_TYPES.CHAT) || unlockedFeatures.has(UNLOCK_TYPES.FINHUB)) {
                     chatBtn.classList.remove('locked');
                     chatBtn.onclick = toggleChat;
                 } else {
                     chatBtn.classList.add('locked');
                     chatBtn.onclick = () => {
-                        alert('Unlock Chat by sending your first message!');
+                        alert('Unlock Chat by clicking the FinHub logo!');
                     };
                 }
             }
