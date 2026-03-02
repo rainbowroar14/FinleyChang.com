@@ -1214,7 +1214,6 @@
             <div class="paint-header">
                 <h3>Paint Game</h3>
                 <div class="paint-controls">
-                    <button class="paint-btn secondary" onclick="openInviteModal()">Invite</button>
                     <button class="paint-btn" onclick="startPaintGame()">Play</button>
                     <button class="close-btn" onclick="togglePaint()">×</button>
                 </div>
@@ -1243,22 +1242,6 @@
             </div>
         </div>
         
-        <!-- Invite Friends Modal -->
-        <div class="invite-modal" id="inviteModal">
-            <div class="invite-modal-content">
-                <div class="invite-modal-header">
-                    <h3>Invite Friends to Paint</h3>
-                    <button class="close-btn" onclick="closeInviteModal()">×</button>
-                </div>
-                <div class="invite-friends-list" id="inviteFriendsList">
-                    <p style="color: #8b949e; text-align: center; padding: 20px;">Loading friends...</p>
-                </div>
-                <div class="invite-modal-footer">
-                    <button class="paint-btn secondary" onclick="closeInviteModal()">Cancel</button>
-                    <button class="invite-btn" id="sendInviteBtn" onclick="sendPaintInvites()" disabled>Send Invites</button>
-                </div>
-            </div>
-        </div>
         
         <!-- Private Chat -->
         <div class="private-chat-container" id="privateChat">
@@ -1667,20 +1650,11 @@
             // Load friends list
             loadFriends();
             
-            // Listen for new friend requests and paint invites
+            // Listen for new friend requests
             if (database && usernameLower) {
                 // Listen for friend requests
                 friendRequestsListener = listenToFirebase(`friendRequests/${usernameLower}`, (requests) => {
-                    readFromFirebase(`paintInvites/${usernameLower}`).then((paintInvites) => {
-                        updateFriendRequestsUI(requests, paintInvites);
-                    });
-                });
-                
-                // Listen for paint invites
-                listenToFirebase(`paintInvites/${usernameLower}`, (paintInvites) => {
-                    readFromFirebase(`friendRequests/${usernameLower}`).then((requests) => {
-                        updateFriendRequestsUI(requests, paintInvites);
-                    });
+                    updateFriendRequestsUI(requests);
                 });
             }
         }
@@ -1890,115 +1864,36 @@
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
             if (!usernameLower || !database) return;
             
-            Promise.all([
-                readFromFirebase(`friendRequests/${usernameLower}`),
-                readFromFirebase(`paintInvites/${usernameLower}`)
-            ]).then(([friendRequests, paintInvites]) => {
-                updateFriendRequestsUI(friendRequests, paintInvites);
+            readFromFirebase(`friendRequests/${usernameLower}`).then((friendRequests) => {
+                updateFriendRequestsUI(friendRequests);
             });
         }
         
-        function updateFriendRequestsUI(friendRequests, paintInvites) {
+        function updateFriendRequestsUI(friendRequests) {
             const list = document.getElementById('friendRequestsListTab');
             
             const hasFriendRequests = friendRequests && Object.keys(friendRequests).length > 0;
-            const hasPaintInvites = paintInvites && Object.keys(paintInvites).length > 0;
             
-            if (!hasFriendRequests && !hasPaintInvites) {
-                list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friend requests or invites</p>';
+            if (!hasFriendRequests) {
+                list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friend requests</p>';
                 return;
             }
             
             list.innerHTML = '';
             
             // Show friend requests
-            if (hasFriendRequests) {
-                Object.entries(friendRequests).forEach(([fromUsernameLower, requestData]) => {
-                    const displayName = requestData.from || fromUsernameLower;
-                    const div = document.createElement('div');
-                    div.className = 'friend-request-item';
-                    div.innerHTML = `
-                        <span class="username">${displayName}</span>
-                        <div class="friend-request-buttons">
-                            <button class="accept-btn" onclick="acceptFriendRequest('${fromUsernameLower}', '${displayName}')">Accept</button>
-                            <button class="decline-btn" onclick="declineFriendRequest('${fromUsernameLower}')">Decline</button>
-                        </div>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-            
-            // Show paint invites
-            if (hasPaintInvites) {
-                Object.entries(paintInvites).forEach(([fromUsernameLower, inviteData]) => {
-                    const displayName = inviteData.from || fromUsernameLower;
-                    const div = document.createElement('div');
-                    div.className = 'friend-request-item';
-                    div.style.borderLeftColor = '#ffa657';
-                    div.innerHTML = `
-                        <div>
-                            <span class="username">${displayName}</span>
-                            <div style="color: #8b949e; font-size: 12px; margin-top: 5px;">🎨 Invited you to Paint</div>
-                        </div>
-                        <div class="friend-request-buttons">
-                            <button class="accept-btn" onclick="acceptPaintInvite('${fromUsernameLower}', '${displayName}')">Join</button>
-                            <button class="decline-btn" onclick="declinePaintInvite('${fromUsernameLower}')">Decline</button>
-                        </div>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-        }
-        
-        // Accept Paint Invite
-        function acceptPaintInvite(fromUsernameLower, displayName) {
-            const username = localStorage.getItem('loggedInUsername');
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
-            if (!usernameLower || !database) return;
-            
-            // Find the paint session from the invite
-            readFromFirebase(`paintInvites/${usernameLower}/${fromUsernameLower}`).then((invite) => {
-                if (invite && invite.sessionId) {
-                    // Join existing session
-                    currentPaintSession = invite.sessionId;
-                    
-                    // Add user to session participants
-                    readFromFirebase(`paintSessions/${currentPaintSession}`).then((session) => {
-                        if (session) {
-                            const participants = session.participants || {};
-                            participants[usernameLower] = username;
-                            updateFirebase(`paintSessions/${currentPaintSession}`, { participants });
-                        }
-                    });
-                } else {
-                    // If no session ID, create a new one (fallback)
-                    currentPaintSession = `paint_${Date.now()}_${usernameLower}`;
-                    writeToFirebase(`paintSessions/${currentPaintSession}`, {
-                        createdBy: username,
-                        createdByLower: usernameLower,
-                        createdAt: Date.now(),
-                        participants: { [usernameLower]: username }
-                    });
-                }
-                
-                // Remove invite
-                deleteFromFirebase(`paintInvites/${usernameLower}/${fromUsernameLower}`).then(() => {
-                    // Open paint game
-                    togglePaint();
-                    // Start game will load canvas and listen for strokes
-                    startPaintGame();
-                    loadFriendRequests(); // Refresh requests
-                });
-            });
-        }
-        
-        // Decline Paint Invite
-        function declinePaintInvite(fromUsernameLower) {
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
-            if (!usernameLower || !database) return;
-            
-            deleteFromFirebase(`paintInvites/${usernameLower}/${fromUsernameLower}`).then(() => {
-                loadFriendRequests(); // Refresh requests
+            Object.entries(friendRequests).forEach(([fromUsernameLower, requestData]) => {
+                const displayName = requestData.from || fromUsernameLower;
+                const div = document.createElement('div');
+                div.className = 'friend-request-item';
+                div.innerHTML = `
+                    <span class="username">${displayName}</span>
+                    <div class="friend-request-buttons">
+                        <button class="accept-btn" onclick="acceptFriendRequest('${fromUsernameLower}', '${displayName}')">Accept</button>
+                        <button class="decline-btn" onclick="declineFriendRequest('${fromUsernameLower}')">Decline</button>
+                    </div>
+                `;
+                list.appendChild(div);
             });
         }
         
@@ -2186,11 +2081,8 @@
         
         let paintCanvas, paintCtx;
         let isDrawing = false;
-        let selectedFriendsForInvite = [];
-        let currentPaintSession = null;
-        let paintSessionListener = null;
         let currentStroke = null;
-        let drawnStrokes = new Set();
+        let localStrokes = []; // Store strokes locally instead of Firebase
         
         // Toggle Paint Game
         function togglePaint() {
@@ -2201,11 +2093,6 @@
             
             if (paint.classList.contains('active')) {
                 paint.classList.remove('active');
-                // Clean up listeners when closing
-                if (paintSessionListener) {
-                    paintSessionListener.off('value');
-                    paintSessionListener = null;
-                }
             } else {
                 paint.classList.add('active');
                 chat.classList.remove('active');
@@ -2234,20 +2121,9 @@
                 paintCtx.lineJoin = 'round';
             }
             
-            // Create or join paint session
-            const username = localStorage.getItem('loggedInUsername');
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
-            
-            if (!currentPaintSession) {
-                // Create new session
-                currentPaintSession = `paint_${Date.now()}_${usernameLower}`;
-                writeToFirebase(`paintSessions/${currentPaintSession}`, {
-                    createdBy: username,
-                    createdByLower: usernameLower,
-                    createdAt: Date.now(),
-                    participants: { [usernameLower]: username }
-                });
-            }
+            // Clear canvas and reset strokes for new session
+            paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+            localStrokes = [];
             
             // Set up drawing event listeners
             paintCanvas.addEventListener('mousedown', startDrawing);
@@ -2306,33 +2182,27 @@
                 brushSizeValue.textContent = e.target.value;
             });
             
-            // Load existing canvas state
-            loadPaintCanvas();
-            
-            // Listen for strokes from other users
-            listenToPaintStrokes();
+            // Redraw all local strokes
+            redrawCanvas();
         }
         
         function startDrawing(e) {
-            if (!currentPaintSession || !database) return;
+            if (!paintCanvas || !paintCtx) return;
             
             isDrawing = true;
             const rect = paintCanvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
-            const username = localStorage.getItem('loggedInUsername');
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
             const color = document.getElementById('colorPicker').value;
             const brushSize = document.getElementById('brushSize').value;
             
             // Start new stroke
             currentStroke = {
                 id: `stroke_${Date.now()}_${Math.random()}`,
-                username: username,
-                usernameLower: usernameLower,
                 color: color,
                 brushSize: parseInt(brushSize),
+                texture: currentTexture,
                 points: [{ x, y }],
                 timestamp: Date.now()
             };
@@ -2342,7 +2212,7 @@
         }
         
         function draw(e) {
-            if (!isDrawing || !currentStroke) return;
+            if (!isDrawing || !currentStroke || !paintCtx) return;
             
             const rect = paintCanvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -2359,11 +2229,6 @@
             
             // Draw locally with texture
             drawWithTexture(paintCtx, color, brushSize, currentStroke.points.slice(-2), currentTexture);
-            
-            // Sync to Firebase (throttle updates)
-            if (currentStroke.points.length % 3 === 0 || currentStroke.points.length === 2) {
-                syncStrokeToFirebase();
-            }
         }
         
         function drawWithTexture(ctx, color, brushSize, points, texture) {
@@ -2431,9 +2296,9 @@
         
         function stopDrawing() {
             if (isDrawing) {
-                if (currentStroke) {
-                    // Final sync
-                    syncStrokeToFirebase();
+                if (currentStroke && currentStroke.points.length > 0) {
+                    // Save stroke to local array
+                    localStrokes.push(currentStroke);
                     currentStroke = null;
                 }
                 paintCtx.beginPath();
@@ -2441,214 +2306,37 @@
             }
         }
         
-        function syncStrokeToFirebase() {
-            if (!currentStroke || !currentPaintSession || !database) return;
+        function redrawCanvas() {
+            if (!paintCtx || !paintCanvas) return;
             
-            // Mark as drawn so we don't redraw our own stroke
-            drawnStrokes.add(currentStroke.id);
+            // Clear canvas
+            paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
             
-            // Update stroke in Firebase
-            writeToFirebase(`paintSessions/${currentPaintSession}/strokes/${currentStroke.id}`, currentStroke);
-        }
-        
-        function listenToPaintStrokes() {
-            if (!currentPaintSession || !database) return;
-            
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
-            
-            // Stop previous listener
-            if (paintSessionListener) {
-                paintSessionListener.off('value');
-            }
-            
-            // Reset drawn strokes when starting new session
-            drawnStrokes.clear();
-            
-            // Mark all currently loaded strokes as drawn
-            readFromFirebase(`paintSessions/${currentPaintSession}/strokes`).then((strokes) => {
-                if (strokes) {
-                    Object.keys(strokes).forEach(strokeId => {
-                        drawnStrokes.add(strokeId);
-                    });
-                }
-            });
-            
-            // Listen for new strokes
-            paintSessionListener = listenToFirebase(`paintSessions/${currentPaintSession}/strokes`, (strokes) => {
-                if (!strokes) {
-                    // Canvas was cleared
-                    paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-                    drawnStrokes.clear();
-                    return;
-                }
-                
-                // Draw new strokes only (avoid redrawing everything)
-                Object.entries(strokes).forEach(([strokeId, stroke]) => {
-                    // Skip if we've already drawn this stroke
-                    if (drawnStrokes.has(strokeId)) return;
+            // Redraw all strokes
+            localStrokes.forEach(stroke => {
+                if (stroke.points && stroke.points.length > 0) {
+                    const texture = stroke.texture || 'solid';
+                    const color = stroke.color || '#000000';
+                    const brushSize = stroke.brushSize || 5;
                     
-                    // Skip if it's our own stroke (we already drew it locally)
-                    if (stroke.usernameLower === usernameLower) {
-                        drawnStrokes.add(strokeId);
-                        return;
+                    // Draw stroke with texture
+                    for (let i = 1; i < stroke.points.length; i++) {
+                        drawWithTexture(paintCtx, color, brushSize, [stroke.points[i-1], stroke.points[i]], texture);
                     }
-                    
-                    // Draw the stroke
-                    drawStrokeOnCanvas(stroke);
-                    drawnStrokes.add(strokeId);
-                });
-            });
-        }
-        
-        function drawStrokeOnCanvas(stroke) {
-            if (!paintCtx || !stroke.points || stroke.points.length === 0) return;
-            
-            const texture = stroke.texture || 'solid';
-            const color = stroke.color || '#000000';
-            const brushSize = stroke.brushSize || 5;
-            
-            // Draw stroke with texture
-            for (let i = 1; i < stroke.points.length; i++) {
-                drawWithTexture(paintCtx, color, brushSize, [stroke.points[i-1], stroke.points[i]], texture);
-            }
-        }
-        
-        function loadPaintCanvas() {
-            if (!currentPaintSession || !database) return;
-            
-            // Load all existing strokes
-            readFromFirebase(`paintSessions/${currentPaintSession}/strokes`).then((strokes) => {
-                if (!strokes) {
-                    // Clear canvas if no strokes
-                    paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-                    return;
                 }
-                
-                // Clear canvas first
-                paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-                
-                // Draw all strokes in order
-                const strokeArray = Object.values(strokes).sort((a, b) => a.timestamp - b.timestamp);
-                strokeArray.forEach(stroke => {
-                    drawStrokeOnCanvas(stroke);
-                });
             });
         }
         
         function clearCanvas() {
-            if (!paintCtx || !currentPaintSession || !database) return;
+            if (!paintCtx || !paintCanvas) return;
             
-            // Clear locally
+            // Clear canvas
             paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
             
-            // Clear in Firebase (delete all strokes)
-            readFromFirebase(`paintSessions/${currentPaintSession}/strokes`).then((strokes) => {
-                if (strokes) {
-                    Object.keys(strokes).forEach(strokeId => {
-                        deleteFromFirebase(`paintSessions/${currentPaintSession}/strokes/${strokeId}`);
-                    });
-                }
-            });
+            // Clear local strokes
+            localStrokes = [];
         }
         
-        // Open Invite Modal
-        function openInviteModal() {
-            const modal = document.getElementById('inviteModal');
-            modal.classList.add('active');
-            loadFriendsForInvite();
-        }
-        
-        // Close Invite Modal
-        function closeInviteModal() {
-            const modal = document.getElementById('inviteModal');
-            modal.classList.remove('active');
-            selectedFriendsForInvite = [];
-        }
-        
-        // Load Friends for Invite
-        function loadFriendsForInvite() {
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
-            if (!usernameLower || !database) return;
-            
-            const list = document.getElementById('inviteFriendsList');
-            list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading friends...</p>';
-            
-            readFromFirebase(`friends/${usernameLower}`).then((friends) => {
-                if (!friends || Object.keys(friends).length === 0) {
-                    list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friends to invite</p>';
-                    return;
-                }
-                
-                list.innerHTML = '';
-                Object.entries(friends).forEach(([friendUsernameLower, friendData]) => {
-                    const displayName = friendData?.username || friendUsernameLower;
-                    const div = document.createElement('div');
-                    div.className = 'invite-friend-item';
-                    div.dataset.usernameLower = friendUsernameLower;
-                    div.innerHTML = `
-                        <span class="username">${displayName}</span>
-                        <span style="color: #8b949e; font-size: 12px;">Click to select</span>
-                    `;
-                    div.addEventListener('click', () => toggleFriendSelection(friendUsernameLower, div));
-                    list.appendChild(div);
-                });
-            });
-        }
-        
-        // Toggle Friend Selection
-        function toggleFriendSelection(friendUsernameLower, element) {
-            const index = selectedFriendsForInvite.indexOf(friendUsernameLower);
-            if (index > -1) {
-                selectedFriendsForInvite.splice(index, 1);
-                element.classList.remove('selected');
-            } else {
-                selectedFriendsForInvite.push(friendUsernameLower);
-                element.classList.add('selected');
-            }
-            
-            // Update send button
-            const sendBtn = document.getElementById('sendInviteBtn');
-            sendBtn.disabled = selectedFriendsForInvite.length === 0;
-        }
-        
-        // Send Paint Invites
-        function sendPaintInvites() {
-            if (selectedFriendsForInvite.length === 0) return;
-            
-            const username = localStorage.getItem('loggedInUsername');
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
-            
-            if (!username || !database) return;
-            
-            // Make sure we have a paint session
-            if (!currentPaintSession) {
-                currentPaintSession = `paint_${Date.now()}_${usernameLower}`;
-                writeToFirebase(`paintSessions/${currentPaintSession}`, {
-                    createdBy: username,
-                    createdByLower: usernameLower,
-                    createdAt: Date.now(),
-                    participants: { [usernameLower]: username }
-                });
-            }
-            
-            // Send invite to each selected friend (include session ID)
-            const promises = selectedFriendsForInvite.map(friendUsernameLower => {
-                return writeToFirebase(`paintInvites/${friendUsernameLower}/${usernameLower}`, {
-                    from: username,
-                    fromLower: usernameLower,
-                    toLower: friendUsernameLower,
-                    type: 'paint',
-                    sessionId: currentPaintSession,
-                    timestamp: Date.now()
-                });
-            });
-            
-            Promise.all(promises).then(() => {
-                alert(`Invites sent to ${selectedFriendsForInvite.length} friend(s)!`);
-                closeInviteModal();
-                selectedFriendsForInvite = [];
-            });
-        }
         
         // ============================================
         // AUTHENTICATION SYSTEM
