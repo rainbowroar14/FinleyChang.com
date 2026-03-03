@@ -2270,7 +2270,7 @@
             </div>
             
             <!-- Sections Panel -->
-            <div id="gdSectionsPanel" class="panel hidden" role="dialog" aria-modal="true" aria-label="Sections" style="position: fixed; inset: 0; display: none; grid; place-items: center; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(10px); pointer-events: auto; z-index: 10002;">
+            <div id="gdSectionsPanel" class="panel hidden" role="dialog" aria-modal="true" aria-label="Sections" style="position: fixed; inset: 0; display: none; place-items: center; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(10px); pointer-events: auto; z-index: 10002;">
                 <div class="panel-inner panel-inner-wide" style="width: min(720px, calc(100vw - 24px)); border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.85); padding: 16px; box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);">
                     <div class="panel-title" style="font-weight: 800; letter-spacing: 0.2px; margin: 2px 2px 12px 2px; color: rgba(255, 255, 255, 0.92);">Pick Sections</div>
                     <div class="panel-sub" style="margin: -6px 2px 12px 2px; font-size: 13px; color: rgba(255, 255, 255, 0.68);">Choose what zones/sections can appear. Each one has a different mechanic.</div>
@@ -3032,6 +3032,9 @@
                 writeToFirebase(`users/${usernameLower}/hasWonMinesweeper`, true);
                 writeToFirebase(`users/${usernameLower}/hasWonSnake`, true);
             }
+            
+            // Update UI to reflect all unlocks (including Geometry Dash)
+            updateUIUnlocks();
             
             alert('🎉 FINLEYBOSS MODE ACTIVATED! Everything unlocked!');
         }
