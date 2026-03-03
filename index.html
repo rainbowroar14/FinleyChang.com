@@ -3140,6 +3140,43 @@
             </div>
         </div>
         
+        <!-- Pong Game -->
+        <div class="game-container" id="pongContainer">
+            <div class="game-header">
+                <h3>🏓 Pong</h3>
+                <button class="close-btn" onclick="togglePong()">×</button>
+            </div>
+            <div class="game-content">
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <div>
+                        <div class="snake-controls" style="margin-bottom: 20px;">
+                            <div class="snake-info">
+                                <div>Player Score: <span id="pongPlayerScore">0</span></div>
+                                <div>AI Score: <span id="pongAIScore">0</span></div>
+                                <div>Best Score: <span id="pongBestScore">0</span></div>
+                                <button class="snake-reset-btn" onclick="resetPong()">Reset</button>
+                            </div>
+                        </div>
+                        <div class="snake-instructions">
+                            <p><strong>Controls:</strong></p>
+                            <p>W / ↑ - Move Up</p>
+                            <p>S / ↓ - Move Down</p>
+                            <p>Score 10 points to unlock theme!</p>
+                        </div>
+                    </div>
+                    <div>
+                        <canvas id="pongCanvas" width="600" height="400" style="border: 2px solid #30363d; background: #0d1117; cursor: none;"></canvas>
+                    </div>
+                </div>
+                <div class="leaderboard-section" style="margin-top: 20px;">
+                    <h4>Best Scores</h4>
+                    <div class="leaderboard-list" id="pongLeaderboard">
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Private Chat -->
         <div class="private-chat-container" id="privateChat">
             <div class="chat-header">
@@ -3274,6 +3311,10 @@
                 <div class="game-folder-icon">💥</div>
                 <div class="game-folder-name">Block Blast</div>
             </div>
+            <div class="game-folder-item" id="pongFolderItem" onclick="openGameFromFolder('pong')">
+                <div class="game-folder-icon">🏓</div>
+                <div class="game-folder-name">Pong</div>
+            </div>
         </div>
     </div>
     
@@ -3288,7 +3329,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.9.4';
+        const APP_VERSION = '1.9.5';
         
         // ============================================
         // SOUND EFFECTS SYSTEM
@@ -4009,6 +4050,28 @@
                 }
             }
             
+            // Update Pong folder item (requires Snake unlock)
+            const pongFolderItem = document.getElementById('pongFolderItem');
+            if (pongFolderItem && database) {
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                if (usernameLower) {
+                    readFromFirebase(`users/${usernameLower}/hasWonSnake`).then((unlocked) => {
+                        if (unlocked) {
+                            pongFolderItem.classList.remove('locked');
+                            pongFolderItem.style.opacity = '1';
+                            pongFolderItem.onclick = () => openGameFromFolder('pong');
+                        } else {
+                            pongFolderItem.classList.add('locked');
+                            pongFolderItem.style.opacity = '0.5';
+                            pongFolderItem.onclick = () => {
+                                alert('Unlock Pong by beating Snake!');
+                            };
+                        }
+                    });
+                }
+            }
+            
         }
         
         function unlockTexture(texture) {
@@ -4152,12 +4215,14 @@
             unlockTheme('word');
             unlockTheme('tetris');
             unlockTheme('blockblast');
+            unlockTheme('pong');
             
             // Unlock all games
             if (usernameLower && database) {
                 writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
                 writeToFirebase(`users/${usernameLower}/unlockedGames/tetris`, true);
                 writeToFirebase(`users/${usernameLower}/unlockedGames/blockblast`, true);
+                writeToFirebase(`users/${usernameLower}/unlockedGames/pong`, true);
                 
                 // Unlock Hexagon game (if it has unlock requirement)
                 const hasPlayedHexagon = true;
@@ -6932,6 +6997,8 @@
                 
                 if (usernameLower && database) {
                     writeToFirebase(`users/${usernameLower}/hasWonSnake`, true);
+                    // Unlock Pong game
+                    writeToFirebase(`users/${usernameLower}/unlockedGames/pong`, true);
                 }
                 unlockTheme('snake');
             }
@@ -8795,6 +8862,12 @@
                     name: 'Block Blast',
                     description: 'Score 10,000+ in Block Blast to unlock',
                     unlocked: unlockedThemes.has('blockblast')
+                },
+                {
+                    id: 'pong',
+                    name: 'Pong',
+                    description: 'Score 10 points in Pong to unlock',
+                    unlocked: unlockedThemes.has('pong')
                 }
             ];
             
@@ -8902,6 +8975,8 @@
                         applyTetrisTheme();
                     } else if (themeId === 'blockblast') {
                         applyBlockBlastTheme();
+                    } else if (themeId === 'pong') {
+                        applyPongTheme();
                     }
                 } catch (err) {
                     console.error('Error applying theme:', err);
@@ -8937,6 +9012,17 @@
             if (customThemeParticleInterval) {
                 clearInterval(customThemeParticleInterval);
                 customThemeParticleInterval = null;
+            }
+            
+            // Stop Pong theme animation
+            if (pongThemeAnimationId) {
+                cancelAnimationFrame(pongThemeAnimationId);
+                pongThemeAnimationId = null;
+            }
+            if (pongThemeCanvas && pongThemeCanvas.parentElement) {
+                pongThemeCanvas.remove();
+                pongThemeCanvas = null;
+                pongThemeCtx = null;
             }
             
             // Clear cursors
@@ -10747,6 +10833,226 @@
         let blockBlastThemeBlocks = [];
         let blockBlastThemeInterval = null;
         
+        // ============================================
+        // PONG THEME
+        // ============================================
+        
+        let pongThemeCanvas = null;
+        let pongThemeCtx = null;
+        let pongThemeAnimationId = null;
+        let pongThemeGame = {
+            bot1Y: 150,
+            bot2Y: 150,
+            ballX: 300,
+            ballY: 200,
+            ballSpeedX: 4,
+            ballSpeedY: 3,
+            paddleHeight: 80,
+            paddleWidth: 10,
+            ballSize: 10,
+            score1: 0,
+            score2: 0
+        };
+        
+        function applyPongTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            const isLightMode = document.body.classList.contains('light-mode');
+            bg.style.background = isLightMode
+                ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+                : 'linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%)';
+            bg.style.opacity = '0.9';
+            
+            // Create canvas for Pong game
+            pongThemeCanvas = document.createElement('canvas');
+            pongThemeCanvas.width = Math.min(600, window.innerWidth - 100);
+            pongThemeCanvas.height = Math.min(400, window.innerHeight - 200);
+            pongThemeCanvas.style.position = 'absolute';
+            pongThemeCanvas.style.left = '50%';
+            pongThemeCanvas.style.top = '50%';
+            pongThemeCanvas.style.transform = 'translate(-50%, -50%)';
+            pongThemeCanvas.style.border = '2px solid #58a6ff';
+            pongThemeCanvas.style.borderRadius = '8px';
+            pongThemeCanvas.style.pointerEvents = 'none';
+            pongThemeCanvas.style.zIndex = '1';
+            pongThemeCanvas.style.opacity = '0.8';
+            bg.appendChild(pongThemeCanvas);
+            
+            pongThemeCtx = pongThemeCanvas.getContext('2d');
+            
+            // Initialize game state
+            pongThemeGame.bot1Y = pongThemeCanvas.height / 2 - pongThemeGame.paddleHeight / 2;
+            pongThemeGame.bot2Y = pongThemeCanvas.height / 2 - pongThemeGame.paddleHeight / 2;
+            pongThemeGame.ballX = pongThemeCanvas.width / 2;
+            pongThemeGame.ballY = pongThemeCanvas.height / 2;
+            pongThemeGame.ballSpeedX = 4;
+            pongThemeGame.ballSpeedY = 3;
+            
+            // Make FinHub title look like Pong paddles
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach((letter, index) => {
+                    if (index < 3) {
+                        letter.style.color = '#58a6ff';
+                        letter.style.textShadow = '0 0 15px #58a6ff';
+                    } else {
+                        letter.style.color = '#f85149';
+                        letter.style.textShadow = '0 0 15px #f85149';
+                    }
+                    letter.style.fontWeight = 'bold';
+                });
+            }
+            
+            // Start Pong game loop
+            startPongThemeGame();
+        }
+        
+        function startPongThemeGame() {
+            if (pongThemeAnimationId) return;
+            pongThemeGameLoop();
+        }
+        
+        function stopPongThemeGame() {
+            if (pongThemeAnimationId) {
+                cancelAnimationFrame(pongThemeAnimationId);
+                pongThemeAnimationId = null;
+            }
+        }
+        
+        function pongThemeGameLoop() {
+            if (currentTheme !== 'pong' || !pongThemeCanvas || !pongThemeCtx) {
+                stopPongThemeGame();
+                return;
+            }
+            
+            updatePongTheme();
+            drawPongTheme();
+            
+            pongThemeAnimationId = requestAnimationFrame(pongThemeGameLoop);
+        }
+        
+        function updatePongTheme() {
+            // Bot 1 (left) follows ball
+            const bot1Center = pongThemeGame.bot1Y + pongThemeGame.paddleHeight / 2;
+            const ballCenter = pongThemeGame.ballY;
+            const diff1 = ballCenter - bot1Center;
+            
+            if (Math.abs(diff1) > 3) {
+                if (diff1 > 0) {
+                    pongThemeGame.bot1Y += 4;
+                } else {
+                    pongThemeGame.bot1Y -= 4;
+                }
+            }
+            
+            // Bot 2 (right) follows ball
+            const bot2Center = pongThemeGame.bot2Y + pongThemeGame.paddleHeight / 2;
+            const diff2 = ballCenter - bot2Center;
+            
+            if (Math.abs(diff2) > 3) {
+                if (diff2 > 0) {
+                    pongThemeGame.bot2Y += 4;
+                } else {
+                    pongThemeGame.bot2Y -= 4;
+                }
+            }
+            
+            // Keep paddles in bounds
+            if (pongThemeGame.bot1Y < 0) pongThemeGame.bot1Y = 0;
+            if (pongThemeGame.bot1Y + pongThemeGame.paddleHeight > pongThemeCanvas.height) {
+                pongThemeGame.bot1Y = pongThemeCanvas.height - pongThemeGame.paddleHeight;
+            }
+            if (pongThemeGame.bot2Y < 0) pongThemeGame.bot2Y = 0;
+            if (pongThemeGame.bot2Y + pongThemeGame.paddleHeight > pongThemeCanvas.height) {
+                pongThemeGame.bot2Y = pongThemeCanvas.height - pongThemeGame.paddleHeight;
+            }
+            
+            // Update ball position
+            pongThemeGame.ballX += pongThemeGame.ballSpeedX;
+            pongThemeGame.ballY += pongThemeGame.ballSpeedY;
+            
+            // Ball collision with top/bottom walls
+            if (pongThemeGame.ballY <= 0 || pongThemeGame.ballY >= pongThemeCanvas.height - pongThemeGame.ballSize) {
+                pongThemeGame.ballSpeedY = -pongThemeGame.ballSpeedY;
+            }
+            
+            // Ball collision with bot 1 paddle (left)
+            if (pongThemeGame.ballX <= pongThemeGame.paddleWidth &&
+                pongThemeGame.ballY + pongThemeGame.ballSize >= pongThemeGame.bot1Y &&
+                pongThemeGame.ballY <= pongThemeGame.bot1Y + pongThemeGame.paddleHeight) {
+                pongThemeGame.ballSpeedX = -pongThemeGame.ballSpeedX;
+                const hitPos = (pongThemeGame.ballY - pongThemeGame.bot1Y) / pongThemeGame.paddleHeight;
+                pongThemeGame.ballSpeedY = (hitPos - 0.5) * 8;
+            }
+            
+            // Ball collision with bot 2 paddle (right)
+            if (pongThemeGame.ballX + pongThemeGame.ballSize >= pongThemeCanvas.width - pongThemeGame.paddleWidth &&
+                pongThemeGame.ballY + pongThemeGame.ballSize >= pongThemeGame.bot2Y &&
+                pongThemeGame.ballY <= pongThemeGame.bot2Y + pongThemeGame.paddleHeight) {
+                pongThemeGame.ballSpeedX = -pongThemeGame.ballSpeedX;
+                const hitPos = (pongThemeGame.ballY - pongThemeGame.bot2Y) / pongThemeGame.paddleHeight;
+                pongThemeGame.ballSpeedY = (hitPos - 0.5) * 8;
+            }
+            
+            // Score points and reset ball
+            if (pongThemeGame.ballX < 0) {
+                pongThemeGame.score2++;
+                resetPongThemeBall();
+            }
+            if (pongThemeGame.ballX > pongThemeCanvas.width) {
+                pongThemeGame.score1++;
+                resetPongThemeBall();
+            }
+        }
+        
+        function resetPongThemeBall() {
+            pongThemeGame.ballX = pongThemeCanvas.width / 2;
+            pongThemeGame.ballY = pongThemeCanvas.height / 2;
+            pongThemeGame.ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * 4;
+            pongThemeGame.ballSpeedY = (Math.random() > 0.5 ? 1 : -1) * 3;
+        }
+        
+        function drawPongTheme() {
+            const ctx = pongThemeCtx;
+            const canvas = pongThemeCanvas;
+            
+            // Clear canvas
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw center line
+            ctx.strokeStyle = '#30363d';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw bot 1 paddle (left)
+            ctx.fillStyle = '#58a6ff';
+            ctx.fillRect(0, pongThemeGame.bot1Y, pongThemeGame.paddleWidth, pongThemeGame.paddleHeight);
+            
+            // Draw bot 2 paddle (right)
+            ctx.fillStyle = '#f85149';
+            ctx.fillRect(canvas.width - pongThemeGame.paddleWidth, pongThemeGame.bot2Y, pongThemeGame.paddleWidth, pongThemeGame.paddleHeight);
+            
+            // Draw ball
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(pongThemeGame.ballX, pongThemeGame.ballY, pongThemeGame.ballSize, pongThemeGame.ballSize);
+            
+            // Draw scores
+            ctx.fillStyle = '#58a6ff';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(pongThemeGame.score1, canvas.width / 4, 30);
+            
+            ctx.fillStyle = '#f85149';
+            ctx.fillText(pongThemeGame.score2, canvas.width * 3 / 4, 30);
+        }
+        
         function applyBlockBlastTheme() {
             const bg = document.getElementById('themeBackground');
             bg.classList.add('active');
@@ -12526,6 +12832,9 @@
                         break;
                     case 'blockblast':
                         toggleBlockBlast();
+                        break;
+                    case 'pong':
+                        togglePong();
                         break;
                 }
             }, 100);
