@@ -4256,11 +4256,13 @@
                 writeToFirebase(`users/${usernameLower}/themes/word`, true);
                 writeToFirebase(`users/${usernameLower}/themes/tetris`, true);
                 writeToFirebase(`users/${usernameLower}/themes/blockblast`, true);
+                writeToFirebase(`users/${usernameLower}/themes/pong`, true);
                 
                 // Save unlocked games
                 writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
                 writeToFirebase(`users/${usernameLower}/unlockedGames/tetris`, true);
                 writeToFirebase(`users/${usernameLower}/unlockedGames/blockblast`, true);
+                writeToFirebase(`users/${usernameLower}/unlockedGames/pong`, true);
                 
                 // Save stats
                 writeToFirebase(`users/${usernameLower}/stats/totalClicks`, 10000);
