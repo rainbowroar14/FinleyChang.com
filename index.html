@@ -283,6 +283,207 @@
             color: #f85149;
         }
         
+        /* Time Leaderboard Podium */
+        .time-leaderboard-podium {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            min-height: 200px;
+        }
+        
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .podium-stand {
+            width: 80px;
+            background: linear-gradient(135deg, #58a6ff 0%, #238636 100%);
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .podium-stand.first {
+            height: 120px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            font-size: 18px;
+        }
+        
+        .podium-stand.second {
+            height: 90px;
+            background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
+        }
+        
+        .podium-stand.third {
+            height: 70px;
+            background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%);
+        }
+        
+        .podium-username {
+            font-weight: bold;
+            color: #c9d1d9;
+            font-size: 14px;
+            text-align: center;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        body.light-mode .podium-username {
+            color: #24292f;
+        }
+        
+        .podium-time {
+            color: #8b949e;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        body.light-mode .podium-time {
+            color: #57606a;
+        }
+        
+        /* Games Folder (iPhone Style) */
+        .games-folder {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .games-folder.active {
+            display: flex;
+        }
+        
+        body.light-mode .games-folder {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .games-folder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+        
+        .games-folder-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #c9d1d9;
+        }
+        
+        body.light-mode .games-folder-title {
+            color: #24292f;
+        }
+        
+        .games-folder-close {
+            background: rgba(248, 81, 73, 0.2);
+            border: 1px solid #f85149;
+            border-radius: 8px;
+            color: #f85149;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .games-folder-close:hover {
+            background: rgba(248, 81, 73, 0.3);
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .game-folder-item {
+            background: rgba(22, 27, 34, 0.8);
+            border: 2px solid #30363d;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            min-height: 150px;
+            position: relative;
+        }
+        
+        body.light-mode .game-folder-item {
+            background: rgba(246, 248, 250, 0.9);
+            border: 2px solid #d0d7de;
+        }
+        
+        .game-folder-item:hover:not(.locked) {
+            transform: scale(1.05);
+            border-color: #58a6ff;
+            box-shadow: 0 8px 24px rgba(88, 166, 255, 0.3);
+        }
+        
+        body.light-mode .game-folder-item:hover:not(.locked) {
+            border-color: #0969da;
+            box-shadow: 0 8px 24px rgba(9, 105, 218, 0.2);
+        }
+        
+        .game-folder-item.locked {
+            cursor: not-allowed;
+            filter: grayscale(0.7);
+        }
+        
+        .game-folder-item.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            opacity: 0.7;
+        }
+        
+        .game-folder-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        
+        .game-folder-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #c9d1d9;
+        }
+        
+        body.light-mode .game-folder-name {
+            color: #24292f;
+        }
+        
         .page {
             min-height: calc(100vh - 40px);
             display: flex;
@@ -362,11 +563,45 @@
             margin-top: 20px;
         }
         
+        /* Spinning Hexagon Easter Egg */
+        .hexagon-easter-egg {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            z-index: 1001;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .hexagon-easter-egg:hover {
+            transform: scale(1.2);
+        }
+        
+        .hexagon-shape {
+            width: 100%;
+            height: 100%;
+            background: #58a6ff;
+            clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+            animation: spin 3s linear infinite;
+            transition: all 0.3s ease;
+        }
+        
+        .hexagon-shape:hover {
+            background: #79c0ff;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
         /* Firebase Connection Status */
         .firebase-status {
             position: fixed;
             top: 10px;
-            right: 10px;
+            right: 50px;
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
@@ -1837,6 +2072,58 @@
             cursor: pointer;
             font-family: 'MS Sans Serif', 'Segoe UI', sans-serif;
             font-size: 11px;
+        }
+        
+        /* Hexagon Game Styles */
+        .hexagon-game-info {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 15px;
+            background: rgba(22, 27, 34, 0.5);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        body.light-mode .hexagon-game-info {
+            background: rgba(246, 248, 250, 0.5);
+        }
+        
+        .hexagon-reset-btn {
+            padding: 8px 16px;
+            background: #238636;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        
+        .hexagon-reset-btn:hover {
+            background: #2ea043;
+        }
+        
+        .hexagon-instructions {
+            text-align: center;
+            color: #8b949e;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        body.light-mode .hexagon-instructions {
+            color: #57606a;
+        }
+        
+        /* Grassland Theme Styles */
+        .grass-blade {
+            background: linear-gradient(to bottom, transparent 0%, currentColor 50%, currentColor 100%);
+            border-radius: 2px;
+        }
+        
+        .grassland-hog {
+            filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
+            user-select: none;
             font-weight: normal;
             box-shadow: 1px 1px 0 #fff, -1px -1px 0 #808080;
         }
@@ -2065,6 +2352,11 @@
     <!-- Dark/Light Mode Toggle - Bottom Right -->
     <button class="dark-mode-toggle" id="themeToggleBtn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">🌙</button>
     
+    <!-- Spinning Hexagon Easter Egg -->
+    <div class="hexagon-easter-egg" id="hexagonEasterEgg" onclick="handleHexagonClick()">
+        <div class="hexagon-shape"></div>
+    </div>
+    
     <!-- Main page with FinHub title -->
     <div class="page hidden" id="mainPage">
         <!-- Unlock Overlay -->
@@ -2080,6 +2372,7 @@
         <div class="top-bar">
             <div class="top-bar-left">
                 <button class="top-bar-btn" id="profileBtn" onclick="toggleProfile()" title="Your Profile">👤 Profile</button>
+                <button class="top-bar-btn" id="timeLeaderboardBtn" onclick="toggleTimeLeaderboard()" title="Time Spent Leaderboard">⏱️ Time Leaderboard</button>
                 <button class="top-bar-btn" id="notificationsBtn" onclick="toggleNotifications()" title="Notifications">
                     🔔 Notifications
                     <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
@@ -2093,11 +2386,34 @@
         <div class="sidebar-buttons">
             <div class="sidebar-btn" id="chatBtn" onclick="toggleChat()">💬 Chat</div>
             <div class="sidebar-btn" id="friendsBtn" onclick="toggleFriends()">👥 Friends</div>
-            <div class="sidebar-btn" id="paintBtn" onclick="togglePaint()">🎨 Paint</div>
-            <div class="sidebar-btn" id="clickerBtn" onclick="toggleClicker()">🖱️ Clicker</div>
-            <div class="sidebar-btn" id="minesweeperBtn" onclick="toggleMinesweeper()">💣 Minesweeper</div>
-            <div class="sidebar-btn" id="snakeBtn" onclick="toggleSnake()">🐍 Snake</div>
+            <div class="sidebar-btn" id="gamesBtn" onclick="toggleGamesFolder()">🎮 Games</div>
             <div class="sidebar-btn" id="themesBtn" onclick="toggleThemes()">🎨 Themes</div>
+        </div>
+        
+        <!-- Games Folder (iPhone Style) -->
+        <div class="games-folder" id="gamesFolder">
+            <div class="games-folder-header">
+                <h2 class="games-folder-title">🎮 Games</h2>
+                <button class="games-folder-close" onclick="toggleGamesFolder()">✕ Close</button>
+            </div>
+            <div class="games-grid">
+                <div class="game-folder-item" id="paintFolderItem" onclick="openGameFromFolder('paint')">
+                    <div class="game-folder-icon">🎨</div>
+                    <div class="game-folder-name">Paint</div>
+                </div>
+                <div class="game-folder-item" id="clickerFolderItem" onclick="openGameFromFolder('clicker')">
+                    <div class="game-folder-icon">🖱️</div>
+                    <div class="game-folder-name">Clicker</div>
+                </div>
+                <div class="game-folder-item" id="minesweeperFolderItem" onclick="openGameFromFolder('minesweeper')">
+                    <div class="game-folder-icon">💣</div>
+                    <div class="game-folder-name">Minesweeper</div>
+                </div>
+                <div class="game-folder-item" id="snakeFolderItem" onclick="openGameFromFolder('snake')">
+                    <div class="game-folder-icon">🐍</div>
+                    <div class="game-folder-name">Snake</div>
+                </div>
+            </div>
         </div>
         
         <!-- Theme Selector -->
@@ -2251,6 +2567,26 @@
             </div>
         </div>
         
+        <!-- Hexagon Slapping Hogs Game -->
+        <div class="game-container" id="hexagonGameContainer">
+            <div class="game-header">
+                <h3>🔷 Hexagon Slapping Hogs</h3>
+                <button class="close-btn" onclick="toggleHexagonGame()">×</button>
+            </div>
+            <div class="game-content">
+                <div class="hexagon-game-info">
+                    <div>Score: <span id="hexagonScore">0</span></div>
+                    <div>Hogs Slapped: <span id="hexagonHogsSlapped">0</span></div>
+                    <button class="hexagon-reset-btn" onclick="resetHexagonGame()">Reset</button>
+                </div>
+                <canvas id="hexagonGameCanvas" width="800" height="600" style="border: 2px solid #30363d; border-radius: 8px; background: #0d1117; display: block; margin: 0 auto;"></canvas>
+                <div class="hexagon-instructions">
+                    <p>Use Mouse to move your hexagon</p>
+                    <p>Slap hogs as they run towards you!</p>
+                </div>
+            </div>
+        </div>
+        
         <!-- Snake Game -->
         <div class="game-container" id="snakeContainer">
             <div class="game-header">
@@ -2324,6 +2660,19 @@
         </div>
         
         <!-- Notifications -->
+        <!-- Time Leaderboard -->
+        <div class="game-container" id="timeLeaderboardContainer">
+            <div class="game-header">
+                <h3>⏱️ Time Spent Leaderboard</h3>
+                <button class="close-btn" onclick="toggleTimeLeaderboard()">×</button>
+            </div>
+            <div class="game-content">
+                <div class="time-leaderboard-podium" id="timeLeaderboardPodium">
+                    <p style="color: #8b949e; text-align: center; padding: 20px;">Loading leaderboard...</p>
+                </div>
+            </div>
+        </div>
+        
         <div class="game-container" id="notificationsContainer">
             <div class="game-header">
                 <h3>🔔 Notifications</h3>
@@ -2703,19 +3052,19 @@
                     targetElement = document.getElementById('friendsBtn');
                     break;
                 case UNLOCK_TYPES.PAINT:
-                    targetElement = document.getElementById('paintBtn');
+                    targetElement = document.getElementById('paintFolderItem');
                     break;
                 case UNLOCK_TYPES.COMMANDBAR:
                     targetElement = document.getElementById('commandBar');
                     break;
                 case UNLOCK_TYPES.CLICKER:
-                    targetElement = document.getElementById('clickerBtn');
+                    targetElement = document.getElementById('clickerFolderItem');
                     break;
                 case UNLOCK_TYPES.MINESWEEPER:
-                    targetElement = document.getElementById('minesweeperBtn');
+                    targetElement = document.getElementById('minesweeperFolderItem');
                     break;
                 case UNLOCK_TYPES.SNAKE:
-                    targetElement = document.getElementById('snakeBtn');
+                    targetElement = document.getElementById('snakeFolderItem');
                     break;
             }
             
@@ -2782,13 +3131,17 @@
                 }
             }
             
-            if (paintBtn) {
+            // Update games folder items
+            const paintFolderItem = document.getElementById('paintFolderItem');
+            if (paintFolderItem) {
                 if (unlockedFeatures.has(UNLOCK_TYPES.PAINT)) {
-                    paintBtn.classList.remove('locked');
-                    paintBtn.onclick = togglePaint;
+                    paintFolderItem.classList.remove('locked');
+                    paintFolderItem.style.opacity = '1';
+                    paintFolderItem.onclick = () => openGameFromFolder('paint');
                 } else {
-                    paintBtn.classList.add('locked');
-                    paintBtn.onclick = () => {
+                    paintFolderItem.classList.add('locked');
+                    paintFolderItem.style.opacity = '0.5';
+                    paintFolderItem.onclick = () => {
                         alert('Unlock Paint by getting one friend!');
                     };
                 }
@@ -2809,42 +3162,48 @@
                 }
             }
             
-            // Update clicker button
-            const clickerBtn = document.getElementById('clickerBtn');
-            if (clickerBtn) {
+            // Update clicker folder item
+            const clickerFolderItem = document.getElementById('clickerFolderItem');
+            if (clickerFolderItem) {
                 if (unlockedFeatures.has(UNLOCK_TYPES.CLICKER)) {
-                    clickerBtn.classList.remove('locked');
-                    clickerBtn.onclick = toggleClicker;
+                    clickerFolderItem.classList.remove('locked');
+                    clickerFolderItem.style.opacity = '1';
+                    clickerFolderItem.onclick = () => openGameFromFolder('clicker');
                 } else {
-                    clickerBtn.classList.add('locked');
-                    clickerBtn.onclick = () => {
+                    clickerFolderItem.classList.add('locked');
+                    clickerFolderItem.style.opacity = '0.5';
+                    clickerFolderItem.onclick = () => {
                         alert('Unlock Clicker by changing your logo color!');
                     };
                 }
             }
             
-            // Update minesweeper button
-            const minesweeperBtn = document.getElementById('minesweeperBtn');
-            if (minesweeperBtn) {
+            // Update minesweeper folder item
+            const minesweeperFolderItem = document.getElementById('minesweeperFolderItem');
+            if (minesweeperFolderItem) {
                 if (unlockedFeatures.has(UNLOCK_TYPES.MINESWEEPER)) {
-                    minesweeperBtn.classList.remove('locked');
-                    minesweeperBtn.onclick = toggleMinesweeper;
+                    minesweeperFolderItem.classList.remove('locked');
+                    minesweeperFolderItem.style.opacity = '1';
+                    minesweeperFolderItem.onclick = () => openGameFromFolder('minesweeper');
                 } else {
-                    minesweeperBtn.classList.add('locked');
-                    minesweeperBtn.onclick = () => {
+                    minesweeperFolderItem.classList.add('locked');
+                    minesweeperFolderItem.style.opacity = '0.5';
+                    minesweeperFolderItem.onclick = () => {
                         alert('Unlock Minesweeper by changing your logo size!');
                     };
                 }
             }
             
-            const snakeBtn = document.getElementById('snakeBtn');
-            if (snakeBtn) {
+            const snakeFolderItem = document.getElementById('snakeFolderItem');
+            if (snakeFolderItem) {
                 if (unlockedFeatures.has(UNLOCK_TYPES.SNAKE)) {
-                    snakeBtn.classList.remove('locked');
-                    snakeBtn.onclick = toggleSnake;
+                    snakeFolderItem.classList.remove('locked');
+                    snakeFolderItem.style.opacity = '1';
+                    snakeFolderItem.onclick = () => openGameFromFolder('snake');
                 } else {
-                    snakeBtn.classList.add('locked');
-                    snakeBtn.onclick = () => {
+                    snakeFolderItem.classList.add('locked');
+                    snakeFolderItem.style.opacity = '0.5';
+                    snakeFolderItem.onclick = () => {
                         alert('Unlock Snake by getting 5 friends!');
                     };
                 }
@@ -2869,6 +3228,7 @@
         
         let titleColorEffect = null; // Track active color effect (matrix, rainbow)
         let titleSize = 'normal'; // Track current title size
+        let is67Theme = false; // Track if user is on "67" theme
         
         function toggleCommandBar() {
             const commandBar = document.getElementById('commandBar');
@@ -2944,7 +3304,7 @@
                     handleSizeCommand('normal');
                 }
             } else {
-                alert(`Unknown command: ${cmd}. Try COLOR [color], SMALL, BIG, NORMAL, RESET, or FINLEYBOSS`);
+                alert(`Unknown command: ${cmd}. Try COLOR [color], SMALL, BIG, NORMAL, or RESET`);
             }
         }
         
@@ -3012,7 +3372,7 @@
             // Update UI to reflect all unlocks (including Geometry Dash)
             updateUIUnlocks();
             
-            alert('🎉 FINLEYBOSS MODE ACTIVATED! Everything unlocked!');
+            alert('🎉 Everything unlocked!');
         }
         
         async function resetAccount() {
@@ -3081,12 +3441,23 @@
             }
             
             if (colorArg === 'normal' || colorArg === '') {
-                // Reset to default colors
+                // Reset to default colors and restore original letters
+                const originalLetters = ['F', 'I', 'N', 'H', 'U', 'B'];
                 letters.forEach((letter, index) => {
+                    // Restore original letter if it was changed
+                    if (letter.dataset.originalLetter) {
+                        letter.textContent = letter.dataset.originalLetter;
+                        delete letter.dataset.originalLetter;
+                    } else if (!originalLetters.includes(letter.textContent)) {
+                        letter.textContent = originalLetters[index] || letter.textContent;
+                    }
+                    letter.style.display = '';
                     const defaultColors = ['#58a6ff', '#f0883e', '#bc8cff', '#3fb950', '#f85149', '#ffa657'];
                     letter.style.color = defaultColors[index];
                     letter.style.textShadow = '';
+                    letter.style.fontSize = '72px';
                 });
+                is67Theme = false; // Reset 67 theme flag
                 // Don't mark as changed when resetting to normal
             } else if (colorArg === 'matrix') {
                 // Matrix effect - green characters
@@ -3110,6 +3481,79 @@
                     });
                     hue = (hue + 2) % 360;
                 }, 50);
+            } else if (colorArg === 'valorant') {
+                // Valorant colors - red and black theme
+                const valorantColors = ['#ff4655', '#0f1923', '#ff4655', '#0f1923', '#ff4655', '#0f1923'];
+                letters.forEach((letter, index) => {
+                    letter.style.color = valorantColors[index % valorantColors.length];
+                    letter.style.textShadow = '0 0 10px rgba(255, 70, 85, 0.5)';
+                });
+            } else if (colorArg === 'landry remix' || colorArg === 'landryremix') {
+                // Landry Remix - turn letters into Among Us characters
+                const originalLetters = ['F', 'I', 'N', 'H', 'U', 'B'];
+                const amongUsChars = ['🔴', '🟢', '🔵', '🟡', '🟣', '🟠'];
+                letters.forEach((letter, index) => {
+                    // Store original letter if not already stored
+                    if (!letter.dataset.originalLetter) {
+                        letter.dataset.originalLetter = letter.textContent;
+                    }
+                    letter.textContent = amongUsChars[index % amongUsChars.length];
+                    letter.style.fontSize = '72px';
+                    letter.style.color = 'transparent';
+                });
+            } else if (colorArg === 'minecraft') {
+                // Minecraft colors - green and brown
+                const minecraftColors = ['#55c855', '#7aab1f', '#55c855', '#7aab1f', '#55c855', '#7aab1f'];
+                letters.forEach((letter, index) => {
+                    letter.style.color = minecraftColors[index % minecraftColors.length];
+                    letter.style.textShadow = '2px 2px 0px rgba(0, 0, 0, 0.3)';
+                });
+            } else if (colorArg === '67') {
+                // Turn FinHub into "67"
+                is67Theme = true;
+                const originalLetters = ['F', 'I', 'N', 'H', 'U', 'B'];
+                letters.forEach((letter, index) => {
+                    if (index < 2) {
+                        letter.textContent = index === 0 ? '6' : '7';
+                        letter.style.color = '#ff4655';
+                        letter.style.textShadow = '0 0 15px rgba(255, 70, 85, 0.8)';
+                    } else {
+                        letter.style.display = 'none';
+                    }
+                });
+            } else if (colorArg === '41') {
+                // Only works if on 67 theme
+                if (!is67Theme) {
+                    alert('You must use COLOR 67 first!');
+                    return;
+                }
+                // Add 41 to 67
+                const titleContainer = document.getElementById('finhubTitle');
+                if (titleContainer) {
+                    // Find the "7" letter and add "41" after it
+                    const letters = titleContainer.querySelectorAll('.title-letter');
+                    if (letters.length >= 2 && letters[1].textContent === '7') {
+                        // Create new letters for "41"
+                        const letter4 = document.createElement('span');
+                        letter4.className = 'title-letter';
+                        letter4.textContent = '4';
+                        letter4.style.color = '#ff4655';
+                        letter4.style.textShadow = '0 0 15px rgba(255, 70, 85, 0.8)';
+                        letter4.style.fontSize = '72px';
+                        letter4.style.fontWeight = 'bold';
+                        
+                        const letter1 = document.createElement('span');
+                        letter1.className = 'title-letter';
+                        letter1.textContent = '1';
+                        letter1.style.color = '#ff4655';
+                        letter1.style.textShadow = '0 0 15px rgba(255, 70, 85, 0.8)';
+                        letter1.style.fontSize = '72px';
+                        letter1.style.fontWeight = 'bold';
+                        
+                        // Insert after the "7"
+                        letters[1].after(letter4, letter1);
+                    }
+                }
             } else {
                 // Regular color - check if hex code or color name
                 let color = colorArg;
@@ -3743,6 +4187,267 @@
             } else {
                 if (btn) btn.textContent = '🌙';
             }
+        }
+        
+        // ============================================
+        // HEXAGON EASTER EGG
+        // ============================================
+        
+        let hexagonClickCount = 0;
+        let hexagonClickTimeout = null;
+        
+        function handleHexagonClick() {
+            hexagonClickCount++;
+            
+            // Reset count after 3 seconds of no clicks
+            if (hexagonClickTimeout) {
+                clearTimeout(hexagonClickTimeout);
+            }
+            hexagonClickTimeout = setTimeout(() => {
+                hexagonClickCount = 0;
+            }, 3000);
+            
+            // Visual feedback
+            const hexagon = document.getElementById('hexagonEasterEgg');
+            if (hexagon) {
+                hexagon.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    hexagon.style.transform = '';
+                }, 200);
+            }
+            
+            if (hexagonClickCount >= 6) {
+                hexagonClickCount = 0;
+                openHexagonSlappingHogs();
+            }
+        }
+        
+        function openHexagonSlappingHogs() {
+            const container = document.getElementById('hexagonGameContainer');
+            if (container) {
+                container.classList.add('active');
+                initHexagonGame();
+            }
+        }
+        
+        function toggleHexagonGame() {
+            const container = document.getElementById('hexagonGameContainer');
+            if (container) {
+                if (container.classList.contains('active')) {
+                    container.classList.remove('active');
+                    stopHexagonGame();
+                } else {
+                    container.classList.add('active');
+                    initHexagonGame();
+                }
+            }
+        }
+        
+        // ============================================
+        // HEXAGON SLAPPING HOGS GAME
+        // ============================================
+        
+        let hexagonGame = null;
+        let hexagonScore = 0;
+        let hexagonHogsSlapped = 0;
+        let hasPlayedHexagonGame = false;
+        
+        function initHexagonGame() {
+            const canvas = document.getElementById('hexagonGameCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            let gameRunning = true;
+            
+            // Player hexagon
+            const player = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                size: 30,
+                rotation: 0,
+                speed: 5
+            };
+            
+            // Hogs array
+            let hogs = [];
+            let hogSpawnTimer = 0;
+            const hogSpawnRate = 60; // Spawn every 60 frames
+            
+            // Mouse position
+            let mouseX = player.x;
+            let mouseY = player.y;
+            
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+            
+            function spawnHog() {
+                const side = Math.floor(Math.random() * 4);
+                let x, y;
+                
+                switch(side) {
+                    case 0: // Top
+                        x = Math.random() * canvas.width;
+                        y = -20;
+                        break;
+                    case 1: // Right
+                        x = canvas.width + 20;
+                        y = Math.random() * canvas.height;
+                        break;
+                    case 2: // Bottom
+                        x = Math.random() * canvas.width;
+                        y = canvas.height + 20;
+                        break;
+                    case 3: // Left
+                        x = -20;
+                        y = Math.random() * canvas.height;
+                        break;
+                }
+                
+                hogs.push({
+                    x: x,
+                    y: y,
+                    size: 25,
+                    speed: 1 + Math.random() * 2,
+                    angle: Math.atan2(player.y - y, player.x - x)
+                });
+            }
+            
+            function update() {
+                if (!gameRunning) return;
+                
+                // Update player position (move towards mouse)
+                const dx = mouseX - player.x;
+                const dy = mouseY - player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 5) {
+                    player.x += (dx / distance) * player.speed;
+                    player.y += (dy / distance) * player.speed;
+                }
+                
+                player.rotation += 0.1;
+                
+                // Spawn hogs
+                hogSpawnTimer++;
+                if (hogSpawnTimer >= hogSpawnRate) {
+                    spawnHog();
+                    hogSpawnTimer = 0;
+                }
+                
+                // Update hogs
+                hogs.forEach((hog, index) => {
+                    // Move towards player
+                    const dx = player.x - hog.x;
+                    const dy = player.y - hog.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    hog.x += (dx / distance) * hog.speed;
+                    hog.y += (dy / distance) * hog.speed;
+                    
+                    // Check collision with player
+                    const hogDist = Math.sqrt((hog.x - player.x) ** 2 + (hog.y - player.y) ** 2);
+                    if (hogDist < player.size + hog.size) {
+                        // Hog slapped!
+                        hogs.splice(index, 1);
+                        hexagonScore += 10;
+                        hexagonHogsSlapped++;
+                        updateHexagonScore();
+                    }
+                    
+                    // Remove hogs that are too far
+                    if (hog.x < -50 || hog.x > canvas.width + 50 || 
+                        hog.y < -50 || hog.y > canvas.height + 50) {
+                        hogs.splice(index, 1);
+                    }
+                });
+            }
+            
+            function draw() {
+                // Clear canvas
+                ctx.fillStyle = '#0d1117';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw player hexagon
+                ctx.save();
+                ctx.translate(player.x, player.y);
+                ctx.rotate(player.rotation);
+                ctx.fillStyle = '#58a6ff';
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i;
+                    const x = Math.cos(angle) * player.size;
+                    const y = Math.sin(angle) * player.size;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = '#79c0ff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+                
+                // Draw hogs
+                hogs.forEach(hog => {
+                    ctx.fillStyle = '#ff6b6b';
+                    ctx.beginPath();
+                    ctx.arc(hog.x, hog.y, hog.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw hog face
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(hog.x - 8, hog.y - 5, 4, 4); // Left eye
+                    ctx.fillRect(hog.x + 4, hog.y - 5, 4, 4); // Right eye
+                    ctx.fillRect(hog.x - 4, hog.y + 2, 8, 4); // Snout
+                });
+            }
+            
+            function gameLoop() {
+                if (!gameRunning) return;
+                update();
+                draw();
+                requestAnimationFrame(gameLoop);
+            }
+            
+            gameLoop();
+            hexagonGame = { stop: () => { gameRunning = false; } };
+            
+            // Mark that user has played the game
+            if (!hasPlayedHexagonGame) {
+                hasPlayedHexagonGame = true;
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                if (usernameLower && database) {
+                    writeToFirebase(`users/${usernameLower}/hasPlayedHexagonGame`, true);
+                }
+                // Unlock grassland theme
+                unlockTheme('grassland');
+            }
+        }
+        
+        function stopHexagonGame() {
+            if (hexagonGame) {
+                hexagonGame.stop();
+                hexagonGame = null;
+            }
+        }
+        
+        function resetHexagonGame() {
+            stopHexagonGame();
+            hexagonScore = 0;
+            hexagonHogsSlapped = 0;
+            updateHexagonScore();
+            initHexagonGame();
+        }
+        
+        function updateHexagonScore() {
+            const scoreEl = document.getElementById('hexagonScore');
+            const hogsEl = document.getElementById('hexagonHogsSlapped');
+            if (scoreEl) scoreEl.textContent = hexagonScore;
+            if (hogsEl) hogsEl.textContent = hexagonHogsSlapped;
         }
         
         // ============================================
@@ -5279,6 +5984,12 @@
                     name: 'Snake',
                     description: 'Win snake game to unlock',
                     unlocked: unlockedThemes.has('snake')
+                },
+                {
+                    id: 'grassland',
+                    name: 'Grassland',
+                    description: 'Play Hexagon Slapping Hogs to unlock',
+                    unlocked: unlockedThemes.has('grassland')
                 }
             ];
             
@@ -5329,6 +6040,8 @@
                 applyGodClickerTheme();
             } else if (themeId === 'snake') {
                 applySnakeTheme();
+            } else if (themeId === 'grassland') {
+                applyGrasslandTheme();
             }
             
             // Update theme list
@@ -5402,6 +6115,21 @@
             if (bg) {
                 const snakeElements = bg.querySelectorAll('.theme-snake-segment, .theme-fruit');
                 snakeElements.forEach(el => el.remove());
+            }
+            
+            // Clear grassland theme
+            if (grasslandHogInterval) {
+                clearInterval(grasslandHogInterval);
+                grasslandHogInterval = null;
+            }
+            grasslandHogs.forEach(hog => {
+                if (hog.moveInterval) clearInterval(hog.moveInterval);
+                if (hog.element) hog.element.remove();
+            });
+            grasslandHogs = [];
+            if (bg) {
+                const grassElements = bg.querySelectorAll('.grass-blade, .grassland-hog');
+                grassElements.forEach(el => el.remove());
             }
         }
         
@@ -6077,6 +6805,164 @@
         }
         
         // ============================================
+        // GRASSLAND THEME
+        // ============================================
+        
+        let grasslandHogs = [];
+        let grasslandHogInterval = null;
+        
+        function applyGrasslandTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            const isLightMode = document.body.classList.contains('light-mode');
+            bg.style.background = isLightMode
+                ? 'linear-gradient(135deg, #a8d5a8 0%, #7fb87f 50%, #a8d5a8 100%)'
+                : 'linear-gradient(135deg, #2d5016 0%, #1a3d0a 50%, #2d5016 100%)';
+            bg.style.opacity = '0.9';
+            
+            // Add grass pattern
+            createGrassPattern(bg);
+            
+            // Make FinHub title look like grass
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach((letter, index) => {
+                    letter.style.color = isLightMode ? '#4a7c2a' : '#7fb87f';
+                    letter.style.textShadow = isLightMode 
+                        ? '2px 2px 0px rgba(0, 0, 0, 0.2)' 
+                        : '2px 2px 0px rgba(0, 0, 0, 0.5)';
+                    letter.style.fontFamily = 'monospace';
+                    letter.style.imageRendering = 'pixelated';
+                });
+            }
+            
+            // Spawn pixelated hogs
+            spawnGrasslandHogs();
+        }
+        
+        function createGrassPattern(container) {
+            // Create grass blades using CSS
+            for (let i = 0; i < 50; i++) {
+                const grass = document.createElement('div');
+                grass.className = 'grass-blade';
+                grass.style.position = 'absolute';
+                grass.style.left = Math.random() * 100 + '%';
+                grass.style.top = Math.random() * 100 + '%';
+                grass.style.width = '3px';
+                grass.style.height = (20 + Math.random() * 30) + 'px';
+                grass.style.background = document.body.classList.contains('light-mode') 
+                    ? '#4a7c2a' 
+                    : '#5a8c3a';
+                grass.style.transform = `rotate(${Math.random() * 30 - 15}deg)`;
+                grass.style.zIndex = '1';
+                grass.style.pointerEvents = 'none';
+                container.appendChild(grass);
+            }
+        }
+        
+        function spawnGrasslandHogs() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'grassland') return;
+            
+            // Clear existing hogs
+            grasslandHogs.forEach(hog => {
+                if (hog.element) hog.element.remove();
+            });
+            grasslandHogs = [];
+            
+            if (grasslandHogInterval) {
+                clearInterval(grasslandHogInterval);
+            }
+            
+            // Spawn initial hogs
+            for (let i = 0; i < 5; i++) {
+                createGrasslandHog();
+            }
+            
+            // Spawn new hogs periodically
+            grasslandHogInterval = setInterval(() => {
+                if (currentTheme !== 'grassland') {
+                    clearInterval(grasslandHogInterval);
+                    return;
+                }
+                if (grasslandHogs.length < 8) {
+                    createGrasslandHog();
+                }
+            }, 3000);
+        }
+        
+        function createGrasslandHog() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'grassland') return;
+            
+            const hog = document.createElement('div');
+            hog.className = 'grassland-hog';
+            hog.style.position = 'absolute';
+            hog.style.width = '40px';
+            hog.style.height = '40px';
+            hog.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+            hog.style.top = Math.random() * (window.innerHeight - 40) + 'px';
+            hog.style.fontSize = '40px';
+            hog.style.zIndex = '3';
+            hog.style.cursor = 'pointer';
+            hog.style.transition = 'transform 0.2s';
+            hog.style.imageRendering = 'pixelated';
+            hog.textContent = '🐷';
+            
+            // Pixelated style
+            hog.style.imageRendering = 'pixelated';
+            hog.style.imageRendering = '-moz-crisp-edges';
+            hog.style.imageRendering = 'crisp-edges';
+            
+            // Make hog interactive
+            hog.onclick = () => {
+                hog.style.transform = 'scale(1.5) rotate(360deg)';
+                setTimeout(() => {
+                    hog.style.transform = '';
+                }, 500);
+            };
+            
+            // Animate hog walking
+            let direction = Math.random() * Math.PI * 2;
+            let speed = 0.5 + Math.random() * 0.5;
+            
+            const moveHog = () => {
+                if (currentTheme !== 'grassland' || !hog.parentElement) {
+                    clearInterval(hog.moveInterval);
+                    return;
+                }
+                
+                const rect = hog.getBoundingClientRect();
+                let x = parseFloat(hog.style.left) || rect.left;
+                let y = parseFloat(hog.style.top) || rect.top;
+                
+                x += Math.cos(direction) * speed;
+                y += Math.sin(direction) * speed;
+                
+                // Bounce off edges
+                if (x < 0 || x > window.innerWidth - 40) {
+                    direction = Math.PI - direction;
+                }
+                if (y < 0 || y > window.innerHeight - 40) {
+                    direction = -direction;
+                }
+                
+                // Random direction change
+                if (Math.random() < 0.02) {
+                    direction = Math.random() * Math.PI * 2;
+                }
+                
+                hog.style.left = x + 'px';
+                hog.style.top = y + 'px';
+            };
+            
+            hog.moveInterval = setInterval(moveHog, 50);
+            bg.appendChild(hog);
+            grasslandHogs.push({ element: hog, moveInterval: hog.moveInterval });
+        }
+        
+        // ============================================
         // AUTHENTICATION SYSTEM
         // ============================================
         
@@ -6237,7 +7123,9 @@
         
         // Logout
         function logout() {
+            stopTimeTracking();
             localStorage.removeItem('loggedInUsername');
+            localStorage.removeItem('loggedInUsernameLower');
             localStorage.removeItem('loginTime');
             showLoginPage();
         }
@@ -6247,6 +7135,7 @@
             const username = localStorage.getItem('loggedInUsername');
             if (username) {
                 showMainPage();
+                // Time tracking will start in showMainPage()
             } else {
                 showLoginPage();
             }
@@ -6267,10 +7156,281 @@
                 document.getElementById('mainPage').classList.remove('hidden');
                 document.getElementById('userInfo').classList.remove('hidden');
                 document.getElementById('loggedInUsername').textContent = username;
+                
+                // Start time tracking
+                startTimeTracking();
             } else {
                 showLoginPage();
             }
         }
+        
+        // ============================================
+        // TIME TRACKING SYSTEM
+        // ============================================
+        
+        let timeTrackingInterval = null;
+        let sessionStartTime = null;
+        
+        function startTimeTracking() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (!usernameLower || !database) return;
+            
+            // Get or set login time
+            let loginTime = localStorage.getItem('loginTime');
+            if (!loginTime) {
+                loginTime = Date.now();
+                localStorage.setItem('loginTime', loginTime.toString());
+            }
+            sessionStartTime = parseInt(loginTime);
+            
+            // Load existing time spent
+            readFromFirebase(`users/${usernameLower}/stats/timeSpent`).then((timeSpent) => {
+                if (!timeSpent) {
+                    timeSpent = 0;
+                }
+                
+                // Save time every 30 seconds
+                timeTrackingInterval = setInterval(() => {
+                    const currentTime = Date.now();
+                    const sessionTime = Math.floor((currentTime - sessionStartTime) / 1000); // seconds
+                    const totalTime = (timeSpent || 0) + sessionTime;
+                    
+                    // Update session start time to avoid double counting
+                    sessionStartTime = currentTime;
+                    timeSpent = totalTime;
+                    
+                    // Save to Firebase
+                    if (database && usernameLower) {
+                        writeToFirebase(`users/${usernameLower}/stats/timeSpent`, totalTime);
+                        writeToFirebase(`timeLeaderboard/${usernameLower}`, {
+                            username: username,
+                            usernameLower: usernameLower,
+                            timeSpent: totalTime,
+                            lastUpdated: Date.now()
+                        });
+                    }
+                }, 30000); // Every 30 seconds
+            });
+        }
+        
+        function stopTimeTracking() {
+            if (timeTrackingInterval) {
+                clearInterval(timeTrackingInterval);
+                timeTrackingInterval = null;
+            }
+            
+            // Save final time before stopping
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (!usernameLower || !database || !sessionStartTime) return;
+            
+            readFromFirebase(`users/${usernameLower}/stats/timeSpent`).then((timeSpent) => {
+                const currentTime = Date.now();
+                const sessionTime = Math.floor((currentTime - sessionStartTime) / 1000);
+                const totalTime = (timeSpent || 0) + sessionTime;
+                
+                writeToFirebase(`users/${usernameLower}/stats/timeSpent`, totalTime);
+                writeToFirebase(`timeLeaderboard/${usernameLower}`, {
+                    username: username,
+                    usernameLower: usernameLower,
+                    timeSpent: totalTime,
+                    lastUpdated: Date.now()
+                });
+            });
+        }
+        
+        // ============================================
+        // TIME LEADERBOARD
+        // ============================================
+        
+        function toggleTimeLeaderboard() {
+            const container = document.getElementById('timeLeaderboardContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const snake = document.getElementById('snakeContainer');
+            const themes = document.getElementById('themeContainer');
+            const notifications = document.getElementById('notificationsContainer');
+            const profile = document.getElementById('profileContainer');
+            
+            // Close other panels
+            chat.classList.remove('active');
+            friends.classList.remove('active');
+            paint.classList.remove('active');
+            clicker.classList.remove('active');
+            minesweeper.classList.remove('active');
+            snake.classList.remove('active');
+            themes.classList.remove('active');
+            if (notifications) notifications.classList.remove('active');
+            if (profile) profile.classList.remove('active');
+            
+            if (container.classList.contains('active')) {
+                container.classList.remove('active');
+            } else {
+                container.classList.add('active');
+                loadTimeLeaderboard();
+            }
+        }
+        
+        function loadTimeLeaderboard() {
+            if (!database) return;
+            
+            const podium = document.getElementById('timeLeaderboardPodium');
+            podium.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading leaderboard...</p>';
+            
+            // Read all time leaderboard entries
+            readFromFirebase('timeLeaderboard').then((data) => {
+                if (!data) {
+                    podium.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No time data yet. Start using the site to track your time!</p>';
+                    return;
+                }
+                
+                // Convert to array and sort by time spent (descending)
+                const entries = Object.entries(data).map(([key, value]) => ({
+                    usernameLower: key,
+                    username: value.username || key,
+                    timeSpent: value.timeSpent || 0
+                })).sort((a, b) => b.timeSpent - a.timeSpent);
+                
+                // Get top 3
+                const top3 = entries.slice(0, 3);
+                
+                // Format time
+                function formatTime(seconds) {
+                    const hours = Math.floor(seconds / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    const secs = seconds % 60;
+                    if (hours > 0) {
+                        return `${hours}h ${minutes}m`;
+                    } else if (minutes > 0) {
+                        return `${minutes}m ${secs}s`;
+                    } else {
+                        return `${secs}s`;
+                    }
+                }
+                
+                // Render podium
+                podium.innerHTML = '';
+                
+                // Second place (left)
+                if (top3[1]) {
+                    const item = document.createElement('div');
+                    item.className = 'podium-item';
+                    item.innerHTML = `
+                        <div class="podium-stand second">2</div>
+                        <div class="podium-username">${top3[1].username}</div>
+                        <div class="podium-time">${formatTime(top3[1].timeSpent)}</div>
+                    `;
+                    podium.appendChild(item);
+                } else {
+                    const item = document.createElement('div');
+                    item.className = 'podium-item';
+                    item.innerHTML = `
+                        <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
+                        <div class="podium-username" style="color: #8b949e;">-</div>
+                        <div class="podium-time">-</div>
+                    `;
+                    podium.appendChild(item);
+                }
+                
+                // First place (center)
+                if (top3[0]) {
+                    const item = document.createElement('div');
+                    item.className = 'podium-item';
+                    item.innerHTML = `
+                        <div class="podium-stand first">1</div>
+                        <div class="podium-username">${top3[0].username}</div>
+                        <div class="podium-time">${formatTime(top3[0].timeSpent)}</div>
+                    `;
+                    podium.appendChild(item);
+                } else {
+                    const item = document.createElement('div');
+                    item.className = 'podium-item';
+                    item.innerHTML = `
+                        <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
+                        <div class="podium-username" style="color: #8b949e;">-</div>
+                        <div class="podium-time">-</div>
+                    `;
+                    podium.appendChild(item);
+                }
+                
+                // Third place (right)
+                if (top3[2]) {
+                    const item = document.createElement('div');
+                    item.className = 'podium-item';
+                    item.innerHTML = `
+                        <div class="podium-stand third">3</div>
+                        <div class="podium-username">${top3[2].username}</div>
+                        <div class="podium-time">${formatTime(top3[2].timeSpent)}</div>
+                    `;
+                    podium.appendChild(item);
+                } else {
+                    const item = document.createElement('div');
+                    item.className = 'podium-item';
+                    item.innerHTML = `
+                        <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
+                        <div class="podium-username" style="color: #8b949e;">-</div>
+                        <div class="podium-time">-</div>
+                    `;
+                    podium.appendChild(item);
+                }
+            }).catch(err => {
+                console.error('Error loading time leaderboard:', err);
+                podium.innerHTML = '<p style="color: #f85149; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
+        }
+        
+        // ============================================
+        // GAMES FOLDER
+        // ============================================
+        
+        function toggleGamesFolder() {
+            const folder = document.getElementById('gamesFolder');
+            if (folder.classList.contains('active')) {
+                folder.classList.remove('active');
+            } else {
+                folder.classList.add('active');
+            }
+        }
+        
+        function openGameFromFolder(gameName) {
+            // Close folder
+            toggleGamesFolder();
+            
+            // Small delay to allow folder to close
+            setTimeout(() => {
+                // Open the selected game
+                switch(gameName) {
+                    case 'paint':
+                        togglePaint();
+                        break;
+                    case 'clicker':
+                        toggleClicker();
+                        break;
+                    case 'minesweeper':
+                        toggleMinesweeper();
+                        break;
+                    case 'snake':
+                        toggleSnake();
+                        break;
+                }
+            }, 100);
+        }
+        
+        // Close games folder when clicking outside
+        document.addEventListener('click', (e) => {
+            const folder = document.getElementById('gamesFolder');
+            if (folder && folder.classList.contains('active')) {
+                const folderContent = folder.querySelector('.games-grid');
+                const folderHeader = folder.querySelector('.games-folder-header');
+                if (!folder.contains(e.target) || e.target === folder) {
+                    toggleGamesFolder();
+                }
+            }
+        });
         
         // Allow Enter key to submit forms
         document.addEventListener('DOMContentLoaded', () => {
