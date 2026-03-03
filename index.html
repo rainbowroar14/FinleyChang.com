@@ -452,6 +452,21 @@
             }
         }
         
+        @keyframes comboPulse {
+            0% {
+                transform: translateX(-50%) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: translateX(-50%) scale(1.3);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+            }
+        }
+        
         /* Tetris Styles */
         #tetrisCanvas, #tetrisNextCanvas {
             image-rendering: pixelated;
@@ -670,8 +685,9 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 40px;
+            overflow-y: auto;
         }
         
         .games-folder.active {
@@ -689,6 +705,8 @@
             width: 100%;
             max-width: 600px;
             margin-bottom: 30px;
+            flex-shrink: 0;
+            padding-top: 20px;
         }
         
         .games-folder-title {
@@ -722,6 +740,7 @@
             gap: 30px;
             max-width: 600px;
             width: 100%;
+            padding-bottom: 40px;
         }
         
         .game-folder-item {
@@ -3088,6 +3107,7 @@
                                 <div>Score: <span id="blockBlastScore">0</span></div>
                                 <div>Level: <span id="blockBlastLevel">1</span></div>
                                 <div>Lines Cleared: <span id="blockBlastLines">0</span></div>
+                                <div id="blockBlastCombo" style="display: none; font-weight: bold; font-size: 18px; margin-top: 10px; text-align: center;"></div>
                                 <button class="snake-reset-btn" onclick="resetBlockBlast()">Reset</button>
                             </div>
                         </div>
@@ -3268,7 +3288,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.9.1';
+        const APP_VERSION = '1.9.3';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -7665,8 +7685,75 @@
             score: 0,
             level: 1,
             linesCleared: 0,
-            gameOver: false
+            gameOver: false,
+            combo: 0,
+            comboMultiplier: 1,
+            lastClearTime: 0
         };
+        
+        // Audio context for sound effects
+        let blockBlastAudioContext = null;
+        
+        function initBlockBlastAudio() {
+            if (!blockBlastAudioContext) {
+                try {
+                    blockBlastAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.warn('Audio context not supported');
+                }
+            }
+        }
+        
+        function playBlockBlastSound(frequency, duration, type = 'sine') {
+            if (!blockBlastAudioContext) {
+                initBlockBlastAudio();
+            }
+            if (!blockBlastAudioContext) return;
+            
+            try {
+                const oscillator = blockBlastAudioContext.createOscillator();
+                const gainNode = blockBlastAudioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(blockBlastAudioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(0.1, blockBlastAudioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, blockBlastAudioContext.currentTime + duration);
+                
+                oscillator.start(blockBlastAudioContext.currentTime);
+                oscillator.stop(blockBlastAudioContext.currentTime + duration);
+            } catch (e) {
+                // Silently fail if audio fails
+            }
+        }
+        
+        function playBlockBlastPlacementSound() {
+            playBlockBlastSound(400, 0.1, 'square');
+        }
+        
+        function playBlockBlastClearSound(lines) {
+            const baseFreq = 300 + (lines * 50);
+            playBlockBlastSound(baseFreq, 0.2, 'sine');
+        }
+        
+        function playBlockBlastComboSound(combo) {
+            const baseFreq = 500 + (combo * 30);
+            playBlockBlastSound(baseFreq, 0.3, 'sawtooth');
+        }
+        
+        function playBlockBlastInvalidSound() {
+            playBlockBlastSound(150, 0.15, 'square');
+        }
+        
+        function playBlockBlastLevelUpSound() {
+            // Play ascending notes
+            playBlockBlastSound(400, 0.1, 'sine');
+            setTimeout(() => playBlockBlastSound(500, 0.1, 'sine'), 100);
+            setTimeout(() => playBlockBlastSound(600, 0.2, 'sine'), 200);
+        }
         
         const BLOCK_BLAST_SHAPES = [
             [[1]], // Single
@@ -7748,6 +7835,12 @@
             blockBlastGame.level = 1;
             blockBlastGame.linesCleared = 0;
             blockBlastGame.gameOver = false;
+            blockBlastGame.combo = 0;
+            blockBlastGame.comboMultiplier = 1;
+            blockBlastGame.lastClearTime = 0;
+            
+            // Initialize audio
+            initBlockBlastAudio();
             
             // Generate 3 random blocks
             blockBlastGame.nextBlocks = [];
@@ -7866,8 +7959,12 @@
                 setTimeout(() => {
                     board.style.animation = '';
                 }, 300);
+                playBlockBlastInvalidSound();
                 return;
             }
+            
+            // Play placement sound
+            playBlockBlastPlacementSound();
             
             // Create placement effect
             createBlockBlastPlacementEffect(row, col, shape, color);
@@ -8174,23 +8271,36 @@
             }
         }
         
-        function showBlockBlastScorePopup(points, linesCleared) {
+        function showBlockBlastScorePopup(points, linesCleared, combo = 1, multiplier = 1) {
             const board = document.getElementById('blockBlastBoard');
             if (!board) return;
             
             const popup = document.createElement('div');
-            popup.textContent = `+${points} (${linesCleared} lines!)`;
+            let popupText = `+${points.toLocaleString()}`;
+            if (linesCleared > 1) {
+                popupText += ` (${linesCleared} lines!)`;
+            }
+            if (combo > 1) {
+                popupText += `\n${combo}x COMBO!`;
+            }
+            
+            popup.textContent = popupText;
             popup.style.position = 'absolute';
             popup.style.left = '50%';
             popup.style.top = '50%';
             popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.color = '#ffd700';
-            popup.style.fontSize = '24px';
+            popup.style.color = combo > 1 ? '#ffd700' : '#58a6ff';
+            popup.style.fontSize = combo > 1 ? '28px' : '24px';
             popup.style.fontWeight = 'bold';
-            popup.style.textShadow = '0 0 10px #ffd700, 0 0 20px #ffd700';
+            popup.style.textShadow = combo > 1 
+                ? '0 0 15px #ffd700, 0 0 30px #ffd700, 0 0 45px #ffd700'
+                : '0 0 10px #58a6ff, 0 0 20px #58a6ff';
             popup.style.pointerEvents = 'none';
             popup.style.zIndex = '1001';
             popup.style.opacity = '0';
+            popup.style.textAlign = 'center';
+            popup.style.whiteSpace = 'pre-line';
+            popup.style.lineHeight = '1.4';
             
             board.style.position = 'relative';
             board.appendChild(popup);
@@ -8199,7 +8309,7 @@
             setTimeout(() => {
                 popup.style.transition = 'all 0.5s ease-out';
                 popup.style.opacity = '1';
-                popup.style.transform = 'translate(-50%, -70%) scale(1.2)';
+                popup.style.transform = 'translate(-50%, -70%) scale(combo > 1 ? 1.3 : 1.2)';
             }, 10);
             
             setTimeout(() => {
@@ -8211,13 +8321,66 @@
                         popup.remove();
                     }
                 }, 500);
+            }, combo > 1 ? 1500 : 1000);
+        }
+        
+        function showBlockBlastComboIndicator(combo, multiplier) {
+            const container = document.getElementById('blockBlastContainer');
+            if (!container) return;
+            
+            const indicator = document.createElement('div');
+            indicator.textContent = `${combo}x COMBO!`;
+            indicator.style.position = 'absolute';
+            indicator.style.left = '50%';
+            indicator.style.top = '20%';
+            indicator.style.transform = 'translateX(-50%)';
+            indicator.style.color = '#ffd700';
+            indicator.style.fontSize = '36px';
+            indicator.style.fontWeight = 'bold';
+            indicator.style.textShadow = '0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 60px #ffd700';
+            indicator.style.pointerEvents = 'none';
+            indicator.style.zIndex = '1002';
+            indicator.style.opacity = '0';
+            indicator.style.animation = 'comboPulse 0.5s ease-out';
+            
+            container.style.position = 'relative';
+            container.appendChild(indicator);
+            
+            setTimeout(() => {
+                indicator.style.transition = 'all 0.5s ease-out';
+                indicator.style.opacity = '1';
+                indicator.style.transform = 'translateX(-50%) scale(1.2)';
+            }, 10);
+            
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                indicator.style.transform = 'translateX(-50%) scale(0.8) translateY(-20px)';
+                
+                setTimeout(() => {
+                    if (indicator.parentElement) {
+                        indicator.remove();
+                    }
+                }, 500);
             }, 1000);
         }
         
         function updateBlockBlastUI() {
-            document.getElementById('blockBlastScore').textContent = blockBlastGame.score;
+            document.getElementById('blockBlastScore').textContent = blockBlastGame.score.toLocaleString();
             document.getElementById('blockBlastLevel').textContent = blockBlastGame.level;
             document.getElementById('blockBlastLines').textContent = blockBlastGame.linesCleared;
+            
+            // Update combo display
+            const comboDisplay = document.getElementById('blockBlastCombo');
+            if (comboDisplay) {
+                if (blockBlastGame.combo > 1) {
+                    comboDisplay.textContent = `${blockBlastGame.combo}x COMBO! (${blockBlastGame.comboMultiplier.toFixed(1)}x)`;
+                    comboDisplay.style.display = 'block';
+                    comboDisplay.style.color = '#ffd700';
+                    comboDisplay.style.textShadow = '0 0 10px #ffd700';
+                } else {
+                    comboDisplay.style.display = 'none';
+                }
+            }
         }
         
         function gameOverBlockBlast() {
