@@ -181,6 +181,41 @@
             overflow-y: auto;
         }
         
+        .profile-medals {
+            margin-top: 20px;
+        }
+        
+        .profile-medals h4 {
+            color: #c9d1d9;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        body.light-mode .profile-medals h4 {
+            color: #24292f;
+        }
+        
+        .profile-medals-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .profile-medal-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(22, 27, 34, 0.5);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #30363d;
+        }
+        
+        body.light-mode .profile-medal-item {
+            background: rgba(246, 248, 250, 0.5);
+            border: 1px solid #d0d7de;
+        }
+        
         .profile-friend-item {
             padding: 12px;
             background: rgba(22, 27, 34, 0.5);
@@ -2654,6 +2689,12 @@
                         <h4>Description</h4>
                         <textarea id="profileDescription" class="profile-description" placeholder="Tell everyone about yourself..." rows="5"></textarea>
                         <button class="profile-btn" id="saveProfileBtn" onclick="saveProfile()" style="margin-top: 10px;">💾 Save Profile</button>
+                        <div id="profileMedals" class="profile-medals" style="margin-top: 20px;">
+                            <h4>🏆 Leaderboard Rankings</h4>
+                            <div id="profileMedalsList" class="profile-medals-list">
+                                <p style="color: #8b949e; text-align: center; padding: 10px; font-size: 14px;">Loading rankings...</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="profile-friends-section" id="profileFriendsSection">
                         <h4>Your Friends</h4>
@@ -2742,7 +2783,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.4.5';
+        const APP_VERSION = '1.5.0';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -4879,6 +4920,9 @@
             
             // Load friends for profile
             loadProfileFriends();
+            
+            // Load medals/rankings
+            loadProfileMedals(usernameLower);
         }
         
         function viewFriendProfile(friendUsernameLower, friendDisplayName) {
@@ -4945,6 +4989,9 @@
             
             // Load friend's friends
             loadFriendProfileFriends(friendUsernameLower);
+            
+            // Load medals/rankings
+            loadProfileMedals(friendUsernameLower);
         }
         
         function loadFriendProfileFriends(friendUsernameLower) {
@@ -5422,6 +5469,8 @@
             // Save score to Firebase (throttled - only every 10 clicks or on close)
             if (clickerScore % 10 === 0 || clickerScore === 1) {
                 saveClickerScore();
+                // Check if user is now #1 after saving
+                setTimeout(() => checkTopClickerRank(), 500);
             }
             
             // Save total clicks
@@ -5507,6 +5556,7 @@
             readFromFirebase('clickerScores').then((scores) => {
                 if (!scores || Object.keys(scores).length === 0) {
                     leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    checkTopClickerRank();
                     return;
                 }
                 
@@ -5518,6 +5568,7 @@
                 leaderboard.innerHTML = '';
                 if (scoreArray.length === 0) {
                     leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No valid scores yet!</p>';
+                    checkTopClickerRank();
                     return;
                 }
                 
@@ -5532,9 +5583,41 @@
                     `;
                     leaderboard.appendChild(div);
                 });
+                
+                // Check if user is #1
+                checkTopClickerRank();
             }).catch(err => {
                 console.error('Error loading leaderboard:', err);
                 leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
+        }
+        
+        // Check if user is #1 on clicker leaderboard and unlock theme
+        function checkTopClickerRank() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (!usernameLower || !database) return;
+            
+            readFromFirebase('clickerScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) return;
+                
+                const scoreArray = Object.values(scores)
+                    .filter(entry => entry && entry.username)
+                    .sort((a, b) => (b.score || 0) - (a.score || 0));
+                
+                if (scoreArray.length > 0) {
+                    const topPlayer = scoreArray[0];
+                    // Check if this user is #1 (compare by usernameLower)
+                    if (topPlayer.usernameLower === usernameLower || 
+                        (topPlayer.username && topPlayer.username.toLowerCase() === usernameLower)) {
+                        // User is #1!
+                        if (!unlockedThemes.has('topclicker')) {
+                            unlockTheme('topclicker');
+                        }
+                    }
+                }
+            }).catch(err => {
+                console.error('Error checking top clicker rank:', err);
             });
         }
         
@@ -6192,6 +6275,12 @@
                     name: 'Grassland',
                     description: 'Play Hexagon Slapping Hogs to unlock',
                     unlocked: unlockedThemes.has('grassland')
+                },
+                {
+                    id: 'topclicker',
+                    name: 'Top Clicker',
+                    description: 'Be #1 on clicker leaderboard to unlock',
+                    unlocked: unlockedThemes.has('topclicker')
                 }
             ];
             
@@ -6244,6 +6333,8 @@
                 applySnakeTheme();
             } else if (themeId === 'grassland') {
                 applyGrasslandTheme();
+            } else if (themeId === 'topclicker') {
+                applyTopClickerTheme();
             }
             
             // Update theme list
@@ -6273,6 +6364,7 @@
             const titleContainer = document.getElementById('finhubTitle');
             if (titleContainer) {
                 titleContainer.style.transform = '';
+                titleContainer.style.animation = ''; // Clear top clicker animation
                 const letters = titleContainer.querySelectorAll('.title-letter');
                 letters.forEach((letter, index) => {
                     letter.style.fontSize = '72px';
@@ -7202,6 +7294,188 @@
         }
         
         // ============================================
+        // TOP CLICKER THEME
+        // ============================================
+        
+        function applyTopClickerTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            const isLightMode = document.body.classList.contains('light-mode');
+            bg.style.background = isLightMode
+                ? 'linear-gradient(135deg, #fff9c4 0%, #fff59d 50%, #fff176 100%)'
+                : 'linear-gradient(135deg, #1a0a00 0%, #2d1a00 50%, #1a0a00 100%)';
+            bg.style.opacity = '0.9';
+            
+            // Make FinHub title gold and glowing
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach((letter) => {
+                    letter.style.color = '#ffd700';
+                    letter.style.textShadow = '0 0 20px #ffd700, 0 0 40px #ffaa00, 0 0 60px #ff8800';
+                    letter.style.transition = 'all 0.3s ease';
+                });
+                
+                // Add floating animation
+                titleContainer.style.animation = 'floatTitle 3s ease-in-out infinite';
+            }
+            
+            // Add CSS animation if not already added
+            if (!document.getElementById('topClickerThemeStyles')) {
+                const style = document.createElement('style');
+                style.id = 'topClickerThemeStyles';
+                style.textContent = `
+                    @keyframes floatTitle {
+                        0%, 100% { transform: translateY(0px); }
+                        50% { transform: translateY(-10px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Periodically check if user is #1 on clicker leaderboard
+        let topClickerCheckInterval = null;
+        
+        function startTopClickerCheck() {
+            // Check every 30 seconds
+            if (topClickerCheckInterval) {
+                clearInterval(topClickerCheckInterval);
+            }
+            topClickerCheckInterval = setInterval(() => {
+                checkTopClickerRank();
+            }, 30000); // Check every 30 seconds
+            
+            // Also check immediately
+            checkTopClickerRank();
+        }
+        
+        function stopTopClickerCheck() {
+            if (topClickerCheckInterval) {
+                clearInterval(topClickerCheckInterval);
+                topClickerCheckInterval = null;
+            }
+        }
+        
+        // ============================================
+        // PROFILE MEDALS / RANKINGS
+        // ============================================
+        
+        async function loadProfileMedals(usernameLower) {
+            if (!database || !usernameLower) return;
+            
+            const medalsList = document.getElementById('profileMedalsList');
+            if (!medalsList) return;
+            
+            medalsList.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 10px; font-size: 14px;">Loading rankings...</p>';
+            
+            const rankings = [];
+            
+            // Check Clicker Leaderboard
+            try {
+                const clickerScores = await readFromFirebase('clickerScores');
+                if (clickerScores) {
+                    const scoreArray = Object.values(clickerScores)
+                        .filter(entry => entry && entry.username)
+                        .sort((a, b) => (b.score || 0) - (a.score || 0));
+                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    if (rank > 0 && rank <= 3) {
+                        rankings.push({ type: 'Clicker', rank: rank });
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading clicker rankings:', err);
+            }
+            
+            // Check Minesweeper Leaderboard
+            try {
+                const minesweeperScores = await readFromFirebase('minesweeperScores');
+                if (minesweeperScores) {
+                    const scoreArray = Object.values(minesweeperScores)
+                        .filter(entry => entry && entry.username)
+                        .sort((a, b) => (a.time || Infinity) - (b.time || Infinity));
+                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    if (rank > 0 && rank <= 3) {
+                        rankings.push({ type: 'Minesweeper', rank: rank });
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading minesweeper rankings:', err);
+            }
+            
+            // Check Snake Leaderboard
+            try {
+                const snakeScores = await readFromFirebase('snakeScores');
+                if (snakeScores) {
+                    const scoreArray = Object.values(snakeScores)
+                        .filter(entry => entry && entry.username)
+                        .sort((a, b) => (b.score || 0) - (a.score || 0));
+                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    if (rank > 0 && rank <= 3) {
+                        rankings.push({ type: 'Snake', rank: rank });
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading snake rankings:', err);
+            }
+            
+            // Check Hexagon Leaderboard
+            try {
+                const hexagonScores = await readFromFirebase('hexagonScores');
+                if (hexagonScores) {
+                    const scoreArray = Object.values(hexagonScores)
+                        .filter(entry => entry && entry.username)
+                        .sort((a, b) => (b.score || 0) - (a.score || 0));
+                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    if (rank > 0 && rank <= 3) {
+                        rankings.push({ type: 'Hexagon Hogs', rank: rank });
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading hexagon rankings:', err);
+            }
+            
+            // Check Time Leaderboard
+            try {
+                const timeScores = await readFromFirebase('timeLeaderboard');
+                if (timeScores) {
+                    const scoreArray = Object.values(timeScores)
+                        .filter(entry => entry && entry.username)
+                        .sort((a, b) => (b.timeSpent || 0) - (a.timeSpent || 0));
+                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    if (rank > 0 && rank <= 3) {
+                        rankings.push({ type: 'Time Spent', rank: rank });
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading time rankings:', err);
+            }
+            
+            // Display rankings
+            if (rankings.length === 0) {
+                medalsList.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 10px; font-size: 14px;">No top 3 rankings yet</p>';
+            } else {
+                medalsList.innerHTML = '';
+                rankings.forEach(({ type, rank }) => {
+                    const medalDiv = document.createElement('div');
+                    medalDiv.className = 'profile-medal-item';
+                    medalDiv.style.cssText = 'display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(22, 27, 34, 0.5); border-radius: 6px; margin-bottom: 8px;';
+                    
+                    const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+                    const medalColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : '#cd7f32';
+                    
+                    medalDiv.innerHTML = `
+                        <span style="font-size: 24px;">${medalEmoji}</span>
+                        <span style="color: ${medalColor}; font-weight: bold;">#${rank}</span>
+                        <span style="color: #c9d1d9;">in ${type}</span>
+                    `;
+                    
+                    medalsList.appendChild(medalDiv);
+                });
+            }
+        }
+        
+        // ============================================
         // AUTHENTICATION SYSTEM
         // ============================================
         
@@ -7398,6 +7672,9 @@
                 
                 // Start time tracking
                 startTimeTracking();
+                
+                // Start top clicker check
+                startTopClickerCheck();
             } else {
                 showLoginPage();
             }
