@@ -3053,6 +3053,52 @@
             </div>
         </div>
         
+        <!-- Block Blast Game -->
+        <div class="game-container" id="blockBlastContainer">
+            <div class="game-header">
+                <h3>💥 Block Blast</h3>
+                <button class="close-btn" onclick="toggleBlockBlast()">×</button>
+            </div>
+            <div class="game-content">
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <div>
+                        <div class="snake-controls" style="margin-bottom: 20px;">
+                            <div class="snake-info">
+                                <div>Score: <span id="blockBlastScore">0</span></div>
+                                <div>Level: <span id="blockBlastLevel">1</span></div>
+                                <div>Lines Cleared: <span id="blockBlastLines">0</span></div>
+                                <button class="snake-reset-btn" onclick="resetBlockBlast()">Reset</button>
+                            </div>
+                        </div>
+                        <div class="snake-instructions">
+                            <p>Click blocks to place them</p>
+                            <p>Fill rows/columns to clear</p>
+                            <p>Score 10,000+ to unlock theme!</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div id="blockBlastBoard" style="display: grid; grid-template-columns: repeat(10, 30px); gap: 2px; border: 2px solid #30363d; padding: 5px; background: #0d1117;">
+                            <!-- Board cells will be generated here -->
+                        </div>
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 20px;">
+                            <h4>Next Blocks:</h4>
+                            <div id="blockBlastNextBlocks" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Next blocks will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="leaderboard-section" style="margin-top: 20px;">
+                    <h4>Best Scores</h4>
+                    <div class="leaderboard-list" id="blockBlastLeaderboard">
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Private Chat -->
         <div class="private-chat-container" id="privateChat">
             <div class="chat-header">
@@ -3183,6 +3229,10 @@
                 <div class="game-folder-icon">🧩</div>
                 <div class="game-folder-name">Tetris</div>
             </div>
+            <div class="game-folder-item" id="blockBlastFolderItem" onclick="openGameFromFolder('blockblast')">
+                <div class="game-folder-icon">💥</div>
+                <div class="game-folder-name">Block Blast</div>
+            </div>
         </div>
     </div>
     
@@ -3197,7 +3247,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.8.2';
+        const APP_VERSION = '1.9.0';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -3749,6 +3799,14 @@
                         }
                     });
                 }
+            }
+            
+            // Update Block Blast folder item (always unlocked)
+            const blockBlastFolderItem = document.getElementById('blockBlastFolderItem');
+            if (blockBlastFolderItem) {
+                blockBlastFolderItem.classList.remove('locked');
+                blockBlastFolderItem.style.opacity = '1';
+                blockBlastFolderItem.onclick = () => openGameFromFolder('blockblast');
             }
             
         }
@@ -7558,6 +7616,397 @@
             unlockTheme('tetris');
         }
         
+        // ============================================
+        // BLOCK BLAST GAME
+        // ============================================
+        
+        let blockBlastGame = {
+            board: Array(10).fill(null).map(() => Array(10).fill(0)),
+            nextBlocks: [],
+            score: 0,
+            level: 1,
+            linesCleared: 0,
+            gameOver: false
+        };
+        
+        const BLOCK_BLAST_SHAPES = [
+            [[1]], // Single
+            [[1,1]], // Horizontal 2
+            [[1],[1]], // Vertical 2
+            [[1,1,1]], // Horizontal 3
+            [[1],[1],[1]], // Vertical 3
+            [[1,1],[1,1]], // 2x2 square
+            [[1,1,1,1]], // Horizontal 4
+            [[1],[1],[1],[1]], // Vertical 4
+            [[1,1,1],[1,0,0]], // L shape
+            [[0,1],[1,1]], // Corner
+            [[1,1,1,1,1]], // Horizontal 5
+            [[1],[1],[1],[1],[1]] // Vertical 5
+        ];
+        
+        const BLOCK_BLAST_COLORS = [
+            '#58a6ff', '#f0883e', '#bc8cff', '#3fb950', '#f85149', '#ffa657', '#ffd700', '#ff69b4'
+        ];
+        
+        function toggleBlockBlast() {
+            const blockBlast = document.getElementById('blockBlastContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const snake = document.getElementById('snakeContainer');
+            const wordle = document.getElementById('wordleContainer');
+            const tetris = document.getElementById('tetrisContainer');
+            const themes = document.getElementById('themeContainer');
+            const notifications = document.getElementById('notificationsContainer');
+            
+            if (blockBlast.classList.contains('active')) {
+                blockBlast.classList.remove('active');
+            } else {
+                blockBlast.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                minesweeper.classList.remove('active');
+                snake.classList.remove('active');
+                wordle.classList.remove('active');
+                tetris.classList.remove('active');
+                themes.classList.remove('active');
+                if (notifications) notifications.classList.remove('active');
+                
+                initBlockBlast();
+            }
+        }
+        
+        function initBlockBlast() {
+            startBlockBlastGame();
+            loadBlockBlastLeaderboard();
+        }
+        
+        function startBlockBlastGame() {
+            blockBlastGame.board = Array(10).fill(null).map(() => Array(10).fill(0));
+            blockBlastGame.score = 0;
+            blockBlastGame.level = 1;
+            blockBlastGame.linesCleared = 0;
+            blockBlastGame.gameOver = false;
+            
+            // Generate 3 random blocks
+            blockBlastGame.nextBlocks = [];
+            for (let i = 0; i < 3; i++) {
+                blockBlastGame.nextBlocks.push(generateRandomBlock());
+            }
+            
+            renderBlockBlastBoard();
+            renderBlockBlastNextBlocks();
+            updateBlockBlastUI();
+        }
+        
+        function generateRandomBlock() {
+            const shape = BLOCK_BLAST_SHAPES[Math.floor(Math.random() * BLOCK_BLAST_SHAPES.length)];
+            const color = BLOCK_BLAST_COLORS[Math.floor(Math.random() * BLOCK_BLAST_COLORS.length)];
+            return { shape: shape, color: color };
+        }
+        
+        function renderBlockBlastBoard() {
+            const board = document.getElementById('blockBlastBoard');
+            board.innerHTML = '';
+            
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 10; col++) {
+                    const cell = document.createElement('div');
+                    cell.style.width = '30px';
+                    cell.style.height = '30px';
+                    cell.style.border = '1px solid #30363d';
+                    cell.style.cursor = 'pointer';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    
+                    const cellValue = blockBlastGame.board[row][col];
+                    if (cellValue !== 0 && cellValue !== null) {
+                        cell.style.background = (typeof cellValue === 'object' && cellValue.color) ? cellValue.color : '#58a6ff';
+                    } else {
+                        cell.style.background = '#161b22';
+                    }
+                    
+                    board.appendChild(cell);
+                }
+            }
+        }
+        
+        function renderBlockBlastNextBlocks() {
+            const container = document.getElementById('blockBlastNextBlocks');
+            container.innerHTML = '';
+            
+            blockBlastGame.nextBlocks.forEach((block, index) => {
+                const blockDiv = document.createElement('div');
+                blockDiv.style.border = '2px solid #30363d';
+                blockDiv.style.padding = '5px';
+                blockDiv.style.cursor = 'pointer';
+                blockDiv.style.display = 'inline-block';
+                blockDiv.dataset.blockIndex = index;
+                
+                const grid = document.createElement('div');
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = `repeat(${block.shape[0].length}, 20px)`;
+                grid.style.gap = '2px';
+                
+                block.shape.forEach(row => {
+                    row.forEach(cell => {
+                        if (cell) {
+                            const cellEl = document.createElement('div');
+                            cellEl.style.width = '18px';
+                            cellEl.style.height = '18px';
+                            cellEl.style.background = block.color;
+                            cellEl.style.border = '1px solid rgba(255,255,255,0.3)';
+                            grid.appendChild(cellEl);
+                        }
+                    });
+                });
+                
+                blockDiv.appendChild(grid);
+                blockDiv.onclick = () => selectBlockBlastBlock(index);
+                container.appendChild(blockDiv);
+            });
+        }
+        
+        let selectedBlockBlastBlock = null;
+        let selectedBlockBlastIndex = null;
+        
+        function selectBlockBlastBlock(index) {
+            selectedBlockBlastBlock = blockBlastGame.nextBlocks[index];
+            selectedBlockBlastIndex = index;
+            
+            // Highlight selected block
+            const blocks = document.querySelectorAll('#blockBlastNextBlocks > div');
+            blocks.forEach((b, i) => {
+                if (i === index) {
+                    b.style.border = '2px solid #58a6ff';
+                } else {
+                    b.style.border = '2px solid #30363d';
+                }
+            });
+            
+            // Add click handlers to board cells
+            const cells = document.querySelectorAll('#blockBlastBoard > div');
+            cells.forEach(cell => {
+                cell.onclick = () => placeBlockBlastBlock(parseInt(cell.dataset.row), parseInt(cell.dataset.col));
+            });
+        }
+        
+        function placeBlockBlastBlock(row, col) {
+            if (!selectedBlockBlastBlock) return;
+            
+            const shape = selectedBlockBlastBlock.shape;
+            const color = selectedBlockBlastBlock.color;
+            
+            // Check if block can be placed
+            if (!canPlaceBlockBlastBlock(row, col, shape)) {
+                alert('Cannot place block here!');
+                return;
+            }
+            
+            // Place the block
+            for (let r = 0; r < shape.length; r++) {
+                for (let c = 0; c < shape[r].length; c++) {
+                    if (shape[r][c]) {
+                        const boardRow = row + r;
+                        const boardCol = col + c;
+                        if (boardRow >= 0 && boardRow < 10 && boardCol >= 0 && boardCol < 10) {
+                            blockBlastGame.board[boardRow][boardCol] = { color: color, value: 1 };
+                        }
+                    }
+                }
+            }
+            
+            // Remove used block
+            blockBlastGame.nextBlocks.splice(selectedBlockBlastIndex, 1);
+            blockBlastGame.nextBlocks.push(generateRandomBlock());
+            
+            selectedBlockBlastBlock = null;
+            selectedBlockBlastIndex = null;
+            
+            // Clear full rows and columns
+            clearBlockBlastLines();
+            
+            renderBlockBlastBoard();
+            renderBlockBlastNextBlocks();
+            updateBlockBlastUI();
+            
+            // Check game over
+            if (blockBlastGame.nextBlocks.length === 0 || !canPlaceAnyBlock()) {
+                gameOverBlockBlast();
+            }
+        }
+        
+        function canPlaceBlockBlastBlock(row, col, shape) {
+            for (let r = 0; r < shape.length; r++) {
+                for (let c = 0; c < shape[r].length; c++) {
+                    if (shape[r][c]) {
+                        const boardRow = row + r;
+                        const boardCol = col + c;
+                        
+                        if (boardRow < 0 || boardRow >= 10 || boardCol < 0 || boardCol >= 10) {
+                            return false;
+                        }
+                        
+                        const cellValue = blockBlastGame.board[boardRow][boardCol];
+                        if (cellValue !== 0 && cellValue !== null) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        
+        function canPlaceAnyBlock() {
+            for (let block of blockBlastGame.nextBlocks) {
+                for (let row = 0; row < 10; row++) {
+                    for (let col = 0; col < 10; col++) {
+                        if (canPlaceBlockBlastBlock(row, col, block.shape)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        
+        function clearBlockBlastLines() {
+            const rowsToClear = [];
+            const colsToClear = [];
+            
+            // Check full rows
+            for (let row = 0; row < 10; row++) {
+                let isFull = true;
+                for (let col = 0; col < 10; col++) {
+                    const cellValue = blockBlastGame.board[row][col];
+                    if (cellValue === 0 || cellValue === null) {
+                        isFull = false;
+                        break;
+                    }
+                }
+                if (isFull) rowsToClear.push(row);
+            }
+            
+            // Check full columns
+            for (let col = 0; col < 10; col++) {
+                let isFull = true;
+                for (let row = 0; row < 10; row++) {
+                    const cellValue = blockBlastGame.board[row][col];
+                    if (cellValue === 0 || cellValue === null) {
+                        isFull = false;
+                        break;
+                    }
+                }
+                if (isFull) colsToClear.push(col);
+            }
+            
+            // Clear rows
+            rowsToClear.forEach(row => {
+                for (let col = 0; col < 10; col++) {
+                    blockBlastGame.board[row][col] = 0;
+                }
+            });
+            
+            // Clear columns
+            colsToClear.forEach(col => {
+                for (let row = 0; row < 10; row++) {
+                    blockBlastGame.board[row][col] = 0;
+                }
+            });
+            
+            // Calculate score
+            const cleared = rowsToClear.length + colsToClear.length;
+            if (cleared > 0) {
+                blockBlastGame.linesCleared += cleared;
+                const points = cleared * 100 * blockBlastGame.level;
+                blockBlastGame.score += points;
+                
+                // Level up every 10 lines
+                blockBlastGame.level = Math.floor(blockBlastGame.linesCleared / 10) + 1;
+                
+                // Check for theme unlock
+                if (blockBlastGame.score >= 10000) {
+                    unlockTheme('blockblast');
+                }
+            }
+        }
+        
+        function updateBlockBlastUI() {
+            document.getElementById('blockBlastScore').textContent = blockBlastGame.score;
+            document.getElementById('blockBlastLevel').textContent = blockBlastGame.level;
+            document.getElementById('blockBlastLines').textContent = blockBlastGame.linesCleared;
+        }
+        
+        function gameOverBlockBlast() {
+            blockBlastGame.gameOver = true;
+            alert(`Game Over! Score: ${blockBlastGame.score}`);
+            saveBlockBlastScore();
+            loadBlockBlastLeaderboard();
+        }
+        
+        function resetBlockBlast() {
+            startBlockBlastGame();
+        }
+        
+        function saveBlockBlastScore() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database || blockBlastGame.score === 0) return;
+            
+            writeToFirebase(`blockBlastScores/${usernameLower}`, {
+                username: username,
+                usernameLower: usernameLower,
+                score: blockBlastGame.score,
+                level: blockBlastGame.level,
+                linesCleared: blockBlastGame.linesCleared,
+                timestamp: Date.now()
+            });
+        }
+        
+        function loadBlockBlastLeaderboard() {
+            if (!database) return;
+            
+            const leaderboard = document.getElementById('blockBlastLeaderboard');
+            leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase('blockBlastScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    return;
+                }
+                
+                const scoreArray = Object.values(scores)
+                    .filter(entry => entry && entry.username)
+                    .sort((a, b) => (b.score || 0) - (a.score || 0))
+                    .slice(0, 10);
+                
+                leaderboard.innerHTML = '';
+                if (scoreArray.length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No valid scores yet!</p>';
+                    return;
+                }
+                
+                scoreArray.forEach((entry, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item';
+                    item.innerHTML = `
+                        <span class="leaderboard-rank">${index + 1}.</span>
+                        <span class="leaderboard-username">${entry.username}</span>
+                        <span class="leaderboard-score">${entry.score.toLocaleString()}</span>
+                    `;
+                    leaderboard.appendChild(item);
+                });
+            }).catch(err => {
+                console.error('Error loading Block Blast leaderboard:', err);
+                leaderboard.innerHTML = '<p style="color: #f85149; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
+        }
+        
         function saveTetrisScore() {
             const username = localStorage.getItem('loggedInUsername');
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
@@ -7734,6 +8183,12 @@
                     name: 'Tetris',
                     description: 'Play Tetris to unlock',
                     unlocked: unlockedThemes.has('tetris')
+                },
+                {
+                    id: 'blockblast',
+                    name: 'Block Blast',
+                    description: 'Score 10,000+ in Block Blast to unlock',
+                    unlocked: unlockedThemes.has('blockblast')
                 }
             ];
             
@@ -7836,6 +8291,8 @@
                         applyWordTheme();
                     } else if (themeId === 'tetris') {
                         applyTetrisTheme();
+                    } else if (themeId === 'blockblast') {
+                        applyBlockBlastTheme();
                     }
                 } catch (err) {
                     console.error('Error applying theme:', err);
@@ -9672,6 +10129,146 @@
             }
         }
         
+        // ============================================
+        // BLOCK BLAST THEME
+        // ============================================
+        
+        let blockBlastThemeBlocks = [];
+        let blockBlastThemeInterval = null;
+        
+        function applyBlockBlastTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            const isLightMode = document.body.classList.contains('light-mode');
+            bg.style.background = isLightMode
+                ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+                : 'linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%)';
+            bg.style.opacity = '0.9';
+            
+            // Make FinHub title look like Block Blast blocks
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach((letter, index) => {
+                    letter.style.color = BLOCK_BLAST_COLORS[index % BLOCK_BLAST_COLORS.length];
+                    letter.style.textShadow = `0 0 15px ${BLOCK_BLAST_COLORS[index % BLOCK_BLAST_COLORS.length]}, 0 0 30px ${BLOCK_BLAST_COLORS[index % BLOCK_BLAST_COLORS.length]}`;
+                    letter.style.fontWeight = 'bold';
+                    letter.style.transform = 'scale(1.1)';
+                });
+            }
+            
+            // Spawn floating Block Blast blocks
+            spawnBlockBlastThemeBlocks();
+        }
+        
+        function spawnBlockBlastThemeBlocks() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'blockblast') return;
+            
+            // Clear existing blocks
+            blockBlastThemeBlocks.forEach(block => {
+                if (block.element) block.element.remove();
+            });
+            blockBlastThemeBlocks = [];
+            
+            if (blockBlastThemeInterval) {
+                clearInterval(blockBlastThemeInterval);
+            }
+            
+            // Spawn blocks periodically
+            blockBlastThemeInterval = setInterval(() => {
+                if (currentTheme !== 'blockblast') {
+                    clearInterval(blockBlastThemeInterval);
+                    return;
+                }
+                createBlockBlastThemeBlock();
+            }, 1500);
+            
+            // Spawn initial blocks
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => createBlockBlastThemeBlock(), i * 500);
+            }
+        }
+        
+        function createBlockBlastThemeBlock() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'blockblast') return;
+            
+            const shape = BLOCK_BLAST_SHAPES[Math.floor(Math.random() * Math.min(6, BLOCK_BLAST_SHAPES.length))];
+            const color = BLOCK_BLAST_COLORS[Math.floor(Math.random() * BLOCK_BLAST_COLORS.length)];
+            
+            const blockContainer = document.createElement('div');
+            blockContainer.style.position = 'absolute';
+            blockContainer.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            blockContainer.style.top = '-100px';
+            blockContainer.style.display = 'grid';
+            blockContainer.style.gridTemplateColumns = `repeat(${shape[0].length}, 25px)`;
+            blockContainer.style.gap = '2px';
+            blockContainer.style.pointerEvents = 'none';
+            blockContainer.style.zIndex = '1';
+            
+            shape.forEach((row, y) => {
+                row.forEach((cell, x) => {
+                    if (cell) {
+                        const cellEl = document.createElement('div');
+                        cellEl.style.width = '23px';
+                        cellEl.style.height = '23px';
+                        cellEl.style.background = color;
+                        cellEl.style.border = '2px solid rgba(255,255,255,0.5)';
+                        cellEl.style.borderRadius = '4px';
+                        cellEl.style.boxShadow = `0 0 10px ${color}, inset 0 0 10px rgba(255,255,255,0.3)`;
+                        blockContainer.appendChild(cellEl);
+                    }
+                });
+            });
+            
+            bg.appendChild(blockContainer);
+            
+            // Animate block floating and rotating
+            const startTime = Date.now();
+            const duration = 5000 + Math.random() * 3000;
+            const startX = parseFloat(blockContainer.style.left);
+            const rotation = (Math.random() - 0.5) * 0.5;
+            const floatAmount = 30 + Math.random() * 20;
+            
+            const blockData = {
+                element: blockContainer,
+                startX: startX
+            };
+            
+            blockBlastThemeBlocks.push(blockData);
+            
+            const animate = () => {
+                if (currentTheme !== 'blockblast' || !blockContainer.parentElement) {
+                    const index = blockBlastThemeBlocks.indexOf(blockData);
+                    if (index > -1) blockBlastThemeBlocks.splice(index, 1);
+                    return;
+                }
+                
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const currentY = -100 + (window.innerHeight + 200) * progress;
+                const currentX = startX + Math.sin(progress * Math.PI * 4) * floatAmount;
+                const currentRotation = progress * rotation * 360;
+                
+                blockContainer.style.top = currentY + 'px';
+                blockContainer.style.left = currentX + 'px';
+                blockContainer.style.transform = `rotate(${currentRotation}deg)`;
+                blockContainer.style.opacity = 1 - progress * 0.5;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    blockContainer.remove();
+                    const index = blockBlastThemeBlocks.indexOf(blockData);
+                    if (index > -1) blockBlastThemeBlocks.splice(index, 1);
+                }
+            };
+            
+            animate();
+        }
+        
         // Periodically check if user is #1 on clicker leaderboard
         let topClickerCheckInterval = null;
         
@@ -11294,6 +11891,9 @@
                         break;
                     case 'tetris':
                         toggleTetris();
+                        break;
+                    case 'blockblast':
+                        toggleBlockBlast();
                         break;
                 }
             }, 100);
