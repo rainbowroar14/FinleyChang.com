@@ -216,6 +216,102 @@
             border: 1px solid #d0d7de;
         }
         
+        .profile-stats-section {
+            margin-top: 20px;
+        }
+        
+        .profile-stats-section h4 {
+            color: #c9d1d9;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        body.light-mode .profile-stats-section h4 {
+            color: #24292f;
+        }
+        
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        
+        .stat-item {
+            background: rgba(22, 27, 34, 0.5);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        body.light-mode .stat-item {
+            background: rgba(246, 248, 250, 0.5);
+            border: 1px solid #d0d7de;
+        }
+        
+        .stat-label {
+            color: #8b949e;
+            font-size: 12px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        body.light-mode .stat-label {
+            color: #656d76;
+        }
+        
+        .stat-value {
+            color: #58a6ff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        body.light-mode .stat-value {
+            color: #0969da;
+        }
+        
+        .follow-btn {
+            padding: 6px 16px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .follow-btn:hover {
+            background: #2ea043;
+        }
+        
+        .follow-btn.following {
+            background: #30363d;
+        }
+        
+        .follow-btn.following:hover {
+            background: #484f58;
+        }
+        
+        body.light-mode .follow-btn {
+            background: #1a7f37;
+        }
+        
+        body.light-mode .follow-btn:hover {
+            background: #2ea043;
+        }
+        
+        body.light-mode .follow-btn.following {
+            background: #d0d7de;
+            color: #24292f;
+        }
+        
+        body.light-mode .follow-btn.following:hover {
+            background: #b1bac4;
+        }
+        
         .profile-friend-item {
             padding: 12px;
             background: rgba(22, 27, 34, 0.5);
@@ -2673,7 +2769,10 @@
         <div class="game-container" id="profileContainer">
             <div class="game-header">
                 <h3 id="profileHeader">👤 Your Profile</h3>
-                <button class="close-btn" onclick="toggleProfile()">×</button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button id="followBtn" class="follow-btn" onclick="toggleFollow()" style="display: none;">Follow</button>
+                    <button class="close-btn" onclick="toggleProfile()">×</button>
+                </div>
             </div>
             <div class="game-content">
                 <div class="profile-content">
@@ -2694,6 +2793,12 @@
                             <div id="profileMedalsList" class="profile-medals-list">
                                 <p style="color: #8b949e; text-align: center; padding: 10px; font-size: 14px;">Loading rankings...</p>
                             </div>
+                        </div>
+                    </div>
+                    <div class="profile-stats-section" id="profileStatsSection" style="margin-top: 20px;">
+                        <h4>📊 Statistics</h4>
+                        <div id="profileStats" class="profile-stats-grid">
+                            <p style="color: #8b949e; text-align: center; padding: 10px; font-size: 14px;">Loading statistics...</p>
                         </div>
                     </div>
                     <div class="profile-friends-section" id="profileFriendsSection">
@@ -2783,7 +2888,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.5.0';
+        const APP_VERSION = '1.6.0';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -4923,6 +5028,12 @@
             
             // Load medals/rankings
             loadProfileMedals(usernameLower);
+            
+            // Load statistics
+            loadProfileStats(usernameLower);
+            
+            // Hide follow button on own profile
+            document.getElementById('followBtn').style.display = 'none';
         }
         
         function viewFriendProfile(friendUsernameLower, friendDisplayName) {
@@ -4992,6 +5103,14 @@
             
             // Load medals/rankings
             loadProfileMedals(friendUsernameLower);
+            
+            // Load statistics
+            loadProfileStats(friendUsernameLower);
+            
+            // Show and update follow button
+            const followBtn = document.getElementById('followBtn');
+            followBtn.style.display = 'block';
+            checkFollowStatus(friendUsernameLower);
         }
         
         function loadFriendProfileFriends(friendUsernameLower) {
@@ -7476,6 +7595,277 @@
         }
         
         // ============================================
+        // PROFILE STATISTICS
+        // ============================================
+        
+        async function loadProfileStats(usernameLower) {
+            if (!database || !usernameLower) return;
+            
+            const statsGrid = document.getElementById('profileStats');
+            if (!statsGrid) return;
+            
+            statsGrid.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 10px; font-size: 14px;">Loading statistics...</p>';
+            
+            const stats = {
+                totalClicks: 0,
+                clickerScore: 0,
+                minesweeperWins: 0,
+                minesweeperBestTime: null,
+                snakeScore: 0,
+                snakeWins: 0,
+                hexagonScore: 0,
+                timeSpent: 0,
+                themesUnlocked: 0,
+                gamesPlayed: 0
+            };
+            
+            try {
+                // Get total clicks
+                const totalClicks = await readFromFirebase(`users/${usernameLower}/stats/totalClicks`);
+                stats.totalClicks = totalClicks || 0;
+                
+                // Get clicker score
+                const clickerData = await readFromFirebase(`clickerScores/${usernameLower}`);
+                if (clickerData && clickerData.score) {
+                    stats.clickerScore = clickerData.score;
+                }
+                
+                // Get minesweeper stats
+                const minesweeperData = await readFromFirebase(`minesweeperScores/${usernameLower}`);
+                if (minesweeperData) {
+                    stats.minesweeperWins = minesweeperData.wins || 0;
+                    stats.minesweeperBestTime = minesweeperData.bestTime || null;
+                }
+                
+                // Get snake stats
+                const snakeData = await readFromFirebase(`snakeScores/${usernameLower}`);
+                if (snakeData) {
+                    stats.snakeScore = snakeData.score || 0;
+                }
+                const hasWonSnake = await readFromFirebase(`users/${usernameLower}/hasWonSnake`);
+                stats.snakeWins = hasWonSnake ? 1 : 0;
+                
+                // Get hexagon score
+                const hexagonData = await readFromFirebase(`hexagonScores/${usernameLower}`);
+                if (hexagonData && hexagonData.score) {
+                    stats.hexagonScore = hexagonData.score;
+                }
+                
+                // Get time spent
+                const timeData = await readFromFirebase(`timeLeaderboard/${usernameLower}`);
+                if (timeData && timeData.timeSpent) {
+                    stats.timeSpent = timeData.timeSpent;
+                }
+                
+                // Get themes unlocked
+                const themesData = await readFromFirebase(`users/${usernameLower}/themes`);
+                if (themesData) {
+                    stats.themesUnlocked = Object.keys(themesData).length;
+                }
+                
+                // Calculate games played (any game with a score)
+                if (stats.clickerScore > 0) stats.gamesPlayed++;
+                if (stats.minesweeperWins > 0) stats.gamesPlayed++;
+                if (stats.snakeScore > 0) stats.gamesPlayed++;
+                if (stats.hexagonScore > 0) stats.gamesPlayed++;
+                
+            } catch (err) {
+                console.error('Error loading profile stats:', err);
+            }
+            
+            // Format time spent
+            const hours = Math.floor(stats.timeSpent / 3600000);
+            const minutes = Math.floor((stats.timeSpent % 3600000) / 60000);
+            const timeSpentFormatted = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+            
+            // Format best time
+            const bestTimeFormatted = stats.minesweeperBestTime 
+                ? `${(stats.minesweeperBestTime / 1000).toFixed(2)}s`
+                : 'N/A';
+            
+            // Display statistics
+            statsGrid.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Total Clicks</div>
+                    <div class="stat-value">${stats.totalClicks.toLocaleString()}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Clicker Score</div>
+                    <div class="stat-value">${stats.clickerScore.toLocaleString()}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Snake Score</div>
+                    <div class="stat-value">${stats.snakeScore.toLocaleString()}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Hexagon Score</div>
+                    <div class="stat-value">${stats.hexagonScore.toLocaleString()}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Minesweeper Wins</div>
+                    <div class="stat-value">${stats.minesweeperWins}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Best Time</div>
+                    <div class="stat-value" style="font-size: 18px;">${bestTimeFormatted}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Time Spent</div>
+                    <div class="stat-value" style="font-size: 18px;">${timeSpentFormatted}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Themes Unlocked</div>
+                    <div class="stat-value">${stats.themesUnlocked}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Games Played</div>
+                    <div class="stat-value">${stats.gamesPlayed}</div>
+                </div>
+            `;
+        }
+        
+        // ============================================
+        // FOLLOWING SYSTEM
+        // ============================================
+        
+        async function checkFollowStatus(targetUsernameLower) {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (!usernameLower || !database || !targetUsernameLower) return;
+            
+            if (usernameLower === targetUsernameLower) {
+                document.getElementById('followBtn').style.display = 'none';
+                return;
+            }
+            
+            try {
+                const following = await readFromFirebase(`users/${usernameLower}/following/${targetUsernameLower}`);
+                const followBtn = document.getElementById('followBtn');
+                if (following) {
+                    followBtn.textContent = 'Following';
+                    followBtn.classList.add('following');
+                } else {
+                    followBtn.textContent = 'Follow';
+                    followBtn.classList.remove('following');
+                }
+            } catch (err) {
+                console.error('Error checking follow status:', err);
+            }
+        }
+        
+        async function toggleFollow() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            const container = document.getElementById('profileContainer');
+            const targetUsernameLower = container.dataset.viewingUser;
+            
+            if (!usernameLower || !database || !targetUsernameLower || usernameLower === targetUsernameLower) return;
+            
+            try {
+                const currentlyFollowing = await readFromFirebase(`users/${usernameLower}/following/${targetUsernameLower}`);
+                const followBtn = document.getElementById('followBtn');
+                
+                if (currentlyFollowing) {
+                    // Unfollow
+                    await deleteFromFirebase(`users/${usernameLower}/following/${targetUsernameLower}`);
+                    await deleteFromFirebase(`users/${targetUsernameLower}/followers/${usernameLower}`);
+                    followBtn.textContent = 'Follow';
+                    followBtn.classList.remove('following');
+                } else {
+                    // Follow
+                    const targetUsername = await readFromFirebase(`users/${targetUsernameLower}/username`);
+                    await writeToFirebase(`users/${usernameLower}/following/${targetUsernameLower}`, {
+                        username: targetUsername || targetUsernameLower,
+                        usernameLower: targetUsernameLower,
+                        followedAt: Date.now()
+                    });
+                    await writeToFirebase(`users/${targetUsernameLower}/followers/${usernameLower}`, {
+                        username: username,
+                        usernameLower: usernameLower,
+                        followedAt: Date.now()
+                    });
+                    followBtn.textContent = 'Following';
+                    followBtn.classList.add('following');
+                    
+                    // Create notification for followed user
+                    await pushToFirebase(`users/${targetUsernameLower}/notifications`, {
+                        type: 'follow',
+                        message: `${username} started following you`,
+                        timestamp: Date.now(),
+                        read: false
+                    });
+                }
+            } catch (err) {
+                console.error('Error toggling follow:', err);
+                alert('Error updating follow status. Please try again.');
+            }
+        }
+        
+        // Check for new achievements from followed users
+        async function checkFollowedUsersAchievements() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (!usernameLower || !database) return;
+            
+            try {
+                const following = await readFromFirebase(`users/${usernameLower}/following`);
+                if (!following) return;
+                
+                const followingList = Object.keys(following);
+                
+                // Check each followed user for new top scores
+                for (const followedUser of followingList) {
+                    // Check clicker leaderboard
+                    const clickerScores = await readFromFirebase('clickerScores');
+                    if (clickerScores) {
+                        const scoreArray = Object.values(clickerScores)
+                            .filter(entry => entry && entry.username)
+                            .sort((a, b) => (b.score || 0) - (a.score || 0));
+                        const rank = scoreArray.findIndex(entry => entry.usernameLower === followedUser) + 1;
+                        if (rank === 1) {
+                            // Check if we already notified about this
+                            const lastNotification = await readFromFirebase(`users/${usernameLower}/lastFollowedNotification/${followedUser}/clicker`);
+                            const userScore = clickerScores[followedUser];
+                            if (userScore && (!lastNotification || lastNotification < userScore.timestamp)) {
+                                await pushToFirebase(`users/${usernameLower}/notifications`, {
+                                    type: 'followed_achievement',
+                                    message: `${following[followedUser].username || followedUser} is now #1 on Clicker!`,
+                                    timestamp: Date.now(),
+                                    read: false
+                                });
+                                await writeToFirebase(`users/${usernameLower}/lastFollowedNotification/${followedUser}/clicker`, userScore.timestamp);
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Error checking followed users achievements:', err);
+            }
+        }
+        
+        // Periodically check for followed user achievements
+        let followedUsersCheckInterval = null;
+        
+        function startFollowedUsersCheck() {
+            if (followedUsersCheckInterval) {
+                clearInterval(followedUsersCheckInterval);
+            }
+            followedUsersCheckInterval = setInterval(() => {
+                checkFollowedUsersAchievements();
+            }, 60000); // Check every minute
+            
+            // Check immediately
+            checkFollowedUsersAchievements();
+        }
+        
+        function stopFollowedUsersCheck() {
+            if (followedUsersCheckInterval) {
+                clearInterval(followedUsersCheckInterval);
+                followedUsersCheckInterval = null;
+            }
+        }
+        
+        // ============================================
         // AUTHENTICATION SYSTEM
         // ============================================
         
@@ -7637,6 +8027,8 @@
         // Logout
         function logout() {
             stopTimeTracking();
+            stopTopClickerCheck();
+            stopFollowedUsersCheck();
             localStorage.removeItem('loggedInUsername');
             localStorage.removeItem('loggedInUsernameLower');
             localStorage.removeItem('loginTime');
@@ -7675,6 +8067,9 @@
                 
                 // Start top clicker check
                 startTopClickerCheck();
+                
+                // Start followed users check
+                startFollowedUsersCheck();
             } else {
                 showLoginPage();
             }
