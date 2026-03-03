@@ -3288,7 +3288,150 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.9.3';
+        const APP_VERSION = '1.9.4';
+        
+        // ============================================
+        // SOUND EFFECTS SYSTEM
+        // ============================================
+        
+        let globalAudioContext = null;
+        let soundEnabled = true;
+        
+        function initGlobalAudio() {
+            if (!globalAudioContext) {
+                try {
+                    globalAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.warn('Audio context not supported');
+                    soundEnabled = false;
+                }
+            }
+        }
+        
+        function playSound(frequency, duration, type = 'sine', volume = 0.1) {
+            if (!soundEnabled) return;
+            if (!globalAudioContext) {
+                initGlobalAudio();
+            }
+            if (!globalAudioContext) return;
+            
+            try {
+                const oscillator = globalAudioContext.createOscillator();
+                const gainNode = globalAudioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(globalAudioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(volume, globalAudioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, globalAudioContext.currentTime + duration);
+                
+                oscillator.start(globalAudioContext.currentTime);
+                oscillator.stop(globalAudioContext.currentTime + duration);
+            } catch (e) {
+                // Silently fail if audio fails
+            }
+        }
+        
+        // Sound effect functions
+        function playClickSound() {
+            playSound(600, 0.05, 'square', 0.08);
+        }
+        
+        function playHoverSound() {
+            playSound(700, 0.03, 'sine', 0.05);
+        }
+        
+        function playOpenSound() {
+            playSound(500, 0.1, 'sine', 0.1);
+        }
+        
+        function playCloseSound() {
+            playSound(400, 0.1, 'sine', 0.1);
+        }
+        
+        function playSuccessSound() {
+            playSound(600, 0.1, 'sine', 0.12);
+            setTimeout(() => playSound(700, 0.1, 'sine', 0.1), 50);
+        }
+        
+        function playErrorSound() {
+            playSound(300, 0.15, 'square', 0.1);
+        }
+        
+        function playNotificationSound() {
+            playSound(800, 0.2, 'sine', 0.1);
+        }
+        
+        function playThemeChangeSound() {
+            playSound(550, 0.15, 'sine', 0.1);
+        }
+        
+        function playUnlockSound() {
+            playSound(600, 0.1, 'sine', 0.12);
+            setTimeout(() => playSound(700, 0.1, 'sine', 0.1), 80);
+            setTimeout(() => playSound(800, 0.15, 'sine', 0.1), 160);
+        }
+        
+        function playLoginSound() {
+            playSound(500, 0.1, 'sine', 0.1);
+            setTimeout(() => playSound(600, 0.1, 'sine', 0.1), 100);
+        }
+        
+        function playLogoutSound() {
+            playSound(400, 0.1, 'sine', 0.1);
+            setTimeout(() => playSound(300, 0.1, 'sine', 0.1), 100);
+        }
+        
+        function playChatSound() {
+            playSound(650, 0.08, 'sine', 0.08);
+        }
+        
+        function playGameStartSound() {
+            playSound(500, 0.1, 'sine', 0.1);
+            setTimeout(() => playSound(600, 0.1, 'sine', 0.1), 50);
+        }
+        
+        // Initialize audio on first user interaction
+        document.addEventListener('click', () => {
+            if (!globalAudioContext) {
+                initGlobalAudio();
+            }
+        }, { once: true });
+        
+        // Add click sounds to buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                // Add click sounds to all buttons
+                const buttons = document.querySelectorAll('button, .sidebar-btn, .top-bar-btn, .game-folder-item, .theme-item, .profile-btn, .chat-send-btn, .login-btn, .games-folder-close');
+                buttons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        if (!button.classList.contains('locked') && !button.disabled) {
+                            playClickSound();
+                        }
+                    });
+                });
+                
+                // Add hover sounds to interactive elements (subtle)
+                const interactiveElements = document.querySelectorAll('.sidebar-btn, .top-bar-btn, .game-folder-item:not(.locked), .theme-item:not(.locked)');
+                interactiveElements.forEach(element => {
+                    let hoverTimeout;
+                    element.addEventListener('mouseenter', () => {
+                        clearTimeout(hoverTimeout);
+                        hoverTimeout = setTimeout(() => {
+                            if (!element.classList.contains('locked')) {
+                                playHoverSound();
+                            }
+                        }, 100);
+                    });
+                    element.addEventListener('mouseleave', () => {
+                        clearTimeout(hoverTimeout);
+                    });
+                });
+            }, 500);
+        });
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -3600,6 +3743,8 @@
         function showUnlockAnimation(type) {
             const info = UNLOCK_INFO[type];
             if (!info) return;
+            
+            playUnlockSound();
             
             const overlay = document.getElementById('unlockOverlay');
             const card = document.getElementById('unlockCard');
@@ -4073,6 +4218,7 @@
             // Reload themes to show all unlocked
             loadThemes();
             
+            playSuccessSound();
             alert('🎉 Everything unlocked!');
         }
         
@@ -4476,11 +4622,13 @@
             
             if (chat.classList.contains('active')) {
                 chat.classList.remove('active');
+                playCloseSound();
             } else {
                 chat.classList.add('active');
                 friends.classList.remove('active');
                 privateChat.classList.remove('active');
                 if (snake) snake.classList.remove('active');
+                playOpenSound();
                 loadGlobalChat();
             }
         }
@@ -4494,11 +4642,13 @@
             
             if (friends.classList.contains('active')) {
                 friends.classList.remove('active');
+                playCloseSound();
             } else {
                 friends.classList.add('active');
                 chat.classList.remove('active');
                 privateChat.classList.remove('active');
                 if (snake) snake.classList.remove('active');
+                playOpenSound();
                 loadFriends();
                 loadFriendRequests();
             }
@@ -4539,6 +4689,8 @@
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || username?.toLowerCase();
             
             if (!message || !username || !database) return;
+            
+            playChatSound();
             
             const messageData = {
                 username: username,
@@ -4939,6 +5091,8 @@
             const isLight = body.classList.contains('light-mode');
             const btn = document.getElementById('themeToggleBtn');
             
+            playThemeChangeSound();
+            
             if (isLight) {
                 body.classList.remove('light-mode');
                 btn.textContent = '🌙';
@@ -5338,9 +5492,11 @@
             
             if (container.classList.contains('active')) {
                 container.classList.remove('active');
+                playCloseSound();
             } else {
                 container.classList.add('active');
                 chat.classList.remove('active');
+                playOpenSound();
                 friends.classList.remove('active');
                 paint.classList.remove('active');
                 clicker.classList.remove('active');
@@ -5423,6 +5579,8 @@
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
             if (!usernameLower || !database) return;
             
+            playNotificationSound();
+            
             const notification = {
                 message: message,
                 timestamp: Date.now(),
@@ -5434,6 +5592,8 @@
         
         function addNotificationToUser(usernameLower, message) {
             if (!usernameLower || !database) return;
+            
+            playNotificationSound();
             
             const notification = {
                 message: message,
@@ -5500,9 +5660,11 @@
             
             if (container.classList.contains('active')) {
                 container.classList.remove('active');
+                playCloseSound();
             } else {
                 container.classList.add('active');
                 chat.classList.remove('active');
+                playOpenSound();
                 friends.classList.remove('active');
                 paint.classList.remove('active');
                 clicker.classList.remove('active');
@@ -8554,6 +8716,7 @@
             
             if (themes.classList.contains('active')) {
                 themes.classList.remove('active');
+                playCloseSound();
             } else {
                 themes.classList.add('active');
                 chat.classList.remove('active');
@@ -8563,6 +8726,7 @@
                 minesweeper.classList.remove('active');
                 const snake = document.getElementById('snakeContainer');
                 if (snake) snake.classList.remove('active');
+                playOpenSound();
                 loadThemes();
             }
         }
@@ -8684,6 +8848,7 @@
             if (unlockedThemes.has(themeId)) return;
             
             unlockedThemes.add(themeId);
+            playUnlockSound();
             
             // Save to Firebase
             const username = localStorage.getItem('loggedInUsername');
@@ -8703,12 +8868,14 @@
                 // Clear theme if default
                 clearTheme();
                 currentTheme = 'default';
+                playThemeChangeSound();
                 // Update theme list
                 loadThemes();
                 return;
             }
             
             currentTheme = themeId;
+            playThemeChangeSound();
             
             // Clear previous theme
             clearTheme();
@@ -10401,11 +10568,13 @@
             
             try {
                 await writeToFirebase(`users/${usernameLower}/customThemes/${themeId}`, themeData);
+                playSuccessSound();
                 alert('✨ Theme saved successfully!');
                 closeThemeCreator();
                 loadThemes();
             } catch (err) {
                 console.error('Error saving custom theme:', err);
+                playErrorSound();
                 alert('Error saving theme. Please try again.');
             }
         }
@@ -11178,26 +11347,31 @@
             // Validation
             if (!username || !password || !passwordConfirm) {
                 errorEl.textContent = 'Please fill in all fields';
+                playErrorSound();
                 return;
             }
             
             if (username.length < 3) {
                 errorEl.textContent = 'Username must be at least 3 characters';
+                playErrorSound();
                 return;
             }
             
             if (password.length < 6) {
                 errorEl.textContent = 'Password must be at least 6 characters';
+                playErrorSound();
                 return;
             }
             
             if (password !== passwordConfirm) {
                 errorEl.textContent = 'Passwords do not match';
+                playErrorSound();
                 return;
             }
             
             if (!database) {
                 errorEl.textContent = 'Firebase not connected. Please wait...';
+                playErrorSound();
                 return;
             }
             
@@ -11208,6 +11382,7 @@
             const userExists = await readFromFirebase(`userAccounts/${usernameLower}`);
             if (userExists) {
                 errorEl.textContent = 'Username already exists';
+                playErrorSound();
                 return;
             }
             
@@ -11223,6 +11398,7 @@
             const success = await writeToFirebase(`userAccounts/${usernameLower}`, userData);
             
             if (success) {
+                playSuccessSound();
                 successEl.textContent = 'Account created! You can now login.';
                 // Clear form
                 document.getElementById('signupUsername').value = '';
@@ -11234,6 +11410,7 @@
                 }, 1000);
             } else {
                 errorEl.textContent = 'Failed to create account. Please try again.';
+                playErrorSound();
             }
         }
         
@@ -11264,12 +11441,14 @@
             
             if (!userData) {
                 errorEl.textContent = 'Invalid username or password';
+                playErrorSound();
                 return;
             }
             
             const passwordHash = hashPassword(password);
             if (userData.passwordHash !== passwordHash) {
                 errorEl.textContent = 'Invalid username or password';
+                playErrorSound();
                 return;
             }
             
@@ -11278,19 +11457,24 @@
             localStorage.setItem('loggedInUsernameLower', usernameLower);
             localStorage.setItem('loginTime', Date.now().toString());
             
+            playLoginSound();
+            
             // Show main page
             showMainPage();
         }
         
         // Logout
         function logout() {
+            playLogoutSound();
             stopTimeTracking();
             stopTopClickerCheck();
             stopFollowedUsersCheck();
             localStorage.removeItem('loggedInUsername');
             localStorage.removeItem('loggedInUsernameLower');
             localStorage.removeItem('loginTime');
-            showLoginPage();
+            setTimeout(() => {
+                showLoginPage();
+            }, 200);
         }
         
         // Check login status
@@ -12305,7 +12489,13 @@
                 return;
             }
             // Toggle the active class
+            const wasActive = folder.classList.contains('active');
             folder.classList.toggle('active');
+            if (wasActive) {
+                playCloseSound();
+            } else {
+                playOpenSound();
+            }
         }
         
         function openGameFromFolder(gameName) {
