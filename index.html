@@ -431,6 +431,27 @@
             color: #656d76;
         }
         
+        /* Block Blast Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes blockPlace {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+        
         /* Tetris Styles */
         #tetrisCanvas, #tetrisNextCanvas {
             image-rendering: pixelated;
@@ -3247,7 +3268,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.9.0';
+        const APP_VERSION = '1.9.1';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -3801,12 +3822,26 @@
                 }
             }
             
-            // Update Block Blast folder item (always unlocked)
+            // Update Block Blast folder item (requires Tetris unlock)
             const blockBlastFolderItem = document.getElementById('blockBlastFolderItem');
-            if (blockBlastFolderItem) {
-                blockBlastFolderItem.classList.remove('locked');
-                blockBlastFolderItem.style.opacity = '1';
-                blockBlastFolderItem.onclick = () => openGameFromFolder('blockblast');
+            if (blockBlastFolderItem && database) {
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                if (usernameLower) {
+                    readFromFirebase(`users/${usernameLower}/unlockedGames/tetris`).then((unlocked) => {
+                        if (unlocked) {
+                            blockBlastFolderItem.classList.remove('locked');
+                            blockBlastFolderItem.style.opacity = '1';
+                            blockBlastFolderItem.onclick = () => openGameFromFolder('blockblast');
+                        } else {
+                            blockBlastFolderItem.classList.add('locked');
+                            blockBlastFolderItem.style.opacity = '0.5';
+                            blockBlastFolderItem.onclick = () => {
+                                alert('Unlock Block Blast by unlocking Tetris first!');
+                            };
+                        }
+                    });
+                }
             }
             
         }
@@ -3951,11 +3986,13 @@
             unlockTheme('topclicker');
             unlockTheme('word');
             unlockTheme('tetris');
+            unlockTheme('blockblast');
             
             // Unlock all games
             if (usernameLower && database) {
                 writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
                 writeToFirebase(`users/${usernameLower}/unlockedGames/tetris`, true);
+                writeToFirebase(`users/${usernameLower}/unlockedGames/blockblast`, true);
                 
                 // Unlock Hexagon game (if it has unlock requirement)
                 const hasPlayedHexagon = true;
@@ -3988,10 +4025,12 @@
                 writeToFirebase(`users/${usernameLower}/themes/topclicker`, true);
                 writeToFirebase(`users/${usernameLower}/themes/word`, true);
                 writeToFirebase(`users/${usernameLower}/themes/tetris`, true);
+                writeToFirebase(`users/${usernameLower}/themes/blockblast`, true);
                 
                 // Save unlocked games
                 writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
                 writeToFirebase(`users/${usernameLower}/unlockedGames/tetris`, true);
+                writeToFirebase(`users/${usernameLower}/unlockedGames/blockblast`, true);
                 
                 // Save stats
                 writeToFirebase(`users/${usernameLower}/stats/totalClicks`, 10000);
@@ -7681,8 +7720,26 @@
         }
         
         function initBlockBlast() {
-            startBlockBlastGame();
-            loadBlockBlastLeaderboard();
+            // Check if user has unlocked Tetris (required to play Block Blast)
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) {
+                alert('Please log in to play Block Blast!');
+                toggleBlockBlast();
+                return;
+            }
+            
+            readFromFirebase(`users/${usernameLower}/unlockedGames/tetris`).then((unlocked) => {
+                if (!unlocked) {
+                    alert('Unlock Block Blast by unlocking Tetris first!');
+                    toggleBlockBlast();
+                    return;
+                }
+                
+                startBlockBlastGame();
+                loadBlockBlastLeaderboard();
+            });
         }
         
         function startBlockBlastGame() {
@@ -7803,9 +7860,17 @@
             
             // Check if block can be placed
             if (!canPlaceBlockBlastBlock(row, col, shape)) {
-                alert('Cannot place block here!');
+                // Shake animation for invalid placement
+                const board = document.getElementById('blockBlastBoard');
+                board.style.animation = 'shake 0.3s';
+                setTimeout(() => {
+                    board.style.animation = '';
+                }, 300);
                 return;
             }
+            
+            // Create placement effect
+            createBlockBlastPlacementEffect(row, col, shape, color);
             
             // Place the block
             for (let r = 0; r < shape.length; r++) {
@@ -7820,6 +7885,14 @@
                 }
             }
             
+            // Remove used block with fade out animation
+            const blockDiv = document.querySelector(`#blockBlastNextBlocks > div[data-block-index="${selectedBlockBlastIndex}"]`);
+            if (blockDiv) {
+                blockDiv.style.transition = 'all 0.3s ease';
+                blockDiv.style.opacity = '0';
+                blockDiv.style.transform = 'scale(0.5)';
+            }
+            
             // Remove used block
             blockBlastGame.nextBlocks.splice(selectedBlockBlastIndex, 1);
             blockBlastGame.nextBlocks.push(generateRandomBlock());
@@ -7827,17 +7900,79 @@
             selectedBlockBlastBlock = null;
             selectedBlockBlastIndex = null;
             
-            // Clear full rows and columns
-            clearBlockBlastLines();
-            
+            // Render board with placement animation
             renderBlockBlastBoard();
+            
+            // Add entrance animation to newly placed cells
+            setTimeout(() => {
+                for (let r = 0; r < shape.length; r++) {
+                    for (let c = 0; c < shape[r].length; c++) {
+                        if (shape[r][c]) {
+                            const boardRow = row + r;
+                            const boardCol = col + c;
+                            const cell = document.querySelector(`#blockBlastBoard > div[data-row="${boardRow}"][data-col="${boardCol}"]`);
+                            if (cell) {
+                                cell.style.animation = 'blockPlace 0.3s ease-out';
+                            }
+                        }
+                    }
+                }
+            }, 10);
+            
             renderBlockBlastNextBlocks();
             updateBlockBlastUI();
             
+            // Clear full rows and columns
+            setTimeout(() => {
+                clearBlockBlastLines();
+            }, 300);
+            
             // Check game over
             if (blockBlastGame.nextBlocks.length === 0 || !canPlaceAnyBlock()) {
-                gameOverBlockBlast();
+                setTimeout(() => {
+                    gameOverBlockBlast();
+                }, 500);
             }
+        }
+        
+        function createBlockBlastPlacementEffect(row, col, shape, color) {
+            const board = document.getElementById('blockBlastBoard');
+            if (!board) return;
+            
+            // Create a pulse effect at placement location
+            const pulse = document.createElement('div');
+            pulse.style.position = 'absolute';
+            pulse.style.width = (shape[0].length * 32) + 'px';
+            pulse.style.height = (shape.length * 32) + 'px';
+            pulse.style.border = `3px solid ${color}`;
+            pulse.style.borderRadius = '8px';
+            pulse.style.pointerEvents = 'none';
+            pulse.style.zIndex = '999';
+            pulse.style.opacity = '0.8';
+            pulse.style.boxShadow = `0 0 20px ${color}, inset 0 0 20px ${color}`;
+            
+            const cell = document.querySelector(`#blockBlastBoard > div[data-row="${row}"][data-col="${col}"]`);
+            if (cell) {
+                const rect = cell.getBoundingClientRect();
+                const boardRect = board.getBoundingClientRect();
+                pulse.style.left = (rect.left - boardRect.left - 1) + 'px';
+                pulse.style.top = (rect.top - boardRect.top - 1) + 'px';
+            }
+            
+            board.style.position = 'relative';
+            board.appendChild(pulse);
+            
+            pulse.style.transition = 'all 0.3s ease-out';
+            setTimeout(() => {
+                pulse.style.transform = 'scale(1.2)';
+                pulse.style.opacity = '0';
+                
+                setTimeout(() => {
+                    if (pulse.parentElement) {
+                        pulse.remove();
+                    }
+                }, 300);
+            }, 10);
         }
         
         function canPlaceBlockBlastBlock(row, col, shape) {
@@ -7904,23 +8039,53 @@
                 if (isFull) colsToClear.push(col);
             }
             
-            // Clear rows
-            rowsToClear.forEach(row => {
-                for (let col = 0; col < 10; col++) {
-                    blockBlastGame.board[row][col] = 0;
-                }
-            });
-            
-            // Clear columns
-            colsToClear.forEach(col => {
-                for (let row = 0; row < 10; row++) {
-                    blockBlastGame.board[row][col] = 0;
-                }
-            });
-            
             // Calculate score
             const cleared = rowsToClear.length + colsToClear.length;
             if (cleared > 0) {
+                // Create explosion effects for cleared lines
+                createBlockBlastExplosion(rowsToClear, colsToClear);
+                
+                // Clear rows with animation
+                rowsToClear.forEach(row => {
+                    for (let col = 0; col < 10; col++) {
+                        const cell = document.querySelector(`#blockBlastBoard > div[data-row="${row}"][data-col="${col}"]`);
+                        if (cell) {
+                            cell.style.transition = 'all 0.3s ease';
+                            cell.style.transform = 'scale(0) rotate(180deg)';
+                            cell.style.opacity = '0';
+                        }
+                    }
+                });
+                
+                // Clear columns with animation
+                colsToClear.forEach(col => {
+                    for (let row = 0; row < 10; row++) {
+                        const cell = document.querySelector(`#blockBlastBoard > div[data-row="${row}"][data-col="${col}"]`);
+                        if (cell && !rowsToClear.includes(row)) { // Don't double-animate cells in cleared rows
+                            cell.style.transition = 'all 0.3s ease';
+                            cell.style.transform = 'scale(0) rotate(180deg)';
+                            cell.style.opacity = '0';
+                        }
+                    }
+                });
+                
+                // Clear board data after animation
+                setTimeout(() => {
+                    rowsToClear.forEach(row => {
+                        for (let col = 0; col < 10; col++) {
+                            blockBlastGame.board[row][col] = 0;
+                        }
+                    });
+                    
+                    colsToClear.forEach(col => {
+                        for (let row = 0; row < 10; row++) {
+                            blockBlastGame.board[row][col] = 0;
+                        }
+                    });
+                    
+                    renderBlockBlastBoard();
+                }, 300);
+                
                 blockBlastGame.linesCleared += cleared;
                 const points = cleared * 100 * blockBlastGame.level;
                 blockBlastGame.score += points;
@@ -7928,11 +8093,125 @@
                 // Level up every 10 lines
                 blockBlastGame.level = Math.floor(blockBlastGame.linesCleared / 10) + 1;
                 
+                // Show score popup
+                showBlockBlastScorePopup(points, cleared);
+                
                 // Check for theme unlock
                 if (blockBlastGame.score >= 10000) {
                     unlockTheme('blockblast');
                 }
             }
+        }
+        
+        function createBlockBlastExplosion(rowsToClear, colsToClear) {
+            const board = document.getElementById('blockBlastBoard');
+            if (!board) return;
+            
+            // Create particles for each cleared cell
+            rowsToClear.forEach(row => {
+                for (let col = 0; col < 10; col++) {
+                    createBlockBlastParticle(row, col, board);
+                }
+            });
+            
+            colsToClear.forEach(col => {
+                for (let row = 0; row < 10; row++) {
+                    if (!rowsToClear.includes(row)) { // Don't double-create particles
+                        createBlockBlastParticle(row, col, board);
+                    }
+                }
+            });
+        }
+        
+        function createBlockBlastParticle(row, col, board) {
+            const cell = document.querySelector(`#blockBlastBoard > div[data-row="${row}"][data-col="${col}"]`);
+            if (!cell) return;
+            
+            const cellValue = blockBlastGame.board[row][col];
+            const color = (cellValue && typeof cellValue === 'object' && cellValue.color) ? cellValue.color : '#58a6ff';
+            
+            // Create multiple particles
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '6px';
+                particle.style.height = '6px';
+                particle.style.background = color;
+                particle.style.borderRadius = '50%';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '1000';
+                particle.style.boxShadow = `0 0 10px ${color}`;
+                
+                const rect = cell.getBoundingClientRect();
+                const boardRect = board.getBoundingClientRect();
+                const startX = rect.left - boardRect.left + rect.width / 2;
+                const startY = rect.top - boardRect.top + rect.height / 2;
+                
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+                
+                board.style.position = 'relative';
+                board.appendChild(particle);
+                
+                const angle = (Math.PI * 2 * i) / 5;
+                const distance = 50 + Math.random() * 30;
+                const endX = startX + Math.cos(angle) * distance;
+                const endY = startY + Math.sin(angle) * distance;
+                
+                particle.style.transition = 'all 0.5s ease-out';
+                setTimeout(() => {
+                    particle.style.left = endX + 'px';
+                    particle.style.top = endY + 'px';
+                    particle.style.opacity = '0';
+                    particle.style.transform = 'scale(0)';
+                    
+                    setTimeout(() => {
+                        if (particle.parentElement) {
+                            particle.remove();
+                        }
+                    }, 500);
+                }, 10);
+            }
+        }
+        
+        function showBlockBlastScorePopup(points, linesCleared) {
+            const board = document.getElementById('blockBlastBoard');
+            if (!board) return;
+            
+            const popup = document.createElement('div');
+            popup.textContent = `+${points} (${linesCleared} lines!)`;
+            popup.style.position = 'absolute';
+            popup.style.left = '50%';
+            popup.style.top = '50%';
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.style.color = '#ffd700';
+            popup.style.fontSize = '24px';
+            popup.style.fontWeight = 'bold';
+            popup.style.textShadow = '0 0 10px #ffd700, 0 0 20px #ffd700';
+            popup.style.pointerEvents = 'none';
+            popup.style.zIndex = '1001';
+            popup.style.opacity = '0';
+            
+            board.style.position = 'relative';
+            board.appendChild(popup);
+            
+            // Animate popup
+            setTimeout(() => {
+                popup.style.transition = 'all 0.5s ease-out';
+                popup.style.opacity = '1';
+                popup.style.transform = 'translate(-50%, -70%) scale(1.2)';
+            }, 10);
+            
+            setTimeout(() => {
+                popup.style.opacity = '0';
+                popup.style.transform = 'translate(-50%, -90%) scale(0.8)';
+                
+                setTimeout(() => {
+                    if (popup.parentElement) {
+                        popup.remove();
+                    }
+                }, 500);
+            }, 1000);
         }
         
         function updateBlockBlastUI() {
