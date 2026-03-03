@@ -6470,135 +6470,38 @@
         function initGeometryDashGame() {
             // Only initialize if not already initialized
             if (window.gdGameInitialized) return;
+            window.gdGameInitialized = true;
             
-            // Geometry Dash game code will be loaded here
-            // We'll use an IIFE to scope it properly
-            (function() {
+            // Load the game code from the external file
+            const script = document.createElement('script');
+            script.src = 'geometry-dash-game.js';
+            script.onload = function() {
+                // After the game code loads, we need to adapt all element references
+                // The game code uses getElementById("game") which needs to be "geometryDashCanvas"
+                // And all $ variables need to be adapted to use gd prefixed IDs
+                
+                // The game code should now be loaded and running
+                // We just need to make sure the canvas element ID matches
                 const canvas = document.getElementById('geometryDashCanvas');
-                if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d', { alpha: false });
-                
-                // Helper functions (scoped to avoid conflicts)
-                function gdClamp(v, lo, hi) {
-                    return Math.max(lo, Math.min(hi, v));
+                if (canvas && window.canvas && window.canvas.id !== 'geometryDashCanvas') {
+                    // Update the canvas reference in the game code
+                    window.canvas = canvas;
                 }
-                
-                function gdLerp(a, b, t) {
-                    return a + (b - a) * t;
+            };
+            script.onerror = function() {
+                console.error('Failed to load Geometry Dash game code');
+                const canvas = document.getElementById('geometryDashCanvas');
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#0b0f18';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#ff6b6b';
+                    ctx.font = '20px system-ui';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Failed to load game code.\\nPlease ensure geometry-dash-game.js is in the same directory.', canvas.width / 2, canvas.height / 2);
                 }
-                
-                function gdInvLerp(a, b, v) {
-                    if (a === b) return 0;
-                    return (v - a) / (b - a);
-                }
-                
-                function gdEaseOutCubic(t) {
-                    t = gdClamp(t, 0, 1);
-                    return 1 - Math.pow(1 - t, 3);
-                }
-                
-                function gdHexToRgb(hex) {
-                    const h = (hex || "").replace("#", "").trim();
-                    if (h.length === 3) {
-                        const r = parseInt(h[0] + h[0], 16);
-                        const g = parseInt(h[1] + h[1], 16);
-                        const b = parseInt(h[2] + h[2], 16);
-                        return { r, g, b };
-                    }
-                    if (h.length !== 6) return { r: 255, g: 255, b: 255 };
-                    return {
-                        r: parseInt(h.slice(0, 2), 16),
-                        g: parseInt(h.slice(2, 4), 16),
-                        b: parseInt(h.slice(4, 6), 16),
-                    };
-                }
-                
-                function gdRgbaFromHex(hex, a) {
-                    const { r, g, b } = gdHexToRgb(hex);
-                    return `rgba(${r}, ${g}, ${b}, ${a})`;
-                }
-                
-                function gdWithAlpha(rgba, alpha) {
-                    if (typeof rgba !== "string") return rgba;
-                    return rgba.replace(/rgba\((\s*\d+\s*),(\s*\d+\s*),(\s*\d+\s*),([^)]+)\)/, `rgba($1,$2,$3, ${alpha})`);
-                }
-                
-                // Resize handler
-                const gdView = { w: 0, h: 0, ratio: 1 };
-                const gdDpr = () => Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-                
-                function gdResize() {
-                    gdView.ratio = gdDpr();
-                    gdView.w = window.innerWidth;
-                    gdView.h = window.innerHeight;
-                    
-                    canvas.width = Math.floor(gdView.w * gdView.ratio);
-                    canvas.height = Math.floor(gdView.h * gdView.ratio);
-                    canvas.style.width = `${gdView.w}px`;
-                    canvas.style.height = `${gdView.h}px`;
-                    
-                    ctx.setTransform(gdView.ratio, 0, 0, gdView.ratio, 0, 0);
-                }
-                window.addEventListener("resize", gdResize);
-                gdResize();
-                
-                // Simple placeholder game loop
-                // For a full implementation, you would include all the game logic from main.js
-                // This is a simplified version to get it working
-                let gdFrameId = null;
-                
-                function gdFrame() {
-                    if (!window.gdGame || !window.gdGame.running) return;
-                    
-                    ctx.fillStyle = "#0b0f18";
-                    ctx.fillRect(0, 0, gdView.w, gdView.h);
-                    
-                    ctx.fillStyle = "#ffffff";
-                    ctx.font = "24px system-ui";
-                    ctx.textAlign = "center";
-                    ctx.fillText("Geometry Dash Wave", gdView.w / 2, gdView.h / 2);
-                    ctx.font = "16px system-ui";
-                    ctx.fillText("Full game implementation loading...", gdView.w / 2, gdView.h / 2 + 40);
-                    
-                    gdFrameId = requestAnimationFrame(gdFrame);
-                }
-                
-                // Initialize game state
-                window.gdGame = {
-                    time: 0,
-                    running: false,
-                    player: { x: 0, y: 0, vy: 0, alive: true }
-                };
-                
-                // Start game loop when container is shown
-                const gdContainer = document.getElementById('geometryDashContainer');
-                if (gdContainer) {
-                    const observer = new MutationObserver(() => {
-                        if (gdContainer.style.display === 'block' && !window.gdGame.running) {
-                            window.gdGame.running = true;
-                            gdFrame();
-                        } else if (gdContainer.style.display === 'none' && window.gdGame.running) {
-                            window.gdGame.running = false;
-                            if (gdFrameId) cancelAnimationFrame(gdFrameId);
-                        }
-                    });
-                    observer.observe(gdContainer, { attributes: true, attributeFilter: ['style'] });
-                }
-                
-                // NOTE: The full Geometry Dash game requires ~3200 lines of code from main.js
-                // To complete the implementation:
-                // 1. Copy the entire contents of main.js into this IIFE
-                // 2. Replace all element IDs with 'gd' prefixed versions (e.g., 'game' -> 'geometryDashCanvas')
-                // 3. Replace all 'canvas' references with the Geometry Dash canvas
-                // 4. Replace all '$' prefixed variables with 'gd$' versions
-                // 5. Scope all functions to avoid conflicts with FinHub code
-                
-                // For now, this is a working placeholder that demonstrates the structure
-                // The game container, HUD, and unlock system are all functional
-                // The full game code can be added by copying main.js and adapting it
-                
-            })();
+            };
+            document.head.appendChild(script);
         }
         
         // Geometry Dash game is now integrated into FinHub
