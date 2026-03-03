@@ -3095,7 +3095,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.7.4';
+        const APP_VERSION = '1.7.7';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -7665,39 +7665,55 @@
         }
         
         function applyTheme(themeId) {
+            if (!themeId || themeId === 'default') {
+                // Clear theme if default
+                clearTheme();
+                currentTheme = 'default';
+                // Update theme list
+                loadThemes();
+                return;
+            }
+            
             currentTheme = themeId;
             
             // Clear previous theme
             clearTheme();
             
-            // Apply new theme
-            if (themeId === 'clicker100') {
-                applyClicker100Theme();
-            } else if (themeId === 'minesweeper') {
-                applyMinesweeperTheme();
-            } else if (themeId === 'godclicker') {
-                applyGodClickerTheme();
-            } else if (themeId === 'snake') {
-                applySnakeTheme();
-            } else if (themeId === 'grassland') {
-                applyGrasslandTheme();
-            } else if (themeId === 'topclicker') {
-                applyTopClickerTheme();
-            } else if (themeId === 'word') {
-                applyWordTheme();
-            } else if (themeId === 'tetris') {
-                applyTetrisTheme();
-            }
-            
-            // Update theme list
-            loadThemes();
-            
-            // Save current theme
-            const username = localStorage.getItem('loggedInUsername');
-            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
-            if (usernameLower && database) {
-                writeToFirebase(`users/${usernameLower}/currentTheme`, themeId);
-            }
+            // Small delay to ensure clearTheme completes and DOM is ready
+            setTimeout(() => {
+                // Apply new theme
+                try {
+                    if (themeId === 'clicker100') {
+                        applyClicker100Theme();
+                    } else if (themeId === 'minesweeper') {
+                        applyMinesweeperTheme();
+                    } else if (themeId === 'godclicker') {
+                        applyGodClickerTheme();
+                    } else if (themeId === 'snake') {
+                        applySnakeTheme();
+                    } else if (themeId === 'grassland') {
+                        applyGrasslandTheme();
+                    } else if (themeId === 'topclicker') {
+                        applyTopClickerTheme();
+                    } else if (themeId === 'word') {
+                        applyWordTheme();
+                    } else if (themeId === 'tetris') {
+                        applyTetrisTheme();
+                    }
+                } catch (err) {
+                    console.error('Error applying theme:', err);
+                }
+                
+                // Update theme list
+                loadThemes();
+                
+                // Save current theme
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                if (usernameLower && database) {
+                    writeToFirebase(`users/${usernameLower}/currentTheme`, themeId);
+                }
+            }, 50);
         }
         
         function clearTheme() {
@@ -7727,6 +7743,11 @@
                     const defaultColors = ['#58a6ff', '#f0883e', '#bc8cff', '#3fb950', '#f85149', '#ffa657'];
                     letter.style.color = defaultColors[index];
                     letter.style.textShadow = '';
+                    letter.style.background = '';
+                    letter.style.border = '';
+                    letter.style.borderRadius = '';
+                    letter.style.padding = '';
+                    letter.style.textTransform = '';
                 });
             }
             themeLetterClicks = 0;
@@ -8706,6 +8727,248 @@
             }
         }
         
+        // ============================================
+        // WORD THEME
+        // ============================================
+        
+        let wordThemeWords = [];
+        let wordThemeInterval = null;
+        
+        function applyWordTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            const isLightMode = document.body.classList.contains('light-mode');
+            bg.style.background = isLightMode
+                ? 'linear-gradient(135deg, #f6f8fa 0%, #e1e4e8 50%, #f6f8fa 100%)'
+                : 'linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%)';
+            bg.style.opacity = '0.95';
+            
+            // Make FinHub title look like word tiles
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach((letter, index) => {
+                    letter.style.color = isLightMode ? '#24292f' : '#c9d1d9';
+                    letter.style.background = isLightMode ? '#ffffff' : '#161b22';
+                    letter.style.border = '2px solid ' + (isLightMode ? '#d0d7de' : '#30363d');
+                    letter.style.borderRadius = '4px';
+                    letter.style.padding = '8px';
+                    letter.style.fontWeight = 'bold';
+                    letter.style.textTransform = 'uppercase';
+                });
+            }
+            
+            // Spawn flying words
+            spawnFlyingWords();
+        }
+        
+        function spawnFlyingWords() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'word') return;
+            
+            // Clear existing words
+            wordThemeWords.forEach(word => {
+                if (word.element) word.element.remove();
+            });
+            wordThemeWords = [];
+            
+            if (wordThemeInterval) {
+                clearInterval(wordThemeInterval);
+            }
+            
+            // Spawn words periodically
+            wordThemeInterval = setInterval(() => {
+                if (currentTheme !== 'word') {
+                    clearInterval(wordThemeInterval);
+                    return;
+                }
+                createFlyingWord();
+            }, 2000);
+            
+            // Spawn initial words
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => createFlyingWord(), i * 400);
+            }
+        }
+        
+        function createFlyingWord() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'word') return;
+            
+            const words = ['WORD', 'GAME', 'PLAY', 'FUN', 'WIN', 'LOVE', 'CODE', 'HAPPY', 'SMART', 'COOL'];
+            const word = words[Math.floor(Math.random() * words.length)];
+            
+            const wordEl = document.createElement('div');
+            wordEl.textContent = word;
+            wordEl.style.position = 'absolute';
+            wordEl.style.fontSize = (20 + Math.random() * 20) + 'px';
+            wordEl.style.fontWeight = 'bold';
+            wordEl.style.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            wordEl.style.textTransform = 'uppercase';
+            wordEl.style.pointerEvents = 'none';
+            wordEl.style.zIndex = '1';
+            wordEl.style.opacity = '0.8';
+            wordEl.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+            
+            const startX = Math.random() * window.innerWidth;
+            const startY = window.innerHeight + 50;
+            const endX = startX + (Math.random() - 0.5) * 200;
+            const endY = -50;
+            const duration = 3000 + Math.random() * 2000;
+            
+            wordEl.style.left = startX + 'px';
+            wordEl.style.top = startY + 'px';
+            
+            bg.appendChild(wordEl);
+            
+            // Animate word flying
+            const startTime = Date.now();
+            const animate = () => {
+                if (currentTheme !== 'word' || !wordEl.parentElement) return;
+                
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const currentX = startX + (endX - startX) * progress;
+                const currentY = startY + (endY - startY) * progress;
+                
+                wordEl.style.left = currentX + 'px';
+                wordEl.style.top = currentY + 'px';
+                wordEl.style.transform = `rotate(${progress * 360}deg)`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    wordEl.remove();
+                }
+            };
+            
+            animate();
+            wordThemeWords.push({ element: wordEl });
+        }
+        
+        // ============================================
+        // TETRIS THEME
+        // ============================================
+        
+        let tetrisThemeBlocks = [];
+        let tetrisThemeInterval = null;
+        
+        function applyTetrisTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            const isLightMode = document.body.classList.contains('light-mode');
+            bg.style.background = isLightMode
+                ? 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%)'
+                : 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)';
+            bg.style.opacity = '0.9';
+            
+            // Make FinHub title look like Tetris blocks
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach((letter, index) => {
+                    letter.style.color = TETRIS_COLORS[(index % 7) + 1];
+                    letter.style.textShadow = '0 0 10px ' + TETRIS_COLORS[(index % 7) + 1];
+                    letter.style.fontWeight = 'bold';
+                });
+            }
+            
+            // Spawn falling Tetris blocks
+            spawnFallingTetrisBlocks();
+        }
+        
+        function spawnFallingTetrisBlocks() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'tetris') return;
+            
+            // Clear existing blocks
+            tetrisThemeBlocks.forEach(block => {
+                if (block.element) block.element.remove();
+            });
+            tetrisThemeBlocks = [];
+            
+            if (tetrisThemeInterval) {
+                clearInterval(tetrisThemeInterval);
+            }
+            
+            // Spawn blocks periodically
+            tetrisThemeInterval = setInterval(() => {
+                if (currentTheme !== 'tetris') {
+                    clearInterval(tetrisThemeInterval);
+                    return;
+                }
+                createFallingTetrisBlock();
+            }, 1500);
+            
+            // Spawn initial blocks
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => createFallingTetrisBlock(), i * 500);
+            }
+        }
+        
+        function createFallingTetrisBlock() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'tetris') return;
+            
+            const pieceType = Math.floor(Math.random() * 7) + 1;
+            const piece = TETRIS_PIECES[pieceType];
+            const color = TETRIS_COLORS[pieceType];
+            
+            const blockContainer = document.createElement('div');
+            blockContainer.style.position = 'absolute';
+            blockContainer.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            blockContainer.style.top = '-100px';
+            blockContainer.style.display = 'grid';
+            blockContainer.style.gridTemplateColumns = `repeat(${piece[0].length}, 20px)`;
+            blockContainer.style.pointerEvents = 'none';
+            blockContainer.style.zIndex = '1';
+            
+            piece.forEach((row, y) => {
+                row.forEach((cell, x) => {
+                    if (cell) {
+                        const cellEl = document.createElement('div');
+                        cellEl.style.width = '18px';
+                        cellEl.style.height = '18px';
+                        cellEl.style.background = color;
+                        cellEl.style.border = '1px solid rgba(255,255,255,0.3)';
+                        blockContainer.appendChild(cellEl);
+                    }
+                });
+            });
+            
+            bg.appendChild(blockContainer);
+            
+            // Animate block falling
+            const startTime = Date.now();
+            const duration = 4000 + Math.random() * 2000;
+            const startX = parseFloat(blockContainer.style.left);
+            const rotation = (Math.random() - 0.5) * 2;
+            
+            const animate = () => {
+                if (currentTheme !== 'tetris' || !blockContainer.parentElement) return;
+                
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const currentY = -100 + (window.innerHeight + 200) * progress;
+                const currentX = startX + Math.sin(progress * Math.PI * 2) * 50;
+                
+                blockContainer.style.top = currentY + 'px';
+                blockContainer.style.left = currentX + 'px';
+                blockContainer.style.transform = `rotate(${progress * rotation * 360}deg)`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    blockContainer.remove();
+                }
+            };
+            
+            animate();
+            tetrisThemeBlocks.push({ element: blockContainer });
+        }
+        
         // Periodically check if user is #1 on clicker leaderboard
         let topClickerCheckInterval = null;
         
@@ -9459,7 +9722,7 @@
                         type: 'score',
                         local: localScore,
                         cloud: cloudScore,
-                        action: 'cloud',
+                        action: 'better', // Auto-select better (cloud)
                         resolved: false
                     });
                 } else if (localScore > cloudScore && localScore > 0) {
@@ -9484,13 +9747,13 @@
                 const cloudBestTime = cloudData?.bestTime || Infinity;
                 
                 if (cloudBestTime < localBestTime && cloudBestTime !== Infinity) {
-                    // Cloud has better time
+                    // Cloud has better time (lower is better)
                     syncConflicts.push({
                         game: 'Minesweeper',
                         type: 'bestTime',
                         local: localBestTime === Infinity ? 'None' : localBestTime + 's',
                         cloud: cloudBestTime + 's',
-                        action: 'cloud',
+                        action: 'better', // Auto-select better (cloud)
                         resolved: false
                     });
                 } else if (localBestTime < cloudBestTime && localBestTime !== Infinity) {
@@ -9520,7 +9783,7 @@
                         type: 'score',
                         local: localScore,
                         cloud: cloudScore,
-                        action: 'cloud',
+                        action: 'better', // Auto-select better (cloud)
                         resolved: false
                     });
                 } else if (localScore > cloudScore && localScore > 0) {
@@ -9550,7 +9813,7 @@
                         type: 'score',
                         local: localScore,
                         cloud: cloudScore,
-                        action: 'cloud',
+                        action: 'better', // Auto-select better (cloud)
                         resolved: false
                     });
                 } else if (localScore > cloudScore && localScore > 0) {
@@ -9587,7 +9850,7 @@
                             type: 'streak',
                             local: `Best: ${localData.bestStreak || 0}, Current: ${localData.streak || 0}`,
                             cloud: `Best: ${bestStreak}, Current: ${currentStreak}`,
-                            action: 'merge',
+                            action: 'better', // Auto-select better (merge)
                             resolved: false
                         });
                     }
@@ -9633,6 +9896,9 @@
                 </p>
                 <div id="conflictList" style="margin-bottom: 20px;"></div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button id="resolveAllBetter" style="padding: 10px 20px; background: #f0883e; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                        Use Better (All)
+                    </button>
                     <button id="resolveAllCloud" style="padding: 10px 20px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer;">
                         Use Cloud (All)
                     </button>
@@ -9660,6 +9926,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <strong style="color: #c9d1d9;">${conflict.game}</strong>
                         <select class="conflict-resolution" data-index="${index}" style="padding: 5px 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9;">
+                            <option value="better" ${conflict.action === 'better' ? 'selected' : ''}>Use Better (Auto)</option>
                             <option value="cloud" ${conflict.action === 'cloud' ? 'selected' : ''}>Use Cloud (${conflict.cloud})</option>
                             <option value="local" ${conflict.action === 'local' ? 'selected' : ''}>Use Local (${conflict.local})</option>
                             ${conflict.type === 'streak' ? '<option value="merge" ' + (conflict.action === 'merge' ? 'selected' : '') + '>Merge (Keep Best)</option>' : ''}
@@ -9678,6 +9945,13 @@
             document.body.appendChild(overlay);
             
             // Handle resolution
+            dialog.querySelector('#resolveAllBetter').onclick = () => {
+                syncConflicts.forEach(conflict => {
+                    conflict.action = determineBetterAction(conflict);
+                });
+                resolveConflicts();
+            };
+            
             dialog.querySelector('#resolveAllCloud').onclick = () => {
                 syncConflicts.forEach(c => c.action = 'cloud');
                 resolveConflicts();
@@ -9695,12 +9969,34 @@
                 resolveConflicts();
             };
             
-            // Update conflict action when selection changes
+            // Update conflict actions when selection changes
             dialog.querySelectorAll('.conflict-resolution').forEach((select, index) => {
                 select.onchange = () => {
                     syncConflicts[index].action = select.value;
                 };
             });
+        }
+        
+        function determineBetterAction(conflict) {
+            // Determine which value is better based on conflict type
+            if (conflict.type === 'score') {
+                // Higher score is better
+                const localNum = typeof conflict.local === 'number' ? conflict.local : parseFloat(conflict.local) || 0;
+                const cloudNum = typeof conflict.cloud === 'number' ? conflict.cloud : parseFloat(conflict.cloud) || 0;
+                return cloudNum > localNum ? 'cloud' : 'local';
+            } else if (conflict.type === 'bestTime') {
+                // Lower time is better
+                const localTime = typeof conflict.local === 'string' ? parseFloat(conflict.local.replace('s', '').replace('None', 'Infinity')) : (conflict.local === 'None' ? Infinity : conflict.local);
+                const cloudTime = typeof conflict.cloud === 'string' ? parseFloat(conflict.cloud.replace('s', '').replace('None', 'Infinity')) : (conflict.cloud === 'None' ? Infinity : conflict.cloud);
+                if (localTime === Infinity || localTime === 'None') return 'cloud';
+                if (cloudTime === Infinity || cloudTime === 'None') return 'local';
+                return cloudTime < localTime ? 'cloud' : 'local';
+            } else if (conflict.type === 'streak') {
+                // Merge is always better for streaks
+                return 'merge';
+            }
+            // Default to cloud if we can't determine
+            return 'cloud';
         }
         
         async function resolveConflicts() {
@@ -9713,7 +10009,13 @@
             
             for (const conflict of syncConflicts) {
                 try {
-                    if (conflict.action === 'cloud') {
+                    // Handle "better" action by determining which is actually better
+                    let action = conflict.action;
+                    if (action === 'better') {
+                        action = determineBetterAction(conflict);
+                    }
+                    
+                    if (action === 'cloud') {
                         // Use cloud data
                         if (conflict.game === 'Snake') {
                             const cloudData = await readFromFirebase(`snakeScores/${usernameLower}`);
@@ -9891,7 +10193,10 @@
                             unlockedThemes.add(themeId);
                         }
                     });
-                    loadThemes();
+                    // Reload themes list if themes container is open
+                    if (document.getElementById('themeContainer') && document.getElementById('themeContainer').classList.contains('active')) {
+                        loadThemes();
+                    }
                 }
             } catch (err) {
                 console.error('Error loading unlocked themes:', err);
@@ -9906,8 +10211,15 @@
             
             try {
                 const theme = await readFromFirebase(`users/${usernameLower}/currentTheme`);
-                if (theme && unlockedThemes.has(theme)) {
-                    applyTheme(theme);
+                if (theme) {
+                    // Check if theme is unlocked, if not unlock it
+                    if (!unlockedThemes.has(theme)) {
+                        unlockedThemes.add(theme);
+                    }
+                    // Apply theme after a short delay to ensure DOM is ready
+                    setTimeout(() => {
+                        applyTheme(theme);
+                    }, 100);
                 }
             } catch (err) {
                 console.error('Error loading current theme:', err);
