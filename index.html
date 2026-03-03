@@ -19,10 +19,268 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #c9d1d9;
             background: #0d1117;
             min-height: 100vh;
             padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        body.light-mode {
+            background: #ffffff;
+            color: #24292f;
+        }
+        
+        body.light-mode .page {
+            background: #ffffff;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: rgba(13, 17, 23, 0.95);
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 999;
+            backdrop-filter: blur(10px);
+        }
+        
+        body.light-mode .top-bar {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid #d0d7de;
+        }
+        
+        .top-bar-left, .top-bar-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .top-bar-btn {
+            padding: 8px 16px;
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        body.light-mode .top-bar-btn {
+            background: rgba(246, 248, 250, 0.8);
+            border: 1px solid #d0d7de;
+            color: #24292f;
+        }
+        
+        .top-bar-btn:hover {
+            background: rgba(33, 38, 45, 0.9);
+            border-color: #58a6ff;
+        }
+        
+        body.light-mode .top-bar-btn:hover {
+            background: rgba(246, 248, 250, 1);
+            border-color: #0969da;
+        }
+        
+        .notification-badge {
+            background: #f85149;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+        }
+        
+        /* Profile Styles */
+        .profile-content {
+            padding: 20px;
+        }
+        
+        .profile-photo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-photo-container {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .profile-info-section {
+            margin-bottom: 30px;
+        }
+        
+        .profile-info-section h4 {
+            color: #c9d1d9;
+            margin-bottom: 10px;
+        }
+        
+        body.light-mode .profile-info-section h4 {
+            color: #24292f;
+        }
+        
+        .profile-description {
+            width: 100%;
+            padding: 12px;
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        body.light-mode .profile-description {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            color: #24292f;
+        }
+        
+        .profile-btn {
+            padding: 10px 20px;
+            background: #238636;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        
+        .profile-btn:hover {
+            background: #2ea043;
+        }
+        
+        .profile-friends-section h4 {
+            color: #c9d1d9;
+            margin-bottom: 15px;
+        }
+        
+        body.light-mode .profile-friends-section h4 {
+            color: #24292f;
+        }
+        
+        .profile-friends-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .profile-friend-item {
+            padding: 12px;
+            background: rgba(22, 27, 34, 0.5);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        body.light-mode .profile-friend-item {
+            background: rgba(246, 248, 250, 0.5);
+            border: 1px solid #d0d7de;
+        }
+        
+        .profile-friend-item:hover {
+            background: rgba(33, 38, 45, 0.8);
+            border-color: #58a6ff;
+        }
+        
+        body.light-mode .profile-friend-item:hover {
+            background: rgba(246, 248, 250, 1);
+            border-color: #0969da;
+        }
+        
+        .profile-friend-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #58a6ff;
+        }
+        
+        .profile-friend-name {
+            flex: 1;
+            color: #c9d1d9;
+            font-weight: 500;
+        }
+        
+        body.light-mode .profile-friend-name {
+            color: #24292f;
+        }
+        
+        /* Notifications */
+        .notifications-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .notification-item {
+            padding: 12px;
+            background: rgba(22, 27, 34, 0.5);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        body.light-mode .notification-item {
+            background: rgba(246, 248, 250, 0.5);
+            border: 1px solid #d0d7de;
+        }
+        
+        .notification-item.unread {
+            background: rgba(31, 111, 235, 0.1);
+            border-color: #1f6feb;
+        }
+        
+        .notification-content {
+            flex: 1;
+            color: #c9d1d9;
+        }
+        
+        body.light-mode .notification-content {
+            color: #24292f;
+        }
+        
+        .notification-time {
+            color: #8b949e;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 5px;
+        }
+        
+        .notification-close:hover {
+            color: #f85149;
         }
         
         .page {
@@ -1703,6 +1961,20 @@
             </div>
         </div>
         
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button class="top-bar-btn" id="profileBtn" onclick="toggleProfile()" title="Your Profile">👤 Profile</button>
+                <button class="top-bar-btn" id="notificationsBtn" onclick="toggleNotifications()" title="Notifications">
+                    🔔 Notifications
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </button>
+            </div>
+            <div class="top-bar-right">
+                <button class="top-bar-btn" id="themeToggleBtn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">🌙</button>
+            </div>
+        </div>
+        
         <!-- Sidebar Buttons -->
         <div class="sidebar-buttons">
             <div class="sidebar-btn" id="chatBtn" onclick="toggleChat()">💬 Chat</div>
@@ -1765,6 +2037,9 @@
                     <div class="add-friend-section">
                         <input type="text" class="add-friend-input" id="addFriendInput" placeholder="Enter username to add friend..." onkeypress="if(event.key === 'Enter') sendFriendRequest()">
                         <button class="add-friend-btn" onclick="sendFriendRequest()">Send Friend Request</button>
+                    </div>
+                    <div class="search-friends-section" style="margin-top: 10px;">
+                        <input type="text" class="add-friend-input" id="searchFriendsInput" placeholder="🔍 Search friends..." onkeyup="searchFriends()">
                     </div>
                 </div>
                 
@@ -1903,6 +2178,51 @@
             </div>
         </div>
         
+        <!-- Profile Board -->
+        <div class="game-container" id="profileContainer">
+            <div class="game-header">
+                <h3>👤 Your Profile</h3>
+                <button class="close-btn" onclick="toggleProfile()">×</button>
+            </div>
+            <div class="game-content">
+                <div class="profile-content">
+                    <div class="profile-photo-section">
+                        <div class="profile-photo-container">
+                            <img id="profilePhoto" src="" alt="Profile Photo" style="display: none; width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #58a6ff;">
+                            <div id="profilePhotoPlaceholder" style="width: 150px; height: 150px; border-radius: 50%; background: #30363d; display: flex; align-items: center; justify-content: center; font-size: 60px; border: 3px solid #58a6ff;">👤</div>
+                        </div>
+                        <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                        <button class="profile-btn" onclick="document.getElementById('profilePhotoInput').click()">📷 Upload Photo</button>
+                    </div>
+                    <div class="profile-info-section">
+                        <h4>Description</h4>
+                        <textarea id="profileDescription" class="profile-description" placeholder="Tell everyone about yourself..." rows="5"></textarea>
+                        <button class="profile-btn" onclick="saveProfile()" style="margin-top: 10px;">💾 Save Profile</button>
+                    </div>
+                    <div class="profile-friends-section">
+                        <h4>Your Friends</h4>
+                        <div id="profileFriendsList" class="profile-friends-list">
+                            <p style="color: #8b949e; text-align: center; padding: 20px;">Loading friends...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notifications -->
+        <div class="game-container" id="notificationsContainer">
+            <div class="game-header">
+                <h3>🔔 Notifications</h3>
+                <button class="close-btn" onclick="toggleNotifications()">×</button>
+            </div>
+            <div class="game-content">
+                <div class="notifications-list" id="notificationsList">
+                    <p style="color: #8b949e; text-align: center; padding: 20px;">No notifications</p>
+                </div>
+                <button class="profile-btn" onclick="clearAllNotifications()" style="width: 100%; margin-top: 10px;">Clear All</button>
+            </div>
+        </div>
+        
         
         <div class="finhub-title" id="finhubTitle">
             <span class="title-letter f" data-letter="F">F</span>
@@ -1981,6 +2301,9 @@
             
             // Initialize unlock system
             initUnlockSystem();
+            
+            // Initialize theme
+            initTheme();
         });
         
         // ============================================
@@ -2090,6 +2413,10 @@
                         writeToFirebase(`users/${usernameLower}/unlocks/${UNLOCK_TYPES.CHAT}`, true);
                     }
                 }
+                // Always unlock FRIENDS
+                if (!unlockedFeatures.has(UNLOCK_TYPES.FRIENDS)) {
+                    unlockFeature(UNLOCK_TYPES.FRIENDS);
+                }
                 updateUIUnlocks();
             });
             
@@ -2177,7 +2504,7 @@
                     shouldUnlock = unlockedFeatures.has(UNLOCK_TYPES.FINHUB) || messageCount >= 1;
                     break;
                 case UNLOCK_TYPES.FRIENDS:
-                    shouldUnlock = messageCount >= 1;
+                    shouldUnlock = true; // Always unlocked
                     break;
                 case UNLOCK_TYPES.PAINT:
                     shouldUnlock = friendCount >= 1;
@@ -2332,14 +2659,12 @@
             }
             
             if (friendsBtn) {
-                if (unlockedFeatures.has(UNLOCK_TYPES.FRIENDS)) {
-                    friendsBtn.classList.remove('locked');
-                    friendsBtn.onclick = toggleFriends;
-                } else {
-                    friendsBtn.classList.add('locked');
-                    friendsBtn.onclick = () => {
-                        alert('Unlock Friends by sending a chat message!');
-                    };
+                // Friends is now always unlocked
+                friendsBtn.classList.remove('locked');
+                friendsBtn.onclick = toggleFriends;
+                // Auto-unlock if not already unlocked
+                if (!unlockedFeatures.has(UNLOCK_TYPES.FRIENDS)) {
+                    unlockFeature(UNLOCK_TYPES.FRIENDS);
                 }
             }
             
@@ -3001,6 +3326,8 @@
                         }).then(() => {
                             input.value = '';
                             alert('Friend request sent!');
+                            // Send notification to target user
+                            addNotificationToUser(targetUsernameLower, `${username} sent you a friend request`);
                         });
                     });
                 });
@@ -3066,6 +3393,9 @@
                 loadFriends();
                 loadFriendRequests(); // Refresh the requests list
                 
+                // Send notification to requester
+                addNotificationToUser(fromUsernameLower, `${username} accepted your friend request!`);
+                
                 // Track friend count and check unlocks
                 readFromFirebase(`friends/${usernameLower}`).then((friends) => {
                     friendCount = friends ? Object.keys(friends).length : 0;
@@ -3092,6 +3422,8 @@
         }
         
         // Load Friends List
+        let allFriendsList = []; // Store all friends for search
+        
         function loadFriends() {
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
             if (!usernameLower || !database) return;
@@ -3101,21 +3433,51 @@
                 
                 if (!friends || Object.keys(friends).length === 0) {
                     list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friends yet. Add someone!</p>';
+                    allFriendsList = [];
                     return;
                 }
                 
-                list.innerHTML = '';
-                Object.entries(friends).forEach(([friendUsernameLower, friendData]) => {
-                    const displayName = friendData?.username || friendUsernameLower;
-                    const div = document.createElement('div');
-                    div.className = 'friend-item';
-                    div.innerHTML = `
-                        <span class="username">${displayName}</span>
-                        <button class="chat-btn" onclick="openPrivateChat('${friendUsernameLower}', '${displayName}')">Chat</button>
-                    `;
-                    list.appendChild(div);
-                });
+                allFriendsList = Object.entries(friends).map(([friendUsernameLower, friendData]) => ({
+                    usernameLower: friendUsernameLower,
+                    username: friendData?.username || friendUsernameLower,
+                    data: friendData
+                }));
+                
+                renderFriendsList(allFriendsList);
             });
+        }
+        
+        function renderFriendsList(friends) {
+            const list = document.getElementById('friendsList');
+            if (friends.length === 0) {
+                list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friends found.</p>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            friends.forEach(({usernameLower, username}) => {
+                const div = document.createElement('div');
+                div.className = 'friend-item';
+                div.innerHTML = `
+                    <span class="username">${username}</span>
+                    <button class="chat-btn" onclick="openPrivateChat('${usernameLower}', '${username}')">Chat</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        function searchFriends() {
+            const searchTerm = document.getElementById('searchFriendsInput').value.toLowerCase().trim();
+            if (!searchTerm) {
+                renderFriendsList(allFriendsList);
+                return;
+            }
+            
+            const filtered = allFriendsList.filter(friend => 
+                friend.username.toLowerCase().includes(searchTerm) ||
+                friend.usernameLower.toLowerCase().includes(searchTerm)
+            );
+            renderFriendsList(filtered);
         }
         
         // Open Private Chat
@@ -3221,6 +3583,337 @@
             pushToFirebase(`privateChats/${chatId}/messages`, messageData).then(() => {
                 input.value = '';
             });
+            
+            // Send notification to friend
+            addNotificationToUser(currentPrivateChatUser, `${username} sent you a message`);
+        }
+        
+        // ============================================
+        // DARK/LIGHT MODE
+        // ============================================
+        
+        function toggleDarkMode() {
+            const body = document.body;
+            const isLight = body.classList.contains('light-mode');
+            const btn = document.getElementById('themeToggleBtn');
+            
+            if (isLight) {
+                body.classList.remove('light-mode');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.add('light-mode');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const btn = document.getElementById('themeToggleBtn');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                if (btn) btn.textContent = '☀️';
+            } else {
+                if (btn) btn.textContent = '🌙';
+            }
+        }
+        
+        // ============================================
+        // NOTIFICATIONS SYSTEM
+        // ============================================
+        
+        let notifications = [];
+        let notificationsListener = null;
+        
+        function toggleNotifications() {
+            const container = document.getElementById('notificationsContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const snake = document.getElementById('snakeContainer');
+            const themes = document.getElementById('themeContainer');
+            const profile = document.getElementById('profileContainer');
+            
+            if (container.classList.contains('active')) {
+                container.classList.remove('active');
+            } else {
+                container.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                minesweeper.classList.remove('active');
+                snake.classList.remove('active');
+                themes.classList.remove('active');
+                if (profile) profile.classList.remove('active');
+                loadNotifications();
+            }
+        }
+        
+        function loadNotifications() {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
+            
+            const list = document.getElementById('notificationsList');
+            list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase(`notifications/${usernameLower}`).then((notifs) => {
+                if (!notifs || Object.keys(notifs).length === 0) {
+                    list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No notifications</p>';
+                    notifications = [];
+                    updateNotificationBadge();
+                    return;
+                }
+                
+                notifications = Object.entries(notifs)
+                    .map(([id, notif]) => ({ id, ...notif }))
+                    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                
+                renderNotifications();
+                updateNotificationBadge();
+            });
+            
+            // Listen for new notifications
+            if (notificationsListener) {
+                notificationsListener.off('value');
+            }
+            notificationsListener = listenToFirebase(`notifications/${usernameLower}`, (notifs) => {
+                if (notifs) {
+                    notifications = Object.entries(notifs)
+                        .map(([id, notif]) => ({ id, ...notif }))
+                        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    renderNotifications();
+                    updateNotificationBadge();
+                }
+            });
+        }
+        
+        function renderNotifications() {
+            const list = document.getElementById('notificationsList');
+            if (notifications.length === 0) {
+                list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No notifications</p>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            notifications.forEach(notif => {
+                const div = document.createElement('div');
+                div.className = `notification-item ${notif.read ? '' : 'unread'}`;
+                const date = new Date(notif.timestamp || Date.now());
+                div.innerHTML = `
+                    <div class="notification-content">
+                        <div>${notif.message || 'New notification'}</div>
+                        <div class="notification-time">${date.toLocaleString()}</div>
+                    </div>
+                    <button class="notification-close" onclick="removeNotification('${notif.id}')">×</button>
+                `;
+                list.appendChild(div);
+                
+                // Mark as read on click
+                if (!notif.read) {
+                    div.onclick = () => markNotificationRead(notif.id);
+                }
+            });
+        }
+        
+        function addNotification(message) {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (!usernameLower || !database) return;
+            
+            const notification = {
+                message: message,
+                timestamp: Date.now(),
+                read: false
+            };
+            
+            pushToFirebase(`notifications/${usernameLower}`, notification);
+        }
+        
+        function addNotificationToUser(usernameLower, message) {
+            if (!usernameLower || !database) return;
+            
+            const notification = {
+                message: message,
+                timestamp: Date.now(),
+                read: false
+            };
+            
+            pushToFirebase(`notifications/${usernameLower}`, notification);
+        }
+        
+        function markNotificationRead(notifId) {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
+            
+            writeToFirebase(`notifications/${usernameLower}/${notifId}/read`, true);
+        }
+        
+        function removeNotification(notifId) {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
+            
+            deleteFromFirebase(`notifications/${usernameLower}/${notifId}`);
+        }
+        
+        function clearAllNotifications() {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
+            
+            if (confirm('Clear all notifications?')) {
+                deleteFromFirebase(`notifications/${usernameLower}`);
+                notifications = [];
+                renderNotifications();
+                updateNotificationBadge();
+            }
+        }
+        
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            const unreadCount = notifications.filter(n => !n.read).length;
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+        
+        // ============================================
+        // PROFILE SYSTEM
+        // ============================================
+        
+        function toggleProfile() {
+            const container = document.getElementById('profileContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const snake = document.getElementById('snakeContainer');
+            const themes = document.getElementById('themeContainer');
+            const notifications = document.getElementById('notificationsContainer');
+            
+            if (container.classList.contains('active')) {
+                container.classList.remove('active');
+            } else {
+                container.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                minesweeper.classList.remove('active');
+                snake.classList.remove('active');
+                themes.classList.remove('active');
+                if (notifications) notifications.classList.remove('active');
+                loadProfile();
+            }
+        }
+        
+        function loadProfile() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (!usernameLower || !database) return;
+            
+            // Load profile data
+            readFromFirebase(`users/${usernameLower}/profile`).then((profile) => {
+                if (profile) {
+                    if (profile.description) {
+                        document.getElementById('profileDescription').value = profile.description;
+                    }
+                    if (profile.photoUrl) {
+                        const photo = document.getElementById('profilePhoto');
+                        photo.src = profile.photoUrl;
+                        photo.style.display = 'block';
+                        document.getElementById('profilePhotoPlaceholder').style.display = 'none';
+                    }
+                }
+            });
+            
+            // Load friends for profile
+            loadProfileFriends();
+        }
+        
+        function loadProfileFriends() {
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            if (!usernameLower || !database) return;
+            
+            const list = document.getElementById('profileFriendsList');
+            list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase(`friends/${usernameLower}`).then((friends) => {
+                if (!friends || Object.keys(friends).length === 0) {
+                    list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friends yet.</p>';
+                    return;
+                }
+                
+                list.innerHTML = '';
+                Object.entries(friends).forEach(([friendUsernameLower, friendData]) => {
+                    const displayName = friendData?.username || friendUsernameLower;
+                    readFromFirebase(`users/${friendUsernameLower}/profile`).then((profile) => {
+                        const div = document.createElement('div');
+                        div.className = 'profile-friend-item';
+                        div.onclick = () => openPrivateChat(friendUsernameLower, displayName);
+                        
+                        let photoHtml = '<div style="width: 40px; height: 40px; border-radius: 50%; background: #30363d; display: flex; align-items: center; justify-content: center; font-size: 20px;">👤</div>';
+                        if (profile && profile.photoUrl) {
+                            photoHtml = `<img src="${profile.photoUrl}" alt="${displayName}" class="profile-friend-photo">`;
+                        }
+                        
+                        div.innerHTML = `
+                            ${photoHtml}
+                            <span class="profile-friend-name">${displayName}</span>
+                        `;
+                        list.appendChild(div);
+                    });
+                });
+            });
+        }
+        
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image must be smaller than 5MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const photoUrl = e.target.result;
+                const photo = document.getElementById('profilePhoto');
+                const placeholder = document.getElementById('profilePhotoPlaceholder');
+                
+                photo.src = photoUrl;
+                photo.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                // Save to Firebase
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+                if (usernameLower && database) {
+                    writeToFirebase(`users/${usernameLower}/profile/photoUrl`, photoUrl);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function saveProfile() {
+            const description = document.getElementById('profileDescription').value;
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || localStorage.getItem('loggedInUsername')?.toLowerCase();
+            
+            if (!usernameLower || !database) {
+                alert('Error: Not logged in or Firebase not connected.');
+                return;
+            }
+            
+            writeToFirebase(`users/${usernameLower}/profile/description`, description);
+            alert('Profile saved!');
         }
         
         // ============================================
