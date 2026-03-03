@@ -963,6 +963,22 @@
             font-size: 12px;
         }
         
+        .friend-item .board-btn {
+            padding: 5px 15px;
+            background: #238636;
+            border: 1px solid #238636;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        .friend-item .board-btn:hover {
+            background: #2ea043;
+            border-color: #2ea043;
+        }
+        
         /* Friend Requests Panel (Right Side) */
         .friend-requests-panel {
             position: fixed;
@@ -2076,7 +2092,6 @@
         <!-- Sidebar Buttons -->
         <div class="sidebar-buttons">
             <div class="sidebar-btn" id="chatBtn" onclick="toggleChat()">💬 Chat</div>
-            <div class="sidebar-btn" id="boardBtn" onclick="toggleThemes()">📋 Board</div>
             <div class="sidebar-btn" id="friendsBtn" onclick="toggleFriends()">👥 Friends</div>
             <div class="sidebar-btn" id="paintBtn" onclick="togglePaint()">🎨 Paint</div>
             <div class="sidebar-btn" id="clickerBtn" onclick="toggleClicker()">🖱️ Clicker</div>
@@ -2280,7 +2295,7 @@
         <!-- Profile Board -->
         <div class="game-container" id="profileContainer">
             <div class="game-header">
-                <h3>👤 Your Profile</h3>
+                <h3 id="profileHeader">👤 Your Profile</h3>
                 <button class="close-btn" onclick="toggleProfile()">×</button>
             </div>
             <div class="game-content">
@@ -2291,14 +2306,14 @@
                             <div id="profilePhotoPlaceholder" style="width: 150px; height: 150px; border-radius: 50%; background: #30363d; display: flex; align-items: center; justify-content: center; font-size: 60px; border: 3px solid #58a6ff;">👤</div>
                         </div>
                         <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
-                        <button class="profile-btn" onclick="document.getElementById('profilePhotoInput').click()">📷 Upload Photo</button>
+                        <button class="profile-btn" id="uploadPhotoBtn" onclick="document.getElementById('profilePhotoInput').click()">📷 Upload Photo</button>
                     </div>
                     <div class="profile-info-section">
                         <h4>Description</h4>
                         <textarea id="profileDescription" class="profile-description" placeholder="Tell everyone about yourself..." rows="5"></textarea>
-                        <button class="profile-btn" onclick="saveProfile()" style="margin-top: 10px;">💾 Save Profile</button>
+                        <button class="profile-btn" id="saveProfileBtn" onclick="saveProfile()" style="margin-top: 10px;">💾 Save Profile</button>
                     </div>
-                    <div class="profile-friends-section">
+                    <div class="profile-friends-section" id="profileFriendsSection">
                         <h4>Your Friends</h4>
                         <div id="profileFriendsList" class="profile-friends-list">
                             <p style="color: #8b949e; text-align: center; padding: 20px;">Loading friends...</p>
@@ -3563,7 +3578,10 @@
                 div.className = 'friend-item';
                 div.innerHTML = `
                     <span class="username">${username}</span>
-                    <button class="chat-btn" onclick="openPrivateChat('${usernameLower}', '${username}')">Chat</button>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="chat-btn" onclick="openPrivateChat('${usernameLower}', '${username}')">Chat</button>
+                        <button class="board-btn" onclick="viewFriendProfile('${usernameLower}', '${username}')">📋 Board</button>
+                    </div>
                 `;
                 list.appendChild(div);
             });
@@ -3928,6 +3946,15 @@
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
             if (!usernameLower || !database) return;
             
+            // Set profile mode to own profile
+            document.getElementById('profileContainer').dataset.viewingUser = 'own';
+            document.getElementById('profileHeader').textContent = '👤 Your Profile';
+            document.getElementById('profileDescription').disabled = false;
+            document.getElementById('profilePhotoInput').style.display = 'none';
+            document.getElementById('uploadPhotoBtn').style.display = 'block';
+            document.getElementById('saveProfileBtn').style.display = 'block';
+            document.getElementById('profileFriendsSection').querySelector('h4').textContent = 'Your Friends';
+            
             // Load profile data
             readFromFirebase(`users/${usernameLower}/profile`).then((profile) => {
                 if (profile) {
@@ -3945,6 +3972,107 @@
             
             // Load friends for profile
             loadProfileFriends();
+        }
+        
+        function viewFriendProfile(friendUsernameLower, friendDisplayName) {
+            const container = document.getElementById('profileContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const snake = document.getElementById('snakeContainer');
+            const themes = document.getElementById('themeContainer');
+            const notifications = document.getElementById('notificationsContainer');
+            
+            // Close other panels
+            chat.classList.remove('active');
+            friends.classList.remove('active');
+            paint.classList.remove('active');
+            clicker.classList.remove('active');
+            minesweeper.classList.remove('active');
+            snake.classList.remove('active');
+            themes.classList.remove('active');
+            if (notifications) notifications.classList.remove('active');
+            
+            // Open profile container
+            container.classList.add('active');
+            
+            // Set profile mode to friend's profile
+            container.dataset.viewingUser = friendUsernameLower;
+            document.getElementById('profileHeader').textContent = `👤 ${friendDisplayName}'s Profile`;
+            document.getElementById('profileDescription').disabled = true;
+            document.getElementById('profilePhotoInput').style.display = 'none';
+            document.getElementById('uploadPhotoBtn').style.display = 'none';
+            document.getElementById('saveProfileBtn').style.display = 'none';
+            document.getElementById('profileFriendsSection').querySelector('h4').textContent = `${friendDisplayName}'s Friends`;
+            
+            // Load friend's profile data
+            if (!database) return;
+            
+            readFromFirebase(`users/${friendUsernameLower}/profile`).then((profile) => {
+                const photo = document.getElementById('profilePhoto');
+                const placeholder = document.getElementById('profilePhotoPlaceholder');
+                
+                if (profile) {
+                    if (profile.description) {
+                        document.getElementById('profileDescription').value = profile.description;
+                    } else {
+                        document.getElementById('profileDescription').value = '';
+                    }
+                    
+                    if (profile.photoUrl) {
+                        photo.src = profile.photoUrl;
+                        photo.style.display = 'block';
+                        placeholder.style.display = 'none';
+                    } else {
+                        photo.style.display = 'none';
+                        placeholder.style.display = 'flex';
+                    }
+                } else {
+                    document.getElementById('profileDescription').value = '';
+                    photo.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                }
+            });
+            
+            // Load friend's friends
+            loadFriendProfileFriends(friendUsernameLower);
+        }
+        
+        function loadFriendProfileFriends(friendUsernameLower) {
+            if (!database) return;
+            
+            const list = document.getElementById('profileFriendsList');
+            list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase(`friends/${friendUsernameLower}`).then((friends) => {
+                if (!friends || Object.keys(friends).length === 0) {
+                    list.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No friends yet.</p>';
+                    return;
+                }
+                
+                list.innerHTML = '';
+                Object.entries(friends).forEach(([friendUsernameLower2, friendData]) => {
+                    const displayName = friendData?.username || friendUsernameLower2;
+                    readFromFirebase(`users/${friendUsernameLower2}/profile`).then((profile) => {
+                        const div = document.createElement('div');
+                        div.className = 'profile-friend-item';
+                        div.onclick = () => viewFriendProfile(friendUsernameLower2, displayName);
+                        
+                        let photoHtml = '<div style="width: 40px; height: 40px; border-radius: 50%; background: #30363d; display: flex; align-items: center; justify-content: center; font-size: 20px;">👤</div>';
+                        if (profile && profile.photoUrl) {
+                            photoHtml = `<img src="${profile.photoUrl}" alt="${displayName}" class="profile-friend-photo">`;
+                        }
+                        
+                        div.innerHTML = `
+                            ${photoHtml}
+                            <span class="profile-friend-name">${displayName}</span>
+                        `;
+                        list.appendChild(div);
+                    });
+                });
+            });
         }
         
         function loadProfileFriends() {
