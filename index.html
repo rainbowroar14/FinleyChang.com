@@ -312,6 +312,130 @@
             background: #b1bac4;
         }
         
+        /* Wordle Styles */
+        .wordle-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+        
+        .wordle-cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #30363d;
+            background: rgba(22, 27, 34, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #c9d1d9;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        
+        body.light-mode .wordle-cell {
+            border-color: #d0d7de;
+            background: rgba(246, 248, 250, 0.5);
+            color: #24292f;
+        }
+        
+        .wordle-cell.filled {
+            border-color: #58a6ff;
+        }
+        
+        .wordle-cell.correct {
+            background: #238636;
+            border-color: #238636;
+            color: white;
+        }
+        
+        .wordle-cell.present {
+            background: #d29922;
+            border-color: #d29922;
+            color: white;
+        }
+        
+        .wordle-cell.absent {
+            background: #30363d;
+            border-color: #30363d;
+            color: #8b949e;
+        }
+        
+        body.light-mode .wordle-cell.absent {
+            background: #d0d7de;
+            border-color: #d0d7de;
+            color: #656d76;
+        }
+        
+        .wordle-keyboard-row {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+        
+        .wordle-key {
+            min-width: 35px;
+            height: 45px;
+            border: 1px solid #30363d;
+            background: rgba(22, 27, 34, 0.8);
+            color: #c9d1d9;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        
+        .wordle-key:hover {
+            background: rgba(22, 27, 34, 1);
+        }
+        
+        .wordle-key.wide {
+            min-width: 60px;
+        }
+        
+        body.light-mode .wordle-key {
+            border-color: #d0d7de;
+            background: rgba(246, 248, 250, 0.8);
+            color: #24292f;
+        }
+        
+        body.light-mode .wordle-key:hover {
+            background: rgba(246, 248, 250, 1);
+        }
+        
+        .wordle-key.correct {
+            background: #238636;
+            border-color: #238636;
+            color: white;
+        }
+        
+        .wordle-key.present {
+            background: #d29922;
+            border-color: #d29922;
+            color: white;
+        }
+        
+        .wordle-key.absent {
+            background: #30363d;
+            border-color: #30363d;
+            color: #8b949e;
+        }
+        
+        body.light-mode .wordle-key.absent {
+            background: #d0d7de;
+            border-color: #d0d7de;
+            color: #656d76;
+        }
+        
+        /* Tetris Styles */
+        #tetrisCanvas, #tetrisNextCanvas {
+            image-rendering: pixelated;
+        }
+        
         .profile-friend-item {
             padding: 12px;
             background: rgba(22, 27, 34, 0.5);
@@ -2752,6 +2876,81 @@
             </div>
         </div>
         
+        <!-- Wordle Game -->
+        <div class="game-container" id="wordleContainer">
+            <div class="game-header">
+                <h3>📝 Wordle</h3>
+                <button class="close-btn" onclick="toggleWordle()">×</button>
+            </div>
+            <div class="game-content">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h4 id="wordleTitle">Guess the 5-letter word!</h4>
+                    <div style="margin: 10px 0;">
+                        <span>Attempts: <span id="wordleAttempts">0</span>/6</span>
+                    </div>
+                </div>
+                <div id="wordleBoard" style="display: flex; flex-direction: column; gap: 8px; align-items: center; margin-bottom: 20px;">
+                    <!-- Wordle rows will be generated here -->
+                </div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div id="wordleKeyboard" style="display: inline-block;">
+                        <!-- Keyboard will be generated here -->
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <button class="snake-reset-btn" onclick="resetWordle()" id="wordleResetBtn" style="display: none;">New Game</button>
+                </div>
+                <div class="leaderboard-section" style="margin-top: 20px;">
+                    <h4>Best Streaks</h4>
+                    <div class="leaderboard-list" id="wordleLeaderboard">
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tetris Game -->
+        <div class="game-container" id="tetrisContainer">
+            <div class="game-header">
+                <h3>🧩 Tetris</h3>
+                <button class="close-btn" onclick="toggleTetris()">×</button>
+            </div>
+            <div class="game-content">
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <div>
+                        <div class="snake-controls" style="margin-bottom: 20px;">
+                            <div class="snake-info">
+                                <div>Score: <span id="tetrisScore">0</span></div>
+                                <div>Level: <span id="tetrisLevel">1</span></div>
+                                <div>Lines: <span id="tetrisLines">0</span></div>
+                                <button class="snake-reset-btn" onclick="resetTetris()">Reset</button>
+                            </div>
+                        </div>
+                        <div class="snake-instructions">
+                            <p>Arrow Keys: Move/Rotate</p>
+                            <p>Down Arrow: Soft Drop</p>
+                            <p>Space: Hard Drop</p>
+                        </div>
+                    </div>
+                    <div>
+                        <canvas id="tetrisCanvas" width="300" height="600" style="border: 2px solid #30363d; background: #0d1117; display: block;"></canvas>
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 20px;">
+                            <h4>Next:</h4>
+                            <canvas id="tetrisNextCanvas" width="120" height="120" style="border: 2px solid #30363d; background: #0d1117; display: block;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="leaderboard-section" style="margin-top: 20px;">
+                    <h4>Best Scores</h4>
+                    <div class="leaderboard-list" id="tetrisLeaderboard">
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Private Chat -->
         <div class="private-chat-container" id="privateChat">
             <div class="chat-header">
@@ -2874,6 +3073,14 @@
                 <div class="game-folder-icon">🐍</div>
                 <div class="game-folder-name">Snake</div>
             </div>
+            <div class="game-folder-item" id="wordleFolderItem" onclick="openGameFromFolder('wordle')">
+                <div class="game-folder-icon">📝</div>
+                <div class="game-folder-name">Wordle</div>
+            </div>
+            <div class="game-folder-item" id="tetrisFolderItem" onclick="openGameFromFolder('tetris')">
+                <div class="game-folder-icon">🧩</div>
+                <div class="game-folder-name">Tetris</div>
+            </div>
         </div>
     </div>
     
@@ -2888,7 +3095,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.6.0';
+        const APP_VERSION = '1.7.1';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -3384,6 +3591,61 @@
                     snakeFolderItem.onclick = () => {
                         alert('Unlock Snake by getting 5 friends!');
                     };
+                }
+            }
+            
+            // Update Wordle folder item
+            const wordleFolderItem = document.getElementById('wordleFolderItem');
+            if (wordleFolderItem && database) {
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                if (usernameLower) {
+                    readFromFirebase(`users/${usernameLower}/unlockedGames/wordle`).then((unlocked) => {
+                        if (unlocked) {
+                            wordleFolderItem.classList.remove('locked');
+                            wordleFolderItem.style.opacity = '1';
+                            wordleFolderItem.onclick = () => openGameFromFolder('wordle');
+                        } else {
+                            // Check time spent
+                            readFromFirebase(`timeLeaderboard/${usernameLower}`).then((timeData) => {
+                                const timeSpent = timeData?.timeSpent || 0;
+                                if (timeSpent >= 600000) { // 10 minutes
+                                    writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
+                                    wordleFolderItem.classList.remove('locked');
+                                    wordleFolderItem.style.opacity = '1';
+                                    wordleFolderItem.onclick = () => openGameFromFolder('wordle');
+                                } else {
+                                    wordleFolderItem.classList.add('locked');
+                                    wordleFolderItem.style.opacity = '0.5';
+                                    wordleFolderItem.onclick = () => {
+                                        alert('Unlock Wordle by spending 10 minutes on the website!');
+                                    };
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+            
+            // Update Tetris folder item
+            const tetrisFolderItem = document.getElementById('tetrisFolderItem');
+            if (tetrisFolderItem && database) {
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                if (usernameLower) {
+                    readFromFirebase(`users/${usernameLower}/unlockedGames/tetris`).then((unlocked) => {
+                        if (unlocked) {
+                            tetrisFolderItem.classList.remove('locked');
+                            tetrisFolderItem.style.opacity = '1';
+                            tetrisFolderItem.onclick = () => openGameFromFolder('tetris');
+                        } else {
+                            tetrisFolderItem.classList.add('locked');
+                            tetrisFolderItem.style.opacity = '0.5';
+                            tetrisFolderItem.onclick = () => {
+                                alert('Unlock Tetris by beating Wordle!');
+                            };
+                        }
+                    });
                 }
             }
             
@@ -6279,6 +6541,7 @@
             };
             
             writeToFirebase(`snakeScores/${usernameLower}`, scoreData);
+            saveSnakeGameState();
         }
         
         function loadSnakeLeaderboard() {
@@ -6320,6 +6583,912 @@
                 leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
             });
         }
+        
+        // ============================================
+        // WORDLE GAME
+        // ============================================
+        
+        const wordleWords = [
+            'APPLE', 'BEACH', 'CHAIR', 'DANCE', 'EARTH', 'FLAME', 'GLASS', 'HEART',
+            'IMAGE', 'JAZZY', 'KNIFE', 'LIGHT', 'MAGIC', 'NIGHT', 'OCEAN', 'PIANO',
+            'QUART', 'RIVER', 'STORM', 'TABLE', 'UNITY', 'VALUE', 'WATER', 'YOUTH',
+            'ZEBRA', 'BRAVE', 'CLOUD', 'DREAM', 'EAGLE', 'FOCUS', 'GREEN', 'HAPPY',
+            'IVORY', 'JUMBO', 'KNEEL', 'LEMON', 'MUSIC', 'NOVEL', 'OLIVE', 'PEACE',
+            'QUICK', 'ROBOT', 'SMILE', 'TIGER', 'ULTRA', 'VITAL', 'WHEAT', 'XENON',
+            'YACHT', 'ZONAL', 'BREAD', 'CRANE', 'DROVE', 'ELBOW', 'FROST', 'GRACE',
+            'HONEY', 'INBOX', 'JUMPS', 'KINGS', 'LUNCH', 'MERRY', 'NURSE', 'OPERA',
+            'PIZZA', 'QUERY', 'ROUND', 'SNAKE', 'TREND', 'USAGE', 'VOCAL', 'WALTZ',
+            'XEROX', 'YIELD', 'ZONED', 'BLANK', 'CRISP', 'DUSKY', 'ELITE', 'FANCY',
+            'GHOST', 'HUMOR', 'INERT', 'JOKER', 'KARMA', 'LATCH', 'MORAL', 'NEXUS',
+            'OPTIC', 'PULSE', 'QUILT', 'RADIO', 'SCALE', 'THINK', 'UNITY', 'VISTA',
+            'WOMAN', 'XENIA', 'YOGIC', 'ZONAL'
+        ];
+        
+        let wordleGame = {
+            targetWord: '',
+            currentRow: 0,
+            currentCol: 0,
+            attempts: 0,
+            gameOver: false,
+            won: false,
+            board: Array(6).fill(null).map(() => Array(5).fill('')),
+            keyboardState: {}
+        };
+        
+        function toggleWordle() {
+            const wordle = document.getElementById('wordleContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const snake = document.getElementById('snakeContainer');
+            const tetris = document.getElementById('tetrisContainer');
+            const themes = document.getElementById('themeContainer');
+            const notifications = document.getElementById('notificationsContainer');
+            
+            if (wordle.classList.contains('active')) {
+                wordle.classList.remove('active');
+            } else {
+                wordle.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                minesweeper.classList.remove('active');
+                snake.classList.remove('active');
+                tetris.classList.remove('active');
+                themes.classList.remove('active');
+                if (notifications) notifications.classList.remove('active');
+                
+                if (!wordleGame.targetWord) {
+                    initWordle();
+                } else {
+                    loadWordleLeaderboard();
+                }
+                
+                startWordleAutoSave();
+            }
+        }
+        
+        // Stop auto-save when Wordle is closed
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('close-btn')) {
+                const wordle = document.getElementById('wordleContainer');
+                if (wordle && !wordle.classList.contains('active')) {
+                    stopWordleAutoSave();
+                }
+            }
+        });
+        
+        function initWordle() {
+            // Check if user has unlocked Wordle (10 minutes on site)
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) {
+                alert('Please log in to play Wordle!');
+                toggleWordle();
+                return;
+            }
+            
+            readFromFirebase(`users/${usernameLower}/unlockedGames/wordle`).then((unlocked) => {
+                if (!unlocked) {
+                    // Check time spent
+                    readFromFirebase(`timeLeaderboard/${usernameLower}`).then((timeData) => {
+                        const timeSpent = timeData?.timeSpent || 0;
+                        if (timeSpent < 600000) { // 10 minutes = 600000ms
+                            alert('Unlock Wordle by spending 10 minutes on the website!');
+                            toggleWordle();
+                            return;
+                        }
+                        // Unlock Wordle
+                        writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
+                        startWordleGame();
+                    });
+                } else {
+                    startWordleGame();
+                }
+            });
+        }
+        
+        function startWordleGame() {
+            // Get today's word (based on date)
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            wordleGame.targetWord = wordleWords[dayOfYear % wordleWords.length].toUpperCase();
+            
+            wordleGame.currentRow = 0;
+            wordleGame.currentCol = 0;
+            wordleGame.attempts = 0;
+            wordleGame.gameOver = false;
+            wordleGame.won = false;
+            wordleGame.board = Array(6).fill(null).map(() => Array(5).fill(''));
+            wordleGame.keyboardState = {};
+            
+            renderWordleBoard();
+            renderWordleKeyboard();
+            document.getElementById('wordleResetBtn').style.display = 'none';
+            document.getElementById('wordleTitle').textContent = 'Guess the 5-letter word!';
+            document.getElementById('wordleAttempts').textContent = '0';
+            
+            // Load saved game from Firebase
+            loadWordleGameState();
+        }
+        
+        function loadWordleGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            readFromFirebase(`users/${usernameLower}/gameState/wordle`).then((saved) => {
+                if (saved && saved.targetWord === wordleGame.targetWord && !saved.gameOver) {
+                    wordleGame = saved;
+                    renderWordleBoard();
+                    renderWordleKeyboard();
+                    document.getElementById('wordleAttempts').textContent = wordleGame.attempts;
+                }
+            }).catch(err => {
+                console.error('Error loading Wordle game state:', err);
+            });
+        }
+        
+        function saveWordleGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            writeToFirebase(`users/${usernameLower}/gameState/wordle`, wordleGame).catch(err => {
+                console.error('Error saving Wordle game state:', err);
+            });
+        }
+        
+        function renderWordleBoard() {
+            const board = document.getElementById('wordleBoard');
+            board.innerHTML = '';
+            
+            for (let row = 0; row < 6; row++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'wordle-row';
+                
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'wordle-cell';
+                    cell.id = `wordle-cell-${row}-${col}`;
+                    
+                    const letter = wordleGame.board[row][col];
+                    if (letter) {
+                        cell.textContent = letter;
+                        cell.classList.add('filled');
+                        
+                        // Check if row is complete and evaluate
+                        if (row < wordleGame.currentRow || (row === wordleGame.currentRow && col < wordleGame.currentCol)) {
+                            const targetLetter = wordleGame.targetWord[col];
+                            if (letter === targetLetter) {
+                                cell.classList.add('correct');
+                            } else if (wordleGame.targetWord.includes(letter)) {
+                                cell.classList.add('present');
+                            } else {
+                                cell.classList.add('absent');
+                            }
+                        }
+                    }
+                    
+                    rowDiv.appendChild(cell);
+                }
+                
+                board.appendChild(rowDiv);
+            }
+        }
+        
+        function renderWordleKeyboard() {
+            const keyboard = document.getElementById('wordleKeyboard');
+            keyboard.innerHTML = '';
+            
+            const rows = [
+                ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+                ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+                ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACK']
+            ];
+            
+            rows.forEach((row, rowIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'wordle-keyboard-row';
+                
+                row.forEach(key => {
+                    const keyBtn = document.createElement('button');
+                    keyBtn.className = 'wordle-key';
+                    keyBtn.textContent = key;
+                    if (key === 'ENTER' || key === 'BACK') {
+                        keyBtn.classList.add('wide');
+                    }
+                    
+                    // Apply keyboard state
+                    if (wordleGame.keyboardState[key]) {
+                        keyBtn.classList.add(wordleGame.keyboardState[key]);
+                    }
+                    
+                    keyBtn.onclick = () => handleWordleKey(key);
+                    rowDiv.appendChild(keyBtn);
+                });
+                
+                keyboard.appendChild(rowDiv);
+            });
+        }
+        
+        function handleWordleKey(key) {
+            if (wordleGame.gameOver) return;
+            
+            if (key === 'ENTER') {
+                submitWordleGuess();
+            } else if (key === 'BACK') {
+                deleteWordleLetter();
+            } else if (key.length === 1 && /[A-Z]/.test(key)) {
+                addWordleLetter(key);
+            }
+        }
+        
+        function addWordleLetter(letter) {
+            if (wordleGame.currentCol < 5 && wordleGame.currentRow < 6) {
+                wordleGame.board[wordleGame.currentRow][wordleGame.currentCol] = letter;
+                wordleGame.currentCol++;
+                renderWordleBoard();
+                saveWordleGameState();
+            }
+        }
+        
+        function deleteWordleLetter() {
+            if (wordleGame.currentCol > 0) {
+                wordleGame.currentCol--;
+                wordleGame.board[wordleGame.currentRow][wordleGame.currentCol] = '';
+                renderWordleBoard();
+                saveWordleGameState();
+            }
+        }
+        
+        function submitWordleGuess() {
+            if (wordleGame.currentCol !== 5) {
+                alert('Please enter a 5-letter word!');
+                return;
+            }
+            
+            const guess = wordleGame.board[wordleGame.currentRow].join('');
+            
+            // Check if word is valid (simple check - in real Wordle, you'd check against dictionary)
+            if (!wordleWords.includes(guess)) {
+                alert('Not a valid word!');
+                return;
+            }
+            
+            wordleGame.attempts++;
+            document.getElementById('wordleAttempts').textContent = wordleGame.attempts;
+            
+            // Evaluate guess
+            const guessArray = guess.split('');
+            const targetArray = wordleGame.targetWord.split('');
+            const evaluation = Array(5).fill('absent');
+            
+            // First pass: mark correct positions
+            for (let i = 0; i < 5; i++) {
+                if (guessArray[i] === targetArray[i]) {
+                    evaluation[i] = 'correct';
+                    targetArray[i] = null; // Mark as used
+                }
+            }
+            
+            // Second pass: mark present letters
+            for (let i = 0; i < 5; i++) {
+                if (evaluation[i] !== 'correct') {
+                    const index = targetArray.indexOf(guessArray[i]);
+                    if (index !== -1) {
+                        evaluation[i] = 'present';
+                        targetArray[index] = null; // Mark as used
+                    }
+                }
+            }
+            
+            // Update keyboard state
+            for (let i = 0; i < 5; i++) {
+                const letter = guessArray[i];
+                const state = evaluation[i];
+                if (!wordleGame.keyboardState[letter] || 
+                    (state === 'correct' && wordleGame.keyboardState[letter] !== 'correct')) {
+                    wordleGame.keyboardState[letter] = state;
+                }
+            }
+            
+            // Check win condition
+            if (guess === wordleGame.targetWord) {
+                wordleGame.won = true;
+                wordleGame.gameOver = true;
+                document.getElementById('wordleTitle').textContent = `🎉 You won in ${wordleGame.attempts} attempts!`;
+                document.getElementById('wordleResetBtn').style.display = 'block';
+                
+                // Unlock Tetris
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                if (usernameLower && database) {
+                    writeToFirebase(`users/${usernameLower}/unlockedGames/tetris`, true);
+                    unlockTheme('word');
+                }
+                
+                // Save score
+                saveWordleScore();
+            } else if (wordleGame.attempts >= 6) {
+                wordleGame.gameOver = true;
+                document.getElementById('wordleTitle').textContent = `Game Over! The word was: ${wordleGame.targetWord}`;
+                document.getElementById('wordleResetBtn').style.display = 'block';
+            } else {
+                wordleGame.currentRow++;
+                wordleGame.currentCol = 0;
+            }
+            
+            renderWordleBoard();
+            renderWordleKeyboard();
+            
+            // Save game state to Firebase
+            saveWordleGameState();
+        }
+        
+        // Auto-save Wordle game state periodically
+        let wordleAutoSaveInterval = null;
+        
+        function startWordleAutoSave() {
+            if (wordleAutoSaveInterval) {
+                clearInterval(wordleAutoSaveInterval);
+            }
+            wordleAutoSaveInterval = setInterval(() => {
+                const wordle = document.getElementById('wordleContainer');
+                if (wordle && wordle.classList.contains('active') && !wordleGame.gameOver) {
+                    saveWordleGameState();
+                }
+            }, 30000); // Save every 30 seconds
+        }
+        
+        function stopWordleAutoSave() {
+            if (wordleAutoSaveInterval) {
+                clearInterval(wordleAutoSaveInterval);
+                wordleAutoSaveInterval = null;
+            }
+        }
+        
+        function resetWordle() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (usernameLower && database) {
+                deleteFromFirebase(`users/${usernameLower}/gameState/wordle`);
+            }
+            startWordleGame();
+        }
+        
+        function saveWordleScore() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            readFromFirebase(`wordleScores/${usernameLower}`).then((data) => {
+                const currentStreak = data?.streak || 0;
+                const bestStreak = data?.bestStreak || 0;
+                
+                writeToFirebase(`wordleScores/${usernameLower}`, {
+                    username: username,
+                    usernameLower: usernameLower,
+                    streak: currentStreak + 1,
+                    bestStreak: Math.max(bestStreak, currentStreak + 1),
+                    lastPlayed: Date.now(),
+                    totalWins: (data?.totalWins || 0) + 1
+                });
+                
+                loadWordleLeaderboard();
+            });
+        }
+        
+        function loadWordleLeaderboard() {
+            if (!database) return;
+            
+            const leaderboard = document.getElementById('wordleLeaderboard');
+            leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase('wordleScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    return;
+                }
+                
+                const scoreArray = Object.values(scores)
+                    .filter(entry => entry && entry.username)
+                    .sort((a, b) => (b.bestStreak || 0) - (a.bestStreak || 0))
+                    .slice(0, 10);
+                
+                leaderboard.innerHTML = '';
+                if (scoreArray.length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No valid scores yet!</p>';
+                    return;
+                }
+                
+                scoreArray.forEach((entry, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'leaderboard-item';
+                    const displayName = entry.username || entry.usernameLower || 'Unknown';
+                    div.innerHTML = `
+                        <span class="rank">#${index + 1}</span>
+                        <span class="username">${displayName}</span>
+                        <span class="score">Streak: ${entry.bestStreak || 0}</span>
+                    `;
+                    leaderboard.appendChild(div);
+                });
+            }).catch(err => {
+                console.error('Error loading leaderboard:', err);
+                leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
+        }
+        
+        // Keyboard input for Wordle
+        document.addEventListener('keydown', (e) => {
+            const wordle = document.getElementById('wordleContainer');
+            if (!wordle || !wordle.classList.contains('active')) return;
+            
+            if (wordleGame.gameOver) return;
+            
+            const key = e.key.toUpperCase();
+            
+            if (key === 'ENTER') {
+                e.preventDefault();
+                submitWordleGuess();
+            } else if (key === 'BACKSPACE') {
+                e.preventDefault();
+                deleteWordleLetter();
+            } else if (/^[A-Z]$/.test(key)) {
+                e.preventDefault();
+                addWordleLetter(key);
+            }
+        });
+        
+        // ============================================
+        // TETRIS GAME
+        // ============================================
+        
+        const TETRIS_COLORS = [
+            null,
+            '#58a6ff', // I piece
+            '#f0883e', // O piece
+            '#bc8cff', // T piece
+            '#3fb950', // S piece
+            '#f85149', // Z piece
+            '#ffa657', // J piece
+            '#ffd700'  // L piece
+        ];
+        
+        const TETRIS_PIECES = [
+            null,
+            [[1,1,1,1]], // I
+            [[1,1],[1,1]], // O
+            [[0,1,0],[1,1,1]], // T
+            [[0,1,1],[1,1,0]], // S
+            [[1,1,0],[0,1,1]], // Z
+            [[1,0,0],[1,1,1]], // J
+            [[0,0,1],[1,1,1]]  // L
+        ];
+        
+        let tetrisGame = {
+            board: Array(20).fill(null).map(() => Array(10).fill(0)),
+            currentPiece: null,
+            nextPiece: null,
+            pieceX: 0,
+            pieceY: 0,
+            score: 0,
+            level: 1,
+            lines: 0,
+            gameOver: false,
+            dropCounter: 0,
+            dropInterval: 1000,
+            lastTime: 0
+        };
+        
+        function toggleTetris() {
+            const tetris = document.getElementById('tetrisContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const snake = document.getElementById('snakeContainer');
+            const wordle = document.getElementById('wordleContainer');
+            const themes = document.getElementById('themeContainer');
+            const notifications = document.getElementById('notificationsContainer');
+            
+            if (tetris.classList.contains('active')) {
+                tetris.classList.remove('active');
+                stopTetrisGame();
+            } else {
+                tetris.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                minesweeper.classList.remove('active');
+                snake.classList.remove('active');
+                wordle.classList.remove('active');
+                themes.classList.remove('active');
+                if (notifications) notifications.classList.remove('active');
+                
+                initTetris();
+            }
+        }
+        
+        function initTetris() {
+            // Check if user has unlocked Tetris (beat Wordle)
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) {
+                alert('Please log in to play Tetris!');
+                toggleTetris();
+                return;
+            }
+            
+            readFromFirebase(`users/${usernameLower}/unlockedGames/tetris`).then((unlocked) => {
+                if (!unlocked) {
+                    alert('Unlock Tetris by beating Wordle!');
+                    toggleTetris();
+                    return;
+                }
+                
+                startTetrisGame();
+            });
+        }
+        
+        function startTetrisGame() {
+            tetrisGame.board = Array(20).fill(null).map(() => Array(10).fill(0));
+            tetrisGame.score = 0;
+            tetrisGame.level = 1;
+            tetrisGame.lines = 0;
+            tetrisGame.gameOver = false;
+            tetrisGame.dropInterval = 1000;
+            tetrisGame.dropCounter = 0;
+            tetrisGame.lastTime = performance.now();
+            
+            spawnTetrisPiece();
+            spawnNextTetrisPiece();
+            updateTetrisUI();
+            renderTetris();
+            requestTetrisAnimationFrame();
+        }
+        
+        function spawnTetrisPiece() {
+            tetrisGame.currentPiece = tetrisGame.nextPiece || Math.floor(Math.random() * 7) + 1;
+            tetrisGame.pieceX = 3;
+            tetrisGame.pieceY = 0;
+            spawnNextTetrisPiece();
+            
+            if (checkTetrisCollision()) {
+                tetrisGame.gameOver = true;
+                gameOverTetris();
+            }
+        }
+        
+        function spawnNextTetrisPiece() {
+            tetrisGame.nextPiece = Math.floor(Math.random() * 7) + 1;
+            renderTetrisNext();
+        }
+        
+        function checkTetrisCollision() {
+            const piece = TETRIS_PIECES[tetrisGame.currentPiece];
+            if (!piece) return true;
+            
+            for (let y = 0; y < piece.length; y++) {
+                for (let x = 0; x < piece[y].length; x++) {
+                    if (piece[y][x]) {
+                        const boardX = tetrisGame.pieceX + x;
+                        const boardY = tetrisGame.pieceY + y;
+                        
+                        if (boardX < 0 || boardX >= 10 || boardY >= 20) {
+                            return true;
+                        }
+                        if (boardY >= 0 && tetrisGame.board[boardY][boardX]) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        
+        function mergeTetrisPiece() {
+            const piece = TETRIS_PIECES[tetrisGame.currentPiece];
+            if (!piece) return;
+            
+            for (let y = 0; y < piece.length; y++) {
+                for (let x = 0; x < piece[y].length; x++) {
+                    if (piece[y][x]) {
+                        const boardY = tetrisGame.pieceY + y;
+                        const boardX = tetrisGame.pieceX + x;
+                        if (boardY >= 0) {
+                            tetrisGame.board[boardY][boardX] = tetrisGame.currentPiece;
+                        }
+                    }
+                }
+            }
+        }
+        
+        function clearTetrisLines() {
+            let linesCleared = 0;
+            for (let y = tetrisGame.board.length - 1; y >= 0; y--) {
+                if (tetrisGame.board[y].every(cell => cell !== 0)) {
+                    tetrisGame.board.splice(y, 1);
+                    tetrisGame.board.unshift(Array(10).fill(0));
+                    linesCleared++;
+                    y++; // Check same line again
+                }
+            }
+            
+            if (linesCleared > 0) {
+                tetrisGame.lines += linesCleared;
+                tetrisGame.score += linesCleared * 100 * tetrisGame.level;
+                tetrisGame.level = Math.floor(tetrisGame.lines / 10) + 1;
+                tetrisGame.dropInterval = Math.max(100, 1000 - (tetrisGame.level - 1) * 100);
+            }
+        }
+        
+        function moveTetrisPiece(dx, dy) {
+            tetrisGame.pieceX += dx;
+            tetrisGame.pieceY += dy;
+            
+            if (checkTetrisCollision()) {
+                tetrisGame.pieceX -= dx;
+                tetrisGame.pieceY -= dy;
+                return false;
+            }
+            return true;
+        }
+        
+        function rotateTetrisPiece() {
+            // Simple rotation (transpose and reverse)
+            const piece = TETRIS_PIECES[tetrisGame.currentPiece];
+            if (!piece || tetrisGame.currentPiece === 2) return; // O piece doesn't rotate
+            
+            const rotated = piece[0].map((_, i) => piece.map(row => row[i]).reverse());
+            const oldPiece = TETRIS_PIECES[tetrisGame.currentPiece];
+            TETRIS_PIECES[tetrisGame.currentPiece] = rotated;
+            
+            if (checkTetrisCollision()) {
+                TETRIS_PIECES[tetrisGame.currentPiece] = oldPiece;
+            } else {
+                renderTetris();
+            }
+        }
+        
+        function dropTetrisPiece() {
+            tetrisGame.pieceY++;
+            if (checkTetrisCollision()) {
+                tetrisGame.pieceY--;
+                mergeTetrisPiece();
+                clearTetrisLines();
+                spawnTetrisPiece();
+            }
+        }
+        
+        function hardDropTetrisPiece() {
+            while (!checkTetrisCollision()) {
+                tetrisGame.pieceY++;
+            }
+            tetrisGame.pieceY--;
+            mergeTetrisPiece();
+            clearTetrisLines();
+            spawnTetrisPiece();
+        }
+        
+        function renderTetris() {
+            const canvas = document.getElementById('tetrisCanvas');
+            const ctx = canvas.getContext('2d');
+            const cellSize = canvas.width / 10;
+            
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw board
+            for (let y = 0; y < 20; y++) {
+                for (let x = 0; x < 10; x++) {
+                    if (tetrisGame.board[y][x]) {
+                        ctx.fillStyle = TETRIS_COLORS[tetrisGame.board[y][x]];
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+                    }
+                }
+            }
+            
+            // Draw current piece
+            const piece = TETRIS_PIECES[tetrisGame.currentPiece];
+            if (piece) {
+                ctx.fillStyle = TETRIS_COLORS[tetrisGame.currentPiece];
+                for (let y = 0; y < piece.length; y++) {
+                    for (let x = 0; x < piece[y].length; x++) {
+                        if (piece[y][x]) {
+                            const boardX = (tetrisGame.pieceX + x) * cellSize;
+                            const boardY = (tetrisGame.pieceY + y) * cellSize;
+                            if (tetrisGame.pieceY + y >= 0) {
+                                ctx.fillRect(boardX, boardY, cellSize - 1, cellSize - 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        function renderTetrisNext() {
+            const canvas = document.getElementById('tetrisNextCanvas');
+            const ctx = canvas.getContext('2d');
+            const cellSize = 30;
+            
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const piece = TETRIS_PIECES[tetrisGame.nextPiece];
+            if (piece) {
+                ctx.fillStyle = TETRIS_COLORS[tetrisGame.nextPiece];
+                const offsetX = (canvas.width - piece[0].length * cellSize) / 2;
+                const offsetY = (canvas.height - piece.length * cellSize) / 2;
+                
+                for (let y = 0; y < piece.length; y++) {
+                    for (let x = 0; x < piece[y].length; x++) {
+                        if (piece[y][x]) {
+                            ctx.fillRect(offsetX + x * cellSize, offsetY + y * cellSize, cellSize - 1, cellSize - 1);
+                        }
+                    }
+                }
+            }
+        }
+        
+        let tetrisAnimationFrame = null;
+        
+        function requestTetrisAnimationFrame() {
+            if (tetrisAnimationFrame) return;
+            
+            const animate = (time) => {
+                if (tetrisGame.gameOver) {
+                    tetrisAnimationFrame = null;
+                    return;
+                }
+                
+                const container = document.getElementById('tetrisContainer');
+                if (!container || !container.classList.contains('active')) {
+                    tetrisAnimationFrame = null;
+                    return;
+                }
+                
+                const deltaTime = time - tetrisGame.lastTime;
+                tetrisGame.lastTime = time;
+                tetrisGame.dropCounter += deltaTime;
+                
+                if (tetrisGame.dropCounter > tetrisGame.dropInterval) {
+                    dropTetrisPiece();
+                    tetrisGame.dropCounter = 0;
+                }
+                
+                renderTetris();
+                updateTetrisUI();
+                tetrisAnimationFrame = requestAnimationFrame(animate);
+            };
+            
+            tetrisAnimationFrame = requestAnimationFrame(animate);
+        }
+        
+        function stopTetrisGame() {
+            if (tetrisAnimationFrame) {
+                cancelAnimationFrame(tetrisAnimationFrame);
+                tetrisAnimationFrame = null;
+            }
+        }
+        
+        function updateTetrisUI() {
+            document.getElementById('tetrisScore').textContent = tetrisGame.score;
+            document.getElementById('tetrisLevel').textContent = tetrisGame.level;
+            document.getElementById('tetrisLines').textContent = tetrisGame.lines;
+        }
+        
+        function resetTetris() {
+            stopTetrisGame();
+            startTetrisGame();
+        }
+        
+        function gameOverTetris() {
+            stopTetrisGame();
+            alert(`Game Over! Score: ${tetrisGame.score}`);
+            saveTetrisScore();
+            saveTetrisGameState();
+            loadTetrisLeaderboard();
+            
+            // Unlock Tetris theme
+            unlockTheme('tetris');
+        }
+        
+        function saveTetrisScore() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database || tetrisGame.score === 0) return;
+            
+            writeToFirebase(`tetrisScores/${usernameLower}`, {
+                username: username,
+                usernameLower: usernameLower,
+                score: tetrisGame.score,
+                level: tetrisGame.level,
+                lines: tetrisGame.lines,
+                timestamp: Date.now()
+            });
+        }
+        
+        function loadTetrisLeaderboard() {
+            if (!database) return;
+            
+            const leaderboard = document.getElementById('tetrisLeaderboard');
+            leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase('tetrisScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    return;
+                }
+                
+                const scoreArray = Object.values(scores)
+                    .filter(entry => entry && entry.username)
+                    .sort((a, b) => (b.score || 0) - (a.score || 0))
+                    .slice(0, 10);
+                
+                leaderboard.innerHTML = '';
+                if (scoreArray.length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No valid scores yet!</p>';
+                    return;
+                }
+                
+                scoreArray.forEach((entry, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'leaderboard-item';
+                    const displayName = entry.username || entry.usernameLower || 'Unknown';
+                    div.innerHTML = `
+                        <span class="rank">#${index + 1}</span>
+                        <span class="username">${displayName}</span>
+                        <span class="score">${entry.score || 0}</span>
+                    `;
+                    leaderboard.appendChild(div);
+                });
+            }).catch(err => {
+                console.error('Error loading leaderboard:', err);
+                leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
+        }
+        
+        // Tetris keyboard controls
+        document.addEventListener('keydown', (e) => {
+            const tetris = document.getElementById('tetrisContainer');
+            if (!tetris || !tetris.classList.contains('active') || tetrisGame.gameOver) return;
+            
+            const key = e.key.toLowerCase();
+            
+            if (key === 'arrowleft' || key === 'a') {
+                e.preventDefault();
+                moveTetrisPiece(-1, 0);
+                renderTetris();
+            } else if (key === 'arrowright' || key === 'd') {
+                e.preventDefault();
+                moveTetrisPiece(1, 0);
+                renderTetris();
+            } else if (key === 'arrowdown' || key === 's') {
+                e.preventDefault();
+                dropTetrisPiece();
+                renderTetris();
+            } else if (key === 'arrowup' || key === 'w') {
+                e.preventDefault();
+                rotateTetrisPiece();
+            } else if (key === ' ') {
+                e.preventDefault();
+                hardDropTetrisPiece();
+                renderTetris();
+            }
+        });
         
         // ============================================
         // THEME SYSTEM
@@ -6400,6 +7569,18 @@
                     name: 'Top Clicker',
                     description: 'Be #1 on clicker leaderboard to unlock',
                     unlocked: unlockedThemes.has('topclicker')
+                },
+                {
+                    id: 'word',
+                    name: 'Word',
+                    description: 'Beat Wordle to unlock',
+                    unlocked: unlockedThemes.has('word')
+                },
+                {
+                    id: 'tetris',
+                    name: 'Tetris',
+                    description: 'Play Tetris to unlock',
+                    unlocked: unlockedThemes.has('tetris')
                 }
             ];
             
@@ -6454,6 +7635,10 @@
                 applyGrasslandTheme();
             } else if (themeId === 'topclicker') {
                 applyTopClickerTheme();
+            } else if (themeId === 'word') {
+                applyWordTheme();
+            } else if (themeId === 'tetris') {
+                applyTetrisTheme();
             }
             
             // Update theme list
@@ -6540,6 +7725,26 @@
                 if (hog.element) hog.element.remove();
             });
             grasslandHogs = [];
+            
+            // Clear word theme
+            if (wordThemeInterval) {
+                clearInterval(wordThemeInterval);
+                wordThemeInterval = null;
+            }
+            wordThemeWords.forEach(word => {
+                if (word.element) word.element.remove();
+            });
+            wordThemeWords = [];
+            
+            // Clear tetris theme
+            if (tetrisThemeInterval) {
+                clearInterval(tetrisThemeInterval);
+                tetrisThemeInterval = null;
+            }
+            tetrisThemeBlocks.forEach(block => {
+                if (block.element) block.element.remove();
+            });
+            tetrisThemeBlocks = [];
             if (bg) {
                 const grassElements = bg.querySelectorAll('.grass-blade, .grassland-hog');
                 grassElements.forEach(el => el.remove());
@@ -8062,6 +9267,9 @@
                 document.getElementById('userInfo').classList.remove('hidden');
                 document.getElementById('loggedInUsername').textContent = username;
                 
+                // Sync all game data from Firebase
+                syncAllGameData();
+                
                 // Start time tracking
                 startTimeTracking();
                 
@@ -8073,6 +9281,235 @@
             } else {
                 showLoginPage();
             }
+        }
+        
+        // ============================================
+        // CROSS-DEVICE GAME DATA SYNC
+        // ============================================
+        
+        async function syncAllGameData() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            try {
+                // Load clicker score
+                await loadClickerScore();
+                
+                // Load Snake game state
+                await loadSnakeGameState();
+                
+                // Load Minesweeper game state
+                await loadMinesweeperGameState();
+                
+                // Load Hexagon game state
+                await loadHexagonGameState();
+                
+                // Load unlocked games
+                await loadUnlockedGames();
+                
+                // Load unlocked themes
+                await loadUnlockedThemes();
+                
+                // Load current theme
+                await loadCurrentTheme();
+                
+                // Load all game scores
+                await loadAllGameScores();
+                
+            } catch (err) {
+                console.error('Error syncing game data:', err);
+            }
+        }
+        
+        async function loadSnakeGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            try {
+                const state = await readFromFirebase(`users/${usernameLower}/gameState/snake`);
+                if (state && state.score > 0) {
+                    // Snake doesn't have persistent state, but we can track best score
+                    // Best score is already loaded via loadSnakeScore
+                }
+            } catch (err) {
+                console.error('Error loading Snake game state:', err);
+            }
+        }
+        
+        async function loadMinesweeperGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            try {
+                const state = await readFromFirebase(`users/${usernameLower}/gameState/minesweeper`);
+                if (state) {
+                    // Minesweeper state can be saved if needed
+                    // Currently only scores are saved
+                }
+            } catch (err) {
+                console.error('Error loading Minesweeper game state:', err);
+            }
+        }
+        
+        async function loadHexagonGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            try {
+                const state = await readFromFirebase(`users/${usernameLower}/gameState/hexagon`);
+                if (state) {
+                    // Hexagon game state can be saved if needed
+                    // Currently only scores are saved
+                }
+            } catch (err) {
+                console.error('Error loading Hexagon game state:', err);
+            }
+        }
+        
+        async function loadUnlockedGames() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            try {
+                const unlockedGames = await readFromFirebase(`users/${usernameLower}/unlockedGames`);
+                if (unlockedGames) {
+                    // Update games folder UI
+                    updateGamesFolderUnlocks(unlockedGames);
+                }
+            } catch (err) {
+                console.error('Error loading unlocked games:', err);
+            }
+        }
+        
+        async function loadUnlockedThemes() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            try {
+                const themes = await readFromFirebase(`users/${usernameLower}/themes`);
+                if (themes) {
+                    Object.keys(themes).forEach(themeId => {
+                        if (themes[themeId]) {
+                            unlockedThemes.add(themeId);
+                        }
+                    });
+                    loadThemes();
+                }
+            } catch (err) {
+                console.error('Error loading unlocked themes:', err);
+            }
+        }
+        
+        async function loadCurrentTheme() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            try {
+                const theme = await readFromFirebase(`users/${usernameLower}/currentTheme`);
+                if (theme && unlockedThemes.has(theme)) {
+                    applyTheme(theme);
+                }
+            } catch (err) {
+                console.error('Error loading current theme:', err);
+            }
+        }
+        
+        async function loadAllGameScores() {
+            // All game scores are already loaded when games are opened
+            // This function ensures they're synced on login
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            // Scores are loaded on-demand when games are opened
+            // But we can preload them here if needed
+        }
+        
+        function updateGamesFolderUnlocks(unlockedGames) {
+            // This will be called by updateGamesFolder, but we ensure it's synced
+            if (typeof updateGamesFolder === 'function') {
+                updateGamesFolder();
+            }
+        }
+        
+        // Save game state functions for other games
+        function saveSnakeGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            // Snake doesn't need persistent state, but we can save preferences
+            const state = {
+                lastPlayed: Date.now()
+            };
+            
+            writeToFirebase(`users/${usernameLower}/gameState/snake`, state).catch(err => {
+                console.error('Error saving Snake game state:', err);
+            });
+        }
+        
+        function saveMinesweeperGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            const state = {
+                lastPlayed: Date.now()
+            };
+            
+            writeToFirebase(`users/${usernameLower}/gameState/minesweeper`, state).catch(err => {
+                console.error('Error saving Minesweeper game state:', err);
+            });
+        }
+        
+        function saveHexagonGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            const state = {
+                lastPlayed: Date.now()
+            };
+            
+            writeToFirebase(`users/${usernameLower}/gameState/hexagon`, state).catch(err => {
+                console.error('Error saving Hexagon game state:', err);
+            });
+        }
+        
+        function saveTetrisGameState() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            const state = {
+                lastPlayed: Date.now(),
+                bestScore: tetrisGame.score,
+                bestLevel: tetrisGame.level,
+                bestLines: tetrisGame.lines
+            };
+            
+            writeToFirebase(`users/${usernameLower}/gameState/tetris`, state).catch(err => {
+                console.error('Error saving Tetris game state:', err);
+            });
         }
         
         // ============================================
@@ -8343,6 +9780,12 @@
                         break;
                     case 'snake':
                         toggleSnake();
+                        break;
+                    case 'wordle':
+                        toggleWordle();
+                        break;
+                    case 'tetris':
+                        toggleTetris();
                         break;
                 }
             }, 100);
