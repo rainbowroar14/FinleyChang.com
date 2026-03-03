@@ -3095,7 +3095,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.7.1';
+        const APP_VERSION = '1.7.4';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -3787,11 +3787,30 @@
             unlockTheme('minesweeper');
             unlockTheme('godclicker');
             unlockTheme('snake');
+            unlockTheme('grassland');
+            unlockTheme('topclicker');
+            unlockTheme('word');
+            unlockTheme('tetris');
+            
+            // Unlock all games
+            if (usernameLower && database) {
+                writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
+                writeToFirebase(`users/${usernameLower}/unlockedGames/tetris`, true);
+                
+                // Unlock Hexagon game (if it has unlock requirement)
+                const hasPlayedHexagon = true;
+                if (hasPlayedHexagon) {
+                    unlockTheme('grassland');
+                }
+            }
             
             // Unlock all textures
             unlockTexture('dots');
             unlockTexture('lines');
             unlockTexture('grid');
+            
+            // Set additional flags
+            hasPlayedHexagonGame = true;
             
             // Save to Firebase
             if (usernameLower && database) {
@@ -3800,20 +3819,40 @@
                     writeToFirebase(`users/${usernameLower}/unlocks/${feature}`, true);
                 });
                 
-                // Save themes
+                // Save all themes
                 writeToFirebase(`users/${usernameLower}/themes/clicker100`, true);
                 writeToFirebase(`users/${usernameLower}/themes/minesweeper`, true);
                 writeToFirebase(`users/${usernameLower}/themes/godclicker`, true);
                 writeToFirebase(`users/${usernameLower}/themes/snake`, true);
+                writeToFirebase(`users/${usernameLower}/themes/grassland`, true);
+                writeToFirebase(`users/${usernameLower}/themes/topclicker`, true);
+                writeToFirebase(`users/${usernameLower}/themes/word`, true);
+                writeToFirebase(`users/${usernameLower}/themes/tetris`, true);
+                
+                // Save unlocked games
+                writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
+                writeToFirebase(`users/${usernameLower}/unlockedGames/tetris`, true);
                 
                 // Save stats
                 writeToFirebase(`users/${usernameLower}/stats/totalClicks`, 10000);
                 writeToFirebase(`users/${usernameLower}/hasWonMinesweeper`, true);
                 writeToFirebase(`users/${usernameLower}/hasWonSnake`, true);
+                writeToFirebase(`users/${usernameLower}/hasPlayedHexagonGame`, true);
+                
+                // Set clicker score high enough to be #1 (for topclicker theme)
+                writeToFirebase(`clickerScores/${usernameLower}`, {
+                    username: username,
+                    usernameLower: usernameLower,
+                    score: 999999,
+                    timestamp: Date.now()
+                });
             }
             
-            // Update UI to reflect all unlocks (including Geometry Dash)
+            // Update UI to reflect all unlocks
             updateUIUnlocks();
+            
+            // Reload themes to show all unlocked
+            loadThemes();
             
             alert('🎉 Everything unlocked!');
         }
@@ -6763,8 +6802,9 @@
                         cell.textContent = letter;
                         cell.classList.add('filled');
                         
-                        // Check if row is complete and evaluate
-                        if (row < wordleGame.currentRow || (row === wordleGame.currentRow && col < wordleGame.currentCol)) {
+                        // Only show colors for completed rows (rows before current row)
+                        // Don't show colors for the current row until it's submitted
+                        if (row < wordleGame.currentRow) {
                             const targetLetter = wordleGame.targetWord[col];
                             if (letter === targetLetter) {
                                 cell.classList.add('correct');
@@ -6805,8 +6845,9 @@
                         keyBtn.classList.add('wide');
                     }
                     
-                    // Apply keyboard state
-                    if (wordleGame.keyboardState[key]) {
+                    // Only apply keyboard state if it exists (after guesses are submitted)
+                    // Don't show colors before any guesses
+                    if (wordleGame.keyboardState[key] && wordleGame.attempts > 0) {
                         keyBtn.classList.add(wordleGame.keyboardState[key]);
                     }
                     
@@ -6856,9 +6897,10 @@
             
             const guess = wordleGame.board[wordleGame.currentRow].join('');
             
-            // Check if word is valid (simple check - in real Wordle, you'd check against dictionary)
-            if (!wordleWords.includes(guess)) {
-                alert('Not a valid word!');
+            // Accept any 5-letter word (removed validation check)
+            // Just check it's 5 letters and all uppercase
+            if (guess.length !== 5 || !/^[A-Z]{5}$/.test(guess)) {
+                alert('Please enter a valid 5-letter word!');
                 return;
             }
             
@@ -6889,13 +6931,17 @@
                 }
             }
             
-            // Update keyboard state
+            // Update keyboard state ONLY after evaluation
             for (let i = 0; i < 5; i++) {
                 const letter = guessArray[i];
                 const state = evaluation[i];
-                if (!wordleGame.keyboardState[letter] || 
-                    (state === 'correct' && wordleGame.keyboardState[letter] !== 'correct')) {
+                // Only update if this is a better state (correct > present > absent)
+                if (!wordleGame.keyboardState[letter]) {
                     wordleGame.keyboardState[letter] = state;
+                } else if (state === 'correct') {
+                    wordleGame.keyboardState[letter] = 'correct';
+                } else if (state === 'present' && wordleGame.keyboardState[letter] === 'absent') {
+                    wordleGame.keyboardState[letter] = 'present';
                 }
             }
             
@@ -6925,7 +6971,9 @@
                 wordleGame.currentCol = 0;
             }
             
+            // Render board first to show colors
             renderWordleBoard();
+            // Then render keyboard with updated state
             renderWordleKeyboard();
             
             // Save game state to Firebase
@@ -9287,24 +9335,37 @@
         // CROSS-DEVICE GAME DATA SYNC
         // ============================================
         
+        let syncConflicts = [];
+        let isSyncing = false;
+        
         async function syncAllGameData() {
             const username = localStorage.getItem('loggedInUsername');
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
             
             if (!usernameLower || !database) return;
             
+            isSyncing = true;
+            updateSyncStatus('Syncing...');
+            syncConflicts = [];
+            
             try {
-                // Load clicker score
-                await loadClickerScore();
+                // Load clicker score with conflict detection
+                await syncClickerScore(usernameLower);
                 
-                // Load Snake game state
-                await loadSnakeGameState();
+                // Load Snake game state with conflict detection
+                await syncSnakeScore(usernameLower);
                 
-                // Load Minesweeper game state
-                await loadMinesweeperGameState();
+                // Load Minesweeper game state with conflict detection
+                await syncMinesweeperScore(usernameLower);
                 
-                // Load Hexagon game state
-                await loadHexagonGameState();
+                // Load Hexagon game state with conflict detection
+                await syncHexagonScore(usernameLower);
+                
+                // Load Tetris game state with conflict detection
+                await syncTetrisScore(usernameLower);
+                
+                // Load Wordle game state with conflict detection
+                await syncWordleScore(usernameLower);
                 
                 // Load unlocked games
                 await loadUnlockedGames();
@@ -9315,12 +9376,437 @@
                 // Load current theme
                 await loadCurrentTheme();
                 
-                // Load all game scores
-                await loadAllGameScores();
+                // Show conflicts if any
+                if (syncConflicts.length > 0) {
+                    showConflictResolutionDialog();
+                } else {
+                    updateSyncStatus('Synced');
+                    setTimeout(() => {
+                        updateSyncStatus('');
+                    }, 2000);
+                }
                 
             } catch (err) {
                 console.error('Error syncing game data:', err);
+                updateSyncStatus('Sync failed');
+            } finally {
+                isSyncing = false;
             }
+        }
+        
+        function updateSyncStatus(status) {
+            const userInfo = document.getElementById('userInfo');
+            if (!userInfo) return;
+            
+            let statusEl = document.getElementById('syncStatus');
+            if (!statusEl) {
+                statusEl = document.createElement('span');
+                statusEl.id = 'syncStatus';
+                statusEl.style.cssText = 'font-size: 12px; color: #8b949e; margin-left: 10px;';
+                userInfo.appendChild(statusEl);
+            }
+            
+            statusEl.textContent = status;
+            if (status === 'Syncing...') {
+                statusEl.style.color = '#58a6ff';
+            } else if (status === 'Synced') {
+                statusEl.style.color = '#3fb950';
+            } else if (status === 'Sync failed') {
+                statusEl.style.color = '#f85149';
+            } else {
+                statusEl.textContent = '';
+            }
+        }
+        
+        async function syncClickerScore(usernameLower) {
+            try {
+                const cloudData = await readFromFirebase(`clickerScores/${usernameLower}`);
+                const localScore = clickerScore || 0;
+                const cloudScore = cloudData?.score || 0;
+                
+                if (cloudScore > localScore) {
+                    // Cloud has higher score, use cloud
+                    clickerScore = cloudScore;
+                    document.getElementById('clickerScore').textContent = clickerScore;
+                } else if (localScore > cloudScore && localScore > 0) {
+                    // Local has higher score, save to cloud
+                    await writeToFirebase(`clickerScores/${usernameLower}`, {
+                        username: localStorage.getItem('loggedInUsername'),
+                        usernameLower: usernameLower,
+                        score: localScore,
+                        timestamp: Date.now()
+                    });
+                } else if (cloudScore === localScore && cloudScore > 0) {
+                    // Same score, just load it
+                    clickerScore = cloudScore;
+                    document.getElementById('clickerScore').textContent = clickerScore;
+                }
+            } catch (err) {
+                console.error('Error syncing clicker score:', err);
+            }
+        }
+        
+        async function syncSnakeScore(usernameLower) {
+            try {
+                const cloudData = await readFromFirebase(`snakeScores/${usernameLower}`);
+                const localScore = snakeGame?.score || 0;
+                const cloudScore = cloudData?.score || 0;
+                
+                if (cloudScore > localScore) {
+                    // Cloud has higher score
+                    syncConflicts.push({
+                        game: 'Snake',
+                        type: 'score',
+                        local: localScore,
+                        cloud: cloudScore,
+                        action: 'cloud',
+                        resolved: false
+                    });
+                } else if (localScore > cloudScore && localScore > 0) {
+                    // Local has higher score, save to cloud
+                    await writeToFirebase(`snakeScores/${usernameLower}`, {
+                        username: localStorage.getItem('loggedInUsername'),
+                        usernameLower: usernameLower,
+                        score: localScore,
+                        length: snakeGame?.snake?.length || 0,
+                        timestamp: Date.now()
+                    });
+                }
+            } catch (err) {
+                console.error('Error syncing snake score:', err);
+            }
+        }
+        
+        async function syncMinesweeperScore(usernameLower) {
+            try {
+                const cloudData = await readFromFirebase(`minesweeperScores/${usernameLower}`);
+                const localBestTime = localStorage.getItem('minesweeperBestTime') ? parseFloat(localStorage.getItem('minesweeperBestTime')) : Infinity;
+                const cloudBestTime = cloudData?.bestTime || Infinity;
+                
+                if (cloudBestTime < localBestTime && cloudBestTime !== Infinity) {
+                    // Cloud has better time
+                    syncConflicts.push({
+                        game: 'Minesweeper',
+                        type: 'bestTime',
+                        local: localBestTime === Infinity ? 'None' : localBestTime + 's',
+                        cloud: cloudBestTime + 's',
+                        action: 'cloud',
+                        resolved: false
+                    });
+                } else if (localBestTime < cloudBestTime && localBestTime !== Infinity) {
+                    // Local has better time, save to cloud
+                    await writeToFirebase(`minesweeperScores/${usernameLower}`, {
+                        username: localStorage.getItem('loggedInUsername'),
+                        usernameLower: usernameLower,
+                        bestTime: localBestTime,
+                        timestamp: Date.now()
+                    });
+                }
+            } catch (err) {
+                console.error('Error syncing minesweeper score:', err);
+            }
+        }
+        
+        async function syncHexagonScore(usernameLower) {
+            try {
+                const cloudData = await readFromFirebase(`hexagonScores/${usernameLower}`);
+                const localScore = hexagonScore || 0;
+                const cloudScore = cloudData?.score || 0;
+                
+                if (cloudScore > localScore) {
+                    // Cloud has higher score
+                    syncConflicts.push({
+                        game: 'Hexagon Hogs',
+                        type: 'score',
+                        local: localScore,
+                        cloud: cloudScore,
+                        action: 'cloud',
+                        resolved: false
+                    });
+                } else if (localScore > cloudScore && localScore > 0) {
+                    // Local has higher score, save to cloud
+                    await writeToFirebase(`hexagonScores/${usernameLower}`, {
+                        username: localStorage.getItem('loggedInUsername'),
+                        usernameLower: usernameLower,
+                        score: localScore,
+                        timestamp: Date.now()
+                    });
+                }
+            } catch (err) {
+                console.error('Error syncing hexagon score:', err);
+            }
+        }
+        
+        async function syncTetrisScore(usernameLower) {
+            try {
+                const cloudData = await readFromFirebase(`tetrisScores/${usernameLower}`);
+                const localScore = tetrisGame?.score || 0;
+                const cloudScore = cloudData?.score || 0;
+                
+                if (cloudScore > localScore) {
+                    // Cloud has higher score
+                    syncConflicts.push({
+                        game: 'Tetris',
+                        type: 'score',
+                        local: localScore,
+                        cloud: cloudScore,
+                        action: 'cloud',
+                        resolved: false
+                    });
+                } else if (localScore > cloudScore && localScore > 0) {
+                    // Local has higher score, save to cloud
+                    await writeToFirebase(`tetrisScores/${usernameLower}`, {
+                        username: localStorage.getItem('loggedInUsername'),
+                        usernameLower: usernameLower,
+                        score: localScore,
+                        level: tetrisGame?.level || 1,
+                        lines: tetrisGame?.lines || 0,
+                        timestamp: Date.now()
+                    });
+                }
+            } catch (err) {
+                console.error('Error syncing tetris score:', err);
+            }
+        }
+        
+        async function syncWordleScore(usernameLower) {
+            try {
+                const cloudData = await readFromFirebase(`wordleScores/${usernameLower}`);
+                const cloudStreak = cloudData?.streak || 0;
+                const cloudBestStreak = cloudData?.bestStreak || 0;
+                
+                // Wordle streaks should merge (keep highest)
+                const localData = await readFromFirebase(`wordleScores/${usernameLower}`);
+                if (localData) {
+                    const bestStreak = Math.max(cloudBestStreak, localData.bestStreak || 0);
+                    const currentStreak = Math.max(cloudStreak, localData.streak || 0);
+                    
+                    if (bestStreak > (localData.bestStreak || 0) || currentStreak > (localData.streak || 0)) {
+                        syncConflicts.push({
+                            game: 'Wordle',
+                            type: 'streak',
+                            local: `Best: ${localData.bestStreak || 0}, Current: ${localData.streak || 0}`,
+                            cloud: `Best: ${bestStreak}, Current: ${currentStreak}`,
+                            action: 'merge',
+                            resolved: false
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('Error syncing wordle score:', err);
+            }
+        }
+        
+        function showConflictResolutionDialog() {
+            // Create conflict resolution overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'conflictResolutionOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                background: #161b22;
+                border: 2px solid #30363d;
+                border-radius: 12px;
+                padding: 30px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                color: #c9d1d9;
+            `;
+            
+            dialog.innerHTML = `
+                <h2 style="margin-bottom: 20px; color: #f0883e;">⚠️ Cloud Save Conflicts Detected</h2>
+                <p style="margin-bottom: 20px; color: #8b949e;">
+                    We found differences between your local and cloud saves. Choose how to resolve each conflict:
+                </p>
+                <div id="conflictList" style="margin-bottom: 20px;"></div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button id="resolveAllCloud" style="padding: 10px 20px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        Use Cloud (All)
+                    </button>
+                    <button id="resolveAllLocal" style="padding: 10px 20px; background: #30363d; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        Use Local (All)
+                    </button>
+                    <button id="resolveConflicts" style="padding: 10px 20px; background: #58a6ff; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        Resolve Selected
+                    </button>
+                </div>
+            `;
+            
+            const conflictList = dialog.querySelector('#conflictList');
+            syncConflicts.forEach((conflict, index) => {
+                const conflictItem = document.createElement('div');
+                conflictItem.style.cssText = `
+                    padding: 15px;
+                    background: rgba(22, 27, 34, 0.5);
+                    border: 1px solid #30363d;
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                `;
+                
+                conflictItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong style="color: #c9d1d9;">${conflict.game}</strong>
+                        <select class="conflict-resolution" data-index="${index}" style="padding: 5px 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #c9d1d9;">
+                            <option value="cloud" ${conflict.action === 'cloud' ? 'selected' : ''}>Use Cloud (${conflict.cloud})</option>
+                            <option value="local" ${conflict.action === 'local' ? 'selected' : ''}>Use Local (${conflict.local})</option>
+                            ${conflict.type === 'streak' ? '<option value="merge" ' + (conflict.action === 'merge' ? 'selected' : '') + '>Merge (Keep Best)</option>' : ''}
+                        </select>
+                    </div>
+                    <div style="font-size: 14px; color: #8b949e;">
+                        <div>Local: ${conflict.local}</div>
+                        <div>Cloud: ${conflict.cloud}</div>
+                    </div>
+                `;
+                
+                conflictList.appendChild(conflictItem);
+            });
+            
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+            
+            // Handle resolution
+            dialog.querySelector('#resolveAllCloud').onclick = () => {
+                syncConflicts.forEach(c => c.action = 'cloud');
+                resolveConflicts();
+            };
+            
+            dialog.querySelector('#resolveAllLocal').onclick = () => {
+                syncConflicts.forEach(c => c.action = 'local');
+                resolveConflicts();
+            };
+            
+            dialog.querySelector('#resolveConflicts').onclick = () => {
+                dialog.querySelectorAll('.conflict-resolution').forEach((select, index) => {
+                    syncConflicts[index].action = select.value;
+                });
+                resolveConflicts();
+            };
+            
+            // Update conflict action when selection changes
+            dialog.querySelectorAll('.conflict-resolution').forEach((select, index) => {
+                select.onchange = () => {
+                    syncConflicts[index].action = select.value;
+                };
+            });
+        }
+        
+        async function resolveConflicts() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) return;
+            
+            updateSyncStatus('Resolving conflicts...');
+            
+            for (const conflict of syncConflicts) {
+                try {
+                    if (conflict.action === 'cloud') {
+                        // Use cloud data
+                        if (conflict.game === 'Snake') {
+                            const cloudData = await readFromFirebase(`snakeScores/${usernameLower}`);
+                            if (cloudData) {
+                                snakeGame.score = cloudData.score || 0;
+                            }
+                        } else if (conflict.game === 'Hexagon Hogs') {
+                            const cloudData = await readFromFirebase(`hexagonScores/${usernameLower}`);
+                            if (cloudData) {
+                                hexagonScore = cloudData.score || 0;
+                            }
+                        } else if (conflict.game === 'Tetris') {
+                            const cloudData = await readFromFirebase(`tetrisScores/${usernameLower}`);
+                            if (cloudData) {
+                                tetrisGame.score = cloudData.score || 0;
+                                tetrisGame.level = cloudData.level || 1;
+                                tetrisGame.lines = cloudData.lines || 0;
+                            }
+                        } else if (conflict.game === 'Minesweeper') {
+                            const cloudData = await readFromFirebase(`minesweeperScores/${usernameLower}`);
+                            if (cloudData && cloudData.bestTime) {
+                                localStorage.setItem('minesweeperBestTime', cloudData.bestTime.toString());
+                            }
+                        } else if (conflict.game === 'Wordle') {
+                            const cloudData = await readFromFirebase(`wordleScores/${usernameLower}`);
+                            if (cloudData) {
+                                await writeToFirebase(`wordleScores/${usernameLower}`, cloudData);
+                            }
+                        }
+                    } else if (conflict.action === 'local') {
+                        // Use local data - save to cloud
+                        if (conflict.game === 'Snake' && snakeGame.score > 0) {
+                            await writeToFirebase(`snakeScores/${usernameLower}`, {
+                                username: username,
+                                usernameLower: usernameLower,
+                                score: snakeGame.score,
+                                length: snakeGame.snake?.length || 0,
+                                timestamp: Date.now()
+                            });
+                        } else if (conflict.game === 'Hexagon Hogs' && hexagonScore > 0) {
+                            await writeToFirebase(`hexagonScores/${usernameLower}`, {
+                                username: username,
+                                usernameLower: usernameLower,
+                                score: hexagonScore,
+                                timestamp: Date.now()
+                            });
+                        } else if (conflict.game === 'Tetris' && tetrisGame.score > 0) {
+                            await writeToFirebase(`tetrisScores/${usernameLower}`, {
+                                username: username,
+                                usernameLower: usernameLower,
+                                score: tetrisGame.score,
+                                level: tetrisGame.level || 1,
+                                lines: tetrisGame.lines || 0,
+                                timestamp: Date.now()
+                            });
+                        }
+                    } else if (conflict.action === 'merge') {
+                        // Merge - keep best values
+                        if (conflict.game === 'Wordle') {
+                            const cloudData = await readFromFirebase(`wordleScores/${usernameLower}`);
+                            const localData = await readFromFirebase(`wordleScores/${usernameLower}`);
+                            const bestStreak = Math.max(cloudData?.bestStreak || 0, localData?.bestStreak || 0);
+                            const currentStreak = Math.max(cloudData?.streak || 0, localData?.streak || 0);
+                            
+                            await writeToFirebase(`wordleScores/${usernameLower}`, {
+                                username: username,
+                                usernameLower: usernameLower,
+                                streak: currentStreak,
+                                bestStreak: bestStreak,
+                                totalWins: Math.max(cloudData?.totalWins || 0, localData?.totalWins || 0),
+                                lastPlayed: Math.max(cloudData?.lastPlayed || 0, localData?.lastPlayed || 0),
+                                timestamp: Date.now()
+                            });
+                        }
+                    }
+                } catch (err) {
+                    console.error(`Error resolving conflict for ${conflict.game}:`, err);
+                }
+            }
+            
+            // Remove overlay
+            const overlay = document.getElementById('conflictResolutionOverlay');
+            if (overlay) {
+                overlay.remove();
+            }
+            
+            updateSyncStatus('Synced');
+            setTimeout(() => {
+                updateSyncStatus('');
+            }, 2000);
+            
+            // Reload affected games
+            syncAllGameData();
         }
         
         async function loadSnakeGameState() {
