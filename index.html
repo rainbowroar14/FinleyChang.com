@@ -1988,6 +1988,9 @@
                 if (totalClicks >= 100) {
                     unlockTheme('clicker100');
                 }
+                if (totalClicks >= 10000) {
+                    unlockTheme('godclicker');
+                }
             });
             
             // Load unlocked themes
@@ -2101,7 +2104,7 @@
             
             icon.textContent = info.icon;
             name.textContent = info.name;
-            desc.textContent = info.description;
+            desc.style.display = 'none'; // Hide description
             card.style.color = info.color;
             
             overlay.classList.add('active');
@@ -2333,6 +2336,8 @@
             
             if (cmd === 'FINLEYBOSS') {
                 unlockEverything();
+            } else if (cmd === 'RESET') {
+                resetAccount();
             } else if (cmd === 'COLOR') {
                 handleColorCommand(arg);
             } else if (cmd === 'SMALL') {
@@ -2346,7 +2351,7 @@
                     handleSizeCommand('normal');
                 }
             } else {
-                alert(`Unknown command: ${cmd}. Try COLOR [color], SMALL, BIG, NORMAL, or FINLEYBOSS`);
+                alert(`Unknown command: ${cmd}. Try COLOR [color], SMALL, BIG, NORMAL, RESET, or FINLEYBOSS`);
             }
         }
         
@@ -2377,11 +2382,12 @@
             logoSizeChanged = true;
             hasDrawn = true;
             hasWonMinesweeper = true;
-            totalClicks = Math.max(totalClicks, 100); // Ensure 100+ clicks
+            totalClicks = Math.max(totalClicks, 10000); // Ensure 10k+ clicks for godclicker
             
             // Unlock all themes
             unlockTheme('clicker100');
             unlockTheme('minesweeper');
+            unlockTheme('godclicker');
             
             // Unlock all textures
             unlockTexture('dots');
@@ -2398,13 +2404,67 @@
                 // Save themes
                 writeToFirebase(`users/${usernameLower}/themes/clicker100`, true);
                 writeToFirebase(`users/${usernameLower}/themes/minesweeper`, true);
+                writeToFirebase(`users/${usernameLower}/themes/godclicker`, true);
                 
                 // Save stats
-                writeToFirebase(`users/${usernameLower}/stats/totalClicks`, 100);
+                writeToFirebase(`users/${usernameLower}/stats/totalClicks`, 10000);
                 writeToFirebase(`users/${usernameLower}/hasWonMinesweeper`, true);
             }
             
             alert('🎉 FINLEYBOSS MODE ACTIVATED! Everything unlocked!');
+        }
+        
+        async function resetAccount() {
+            const confirmed = confirm('⚠️ WARNING: This will DELETE your account and ALL your data permanently!\n\nThis cannot be undone. Are you absolutely sure?');
+            if (!confirmed) return;
+            
+            const doubleConfirm = confirm('⚠️ LAST CHANCE! This will:\n- Delete your account\n- Delete all your data\n- Reset everything\n\nType RESET again if you really want to do this.');
+            if (!doubleConfirm) return;
+            
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database) {
+                alert('Error: Not logged in or Firebase not connected.');
+                return;
+            }
+            
+            try {
+                // Delete all user data from Firebase
+                await deleteFromFirebase(`users/${usernameLower}`);
+                await deleteFromFirebase(`userAccounts/${usernameLower}`);
+                
+                // Clear local storage
+                localStorage.removeItem('loggedInUsername');
+                localStorage.removeItem('loggedInUsernameLower');
+                
+                // Reset all state
+                unlockedFeatures.clear();
+                unlockedThemes.clear();
+                unlockedTextures.clear();
+                unlockedTextures.add('solid');
+                messageCount = 0;
+                friendCount = 0;
+                colorChangeCount = 0;
+                hasDrawn = false;
+                logoColorChanged = false;
+                logoSizeChanged = false;
+                totalClicks = 0;
+                currentTheme = 'default';
+                hasWonMinesweeper = false;
+                clickerScore = 0;
+                
+                // Clear UI
+                clearTheme();
+                updateUIUnlocks();
+                
+                // Reload page to show login
+                alert('Account deleted. Reloading page...');
+                window.location.reload();
+            } catch (error) {
+                console.error('Error resetting account:', error);
+                alert('Error deleting account. Please try again.');
+            }
         }
         
         function handleColorCommand(colorArg) {
@@ -3355,6 +3415,9 @@
             if (totalClicks === 100) {
                 unlockTheme('clicker100');
             }
+            if (totalClicks === 10000) {
+                unlockTheme('godclicker');
+            }
             
             // Save score to Firebase (throttled - only every 10 clicks or on close)
             if (clickerScore % 10 === 0 || clickerScore === 1) {
@@ -3801,6 +3864,12 @@
                     name: 'Minesweeper',
                     description: 'Win minesweeper to unlock',
                     unlocked: unlockedThemes.has('minesweeper')
+                },
+                {
+                    id: 'godclicker',
+                    name: 'God Clicker',
+                    description: 'Unlock at 10,000 clicks',
+                    unlocked: unlockedThemes.has('godclicker')
                 }
             ];
             
@@ -3847,6 +3916,8 @@
                 applyClicker100Theme();
             } else if (themeId === 'minesweeper') {
                 applyMinesweeperTheme();
+            } else if (themeId === 'godclicker') {
+                applyGodClickerTheme();
             }
             
             // Update theme list
@@ -3875,13 +3946,17 @@
             // Reset FINHUB letters
             const titleContainer = document.getElementById('finhubTitle');
             if (titleContainer) {
+                titleContainer.style.transform = '';
                 const letters = titleContainer.querySelectorAll('.title-letter');
-                letters.forEach(letter => {
+                letters.forEach((letter, index) => {
                     letter.style.fontSize = '72px';
                     letter.style.transform = 'scale(1)';
                     letter.style.opacity = '1';
                     letter.style.cursor = 'default';
                     letter.onclick = null;
+                    const defaultColors = ['#58a6ff', '#f0883e', '#bc8cff', '#3fb950', '#f85149', '#ffa657'];
+                    letter.style.color = defaultColors[index];
+                    letter.style.textShadow = '';
                 });
             }
             themeLetterClicks = 0;
@@ -3890,6 +3965,21 @@
             // Clear minesweeper state
             themeMinesweeperBoard = [];
             themeMinesweeperRevealed = [];
+            
+            // Clear god clicker state
+            if (godClickerAnimation) {
+                clearInterval(godClickerAnimation);
+                godClickerAnimation = null;
+            }
+            godClickerCookies.forEach(interval => clearInterval(interval));
+            godClickerCookies = [];
+            
+            // Remove all cookies
+            document.querySelectorAll('div').forEach(div => {
+                if (div.textContent === '🍪' && div.style.position === 'fixed') {
+                    div.remove();
+                }
+            });
         }
         
         function applyClicker100Theme() {
@@ -4246,6 +4336,99 @@
                     
                     board.appendChild(cell);
                 }
+            }
+        }
+        
+        let godClickerCookies = [];
+        let godClickerAnimation = null;
+        
+        function applyGodClickerTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            bg.style.background = 'radial-gradient(circle at center, #1a0a00 0%, #000000 100%)';
+            bg.style.opacity = '0.9';
+            
+            // Make FINHUB yellow, glowing, and floating
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                letters.forEach(letter => {
+                    letter.style.color = '#ffd700';
+                    letter.style.textShadow = '0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 60px #ffaa00';
+                    letter.style.transition = 'all 0.3s ease';
+                });
+                
+                // Floating animation
+                let floatOffset = 0;
+                godClickerAnimation = setInterval(() => {
+                    floatOffset += 0.02;
+                    const floatY = Math.sin(floatOffset) * 20;
+                    const floatX = Math.cos(floatOffset * 0.7) * 15;
+                    titleContainer.style.transform = `translate(${floatX}px, ${floatY}px)`;
+                    
+                    // Pulsing glow
+                    const glowIntensity = 0.7 + Math.sin(floatOffset * 2) * 0.3;
+                    letters.forEach(letter => {
+                        letter.style.textShadow = `0 0 ${20 * glowIntensity}px #ffd700, 0 0 ${40 * glowIntensity}px #ffd700, 0 0 ${60 * glowIntensity}px #ffaa00`;
+                    });
+                }, 16); // ~60fps
+            }
+            
+            // Shoot cookies around
+            function createCookie() {
+                const cookie = document.createElement('div');
+                cookie.textContent = '🍪';
+                cookie.style.position = 'fixed';
+                cookie.style.fontSize = Math.random() * 20 + 20 + 'px';
+                cookie.style.left = Math.random() * window.innerWidth + 'px';
+                cookie.style.top = '-50px';
+                cookie.style.pointerEvents = 'none';
+                cookie.style.zIndex = '1000';
+                cookie.style.transition = 'none';
+                document.body.appendChild(cookie);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 2 + 1;
+                const rotationSpeed = (Math.random() - 0.5) * 10;
+                let rotation = 0;
+                let y = -50;
+                let x = parseFloat(cookie.style.left);
+                
+                const cookieInterval = setInterval(() => {
+                    x += Math.cos(angle) * speed;
+                    y += Math.sin(angle) * speed + 0.5; // Gravity
+                    rotation += rotationSpeed;
+                    
+                    cookie.style.left = x + 'px';
+                    cookie.style.top = y + 'px';
+                    cookie.style.transform = `rotate(${rotation}deg)`;
+                    
+                    // Remove when off screen
+                    if (y > window.innerHeight + 50 || x < -50 || x > window.innerWidth + 50) {
+                        clearInterval(cookieInterval);
+                        cookie.remove();
+                        const index = godClickerCookies.indexOf(cookieInterval);
+                        if (index > -1) {
+                            godClickerCookies.splice(index, 1);
+                        }
+                    }
+                }, 16);
+                
+                godClickerCookies.push(cookieInterval);
+            }
+            
+            // Create cookies periodically
+            const cookieInterval = setInterval(() => {
+                if (currentTheme !== 'godclicker') {
+                    clearInterval(cookieInterval);
+                    return;
+                }
+                createCookie();
+            }, 500);
+            
+            // Store interval for cleanup
+            if (!bg.dataset.cookieInterval) {
+                bg.dataset.cookieInterval = cookieInterval;
             }
         }
         
