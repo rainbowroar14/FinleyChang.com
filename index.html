@@ -1369,6 +1369,96 @@
         .minesweeper-cell.number-7 { color: #000000; }
         .minesweeper-cell.number-8 { color: #808080; }
         
+        /* Snake Game */
+        .snake-controls {
+            margin-bottom: 20px;
+        }
+        
+        .snake-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            color: #c9d1d9;
+        }
+        
+        .snake-info div {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .snake-info span {
+            color: #58a6ff;
+        }
+        
+        .snake-reset-btn {
+            padding: 8px 16px;
+            background: #238636;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        
+        .snake-reset-btn:hover {
+            background: #2ea043;
+        }
+        
+        .snake-instructions {
+            text-align: center;
+            color: #8b949e;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .snake-instructions p {
+            margin: 5px 0;
+        }
+        
+        .snake-board {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            gap: 1px;
+            background: #0d1117;
+            border: 2px solid #30363d;
+            border-radius: 6px;
+            padding: 2px;
+            margin-bottom: 20px;
+            aspect-ratio: 1;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .snake-cell {
+            aspect-ratio: 1;
+            background: #161b22;
+            border-radius: 2px;
+        }
+        
+        .snake-cell.snake-head {
+            background: #3fb950;
+            border-radius: 3px;
+        }
+        
+        .snake-cell.snake-body {
+            background: #238636;
+        }
+        
+        .snake-cell.fruit {
+            background: #f85149;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
         .minesweeper-reset-btn {
             padding: 4px 12px;
             background: #c0c0c0;
@@ -1620,6 +1710,7 @@
             <div class="sidebar-btn" id="paintBtn" onclick="togglePaint()">🎨 Paint</div>
             <div class="sidebar-btn" id="clickerBtn" onclick="toggleClicker()">🖱️ Clicker</div>
             <div class="sidebar-btn" id="minesweeperBtn" onclick="toggleMinesweeper()">💣 Minesweeper</div>
+            <div class="sidebar-btn" id="snakeBtn" onclick="toggleSnake()">🐍 Snake</div>
             <div class="sidebar-btn" id="themesBtn" onclick="toggleThemes()">🎨 Themes</div>
         </div>
         
@@ -1771,6 +1862,34 @@
             </div>
         </div>
         
+        <!-- Snake Game -->
+        <div class="game-container" id="snakeContainer">
+            <div class="game-header">
+                <h3>🐍 Snake Game</h3>
+                <button class="close-btn" onclick="toggleSnake()">×</button>
+            </div>
+            <div class="game-content">
+                <div class="snake-controls">
+                    <div class="snake-info">
+                        <div>Score: <span id="snakeScore">0</span></div>
+                        <div>Length: <span id="snakeLength">3</span></div>
+                        <button class="snake-reset-btn" onclick="resetSnake()">Reset</button>
+                    </div>
+                    <div class="snake-instructions">
+                        <p>Use Arrow Keys or WASD to move</p>
+                        <p>Eat the 🍎 to grow!</p>
+                    </div>
+                </div>
+                <div class="snake-board" id="snakeBoard"></div>
+                <div class="leaderboard-section">
+                    <h4>Best Scores</h4>
+                    <div class="leaderboard-list" id="snakeLeaderboard">
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Private Chat -->
         <div class="private-chat-container" id="privateChat">
             <div class="chat-header">
@@ -1876,7 +1995,8 @@
             COMMANDBAR: 'commandbar',
             CLICKER: 'clicker',
             MINESWEEPER: 'minesweeper',
-            THEMES: 'themes'
+            THEMES: 'themes',
+            SNAKE: 'snake'
         };
         
         const UNLOCK_INFO = {
@@ -1927,6 +2047,12 @@
                 name: 'Themes',
                 description: 'Get 10 clicks to unlock themes!',
                 color: '#bc8cff'
+            },
+            [UNLOCK_TYPES.SNAKE]: {
+                icon: '🐍',
+                name: 'Snake Game',
+                description: 'Get 5 friends to unlock snake game!',
+                color: '#3fb950'
             }
         };
         
@@ -2010,6 +2136,14 @@
                         unlockTheme('minesweeper');
                     }
                 });
+                
+                // Check if won snake
+                readFromFirebase(`users/${usernameLower}/hasWonSnake`).then((won) => {
+                    if (won) {
+                        hasWonSnake = true;
+                        unlockTheme('snake');
+                    }
+                });
             });
             
             // Load current theme
@@ -2059,6 +2193,9 @@
                     break;
                 case UNLOCK_TYPES.THEMES:
                     shouldUnlock = totalClicks >= 10; // Unlock after 10 clicks
+                    break;
+                case UNLOCK_TYPES.SNAKE:
+                    shouldUnlock = friendCount >= 5; // Unlock after 5 friends
                     break;
             }
             
@@ -2135,6 +2272,9 @@
                     break;
                 case UNLOCK_TYPES.MINESWEEPER:
                     targetElement = document.getElementById('minesweeperBtn');
+                    break;
+                case UNLOCK_TYPES.SNAKE:
+                    targetElement = document.getElementById('snakeBtn');
                     break;
             }
             
@@ -2257,6 +2397,19 @@
                     };
                 }
             }
+            
+            const snakeBtn = document.getElementById('snakeBtn');
+            if (snakeBtn) {
+                if (unlockedFeatures.has(UNLOCK_TYPES.SNAKE)) {
+                    snakeBtn.classList.remove('locked');
+                    snakeBtn.onclick = toggleSnake;
+                } else {
+                    snakeBtn.classList.add('locked');
+                    snakeBtn.onclick = () => {
+                        alert('Unlock Snake by getting 5 friends!');
+                    };
+                }
+            }
         }
         
         function unlockTexture(texture) {
@@ -2368,7 +2521,8 @@
                 UNLOCK_TYPES.COMMANDBAR,
                 UNLOCK_TYPES.CLICKER,
                 UNLOCK_TYPES.MINESWEEPER,
-                UNLOCK_TYPES.THEMES
+                UNLOCK_TYPES.THEMES,
+                UNLOCK_TYPES.SNAKE
             ];
             
             allFeatures.forEach(feature => {
@@ -2382,12 +2536,14 @@
             logoSizeChanged = true;
             hasDrawn = true;
             hasWonMinesweeper = true;
+            hasWonSnake = true;
             totalClicks = Math.max(totalClicks, 10000); // Ensure 10k+ clicks for godclicker
             
             // Unlock all themes
             unlockTheme('clicker100');
             unlockTheme('minesweeper');
             unlockTheme('godclicker');
+            unlockTheme('snake');
             
             // Unlock all textures
             unlockTexture('dots');
@@ -2405,10 +2561,12 @@
                 writeToFirebase(`users/${usernameLower}/themes/clicker100`, true);
                 writeToFirebase(`users/${usernameLower}/themes/minesweeper`, true);
                 writeToFirebase(`users/${usernameLower}/themes/godclicker`, true);
+                writeToFirebase(`users/${usernameLower}/themes/snake`, true);
                 
                 // Save stats
                 writeToFirebase(`users/${usernameLower}/stats/totalClicks`, 10000);
                 writeToFirebase(`users/${usernameLower}/hasWonMinesweeper`, true);
+                writeToFirebase(`users/${usernameLower}/hasWonSnake`, true);
             }
             
             alert('🎉 FINLEYBOSS MODE ACTIVATED! Everything unlocked!');
@@ -2650,6 +2808,7 @@
             const chat = document.getElementById('globalChat');
             const friends = document.getElementById('friendsContainer');
             const privateChat = document.getElementById('privateChat');
+            const snake = document.getElementById('snakeContainer');
             
             if (chat.classList.contains('active')) {
                 chat.classList.remove('active');
@@ -2657,6 +2816,7 @@
                 chat.classList.add('active');
                 friends.classList.remove('active');
                 privateChat.classList.remove('active');
+                if (snake) snake.classList.remove('active');
                 loadGlobalChat();
             }
         }
@@ -2666,6 +2826,7 @@
             const friends = document.getElementById('friendsContainer');
             const chat = document.getElementById('globalChat');
             const privateChat = document.getElementById('privateChat');
+            const snake = document.getElementById('snakeContainer');
             
             if (friends.classList.contains('active')) {
                 friends.classList.remove('active');
@@ -2673,6 +2834,7 @@
                 friends.classList.add('active');
                 chat.classList.remove('active');
                 privateChat.classList.remove('active');
+                if (snake) snake.classList.remove('active');
                 loadFriends();
                 loadFriendRequests();
             }
@@ -3076,6 +3238,7 @@
             const chat = document.getElementById('globalChat');
             const friends = document.getElementById('friendsContainer');
             const privateChat = document.getElementById('privateChat');
+            const snake = document.getElementById('snakeContainer');
             
             if (paint.classList.contains('active')) {
                 paint.classList.remove('active');
@@ -3084,6 +3247,7 @@
                 chat.classList.remove('active');
                 friends.classList.remove('active');
                 privateChat.classList.remove('active');
+                if (snake) snake.classList.remove('active');
                 
                 // Initialize canvas if not already done
                 if (!paintCanvas) {
@@ -3465,6 +3629,8 @@
                 friends.classList.remove('active');
                 paint.classList.remove('active');
                 minesweeper.classList.remove('active');
+                const snake = document.getElementById('snakeContainer');
+                if (snake) snake.classList.remove('active');
                 
                 // Load user's current score
                 loadClickerScore();
@@ -3566,6 +3732,8 @@
                 friends.classList.remove('active');
                 paint.classList.remove('active');
                 clicker.classList.remove('active');
+                const snake = document.getElementById('snakeContainer');
+                if (snake) snake.classList.remove('active');
                 initMinesweeper();
                 loadMinesweeperLeaderboard();
             }
@@ -3812,6 +3980,311 @@
         }
         
         // ============================================
+        // SNAKE GAME SYSTEM
+        // ============================================
+        
+        let snakeGame = {
+            boardSize: 20,
+            snake: [{x: 10, y: 10}],
+            direction: {x: 1, y: 0},
+            nextDirection: {x: 1, y: 0},
+            fruit: {x: 15, y: 15},
+            score: 0,
+            gameOver: false,
+            gameLoop: null,
+            speed: 150
+        };
+        
+        let hasWonSnake = false;
+        
+        function toggleSnake() {
+            const snake = document.getElementById('snakeContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const themes = document.getElementById('themeContainer');
+            
+            if (snake.classList.contains('active')) {
+                snake.classList.remove('active');
+                stopSnakeGame();
+            } else {
+                snake.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                minesweeper.classList.remove('active');
+                themes.classList.remove('active');
+                initSnakeGame();
+                loadSnakeLeaderboard();
+            }
+        }
+        
+        function initSnakeGame() {
+            snakeGame = {
+                boardSize: 20,
+                snake: [{x: 10, y: 10}],
+                direction: {x: 1, y: 0},
+                nextDirection: {x: 1, y: 0},
+                fruit: {x: 15, y: 15},
+                score: 0,
+                gameOver: false,
+                gameLoop: null,
+                speed: 150
+            };
+            
+            // Set up keyboard controls
+            document.addEventListener('keydown', handleSnakeKeyPress);
+            
+            spawnFruit();
+            renderSnakeBoard();
+            startSnakeGame();
+        }
+        
+        function stopSnakeGame() {
+            if (snakeGame.gameLoop) {
+                clearInterval(snakeGame.gameLoop);
+                snakeGame.gameLoop = null;
+            }
+            document.removeEventListener('keydown', handleSnakeKeyPress);
+        }
+        
+        function handleSnakeKeyPress(e) {
+            const container = document.getElementById('snakeContainer');
+            if (!container || !container.classList.contains('active')) return;
+            
+            const key = e.key.toLowerCase();
+            const currentDir = snakeGame.direction;
+            
+            // Prevent reversing into itself
+            if (key === 'arrowup' || key === 'w') {
+                if (currentDir.y === 0) {
+                    snakeGame.nextDirection = {x: 0, y: -1};
+                }
+            } else if (key === 'arrowdown' || key === 's') {
+                if (currentDir.y === 0) {
+                    snakeGame.nextDirection = {x: 0, y: 1};
+                }
+            } else if (key === 'arrowleft' || key === 'a') {
+                if (currentDir.x === 0) {
+                    snakeGame.nextDirection = {x: -1, y: 0};
+                }
+            } else if (key === 'arrowright' || key === 'd') {
+                if (currentDir.x === 0) {
+                    snakeGame.nextDirection = {x: 1, y: 0};
+                }
+            }
+        }
+        
+        function startSnakeGame() {
+            if (snakeGame.gameLoop) return;
+            
+            snakeGame.gameLoop = setInterval(() => {
+                if (snakeGame.gameOver) {
+                    stopSnakeGame();
+                    return;
+                }
+                
+                moveSnake();
+                checkCollisions();
+                checkFruit();
+                renderSnakeBoard();
+            }, snakeGame.speed);
+        }
+        
+        function moveSnake() {
+            snakeGame.direction = {...snakeGame.nextDirection};
+            const head = snakeGame.snake[0];
+            const newHead = {
+                x: head.x + snakeGame.direction.x,
+                y: head.y + snakeGame.direction.y
+            };
+            
+            snakeGame.snake.unshift(newHead);
+        }
+        
+        function checkCollisions() {
+            const head = snakeGame.snake[0];
+            
+            // Wall collision
+            if (head.x < 0 || head.x >= snakeGame.boardSize || 
+                head.y < 0 || head.y >= snakeGame.boardSize) {
+                gameOverSnake();
+                return;
+            }
+            
+            // Self collision
+            for (let i = 1; i < snakeGame.snake.length; i++) {
+                if (head.x === snakeGame.snake[i].x && head.y === snakeGame.snake[i].y) {
+                    gameOverSnake();
+                    return;
+                }
+            }
+        }
+        
+        function checkFruit() {
+            const head = snakeGame.snake[0];
+            
+            if (head.x === snakeGame.fruit.x && head.y === snakeGame.fruit.y) {
+                // Eat fruit
+                snakeGame.score += 10;
+                updateSnakeUI();
+                spawnFruit();
+                
+                // Check win condition (score 200 = 20 fruits = length 20)
+                if (snakeGame.score >= 200) {
+                    winSnakeGame();
+                }
+            } else {
+                // Remove tail if didn't eat fruit
+                snakeGame.snake.pop();
+            }
+        }
+        
+        function spawnFruit() {
+            let newFruit;
+            do {
+                newFruit = {
+                    x: Math.floor(Math.random() * snakeGame.boardSize),
+                    y: Math.floor(Math.random() * snakeGame.boardSize)
+                };
+            } while (snakeGame.snake.some(segment => 
+                segment.x === newFruit.x && segment.y === newFruit.y
+            ));
+            
+            snakeGame.fruit = newFruit;
+        }
+        
+        function renderSnakeBoard() {
+            const board = document.getElementById('snakeBoard');
+            if (!board) return;
+            
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${snakeGame.boardSize}, 1fr)`;
+            
+            for (let y = 0; y < snakeGame.boardSize; y++) {
+                for (let x = 0; x < snakeGame.boardSize; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'snake-cell';
+                    
+                    const isHead = snakeGame.snake[0].x === x && snakeGame.snake[0].y === y;
+                    const isBody = snakeGame.snake.some((segment, index) => 
+                        index > 0 && segment.x === x && segment.y === y
+                    );
+                    const isFruit = snakeGame.fruit.x === x && snakeGame.fruit.y === y;
+                    
+                    if (isHead) {
+                        cell.classList.add('snake-head');
+                    } else if (isBody) {
+                        cell.classList.add('snake-body');
+                    } else if (isFruit) {
+                        cell.classList.add('fruit');
+                        cell.textContent = '🍎';
+                    }
+                    
+                    board.appendChild(cell);
+                }
+            }
+        }
+        
+        function updateSnakeUI() {
+            document.getElementById('snakeScore').textContent = snakeGame.score;
+            document.getElementById('snakeLength').textContent = snakeGame.snake.length;
+        }
+        
+        function gameOverSnake() {
+            snakeGame.gameOver = true;
+            stopSnakeGame();
+            alert(`Game Over! Score: ${snakeGame.score}`);
+            saveSnakeScore();
+            loadSnakeLeaderboard();
+        }
+        
+        function winSnakeGame() {
+            snakeGame.gameOver = true;
+            stopSnakeGame();
+            
+            if (!hasWonSnake) {
+                hasWonSnake = true;
+                const username = localStorage.getItem('loggedInUsername');
+                const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+                
+                if (usernameLower && database) {
+                    writeToFirebase(`users/${usernameLower}/hasWonSnake`, true);
+                }
+                unlockTheme('snake');
+            }
+            
+            alert(`🎉 You Win! Score: ${snakeGame.score}`);
+            saveSnakeScore();
+            loadSnakeLeaderboard();
+        }
+        
+        function resetSnake() {
+            stopSnakeGame();
+            initSnakeGame();
+        }
+        
+        function saveSnakeScore() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database || snakeGame.score === 0) return;
+            
+            const scoreData = {
+                username: username,
+                usernameLower: usernameLower,
+                score: snakeGame.score,
+                length: snakeGame.snake.length,
+                timestamp: Date.now()
+            };
+            
+            writeToFirebase(`snakeScores/${usernameLower}`, scoreData);
+        }
+        
+        function loadSnakeLeaderboard() {
+            if (!database) return;
+            
+            const leaderboard = document.getElementById('snakeLeaderboard');
+            leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase('snakeScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    return;
+                }
+                
+                const scoreArray = Object.values(scores)
+                    .filter(entry => entry && entry.username)
+                    .sort((a, b) => (b.score || 0) - (a.score || 0))
+                    .slice(0, 10);
+                
+                leaderboard.innerHTML = '';
+                if (scoreArray.length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No valid scores yet!</p>';
+                    return;
+                }
+                
+                scoreArray.forEach((entry, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'leaderboard-item';
+                    const displayName = entry.username || entry.usernameLower || 'Unknown';
+                    div.innerHTML = `
+                        <span class="rank">#${index + 1}</span>
+                        <span class="username">${displayName}</span>
+                        <span class="score">${entry.score || 0}</span>
+                    `;
+                    leaderboard.appendChild(div);
+                });
+            }).catch(err => {
+                console.error('Error loading snake leaderboard:', err);
+                leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
+        }
+        
+        // ============================================
         // THEME SYSTEM
         // ============================================
         
@@ -3838,6 +4311,8 @@
                 paint.classList.remove('active');
                 clicker.classList.remove('active');
                 minesweeper.classList.remove('active');
+                const snake = document.getElementById('snakeContainer');
+                if (snake) snake.classList.remove('active');
                 loadThemes();
             }
         }
@@ -3870,6 +4345,12 @@
                     name: 'God Clicker',
                     description: 'Unlock at 10,000 clicks',
                     unlocked: unlockedThemes.has('godclicker')
+                },
+                {
+                    id: 'snake',
+                    name: 'Snake',
+                    description: 'Win snake game to unlock',
+                    unlocked: unlockedThemes.has('snake')
                 }
             ];
             
@@ -3918,6 +4399,8 @@
                 applyMinesweeperTheme();
             } else if (themeId === 'godclicker') {
                 applyGodClickerTheme();
+            } else if (themeId === 'snake') {
+                applySnakeTheme();
             }
             
             // Update theme list
@@ -3980,6 +4463,18 @@
                     div.remove();
                 }
             });
+            
+            // Clear snake theme
+            if (themeSnakeInterval) {
+                clearInterval(themeSnakeInterval);
+                themeSnakeInterval = null;
+            }
+            themeSnake.body = [];
+            themeFruits = [];
+            if (bg) {
+                const snakeElements = bg.querySelectorAll('.theme-snake-segment, .theme-fruit');
+                snakeElements.forEach(el => el.remove());
+            }
         }
         
         function applyClicker100Theme() {
@@ -4430,6 +4925,212 @@
             if (!bg.dataset.cookieInterval) {
                 bg.dataset.cookieInterval = cookieInterval;
             }
+        }
+        
+        let themeSnake = {
+            body: [],
+            direction: {x: 1, y: 0},
+            target: null,
+            path: [],
+            cellSize: 20,
+            gridCols: 0,
+            gridRows: 0
+        };
+        let themeFruits = [];
+        let themeSnakeInterval = null;
+        
+        function applySnakeTheme() {
+            const bg = document.getElementById('themeBackground');
+            bg.classList.add('active');
+            bg.style.background = 'linear-gradient(135deg, #0d2818 0%, #1a3d2e 50%, #0d2818 100%)';
+            bg.style.opacity = '0.9';
+            
+            // Initialize theme snake
+            themeSnake.cellSize = 30;
+            themeSnake.gridCols = Math.floor(window.innerWidth / themeSnake.cellSize);
+            themeSnake.gridRows = Math.floor(window.innerHeight / themeSnake.cellSize);
+            
+            // Start snake in center
+            const startX = Math.floor(themeSnake.gridCols / 2);
+            const startY = Math.floor(themeSnake.gridRows / 2);
+            themeSnake.body = [
+                {x: startX, y: startY},
+                {x: startX - 1, y: startY},
+                {x: startX - 2, y: startY}
+            ];
+            themeSnake.direction = {x: 1, y: 0};
+            themeSnake.path = [];
+            themeFruits = [];
+            
+            // Spawn initial fruit
+            spawnThemeFruit();
+            
+            // Start game loop
+            themeSnakeInterval = setInterval(() => {
+                if (currentTheme !== 'snake') {
+                    clearInterval(themeSnakeInterval);
+                    themeSnakeInterval = null;
+                    return;
+                }
+                updateThemeSnake();
+                renderThemeSnake();
+            }, 100);
+        }
+        
+        function spawnThemeFruit() {
+            let attempts = 0;
+            let newFruit;
+            do {
+                newFruit = {
+                    x: Math.floor(Math.random() * themeSnake.gridCols),
+                    y: Math.floor(Math.random() * themeSnake.gridRows)
+                };
+                attempts++;
+            } while (
+                attempts < 100 && 
+                (themeSnake.body.some(segment => segment.x === newFruit.x && segment.y === newFruit.y) ||
+                 themeFruits.some(fruit => fruit.x === newFruit.x && fruit.y === newFruit.y))
+            );
+            
+            if (attempts < 100) {
+                themeFruits.push(newFruit);
+            }
+        }
+        
+        function updateThemeSnake() {
+            // Find nearest fruit
+            if (themeFruits.length === 0) {
+                spawnThemeFruit();
+            }
+            
+            const head = themeSnake.body[0];
+            let nearestFruit = null;
+            let minDistance = Infinity;
+            
+            themeFruits.forEach(fruit => {
+                const distance = Math.abs(head.x - fruit.x) + Math.abs(head.y - fruit.y);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestFruit = fruit;
+                }
+            });
+            
+            if (nearestFruit) {
+                // Simple pathfinding: move towards fruit
+                const dx = nearestFruit.x - head.x;
+                const dy = nearestFruit.y - head.y;
+                
+                // Prefer horizontal movement if equal distance
+                let newDir = {x: 0, y: 0};
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    newDir.x = dx > 0 ? 1 : -1;
+                } else if (dy !== 0) {
+                    newDir.y = dy > 0 ? 1 : -1;
+                } else if (dx !== 0) {
+                    newDir.x = dx > 0 ? 1 : -1;
+                }
+                
+                // Don't reverse into body
+                const nextPos = {x: head.x + newDir.x, y: head.y + newDir.y};
+                const wouldHitBody = themeSnake.body.slice(1).some(segment => 
+                    segment.x === nextPos.x && segment.y === nextPos.y
+                );
+                
+                if (!wouldHitBody) {
+                    themeSnake.direction = newDir;
+                } else {
+                    // Try alternative directions
+                    const alternatives = [
+                        {x: 0, y: -1}, {x: 0, y: 1},
+                        {x: -1, y: 0}, {x: 1, y: 0}
+                    ];
+                    for (const alt of alternatives) {
+                        const altPos = {x: head.x + alt.x, y: head.y + alt.y};
+                        const wouldHit = themeSnake.body.slice(1).some(segment => 
+                            segment.x === altPos.x && segment.y === altPos.y
+                        );
+                        if (!wouldHit && 
+                            altPos.x >= 0 && altPos.x < themeSnake.gridCols &&
+                            altPos.y >= 0 && altPos.y < themeSnake.gridRows) {
+                            themeSnake.direction = alt;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Move snake
+            const newHead = {
+                x: head.x + themeSnake.direction.x,
+                y: head.y + themeSnake.direction.y
+            };
+            
+            // Wrap around edges
+            if (newHead.x < 0) newHead.x = themeSnake.gridCols - 1;
+            if (newHead.x >= themeSnake.gridCols) newHead.x = 0;
+            if (newHead.y < 0) newHead.y = themeSnake.gridRows - 1;
+            if (newHead.y >= themeSnake.gridRows) newHead.y = 0;
+            
+            themeSnake.body.unshift(newHead);
+            
+            // Check if ate fruit
+            const fruitIndex = themeFruits.findIndex(fruit => 
+                fruit.x === newHead.x && fruit.y === newHead.y
+            );
+            
+            if (fruitIndex !== -1) {
+                // Ate fruit - grow
+                themeFruits.splice(fruitIndex, 1);
+                spawnThemeFruit();
+            } else {
+                // Remove tail
+                themeSnake.body.pop();
+            }
+        }
+        
+        function renderThemeSnake() {
+            const bg = document.getElementById('themeBackground');
+            if (!bg || currentTheme !== 'snake') return;
+            
+            // Clear existing snake/fruit elements
+            const existing = bg.querySelectorAll('.theme-snake-segment, .theme-fruit');
+            existing.forEach(el => el.remove());
+            
+            // Render snake
+            themeSnake.body.forEach((segment, index) => {
+                const segmentEl = document.createElement('div');
+                segmentEl.className = 'theme-snake-segment';
+                segmentEl.style.position = 'absolute';
+                segmentEl.style.left = (segment.x * themeSnake.cellSize) + 'px';
+                segmentEl.style.top = (segment.y * themeSnake.cellSize) + 'px';
+                segmentEl.style.width = themeSnake.cellSize + 'px';
+                segmentEl.style.height = themeSnake.cellSize + 'px';
+                segmentEl.style.background = index === 0 ? '#3fb950' : '#238636';
+                segmentEl.style.borderRadius = index === 0 ? '50%' : '4px';
+                segmentEl.style.border = index === 0 ? '2px solid #2ea043' : '1px solid #1a5d2e';
+                segmentEl.style.zIndex = '2';
+                segmentEl.style.pointerEvents = 'none';
+                bg.appendChild(segmentEl);
+            });
+            
+            // Render fruits
+            themeFruits.forEach(fruit => {
+                const fruitEl = document.createElement('div');
+                fruitEl.className = 'theme-fruit';
+                fruitEl.textContent = '🍎';
+                fruitEl.style.position = 'absolute';
+                fruitEl.style.left = (fruit.x * themeSnake.cellSize) + 'px';
+                fruitEl.style.top = (fruit.y * themeSnake.cellSize) + 'px';
+                fruitEl.style.width = themeSnake.cellSize + 'px';
+                fruitEl.style.height = themeSnake.cellSize + 'px';
+                fruitEl.style.fontSize = (themeSnake.cellSize * 0.7) + 'px';
+                fruitEl.style.display = 'flex';
+                fruitEl.style.alignItems = 'center';
+                fruitEl.style.justifyContent = 'center';
+                fruitEl.style.zIndex = '2';
+                fruitEl.style.pointerEvents = 'none';
+                bg.appendChild(fruitEl);
+            });
         }
         
         // ============================================
