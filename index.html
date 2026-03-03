@@ -404,10 +404,15 @@
         
         /* Login Page Styles */
         .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             text-align: center;
             max-width: 400px;
             width: 100%;
             padding: 40px;
+            margin: 0 auto;
         }
         
         .login-container {
@@ -521,6 +526,41 @@
             font-size: 14px;
             margin-top: 10px;
             min-height: 20px;
+        }
+        
+        /* Dark/Light Mode Toggle - Bottom Right */
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 12px 16px;
+            background: rgba(22, 27, 34, 0.9);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dark-mode-toggle:hover {
+            background: rgba(33, 38, 45, 0.95);
+            border-color: #1f6feb;
+            transform: scale(1.05);
+        }
+        
+        body.light-mode .dark-mode-toggle {
+            background: rgba(246, 248, 250, 0.9);
+            border: 1px solid #d0d7de;
+            color: #24292f;
+        }
+        
+        body.light-mode .dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #0969da;
         }
         
         .success-message {
@@ -1950,6 +1990,9 @@
         </div>
     </div>
     
+    <!-- Dark/Light Mode Toggle - Bottom Right -->
+    <button class="dark-mode-toggle" id="themeToggleBtn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">🌙</button>
+    
     <!-- Main page with FinHub title -->
     <div class="page hidden" id="mainPage">
         <!-- Unlock Overlay -->
@@ -1971,7 +2014,6 @@
                 </button>
             </div>
             <div class="top-bar-right">
-                <button class="top-bar-btn" id="themeToggleBtn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">🌙</button>
             </div>
         </div>
         
@@ -1983,7 +2025,6 @@
             <div class="sidebar-btn" id="clickerBtn" onclick="toggleClicker()">🖱️ Clicker</div>
             <div class="sidebar-btn" id="minesweeperBtn" onclick="toggleMinesweeper()">💣 Minesweeper</div>
             <div class="sidebar-btn" id="snakeBtn" onclick="toggleSnake()">🐍 Snake</div>
-            <div class="sidebar-btn" id="geometryDashBtn" onclick="toggleGeometryDash()">🎮 Geometry Dash</div>
             <div class="sidebar-btn" id="themesBtn" onclick="toggleThemes()">🎨 Themes</div>
         </div>
         
@@ -2161,128 +2202,6 @@
                     <h4>Best Scores</h4>
                     <div class="leaderboard-list" id="snakeLeaderboard">
                         <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Geometry Dash Game -->
-        <div class="game-container" id="geometryDashContainer" style="position: fixed; inset: 0; z-index: 10000; background: #0b0f18; display: none;">
-            <canvas id="geometryDashCanvas" style="display: block; width: 100vw; height: 100vh;"></canvas>
-            <div id="geometryDashHud" style="position: fixed; left: 16px; top: 16px; display: grid; gap: 10px; pointer-events: none; z-index: 10001;">
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <button class="pill pill-button" id="gdFormBtn" type="button" title="Click to swap form" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">
-                        Wave
-                    </button>
-                    <div class="pill" id="gdStatus" style="padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Hold to go up · Release to go down</div>
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <div class="pill" style="padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">
-                        <span class="dot" id="gdZoneDot" style="display: inline-block; width: 10px; height: 10px; border-radius: 999px; margin-right: 6px; vertical-align: -1px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); background: rgba(170, 220, 255, 0.9);"></span>
-                        Zone: <span id="gdZone">Warmup</span>
-                    </div>
-                    <div class="pill" style="padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Speed: <span id="gdSpeed">1.00x</span></div>
-                    <div class="pill" style="padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Dual: <span id="gdDual">Off</span></div>
-                    <button class="pill pill-button" id="gdSectionsBtn" type="button" title="Pick what sections can appear" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">
-                        Sections
-                    </button>
-                    <button class="pill pill-button" id="gdCustomBtn" type="button" title="Customize colors/skin" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">
-                        Customize
-                    </button>
-                    <button class="pill pill-button" onclick="toggleGeometryDash()" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(248, 81, 73, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">
-                        Close
-                    </button>
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <div class="pill" style="padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Distance: <span id="gdDist">0</span></div>
-                    <div class="pill" style="padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Best: <span id="gdBest">0</span></div>
-                    <div class="pill" style="padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Restart: <kbd style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; padding: 1px 6px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.06);">R</kbd> / click</div>
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <div class="scorebar" style="position: relative; width: min(420px, calc(100vw - 32px)); height: 22px; border-radius: 999px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.65);">
-                        <div class="scorebar-fill" id="gdScoreFill" style="position: absolute; inset: 0; width: 0%; background: linear-gradient(90deg, rgba(170, 220, 255, 0.9), rgba(255, 226, 140, 0.9)); filter: blur(0px);"></div>
-                        <div class="scorebar-text" style="position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; font-weight: 800; letter-spacing: 0.2px; color: rgba(255, 255, 255, 0.9); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);">
-                            <span id="gdScoreText">0%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Customize Panel -->
-            <div id="gdCustomPanel" class="panel hidden" role="dialog" aria-modal="true" aria-label="Customize" style="position: fixed; inset: 0; display: none; place-items: center; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(10px); pointer-events: auto; z-index: 10002;">
-                <div class="panel-inner" style="width: min(520px, calc(100vw - 24px)); border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.85); padding: 16px; box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);">
-                    <div class="panel-title" style="font-weight: 800; letter-spacing: 0.2px; margin: 2px 2px 12px 2px; color: rgba(255, 255, 255, 0.92);">Customize</div>
-                    <div class="panel-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <label class="field" style="display: grid; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.78);">
-                            <span>Tightness</span>
-                            <select id="gdTightnessSelect" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.92); outline: none;">
-                                <option value="0.85">0.85 (Wide)</option>
-                                <option value="1.00" selected>1.00 (Normal)</option>
-                                <option value="1.15">1.15 (Tight)</option>
-                                <option value="1.30">1.30 (Very tight)</option>
-                                <option value="1.45">1.45 (Insane)</option>
-                            </select>
-                        </label>
-                        <label class="field" style="display: grid; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.78);">
-                            <span>Difficulty (base speed)</span>
-                            <select id="gdBaseSpeedSelect" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.92); outline: none;">
-                                <option value="0.25">0.25x (Baby)</option>
-                                <option value="0.80">0.80x (Easy)</option>
-                                <option value="1.00" selected>1.00x (Normal)</option>
-                                <option value="1.20">1.20x (Hard)</option>
-                                <option value="1.40">1.40x (Insane)</option>
-                                <option value="1.60">1.60x (Demon)</option>
-                            </select>
-                        </label>
-                        <label class="field" style="display: grid; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.78);">
-                            <span>Mode</span>
-                            <select id="gdOgModeSelect" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.92); outline: none;">
-                                <option value="off" selected>Modern (All sections)</option>
-                                <option value="on">OG (No generated sections)</option>
-                            </select>
-                        </label>
-                        <label class="field" style="display: grid; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.78);">
-                            <span>Skin</span>
-                            <select id="gdSkinSelect" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.92); outline: none;">
-                                <option value="classic">Classic</option>
-                                <option value="outline">Outline</option>
-                                <option value="neon">Neon</option>
-                            </select>
-                        </label>
-                        <label class="field" style="display: grid; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.78);">
-                            <span>Primary</span>
-                            <input id="gdPrimaryColor" type="color" value="#dcfaff" style="width: 100%; padding: 6px; height: 42px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.06); outline: none;" />
-                        </label>
-                        <label class="field" style="display: grid; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.78);">
-                            <span>Accent (Dual)</span>
-                            <input id="gdAccentColor" type="color" value="#ffe6ff" style="width: 100%; padding: 6px; height: 42px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.06); outline: none;" />
-                        </label>
-                        <label class="field" style="display: grid; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.78);">
-                            <span>Trail</span>
-                            <input id="gdTrailColor" type="color" value="#d2f5ff" style="width: 100%; padding: 6px; height: 42px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.06); outline: none;" />
-                        </label>
-                    </div>
-                    <div class="panel-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
-                        <button class="pill pill-button" id="gdCustomReset" type="button" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Reset</button>
-                        <button class="pill pill-button" id="gdCustomClose" type="button" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Close</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Sections Panel -->
-            <div id="gdSectionsPanel" class="panel hidden" role="dialog" aria-modal="true" aria-label="Sections" style="position: fixed; inset: 0; display: none; place-items: center; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(10px); pointer-events: auto; z-index: 10002;">
-                <div class="panel-inner panel-inner-wide" style="width: min(720px, calc(100vw - 24px)); border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.85); padding: 16px; box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);">
-                    <div class="panel-title" style="font-weight: 800; letter-spacing: 0.2px; margin: 2px 2px 12px 2px; color: rgba(255, 255, 255, 0.92);">Pick Sections</div>
-                    <div class="panel-sub" style="margin: -6px 2px 12px 2px; font-size: 13px; color: rgba(255, 255, 255, 0.68);">Choose what zones/sections can appear. Each one has a different mechanic.</div>
-                    <div class="sections-actions" style="display: flex; gap: 10px; margin: 6px 0 12px 0; flex-wrap: wrap;">
-                        <button class="pill pill-button" id="gdSectionsAll" type="button" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">All</button>
-                        <button class="pill pill-button" id="gdSectionsNone" type="button" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">None</button>
-                        <button class="pill pill-button" id="gdSectionsDefaults" type="button" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Defaults</button>
-                    </div>
-                    <div id="gdSectionsList" class="sections-list" aria-label="Sections list" style="max-height: min(52vh, 520px); overflow: auto; padding: 6px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04);"></div>
-                    <div class="panel-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
-                        <button class="pill pill-button" id="gdSectionsPlay" type="button" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Play</button>
-                        <button class="pill pill-button" id="gdSectionsClose" type="button" style="pointer-events: auto; cursor: pointer; user-select: none; appearance: none; font: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(10, 14, 24, 0.7); backdrop-filter: blur(8px); color: rgba(255, 255, 255, 0.9); font-size: 13px;">Close</button>
                     </div>
                 </div>
             </div>
@@ -2859,21 +2778,6 @@
                 }
             }
             
-            const geometryDashBtn = document.getElementById('geometryDashBtn');
-            if (geometryDashBtn) {
-                const requiredThemes = ['clicker100', 'minesweeper', 'godclicker', 'snake'];
-                const allThemesUnlocked = requiredThemes.every(theme => unlockedThemes.has(theme));
-                
-                if (allThemesUnlocked) {
-                    geometryDashBtn.classList.remove('locked');
-                    geometryDashBtn.onclick = toggleGeometryDash;
-                } else {
-                    geometryDashBtn.classList.add('locked');
-                    geometryDashBtn.onclick = () => {
-                        alert('Unlock all themes to play Geometry Dash!\n\nRequired themes:\n- Clicker 100 (100 clicks)\n- Minesweeper (win minesweeper)\n- God Clicker (10k clicks)\n- Snake (win snake game)');
-                    };
-                }
-            }
         }
         
         function unlockTexture(texture) {
@@ -4832,54 +4736,6 @@
         
         let hasWonSnake = false;
         
-        function toggleGeometryDash() {
-            // Check if all themes are unlocked
-            const requiredThemes = ['clicker100', 'minesweeper', 'godclicker', 'snake'];
-            const allThemesUnlocked = requiredThemes.every(theme => unlockedThemes.has(theme));
-            
-            if (!allThemesUnlocked) {
-                alert('Unlock all themes to play Geometry Dash!\n\nRequired themes:\n- Clicker 100 (100 clicks)\n- Minesweeper (win minesweeper)\n- God Clicker (10k clicks)\n- Snake (win snake game)');
-                return;
-            }
-            
-            const gd = document.getElementById('geometryDashContainer');
-            const chat = document.getElementById('globalChat');
-            const friends = document.getElementById('friendsContainer');
-            const paint = document.getElementById('paintContainer');
-            const clicker = document.getElementById('clickerContainer');
-            const minesweeper = document.getElementById('minesweeperContainer');
-            const snake = document.getElementById('snakeContainer');
-            const themes = document.getElementById('themeContainer');
-            const profile = document.getElementById('profileContainer');
-            const notifications = document.getElementById('notificationsContainer');
-            
-            if (gd.style.display === 'block' || gd.style.display === '') {
-                gd.style.display = 'none';
-                if (window.gdGame && window.gdGame.running) {
-                    window.gdGame.running = false;
-                }
-            } else {
-                gd.style.display = 'block';
-                chat.classList.remove('active');
-                friends.classList.remove('active');
-                paint.classList.remove('active');
-                clicker.classList.remove('active');
-                minesweeper.classList.remove('active');
-                snake.classList.remove('active');
-                themes.classList.remove('active');
-                if (profile) profile.style.display = 'none';
-                if (notifications) notifications.style.display = 'none';
-                
-                // Initialize game if not already initialized
-                if (!window.gdGameInitialized) {
-                    initGeometryDashGame();
-                    window.gdGameInitialized = true;
-                } else if (window.gdGame) {
-                    window.gdGame.running = true;
-                }
-            }
-        }
-        
         function toggleSnake() {
             const snake = document.getElementById('snakeContainer');
             const chat = document.getElementById('globalChat');
@@ -4888,8 +4744,6 @@
             const clicker = document.getElementById('clickerContainer');
             const minesweeper = document.getElementById('minesweeperContainer');
             const themes = document.getElementById('themeContainer');
-            const gd = document.getElementById('geometryDashContainer');
-            
             if (snake.classList.contains('active')) {
                 snake.classList.remove('active');
                 stopSnakeGame();
@@ -4897,7 +4751,6 @@
                 snake.classList.add('active');
                 chat.classList.remove('active');
                 friends.classList.remove('active');
-                if (gd) gd.style.display = 'none';
                 paint.classList.remove('active');
                 clicker.classList.remove('active');
                 minesweeper.classList.remove('active');
@@ -6467,45 +6320,6 @@
         // This is a self-contained Geometry Dash Wave game
         // Adapted from the original game files
         
-        function initGeometryDashGame() {
-            // Only initialize if not already initialized
-            if (window.gdGameInitialized) return;
-            window.gdGameInitialized = true;
-            
-            // Load the game code from the external file
-            const script = document.createElement('script');
-            script.src = 'geometry-dash-game.js';
-            script.onload = function() {
-                // After the game code loads, we need to adapt all element references
-                // The game code uses getElementById("game") which needs to be "geometryDashCanvas"
-                // And all $ variables need to be adapted to use gd prefixed IDs
-                
-                // The game code should now be loaded and running
-                // We just need to make sure the canvas element ID matches
-                const canvas = document.getElementById('geometryDashCanvas');
-                if (canvas && window.canvas && window.canvas.id !== 'geometryDashCanvas') {
-                    // Update the canvas reference in the game code
-                    window.canvas = canvas;
-                }
-            };
-            script.onerror = function() {
-                console.error('Failed to load Geometry Dash game code');
-                const canvas = document.getElementById('geometryDashCanvas');
-                if (canvas) {
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#0b0f18';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#ff6b6b';
-                    ctx.font = '20px system-ui';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Failed to load game code.\\nPlease ensure geometry-dash-game.js is in the same directory.', canvas.width / 2, canvas.height / 2);
-                }
-            };
-            document.head.appendChild(script);
-        }
-        
-        // Geometry Dash game is now integrated into FinHub
-        // Unlock requirement: All themes must be unlocked (clicker100, minesweeper, godclicker, snake)
     </script>
 </body>
 </html>
