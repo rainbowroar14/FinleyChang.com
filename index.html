@@ -345,6 +345,32 @@
             color: #24292f;
         }
         
+        .podium-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 8px;
+            background: #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+        
+        .podium-photo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        body.light-mode .podium-photo {
+            background: #d0d7de;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+        
         .podium-time {
             color: #8b949e;
             font-size: 12px;
@@ -2390,32 +2416,6 @@
             <div class="sidebar-btn" id="themesBtn" onclick="toggleThemes()">🎨 Themes</div>
         </div>
         
-        <!-- Games Folder (iPhone Style) -->
-        <div class="games-folder" id="gamesFolder">
-            <div class="games-folder-header">
-                <h2 class="games-folder-title">🎮 Games</h2>
-                <button class="games-folder-close" onclick="toggleGamesFolder()">✕ Close</button>
-            </div>
-            <div class="games-grid">
-                <div class="game-folder-item" id="paintFolderItem" onclick="openGameFromFolder('paint')">
-                    <div class="game-folder-icon">🎨</div>
-                    <div class="game-folder-name">Paint</div>
-                </div>
-                <div class="game-folder-item" id="clickerFolderItem" onclick="openGameFromFolder('clicker')">
-                    <div class="game-folder-icon">🖱️</div>
-                    <div class="game-folder-name">Clicker</div>
-                </div>
-                <div class="game-folder-item" id="minesweeperFolderItem" onclick="openGameFromFolder('minesweeper')">
-                    <div class="game-folder-icon">💣</div>
-                    <div class="game-folder-name">Minesweeper</div>
-                </div>
-                <div class="game-folder-item" id="snakeFolderItem" onclick="openGameFromFolder('snake')">
-                    <div class="game-folder-icon">🐍</div>
-                    <div class="game-folder-name">Snake</div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Theme Selector -->
         <div class="theme-container" id="themeContainer">
             <div class="game-header">
@@ -2582,7 +2582,13 @@
                 <canvas id="hexagonGameCanvas" width="800" height="600" style="border: 2px solid #30363d; border-radius: 8px; background: #0d1117; display: block; margin: 0 auto;"></canvas>
                 <div class="hexagon-instructions">
                     <p>Use Mouse to move your hexagon</p>
-                    <p>Slap hogs as they run towards you!</p>
+                    <p>Slap red hogs to score! ⚠️ Avoid green hogs - they're deadly!</p>
+                </div>
+                <div class="leaderboard-section" style="margin-top: 20px;">
+                    <h4>Best Scores</h4>
+                    <div class="leaderboard-list" id="hexagonLeaderboard">
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2699,6 +2705,32 @@
         <p class="subtitle">Built with code, powered by Finley</p>
     </div>
     
+    <!-- Games Folder (iPhone Style) - Outside mainPage so it's always accessible -->
+    <div class="games-folder" id="gamesFolder">
+        <div class="games-folder-header">
+            <h2 class="games-folder-title">🎮 Games</h2>
+            <button class="games-folder-close" onclick="toggleGamesFolder()">✕ Close</button>
+        </div>
+        <div class="games-grid">
+            <div class="game-folder-item" id="paintFolderItem" onclick="openGameFromFolder('paint')">
+                <div class="game-folder-icon">🎨</div>
+                <div class="game-folder-name">Paint</div>
+            </div>
+            <div class="game-folder-item" id="clickerFolderItem" onclick="openGameFromFolder('clicker')">
+                <div class="game-folder-icon">🖱️</div>
+                <div class="game-folder-name">Clicker</div>
+            </div>
+            <div class="game-folder-item" id="minesweeperFolderItem" onclick="openGameFromFolder('minesweeper')">
+                <div class="game-folder-icon">💣</div>
+                <div class="game-folder-name">Minesweeper</div>
+            </div>
+            <div class="game-folder-item" id="snakeFolderItem" onclick="openGameFromFolder('snake')">
+                <div class="game-folder-icon">🐍</div>
+                <div class="game-folder-name">Snake</div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
         <h1>Welcome to the home</h1>
@@ -2710,7 +2742,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.3.0';
+        const APP_VERSION = '1.4.5';
         
         // Mouse proximity effect for FINHUB title
         document.addEventListener('DOMContentLoaded', () => {
@@ -3300,8 +3332,11 @@
             } else if (cmd === 'NORMAL') {
                 if (arg === 'color') {
                     handleColorCommand('normal');
-                } else {
+                } else if (arg === 'size') {
                     handleSizeCommand('normal');
+                } else {
+                    // Reset all cosmetics
+                    resetAllCosmetics();
                 }
             } else {
                 alert(`Unknown command: ${cmd}. Try COLOR [color], SMALL, BIG, NORMAL, or RESET`);
@@ -3489,17 +3524,64 @@
                     letter.style.textShadow = '0 0 10px rgba(255, 70, 85, 0.5)';
                 });
             } else if (colorArg === 'landry remix' || colorArg === 'landryremix') {
-                // Landry Remix - turn letters into Among Us characters
+                // Landry Remix - turn letters into Among Us characters (16x16 pixel sprites)
                 const originalLetters = ['F', 'I', 'N', 'H', 'U', 'B'];
-                const amongUsChars = ['🔴', '🟢', '🔵', '🟡', '🟣', '🟠'];
+                const amongUsColors = [
+                    '#ff0000', // Red
+                    '#00ff00', // Green
+                    '#0000ff', // Blue
+                    '#ffff00', // Yellow
+                    '#ff00ff', // Purple/Magenta
+                    '#ff8800'  // Orange
+                ];
+                
                 letters.forEach((letter, index) => {
                     // Store original letter if not already stored
                     if (!letter.dataset.originalLetter) {
                         letter.dataset.originalLetter = letter.textContent;
                     }
-                    letter.textContent = amongUsChars[index % amongUsChars.length];
-                    letter.style.fontSize = '72px';
+                    
+                    // Create 16x16 pixel sprite canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 16;
+                    canvas.height = 16;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Draw Among Us character (16x16 pixel art)
+                    const color = amongUsColors[index % amongUsColors.length];
+                    
+                    // Body (main shape)
+                    ctx.fillStyle = color;
+                    // Head (top part)
+                    ctx.fillRect(4, 2, 8, 6);
+                    // Body (bottom part - wider)
+                    ctx.fillRect(3, 7, 10, 7);
+                    // Legs
+                    ctx.fillRect(4, 13, 3, 3);
+                    ctx.fillRect(9, 13, 3, 3);
+                    
+                    // Backpack
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(2, 7, 2, 6);
+                    
+                    // Visor (white/light)
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(5, 3, 6, 3);
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(6, 4, 4, 1);
+                    
+                    // Convert canvas to data URL and set as background
+                    const dataUrl = canvas.toDataURL();
+                    letter.innerHTML = '';
+                    letter.style.backgroundImage = `url(${dataUrl})`;
+                    letter.style.backgroundSize = 'contain';
+                    letter.style.backgroundRepeat = 'no-repeat';
+                    letter.style.backgroundPosition = 'center';
+                    letter.style.width = '72px';
+                    letter.style.height = '72px';
+                    letter.style.display = 'inline-block';
                     letter.style.color = 'transparent';
+                    letter.style.fontSize = '0';
                 });
             } else if (colorArg === 'minecraft') {
                 // Minecraft colors - green and brown
@@ -3634,6 +3716,35 @@
                     letter.style.fontSize = '72px';
                 });
                 // Don't mark as changed when resetting to normal
+            }
+        }
+        
+        // Reset all cosmetics (color, size, theme, 67 mode)
+        function resetAllCosmetics() {
+            // Reset logo color
+            handleColorCommand('normal');
+            
+            // Reset logo size
+            handleSizeCommand('normal');
+            
+            // Reset theme to default
+            if (currentTheme && currentTheme !== 'default') {
+                applyTheme('default');
+            }
+            
+            // Reset 67 mode (already handled in handleColorCommand('normal'))
+            is67Theme = false;
+            
+            // Remove any extra letters added by 41 command
+            const titleContainer = document.getElementById('finhubTitle');
+            if (titleContainer) {
+                const letters = titleContainer.querySelectorAll('.title-letter');
+                // Remove any letters beyond the original 6
+                if (letters.length > 6) {
+                    for (let i = 6; i < letters.length; i++) {
+                        letters[i].remove();
+                    }
+                }
             }
         }
         
@@ -4239,6 +4350,7 @@
                 } else {
                     container.classList.add('active');
                     initHexagonGame();
+                    loadHexagonLeaderboard();
                 }
             }
         }
@@ -4306,12 +4418,16 @@
                         break;
                 }
                 
+                // 15% chance to spawn a green (deadly) hog
+                const isGreenHog = Math.random() < 0.15;
+                
                 hogs.push({
                     x: x,
                     y: y,
                     size: 25,
-                    speed: 1 + Math.random() * 2,
-                    angle: Math.atan2(player.y - y, player.x - x)
+                    speed: isGreenHog ? 0.5 + Math.random() * 0.5 : 1 + Math.random() * 2, // Green hogs are slower
+                    angle: Math.atan2(player.y - y, player.x - x),
+                    isGreen: isGreenHog // Mark as green/deadly
                 });
             }
             
@@ -4350,11 +4466,18 @@
                     // Check collision with player
                     const hogDist = Math.sqrt((hog.x - player.x) ** 2 + (hog.y - player.y) ** 2);
                     if (hogDist < player.size + hog.size) {
-                        // Hog slapped!
-                        hogs.splice(index, 1);
-                        hexagonScore += 10;
-                        hexagonHogsSlapped++;
-                        updateHexagonScore();
+                        if (hog.isGreen) {
+                            // Green hog = death!
+                            gameRunning = false;
+                            gameOver();
+                            return;
+                        } else {
+                            // Red hog = score!
+                            hogs.splice(index, 1);
+                            hexagonScore += 10;
+                            hexagonHogsSlapped++;
+                            updateHexagonScore();
+                        }
                     }
                     
                     // Remove hogs that are too far
@@ -4392,7 +4515,8 @@
                 
                 // Draw hogs
                 hogs.forEach(hog => {
-                    ctx.fillStyle = '#ff6b6b';
+                    // Green hogs are deadly, red hogs are safe
+                    ctx.fillStyle = hog.isGreen ? '#00ff00' : '#ff6b6b';
                     ctx.beginPath();
                     ctx.arc(hog.x, hog.y, hog.size, 0, Math.PI * 2);
                     ctx.fill();
@@ -4402,6 +4526,15 @@
                     ctx.fillRect(hog.x - 8, hog.y - 5, 4, 4); // Left eye
                     ctx.fillRect(hog.x + 4, hog.y - 5, 4, 4); // Right eye
                     ctx.fillRect(hog.x - 4, hog.y + 2, 8, 4); // Snout
+                    
+                    // Add warning indicator for green hogs
+                    if (hog.isGreen) {
+                        ctx.strokeStyle = '#ffff00';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.arc(hog.x, hog.y, hog.size + 5, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
                 });
             }
             
@@ -4426,6 +4559,75 @@
                 // Unlock grassland theme
                 unlockTheme('grassland');
             }
+            
+            // Load leaderboard
+            loadHexagonLeaderboard();
+        }
+        
+        function gameOver() {
+            // Save score to leaderboard
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (username && usernameLower && database && hexagonScore > 0) {
+                writeToFirebase(`hexagonScores/${usernameLower}`, {
+                    username: username,
+                    usernameLower: usernameLower,
+                    score: hexagonScore,
+                    hogsSlapped: hexagonHogsSlapped,
+                    timestamp: Date.now()
+                }).catch(err => {
+                    console.error('Error saving hexagon score:', err);
+                });
+            }
+            
+            // Show game over message
+            alert(`Game Over! Final Score: ${hexagonScore}\nHogs Slapped: ${hexagonHogsSlapped}`);
+            
+            // Reload leaderboard
+            loadHexagonLeaderboard();
+        }
+        
+        function loadHexagonLeaderboard() {
+            if (!database) return;
+            
+            const leaderboard = document.getElementById('hexagonLeaderboard');
+            if (!leaderboard) return;
+            
+            leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase('hexagonScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    return;
+                }
+                
+                const scoreArray = Object.values(scores)
+                    .filter(entry => entry && entry.username)
+                    .sort((a, b) => (b.score || 0) - (a.score || 0))
+                    .slice(0, 10);
+                
+                leaderboard.innerHTML = '';
+                if (scoreArray.length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No valid scores yet!</p>';
+                    return;
+                }
+                
+                scoreArray.forEach((entry, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'leaderboard-item';
+                    const displayName = entry.username || entry.usernameLower || 'Unknown';
+                    div.innerHTML = `
+                        <span class="rank">#${index + 1}</span>
+                        <span class="username">${displayName}</span>
+                        <span class="score">${entry.score || 0} (${entry.hogsSlapped || 0} hogs)</span>
+                    `;
+                    leaderboard.appendChild(div);
+                });
+            }).catch(err => {
+                console.error('Error loading hexagon leaderboard:', err);
+                leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
         }
         
         function stopHexagonGame() {
@@ -6899,27 +7101,64 @@
             const hog = document.createElement('div');
             hog.className = 'grassland-hog';
             hog.style.position = 'absolute';
-            hog.style.width = '40px';
-            hog.style.height = '40px';
-            hog.style.left = Math.random() * (window.innerWidth - 40) + 'px';
-            hog.style.top = Math.random() * (window.innerHeight - 40) + 'px';
-            hog.style.fontSize = '40px';
+            hog.style.width = '16px';
+            hog.style.height = '16px';
+            hog.style.left = Math.random() * (window.innerWidth - 16) + 'px';
+            hog.style.top = Math.random() * (window.innerHeight - 16) + 'px';
             hog.style.zIndex = '3';
             hog.style.cursor = 'pointer';
             hog.style.transition = 'transform 0.2s';
             hog.style.imageRendering = 'pixelated';
-            hog.textContent = '🐷';
-            
-            // Pixelated style
-            hog.style.imageRendering = 'pixelated';
             hog.style.imageRendering = '-moz-crisp-edges';
             hog.style.imageRendering = 'crisp-edges';
             
+            // Create 16x16 pixel sprite canvas for hog
+            const canvas = document.createElement('canvas');
+            canvas.width = 16;
+            canvas.height = 16;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw hog (16x16 pixel art)
+            // Body (pink)
+            ctx.fillStyle = '#ffb6c1';
+            ctx.fillRect(3, 4, 10, 8);
+            // Head
+            ctx.fillRect(5, 2, 6, 4);
+            // Snout
+            ctx.fillRect(7, 6, 4, 3);
+            // Ears
+            ctx.fillRect(4, 1, 2, 2);
+            ctx.fillRect(10, 1, 2, 2);
+            // Eyes (black)
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(6, 3, 1, 1);
+            ctx.fillRect(9, 3, 1, 1);
+            // Nose (dark pink)
+            ctx.fillStyle = '#ff69b4';
+            ctx.fillRect(7, 7, 2, 1);
+            // Legs
+            ctx.fillStyle = '#ffb6c1';
+            ctx.fillRect(4, 11, 2, 3);
+            ctx.fillRect(6, 11, 2, 3);
+            ctx.fillRect(8, 11, 2, 3);
+            ctx.fillRect(10, 11, 2, 3);
+            // Tail (curved)
+            ctx.fillRect(12, 8, 2, 1);
+            ctx.fillRect(13, 9, 1, 1);
+            
+            // Convert canvas to data URL and set as background
+            const dataUrl = canvas.toDataURL();
+            hog.style.backgroundImage = `url(${dataUrl})`;
+            hog.style.backgroundSize = 'contain';
+            hog.style.backgroundRepeat = 'no-repeat';
+            hog.style.backgroundPosition = 'center';
+            hog.style.transform = 'scale(2)'; // Scale up 2x for visibility (32x32 display)
+            
             // Make hog interactive
             hog.onclick = () => {
-                hog.style.transform = 'scale(1.5) rotate(360deg)';
+                hog.style.transform = 'scale(3) rotate(360deg)';
                 setTimeout(() => {
-                    hog.style.transform = '';
+                    hog.style.transform = 'scale(2)';
                 }, 500);
             };
             
@@ -6940,11 +7179,11 @@
                 x += Math.cos(direction) * speed;
                 y += Math.sin(direction) * speed;
                 
-                // Bounce off edges
-                if (x < 0 || x > window.innerWidth - 40) {
+                // Bounce off edges (accounting for 2x scale, so 32px effective size)
+                if (x < 0 || x > window.innerWidth - 32) {
                     direction = Math.PI - direction;
                 }
-                if (y < 0 || y > window.innerHeight - 40) {
+                if (y < 0 || y > window.innerHeight - 32) {
                     direction = -direction;
                 }
                 
@@ -7312,71 +7551,87 @@
                     }
                 }
                 
-                // Render podium
-                podium.innerHTML = '';
+                // Load profile photos for top 3
+                const loadProfilePhotos = async () => {
+                    const photos = {};
+                    for (const entry of top3) {
+                        try {
+                            const profile = await readFromFirebase(`users/${entry.usernameLower}/profile`);
+                            if (profile && profile.photoUrl) {
+                                photos[entry.usernameLower] = profile.photoUrl;
+                            }
+                        } catch (err) {
+                            // No photo available
+                        }
+                    }
+                    return photos;
+                };
                 
-                // Second place (left)
-                if (top3[1]) {
-                    const item = document.createElement('div');
-                    item.className = 'podium-item';
-                    item.innerHTML = `
-                        <div class="podium-stand second">2</div>
-                        <div class="podium-username">${top3[1].username}</div>
-                        <div class="podium-time">${formatTime(top3[1].timeSpent)}</div>
-                    `;
-                    podium.appendChild(item);
-                } else {
-                    const item = document.createElement('div');
-                    item.className = 'podium-item';
-                    item.innerHTML = `
-                        <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
-                        <div class="podium-username" style="color: #8b949e;">-</div>
-                        <div class="podium-time">-</div>
-                    `;
-                    podium.appendChild(item);
-                }
-                
-                // First place (center)
-                if (top3[0]) {
-                    const item = document.createElement('div');
-                    item.className = 'podium-item';
-                    item.innerHTML = `
-                        <div class="podium-stand first">1</div>
-                        <div class="podium-username">${top3[0].username}</div>
-                        <div class="podium-time">${formatTime(top3[0].timeSpent)}</div>
-                    `;
-                    podium.appendChild(item);
-                } else {
-                    const item = document.createElement('div');
-                    item.className = 'podium-item';
-                    item.innerHTML = `
-                        <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
-                        <div class="podium-username" style="color: #8b949e;">-</div>
-                        <div class="podium-time">-</div>
-                    `;
-                    podium.appendChild(item);
-                }
-                
-                // Third place (right)
-                if (top3[2]) {
-                    const item = document.createElement('div');
-                    item.className = 'podium-item';
-                    item.innerHTML = `
-                        <div class="podium-stand third">3</div>
-                        <div class="podium-username">${top3[2].username}</div>
-                        <div class="podium-time">${formatTime(top3[2].timeSpent)}</div>
-                    `;
-                    podium.appendChild(item);
-                } else {
-                    const item = document.createElement('div');
-                    item.className = 'podium-item';
-                    item.innerHTML = `
-                        <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
-                        <div class="podium-username" style="color: #8b949e;">-</div>
-                        <div class="podium-time">-</div>
-                    `;
-                    podium.appendChild(item);
-                }
+                // Render podium with photos
+                loadProfilePhotos().then((photos) => {
+                    podium.innerHTML = '';
+                    
+                    // Helper function to create podium item with photo
+                    function createPodiumItem(entry, rank, standClass, rankNum) {
+                        const item = document.createElement('div');
+                        item.className = 'podium-item';
+                        
+                        const photoUrl = photos[entry.usernameLower];
+                        const photoHtml = photoUrl 
+                            ? `<div class="podium-photo"><img src="${photoUrl}" alt="${entry.username}"></div>`
+                            : `<div class="podium-photo">👤</div>`;
+                        
+                        item.innerHTML = `
+                            ${photoHtml}
+                            <div class="podium-stand ${standClass}">${rankNum}</div>
+                            <div class="podium-username">${entry.username}</div>
+                            <div class="podium-time">${formatTime(entry.timeSpent)}</div>
+                        `;
+                        return item;
+                    }
+                    
+                    // Second place (left)
+                    if (top3[1]) {
+                        podium.appendChild(createPodiumItem(top3[1], 2, 'second', '2'));
+                    } else {
+                        const item = document.createElement('div');
+                        item.className = 'podium-item';
+                        item.innerHTML = `
+                            <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
+                            <div class="podium-username" style="color: #8b949e;">-</div>
+                            <div class="podium-time">-</div>
+                        `;
+                        podium.appendChild(item);
+                    }
+                    
+                    // First place (center)
+                    if (top3[0]) {
+                        podium.appendChild(createPodiumItem(top3[0], 1, 'first', '1'));
+                    } else {
+                        const item = document.createElement('div');
+                        item.className = 'podium-item';
+                        item.innerHTML = `
+                            <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
+                            <div class="podium-username" style="color: #8b949e;">-</div>
+                            <div class="podium-time">-</div>
+                        `;
+                        podium.appendChild(item);
+                    }
+                    
+                    // Third place (right)
+                    if (top3[2]) {
+                        podium.appendChild(createPodiumItem(top3[2], 3, 'third', '3'));
+                    } else {
+                        const item = document.createElement('div');
+                        item.className = 'podium-item';
+                        item.innerHTML = `
+                            <div class="podium-stand" style="height: 70px; background: rgba(22, 27, 34, 0.5);">-</div>
+                            <div class="podium-username" style="color: #8b949e;">-</div>
+                            <div class="podium-time">-</div>
+                        `;
+                        podium.appendChild(item);
+                    }
+                });
             }).catch(err => {
                 console.error('Error loading time leaderboard:', err);
                 podium.innerHTML = '<p style="color: #f85149; text-align: center; padding: 20px;">Error loading leaderboard</p>';
@@ -7389,11 +7644,12 @@
         
         function toggleGamesFolder() {
             const folder = document.getElementById('gamesFolder');
-            if (folder.classList.contains('active')) {
-                folder.classList.remove('active');
-            } else {
-                folder.classList.add('active');
+            if (!folder) {
+                console.error('Games folder element not found');
+                return;
             }
+            // Toggle the active class
+            folder.classList.toggle('active');
         }
         
         function openGameFromFolder(gameName) {
@@ -7423,10 +7679,16 @@
         // Close games folder when clicking outside
         document.addEventListener('click', (e) => {
             const folder = document.getElementById('gamesFolder');
+            const gamesBtn = document.getElementById('gamesBtn');
+            
+            // Don't do anything if clicking the games button (it has its own handler)
+            if (gamesBtn && (gamesBtn.contains(e.target) || e.target === gamesBtn)) {
+                return;
+            }
+            
             if (folder && folder.classList.contains('active')) {
-                const folderContent = folder.querySelector('.games-grid');
-                const folderHeader = folder.querySelector('.games-folder-header');
-                if (!folder.contains(e.target) || e.target === folder) {
+                // Only close if clicking on the backdrop (the folder itself, not its children)
+                if (e.target === folder) {
                     toggleGamesFolder();
                 }
             }
