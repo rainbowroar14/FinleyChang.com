@@ -2707,6 +2707,7 @@
                     🔔 Notifications
                     <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
                 </button>
+                <button class="top-bar-btn" id="adminBtn" onclick="toggleAdminPanel()" title="Admin Panel" style="display: none; background: #f85149;">🔧 Admin</button>
             </div>
             <div class="top-bar-right">
             </div>
@@ -3170,8 +3171,7 @@
                         </div>
                         <div class="snake-instructions">
                             <p><strong>Controls:</strong></p>
-                            <p>W / ↑ - Move Up</p>
-                            <p>S / ↓ - Move Down</p>
+                            <p>Move your mouse to control the paddle</p>
                             <p>Score 10 points to unlock theme!</p>
                         </div>
                     </div>
@@ -3241,6 +3241,59 @@
                         <h4>Your Friends</h4>
                         <div id="profileFriendsList" class="profile-friends-list">
                             <p style="color: #8b949e; text-align: center; padding: 20px;">Loading friends...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Admin Panel -->
+        <div class="game-container" id="adminPanel" style="display: none;">
+            <div class="game-header">
+                <h3>🔧 Admin Panel</h3>
+                <button class="close-btn" onclick="toggleAdminPanel()">×</button>
+            </div>
+            <div class="game-content">
+                <div style="padding: 20px;">
+                    <h4 style="color: #f85149; margin-bottom: 20px;">⚠️ Admin Controls</h4>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <h5>Message Management</h5>
+                            <button class="profile-btn" onclick="adminDeleteAllMessages()" style="background: #f85149;">🗑️ Delete All Messages</button>
+                            <button class="profile-btn" onclick="adminViewAllMessages()" style="margin-left: 10px;">📋 View All Messages</button>
+                        </div>
+                        
+                        <div>
+                            <h5>User Management</h5>
+                            <button class="profile-btn" onclick="adminViewAllUsers()" style="background: #58a6ff;">👥 View All Users</button>
+                            <button class="profile-btn" onclick="adminResetAllClicks()" style="background: #f85149; margin-left: 10px;">🔄 Reset All Clicks to 0</button>
+                        </div>
+                        
+                        <div>
+                            <h5>Leaderboard Management</h5>
+                            <button class="profile-btn" onclick="adminResetClickerLeaderboard()" style="background: #f85149;">🖱️ Reset Clicker Leaderboard</button>
+                            <button class="profile-btn" onclick="adminResetAllLeaderboards()" style="background: #f85149; margin-left: 10px;">💥 Reset ALL Leaderboards</button>
+                        </div>
+                        
+                        <div>
+                            <h5>System Actions</h5>
+                            <button class="profile-btn" onclick="adminSendSystemMessage()" style="background: #3fb950;">📢 Send System Message</button>
+                            <button class="profile-btn" onclick="adminAnnouncement()" style="background: #ffa657; margin-left: 10px;">📣 Create Announcement</button>
+                        </div>
+                        
+                        <div>
+                            <h5>Goofy Stuff</h5>
+                            <button class="profile-btn" onclick="adminRainbowMode()" style="background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);">🌈 Enable Rainbow Mode</button>
+                            <button class="profile-btn" onclick="adminSpawnCookies()" style="background: #8b4513; margin-left: 10px;">🍪 Spawn Cookie Storm</button>
+                            <button class="profile-btn" onclick="adminPartyMode()" style="background: #ff00ff; margin-left: 10px;">🎉 Party Mode</button>
+                        </div>
+                    </div>
+                    
+                    <div id="adminLog" style="margin-top: 20px; padding: 15px; background: #161b22; border-radius: 8px; max-height: 300px; overflow-y: auto;">
+                        <h5 style="margin-top: 0;">Admin Log</h5>
+                        <div id="adminLogContent" style="color: #8b949e; font-size: 12px;">
+                            <p>Admin panel ready. Actions will be logged here.</p>
                         </div>
                     </div>
                 </div>
@@ -3340,7 +3393,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.9.9';
+        const APP_VERSION = '2.0.1';
         
         // ============================================
         // SOUND EFFECTS SYSTEM
@@ -4838,14 +4891,38 @@
             const container = document.getElementById('chatMessages');
             const div = document.createElement('div');
             div.className = 'chat-message';
+            div.dataset.messageId = message.id;
             const date = new Date(message.timestamp);
+            
+            let deleteBtn = '';
+            if (isAdmin()) {
+                deleteBtn = `<button onclick="adminDeleteMessage('${message.id}')" style="float: right; background: #f85149; color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; margin-left: 5px;">🗑️</button>`;
+            }
+            
             div.innerHTML = `
                 <span class="username">${message.username}:</span>
                 <span class="text">${message.text}</span>
                 <div class="timestamp">${date.toLocaleTimeString()}</div>
+                ${deleteBtn}
             `;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
+        }
+        
+        function adminDeleteMessage(messageId) {
+            if (!isAdmin() || !database) return;
+            
+            if (confirm('Delete this message?')) {
+                deleteFromFirebase(`messages/${messageId}`).then(() => {
+                    adminLog(`Deleted message ${messageId}`, 'success');
+                    playSuccessSound();
+                    // Reload chat
+                    loadGlobalChat();
+                }).catch(err => {
+                    adminLog('❌ Error deleting message: ' + err.message, 'error');
+                    playErrorSound();
+                });
+            }
         }
         
         // Send Friend Request
@@ -8988,16 +9065,17 @@
             aiY: 150,
             ballX: 300,
             ballY: 200,
-            ballSpeedX: 5,
-            ballSpeedY: 3,
+            ballSpeedX: 3,
+            ballSpeedY: 2,
             playerScore: 0,
             aiScore: 0,
             paddleHeight: 80,
             paddleWidth: 10,
-            ballSize: 10,
+            ballSize: 18,
             keys: {},
             running: false,
-            animationId: null
+            animationId: null,
+            mouseY: 0
         };
         
         function togglePong() {
@@ -9046,27 +9124,25 @@
             pongGame.aiY = pongGame.canvas.height / 2 - pongGame.paddleHeight / 2;
             pongGame.ballX = pongGame.canvas.width / 2;
             pongGame.ballY = pongGame.canvas.height / 2;
-            pongGame.ballSpeedX = 5;
-            pongGame.ballSpeedY = 3;
+            pongGame.ballSpeedX = 3;
+            pongGame.ballSpeedY = 2;
             pongGame.playerScore = 0;
             pongGame.aiScore = 0;
             pongGame.keys = {};
+            pongGame.mouseY = pongGame.canvas.height / 2;
             
-            // Set up event listeners
-            document.addEventListener('keydown', handlePongKeyDown);
-            document.addEventListener('keyup', handlePongKeyUp);
+            // Set up mouse tracking
+            pongGame.canvas.addEventListener('mousemove', handlePongMouseMove);
             
             startPongGame();
         }
         
-        function handlePongKeyDown(e) {
-            if (!pongGame.running) return;
-            pongGame.keys[e.key.toLowerCase()] = true;
-        }
-        
-        function handlePongKeyUp(e) {
-            if (!pongGame.running) return;
-            pongGame.keys[e.key.toLowerCase()] = false;
+        function handlePongMouseMove(e) {
+            if (!pongGame.running || !pongGame.canvas) return;
+            
+            const canvasRect = pongGame.canvas.getBoundingClientRect();
+            const mouseY = e.clientY - canvasRect.top;
+            pongGame.mouseY = mouseY;
         }
         
         function startPongGame() {
@@ -9081,8 +9157,9 @@
                 cancelAnimationFrame(pongGame.animationId);
                 pongGame.animationId = null;
             }
-            document.removeEventListener('keydown', handlePongKeyDown);
-            document.removeEventListener('keyup', handlePongKeyUp);
+            if (pongGame.canvas) {
+                pongGame.canvas.removeEventListener('mousemove', handlePongMouseMove);
+            }
         }
         
         function pongGameLoop() {
@@ -9095,13 +9172,9 @@
         }
         
         function updatePong() {
-            // Player movement
-            if (pongGame.keys['w'] || pongGame.keys['arrowup']) {
-                pongGame.playerY -= 7;
-            }
-            if (pongGame.keys['s'] || pongGame.keys['arrowdown']) {
-                pongGame.playerY += 7;
-            }
+            // Player movement - follow mouse
+            const targetY = pongGame.mouseY - pongGame.paddleHeight / 2;
+            pongGame.playerY = targetY;
             
             // Keep player paddle in bounds
             if (pongGame.playerY < 0) pongGame.playerY = 0;
@@ -9199,8 +9272,8 @@
         function resetPongBall() {
             pongGame.ballX = pongGame.canvas.width / 2;
             pongGame.ballY = pongGame.canvas.height / 2;
-            pongGame.ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * 5;
-            pongGame.ballSpeedY = (Math.random() > 0.5 ? 1 : -1) * 3;
+            pongGame.ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * 3;
+            pongGame.ballSpeedY = (Math.random() > 0.5 ? 1 : -1) * 2;
         }
         
         function drawPong() {
@@ -12483,6 +12556,9 @@
                 document.getElementById('userInfo').classList.remove('hidden');
                 document.getElementById('loggedInUsername').textContent = username;
                 
+                // Check if user is admin (Finley)
+                checkAdminStatus();
+                
                 // Sync all game data from Firebase
                 syncAllGameData();
                 
@@ -12496,6 +12572,376 @@
                 startFollowedUsersCheck();
             } else {
                 showLoginPage();
+            }
+        }
+        
+        // ============================================
+        // ADMIN PANEL SYSTEM
+        // ============================================
+        
+        const ADMIN_USERNAME = 'Finley';
+        
+        function checkAdminStatus() {
+            const username = localStorage.getItem('loggedInUsername');
+            const adminBtn = document.getElementById('adminBtn');
+            
+            if (adminBtn) {
+                if (username && username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+                    adminBtn.style.display = 'block';
+                } else {
+                    adminBtn.style.display = 'none';
+                }
+            }
+        }
+        
+        function isAdmin() {
+            const username = localStorage.getItem('loggedInUsername');
+            return username && username.toLowerCase() === ADMIN_USERNAME.toLowerCase();
+        }
+        
+        function toggleAdminPanel() {
+            if (!isAdmin()) {
+                alert('Access denied. Admin only.');
+                return;
+            }
+            
+            const panel = document.getElementById('adminPanel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                playOpenSound();
+            } else {
+                panel.style.display = 'none';
+                playCloseSound();
+            }
+        }
+        
+        function adminLog(message, type = 'info') {
+            const logContent = document.getElementById('adminLogContent');
+            if (!logContent) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f85149' : type === 'success' ? '#3fb950' : '#8b949e';
+            const logEntry = document.createElement('p');
+            logEntry.style.color = color;
+            logEntry.style.margin = '5px 0';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContent.appendChild(logEntry);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+        
+        async function adminResetAllClicks() {
+            if (!isAdmin() || !database) return;
+            
+            if (!confirm('⚠️ WARNING: This will reset ALL users\' clicks to 0. This cannot be undone!')) {
+                return;
+            }
+            
+            adminLog('Starting click reset...', 'info');
+            
+            try {
+                // Reset all clicker scores
+                const clickerScores = await readFromFirebase('clickerScores');
+                if (clickerScores) {
+                    for (const [usernameLower, data] of Object.entries(clickerScores)) {
+                        await writeToFirebase(`clickerScores/${usernameLower}/score`, 0);
+                    }
+                    adminLog(`Reset ${Object.keys(clickerScores).length} clicker scores`, 'success');
+                }
+                
+                // Reset all total clicks stats
+                const allUsers = await readFromFirebase('users');
+                if (allUsers) {
+                    let resetCount = 0;
+                    for (const [usernameLower, userData] of Object.entries(allUsers)) {
+                        if (userData && userData.stats) {
+                            await writeToFirebase(`users/${usernameLower}/stats/totalClicks`, 0);
+                            resetCount++;
+                        }
+                    }
+                    adminLog(`Reset total clicks for ${resetCount} users`, 'success');
+                }
+                
+                adminLog('✅ All clicks reset to 0!', 'success');
+                playSuccessSound();
+            } catch (err) {
+                adminLog('❌ Error resetting clicks: ' + err.message, 'error');
+                playErrorSound();
+            }
+        }
+        
+        async function adminDeleteAllMessages() {
+            if (!isAdmin() || !database) return;
+            
+            if (!confirm('⚠️ WARNING: This will delete ALL messages. This cannot be undone!')) {
+                return;
+            }
+            
+            adminLog('Deleting all messages...', 'info');
+            
+            try {
+                await deleteFromFirebase('messages');
+                adminLog('✅ All messages deleted!', 'success');
+                playSuccessSound();
+                
+                // Reload chat if open
+                const chat = document.getElementById('globalChat');
+                if (chat && chat.classList.contains('active')) {
+                    loadGlobalChat();
+                }
+            } catch (err) {
+                adminLog('❌ Error deleting messages: ' + err.message, 'error');
+                playErrorSound();
+            }
+        }
+        
+        async function adminViewAllMessages() {
+            if (!isAdmin() || !database) return;
+            
+            adminLog('Loading all messages...', 'info');
+            
+            try {
+                const messages = await readFromFirebase('messages');
+                if (messages) {
+                    const messageArray = Object.entries(messages)
+                        .map(([id, msg]) => ({ id, ...msg }))
+                        .sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    let messageList = 'All Messages:\n\n';
+                    messageArray.forEach((msg, index) => {
+                        const date = new Date(msg.timestamp);
+                        messageList += `${index + 1}. [${date.toLocaleString()}] ${msg.username}: ${msg.text}\n`;
+                    });
+                    
+                    alert(messageList);
+                    adminLog(`Viewed ${messageArray.length} messages`, 'success');
+                } else {
+                    adminLog('No messages found', 'info');
+                }
+            } catch (err) {
+                adminLog('❌ Error loading messages: ' + err.message, 'error');
+            }
+        }
+        
+        async function adminViewAllUsers() {
+            if (!isAdmin() || !database) return;
+            
+            adminLog('Loading all users...', 'info');
+            
+            try {
+                const users = await readFromFirebase('users');
+                if (users) {
+                    const userList = Object.keys(users).map(usernameLower => {
+                        const user = users[usernameLower];
+                        return user.username || usernameLower;
+                    }).join(', ');
+                    
+                    alert(`All Users (${Object.keys(users).length}):\n\n${userList}`);
+                    adminLog(`Viewed ${Object.keys(users).length} users`, 'success');
+                } else {
+                    adminLog('No users found', 'info');
+                }
+            } catch (err) {
+                adminLog('❌ Error loading users: ' + err.message, 'error');
+            }
+        }
+        
+        async function adminResetClickerLeaderboard() {
+            if (!isAdmin() || !database) return;
+            
+            if (!confirm('⚠️ Reset clicker leaderboard? This cannot be undone!')) {
+                return;
+            }
+            
+            adminLog('Resetting clicker leaderboard...', 'info');
+            
+            try {
+                await deleteFromFirebase('clickerScores');
+                adminLog('✅ Clicker leaderboard reset!', 'success');
+                playSuccessSound();
+            } catch (err) {
+                adminLog('❌ Error resetting leaderboard: ' + err.message, 'error');
+                playErrorSound();
+            }
+        }
+        
+        async function adminResetAllLeaderboards() {
+            if (!isAdmin() || !database) return;
+            
+            if (!confirm('⚠️ WARNING: This will reset ALL leaderboards! This cannot be undone!')) {
+                return;
+            }
+            
+            adminLog('Resetting all leaderboards...', 'info');
+            
+            try {
+                await deleteFromFirebase('clickerScores');
+                await deleteFromFirebase('minesweeperScores');
+                await deleteFromFirebase('snakeScores');
+                await deleteFromFirebase('hexagonScores');
+                await deleteFromFirebase('wordleScores');
+                await deleteFromFirebase('tetrisScores');
+                await deleteFromFirebase('blockBlastScores');
+                await deleteFromFirebase('pongScores');
+                await deleteFromFirebase('timeLeaderboard');
+                
+                adminLog('✅ All leaderboards reset!', 'success');
+                playSuccessSound();
+            } catch (err) {
+                adminLog('❌ Error resetting leaderboards: ' + err.message, 'error');
+                playErrorSound();
+            }
+        }
+        
+        function adminSendSystemMessage() {
+            if (!isAdmin() || !database) return;
+            
+            const message = prompt('Enter system message to send to all users:');
+            if (!message) return;
+            
+            adminLog('Sending system message...', 'info');
+            
+            const messageData = {
+                username: '🔧 System',
+                text: message,
+                timestamp: Date.now()
+            };
+            
+            pushToFirebase('messages', messageData).then(() => {
+                adminLog('✅ System message sent!', 'success');
+                playSuccessSound();
+            }).catch(err => {
+                adminLog('❌ Error sending message: ' + err.message, 'error');
+                playErrorSound();
+            });
+        }
+        
+        function adminAnnouncement() {
+            if (!isAdmin() || !database) return;
+            
+            const message = prompt('Enter announcement message:');
+            if (!message) return;
+            
+            adminLog('Creating announcement...', 'info');
+            
+            // Send as system message and create notification for all users
+            const messageData = {
+                username: '📣 Announcement',
+                text: message,
+                timestamp: Date.now()
+            };
+            
+            pushToFirebase('messages', messageData).then(() => {
+                // Get all users and send them notifications
+                readFromFirebase('users').then(users => {
+                    if (users) {
+                        let notified = 0;
+                        Object.keys(users).forEach(usernameLower => {
+                            addNotificationToUser(usernameLower, `📣 Announcement: ${message}`);
+                            notified++;
+                        });
+                        adminLog(`✅ Announcement sent to ${notified} users!`, 'success');
+                        playSuccessSound();
+                    }
+                });
+            }).catch(err => {
+                adminLog('❌ Error creating announcement: ' + err.message, 'error');
+                playErrorSound();
+            });
+        }
+        
+        function adminRainbowMode() {
+            if (!isAdmin()) return;
+            
+            adminLog('Enabling rainbow mode...', 'info');
+            
+            // Apply rainbow effect to entire page
+            let hue = 0;
+            const rainbowInterval = setInterval(() => {
+                if (!isAdmin()) {
+                    clearInterval(rainbowInterval);
+                    document.body.style.filter = '';
+                    return;
+                }
+                
+                document.body.style.filter = `hue-rotate(${hue}deg)`;
+                hue = (hue + 2) % 360;
+            }, 50);
+            
+            adminLog('🌈 Rainbow mode enabled! (Reload page to disable)', 'success');
+            playSuccessSound();
+        }
+        
+        function adminSpawnCookies() {
+            if (!isAdmin()) return;
+            
+            adminLog('Spawning cookie storm...', 'info');
+            
+            const container = document.getElementById('clickerCookieContainer');
+            if (!container) {
+                adminLog('❌ Clicker game not open', 'error');
+                return;
+            }
+            
+            // Spawn 50 cookies at once
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    spawnClickerCookie();
+                }, i * 50);
+            }
+            
+            adminLog('🍪 Cookie storm spawned!', 'success');
+            playSuccessSound();
+        }
+        
+        let partyModeActive = false;
+        let partyModeInterval = null;
+        
+        function adminPartyMode() {
+            if (!isAdmin()) return;
+            
+            if (partyModeActive) {
+                // Disable party mode
+                partyModeActive = false;
+                if (partyModeInterval) {
+                    clearInterval(partyModeInterval);
+                    partyModeInterval = null;
+                }
+                document.body.style.animation = '';
+                adminLog('🎉 Party mode disabled', 'info');
+            } else {
+                // Enable party mode
+                partyModeActive = true;
+                document.body.style.animation = 'partyPulse 0.5s ease-in-out infinite';
+                
+                // Add party animation
+                if (!document.getElementById('partyModeStyles')) {
+                    const style = document.createElement('style');
+                    style.id = 'partyModeStyles';
+                    style.textContent = `
+                        @keyframes partyPulse {
+                            0%, 100% { 
+                                filter: hue-rotate(0deg) brightness(1);
+                                transform: scale(1);
+                            }
+                            25% { 
+                                filter: hue-rotate(90deg) brightness(1.2);
+                                transform: scale(1.02);
+                            }
+                            50% { 
+                                filter: hue-rotate(180deg) brightness(1.1);
+                                transform: scale(1);
+                            }
+                            75% { 
+                                filter: hue-rotate(270deg) brightness(1.2);
+                                transform: scale(1.02);
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                adminLog('🎉 Party mode enabled!', 'success');
+                playSuccessSound();
             }
         }
         
