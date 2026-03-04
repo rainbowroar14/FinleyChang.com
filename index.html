@@ -2157,6 +2157,15 @@
             transform: scale(0.95);
         }
         
+        @keyframes frenzyPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+        
         /* Leaderboard */
         .leaderboard-section {
             border-top: 1px solid #30363d;
@@ -2926,12 +2935,14 @@
                 <h3>🖱️ Clicker Game</h3>
                 <button class="close-btn" onclick="toggleClicker()">×</button>
             </div>
-            <div class="game-content">
+            <div class="game-content" style="position: relative; overflow: hidden;">
                 <div class="clicker-display">
                     <div class="clicker-score" id="clickerScore">0</div>
                     <button class="clicker-button" id="clickerButton" onclick="clickClicker()">Click Me!</button>
                 </div>
-                <div class="leaderboard-section">
+                <div id="clickerCookieContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></div>
+                <div id="clickerParticleContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3;"></div>
+                <div class="leaderboard-section" style="position: relative; z-index: 2;">
                     <h4>Leaderboard</h4>
                     <div class="leaderboard-list" id="clickerLeaderboard">
                         <p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>
@@ -3329,7 +3340,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '1.9.5';
+        const APP_VERSION = '1.9.9';
         
         // ============================================
         // SOUND EFFECTS SYSTEM
@@ -3631,8 +3642,8 @@
                         }
                     });
                 }
-                // If FINHUB is unlocked, also unlock CHAT
-                if (unlockedFeatures.has(UNLOCK_TYPES.FINHUB) && !unlockedFeatures.has(UNLOCK_TYPES.CHAT)) {
+                // Chat is always unlocked
+                if (!unlockedFeatures.has(UNLOCK_TYPES.CHAT)) {
                     unlockedFeatures.add(UNLOCK_TYPES.CHAT);
                     if (database && usernameLower) {
                         writeToFirebase(`users/${usernameLower}/unlocks/${UNLOCK_TYPES.CHAT}`, true);
@@ -3725,8 +3736,7 @@
                     shouldUnlock = true; // Always unlock on click
                     break;
                 case UNLOCK_TYPES.CHAT:
-                    // Unlock if FINHUB is unlocked (clicked logo) or if sent 1 message
-                    shouldUnlock = unlockedFeatures.has(UNLOCK_TYPES.FINHUB) || messageCount >= 1;
+                    shouldUnlock = true; // Always unlocked
                     break;
                 case UNLOCK_TYPES.FRIENDS:
                     shouldUnlock = true; // Always unlocked
@@ -6316,12 +6326,206 @@
         // ============================================
         
         let clickerScore = 0;
+        let clickerCookies = [];
+        let clickerCookieInterval = null;
+        let cookieFrenzyActive = false;
+        let cookieFrenzyEndTime = 0;
+        let clickerParticles = [];
         
+        function startClickerCookies() {
+            const container = document.getElementById('clickerContainer');
+            if (!container || !container.classList.contains('active')) return;
+            
+            // Clear existing cookies
+            clickerCookies.forEach(cookie => {
+                if (cookie.element && cookie.element.parentElement) {
+                    cookie.element.remove();
+                }
+            });
+            clickerCookies = [];
+            
+            if (clickerCookieInterval) {
+                clearInterval(clickerCookieInterval);
+            }
+            
+            // Spawn cookies periodically
+            clickerCookieInterval = setInterval(() => {
+                const container = document.getElementById('clickerContainer');
+                if (!container || !container.classList.contains('active')) {
+                    stopClickerCookies();
+                    return;
+                }
+                spawnClickerCookie();
+            }, 2000); // Spawn every 2 seconds
+            
+            // Spawn initial cookies
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => spawnClickerCookie(), i * 500);
+            }
+        }
+        
+        function stopClickerCookies() {
+            if (clickerCookieInterval) {
+                clearInterval(clickerCookieInterval);
+                clickerCookieInterval = null;
+            }
+            clickerCookies.forEach(cookie => {
+                if (cookie.element && cookie.element.parentElement) {
+                    cookie.element.remove();
+                }
+            });
+            clickerCookies = [];
+            
+            // Clear particles
+            clickerParticles.forEach(particle => {
+                if (particle.element && particle.element.parentElement) {
+                    particle.element.remove();
+                }
+            });
+            clickerParticles = [];
+        }
+        
+        function spawnClickerCookie() {
+            const container = document.getElementById('clickerCookieContainer');
+            if (!container) return;
+            
+            const cookie = document.createElement('div');
+            cookie.textContent = '🍪';
+            cookie.style.position = 'absolute';
+            cookie.style.fontSize = (30 + Math.random() * 20) + 'px';
+            cookie.style.left = Math.random() * (container.offsetWidth - 50) + 'px';
+            cookie.style.top = '-50px';
+            cookie.style.pointerEvents = 'auto';
+            cookie.style.cursor = 'pointer';
+            cookie.style.zIndex = '10';
+            cookie.style.transition = 'transform 0.1s';
+            cookie.style.userSelect = 'none';
+            
+            container.appendChild(cookie);
+            
+            const cookieData = {
+                element: cookie,
+                x: parseFloat(cookie.style.left),
+                y: -50,
+                speed: 2 + Math.random() * 3,
+                rotation: Math.random() * 360,
+                rotationSpeed: (Math.random() - 0.5) * 5
+            };
+            
+            clickerCookies.push(cookieData);
+            
+            // Make cookie clickable
+            cookie.addEventListener('click', () => {
+                clickCookie(cookieData);
+            });
+            
+            // Animate cookie falling
+            animateClickerCookie(cookieData);
+        }
+        
+        function animateClickerCookie(cookieData) {
+            const container = document.getElementById('clickerCookieContainer');
+            if (!container || !cookieData.element.parentElement) {
+                const index = clickerCookies.indexOf(cookieData);
+                if (index > -1) clickerCookies.splice(index, 1);
+                return;
+            }
+            
+            cookieData.y += cookieData.speed;
+            cookieData.rotation += cookieData.rotationSpeed;
+            
+            cookieData.element.style.top = cookieData.y + 'px';
+            cookieData.element.style.transform = `rotate(${cookieData.rotation}deg)`;
+            
+            // Remove if off screen
+            if (cookieData.y > container.offsetHeight + 50) {
+                cookieData.element.remove();
+                const index = clickerCookies.indexOf(cookieData);
+                if (index > -1) clickerCookies.splice(index, 1);
+                return;
+            }
+            
+            requestAnimationFrame(() => animateClickerCookie(cookieData));
+        }
+        
+        function clickCookie(cookieData) {
+            if (!cookieData.element || !cookieData.element.parentElement) return;
+            
+            // Remove clicked cookie
+            cookieData.element.remove();
+            const index = clickerCookies.indexOf(cookieData);
+            if (index > -1) clickerCookies.splice(index, 1);
+            
+            // Trigger cookie frenzy
+            startCookieFrenzy();
+            
+            // Add points (with 2x multiplier if top clicker theme is active)
+            const multiplier = (currentTheme === 'topclicker') ? 2 : 1;
+            clickerScore += 10 * multiplier;
+            totalClicks += 10 * multiplier;
+            document.getElementById('clickerScore').textContent = clickerScore;
+            playSuccessSound();
+        }
+        
+        function startCookieFrenzy() {
+            cookieFrenzyActive = true;
+            cookieFrenzyEndTime = Date.now() + 5000; // 5 second frenzy
+            
+            // Show frenzy indicator
+            const container = document.getElementById('clickerContainer');
+            if (container) {
+                const frenzyText = document.createElement('div');
+                frenzyText.textContent = '🍪 COOKIE FRENZY! 🍪';
+                frenzyText.style.position = 'absolute';
+                frenzyText.style.top = '50%';
+                frenzyText.style.left = '50%';
+                frenzyText.style.transform = 'translate(-50%, -50%)';
+                frenzyText.style.fontSize = '48px';
+                frenzyText.style.fontWeight = 'bold';
+                frenzyText.style.color = '#ffd700';
+                frenzyText.style.textShadow = '0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 60px #ffd700';
+                frenzyText.style.pointerEvents = 'none';
+                frenzyText.style.zIndex = '1000';
+                frenzyText.style.animation = 'frenzyPulse 0.5s ease-out';
+                container.appendChild(frenzyText);
+                
+                setTimeout(() => {
+                    frenzyText.style.transition = 'all 0.5s ease-out';
+                    frenzyText.style.opacity = '0';
+                    frenzyText.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                    setTimeout(() => {
+                        if (frenzyText.parentElement) {
+                            frenzyText.remove();
+                        }
+                    }, 500);
+                }, 2000);
+            }
+            
+            // Spawn many cookies rapidly
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    if (cookieFrenzyActive) {
+                        spawnClickerCookie();
+                    }
+                }, i * 100);
+            }
+            
+            // End frenzy after 5 seconds
+            setTimeout(() => {
+                cookieFrenzyActive = false;
+            }, 5000);
+        }
         
         function clickClicker() {
-            clickerScore++;
-            totalClicks++;
+            // Check if top clicker theme is active for 2x multiplier
+            const multiplier = (currentTheme === 'topclicker') ? 2 : 1;
+            
+            clickerScore += multiplier;
+            totalClicks += multiplier;
             document.getElementById('clickerScore').textContent = clickerScore;
+            
+            // Create particle effects
+            createClickerParticles();
             
             // Check for theme unlocks
             if (totalClicks === 10) {
@@ -6347,6 +6551,99 @@
             if (usernameLower && database) {
                 writeToFirebase(`users/${usernameLower}/stats/totalClicks`, totalClicks);
             }
+        }
+        
+        function createClickerParticles() {
+            const button = document.getElementById('clickerButton');
+            const container = document.getElementById('clickerParticleContainer');
+            if (!button || !container) return;
+            
+            const buttonRect = button.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const centerX = buttonRect.left + buttonRect.width / 2 - containerRect.left;
+            const centerY = buttonRect.top + buttonRect.height / 2 - containerRect.top;
+            
+            // Create 15-20 particles
+            const particleCount = 15 + Math.floor(Math.random() * 6);
+            const colors = ['#238636', '#2ea043', '#3fb950', '#58a6ff', '#ffd700', '#ffa657'];
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const size = 4 + Math.random() * 6;
+                const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+                const speed = 2 + Math.random() * 4;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+                
+                particle.style.position = 'absolute';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.borderRadius = '50%';
+                particle.style.background = color;
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.pointerEvents = 'none';
+                particle.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+                particle.style.opacity = '1';
+                particle.style.transform = 'translate(-50%, -50%)';
+                
+                container.appendChild(particle);
+                
+                const particleData = {
+                    element: particle,
+                    x: centerX,
+                    y: centerY,
+                    vx: vx,
+                    vy: vy,
+                    life: 1.0,
+                    decay: 0.02 + Math.random() * 0.02,
+                    size: size,
+                    color: color
+                };
+                
+                clickerParticles.push(particleData);
+                
+                // Animate particle
+                animateClickerParticle(particleData);
+            }
+        }
+        
+        function animateClickerParticle(particleData) {
+            if (!particleData.element || !particleData.element.parentElement) {
+                const index = clickerParticles.indexOf(particleData);
+                if (index > -1) clickerParticles.splice(index, 1);
+                return;
+            }
+            
+            // Update position
+            particleData.x += particleData.vx;
+            particleData.y += particleData.vy;
+            
+            // Apply gravity
+            particleData.vy += 0.15;
+            
+            // Update life
+            particleData.life -= particleData.decay;
+            
+            // Update element
+            particleData.element.style.left = particleData.x + 'px';
+            particleData.element.style.top = particleData.y + 'px';
+            particleData.element.style.opacity = particleData.life;
+            particleData.element.style.transform = `translate(-50%, -50%) scale(${particleData.life})`;
+            
+            // Remove if dead or off screen
+            const container = document.getElementById('clickerParticleContainer');
+            if (particleData.life <= 0 || !container || 
+                particleData.x < -50 || particleData.x > container.offsetWidth + 50 ||
+                particleData.y < -50 || particleData.y > container.offsetHeight + 50) {
+                particleData.element.remove();
+                const index = clickerParticles.indexOf(particleData);
+                if (index > -1) clickerParticles.splice(index, 1);
+                return;
+            }
+            
+            requestAnimationFrame(() => animateClickerParticle(particleData));
         }
         
         function saveClickerScore() {
@@ -8680,6 +8977,346 @@
             });
         }
         
+        // ============================================
+        // PONG GAME
+        // ============================================
+        
+        let pongGame = {
+            canvas: null,
+            ctx: null,
+            playerY: 150,
+            aiY: 150,
+            ballX: 300,
+            ballY: 200,
+            ballSpeedX: 5,
+            ballSpeedY: 3,
+            playerScore: 0,
+            aiScore: 0,
+            paddleHeight: 80,
+            paddleWidth: 10,
+            ballSize: 10,
+            keys: {},
+            running: false,
+            animationId: null
+        };
+        
+        function togglePong() {
+            const pong = document.getElementById('pongContainer');
+            const chat = document.getElementById('globalChat');
+            const friends = document.getElementById('friendsContainer');
+            const paint = document.getElementById('paintContainer');
+            const clicker = document.getElementById('clickerContainer');
+            const minesweeper = document.getElementById('minesweeperContainer');
+            const snake = document.getElementById('snakeContainer');
+            const wordle = document.getElementById('wordleContainer');
+            const tetris = document.getElementById('tetrisContainer');
+            const blockBlast = document.getElementById('blockBlastContainer');
+            const themes = document.getElementById('themeContainer');
+            const notifications = document.getElementById('notificationsContainer');
+            
+            if (pong.classList.contains('active')) {
+                pong.classList.remove('active');
+                stopPongGame();
+                savePongScore();
+            } else {
+                pong.classList.add('active');
+                chat.classList.remove('active');
+                friends.classList.remove('active');
+                paint.classList.remove('active');
+                clicker.classList.remove('active');
+                minesweeper.classList.remove('active');
+                snake.classList.remove('active');
+                wordle.classList.remove('active');
+                tetris.classList.remove('active');
+                blockBlast.classList.remove('active');
+                themes.classList.remove('active');
+                if (notifications) notifications.classList.remove('active');
+                
+                initPong();
+                loadPongLeaderboard();
+            }
+        }
+        
+        function initPong() {
+            pongGame.canvas = document.getElementById('pongCanvas');
+            if (!pongGame.canvas) return;
+            
+            pongGame.ctx = pongGame.canvas.getContext('2d');
+            pongGame.playerY = pongGame.canvas.height / 2 - pongGame.paddleHeight / 2;
+            pongGame.aiY = pongGame.canvas.height / 2 - pongGame.paddleHeight / 2;
+            pongGame.ballX = pongGame.canvas.width / 2;
+            pongGame.ballY = pongGame.canvas.height / 2;
+            pongGame.ballSpeedX = 5;
+            pongGame.ballSpeedY = 3;
+            pongGame.playerScore = 0;
+            pongGame.aiScore = 0;
+            pongGame.keys = {};
+            
+            // Set up event listeners
+            document.addEventListener('keydown', handlePongKeyDown);
+            document.addEventListener('keyup', handlePongKeyUp);
+            
+            startPongGame();
+        }
+        
+        function handlePongKeyDown(e) {
+            if (!pongGame.running) return;
+            pongGame.keys[e.key.toLowerCase()] = true;
+        }
+        
+        function handlePongKeyUp(e) {
+            if (!pongGame.running) return;
+            pongGame.keys[e.key.toLowerCase()] = false;
+        }
+        
+        function startPongGame() {
+            if (pongGame.running) return;
+            pongGame.running = true;
+            pongGameLoop();
+        }
+        
+        function stopPongGame() {
+            pongGame.running = false;
+            if (pongGame.animationId) {
+                cancelAnimationFrame(pongGame.animationId);
+                pongGame.animationId = null;
+            }
+            document.removeEventListener('keydown', handlePongKeyDown);
+            document.removeEventListener('keyup', handlePongKeyUp);
+        }
+        
+        function pongGameLoop() {
+            if (!pongGame.running) return;
+            
+            updatePong();
+            drawPong();
+            
+            pongGame.animationId = requestAnimationFrame(pongGameLoop);
+        }
+        
+        function updatePong() {
+            // Player movement
+            if (pongGame.keys['w'] || pongGame.keys['arrowup']) {
+                pongGame.playerY -= 7;
+            }
+            if (pongGame.keys['s'] || pongGame.keys['arrowdown']) {
+                pongGame.playerY += 7;
+            }
+            
+            // Keep player paddle in bounds
+            if (pongGame.playerY < 0) pongGame.playerY = 0;
+            if (pongGame.playerY + pongGame.paddleHeight > pongGame.canvas.height) {
+                pongGame.playerY = pongGame.canvas.height - pongGame.paddleHeight;
+            }
+            
+            // AI movement (right paddle) - follows ball with slight delay for challenge
+            const aiCenter = pongGame.aiY + pongGame.paddleHeight / 2;
+            const ballCenter = pongGame.ballY;
+            const diff = ballCenter - aiCenter;
+            
+            // Only move if ball is coming towards AI (on right side)
+            if (pongGame.ballSpeedX > 0) {
+                if (Math.abs(diff) > 5) {
+                    if (diff > 0) {
+                        pongGame.aiY += 5;
+                    } else {
+                        pongGame.aiY -= 5;
+                    }
+                }
+            } else {
+                // If ball is moving away, move towards center
+                const centerY = pongGame.canvas.height / 2 - pongGame.paddleHeight / 2;
+                const centerDiff = centerY - pongGame.aiY;
+                if (Math.abs(centerDiff) > 3) {
+                    if (centerDiff > 0) {
+                        pongGame.aiY += 3;
+                    } else {
+                        pongGame.aiY -= 3;
+                    }
+                }
+            }
+            
+            // Keep AI paddle in bounds
+            if (pongGame.aiY < 0) pongGame.aiY = 0;
+            if (pongGame.aiY + pongGame.paddleHeight > pongGame.canvas.height) {
+                pongGame.aiY = pongGame.canvas.height - pongGame.paddleHeight;
+            }
+            
+            // Update ball position
+            pongGame.ballX += pongGame.ballSpeedX;
+            pongGame.ballY += pongGame.ballSpeedY;
+            
+            // Ball collision with top/bottom walls
+            if (pongGame.ballY <= 0 || pongGame.ballY >= pongGame.canvas.height - pongGame.ballSize) {
+                pongGame.ballSpeedY = -pongGame.ballSpeedY;
+                playClickSound();
+            }
+            
+            // Ball collision with player paddle (left)
+            if (pongGame.ballX <= pongGame.paddleWidth &&
+                pongGame.ballY + pongGame.ballSize >= pongGame.playerY &&
+                pongGame.ballY <= pongGame.playerY + pongGame.paddleHeight) {
+                pongGame.ballSpeedX = -pongGame.ballSpeedX;
+                // Add some spin based on where ball hits paddle
+                const hitPos = (pongGame.ballY - pongGame.playerY) / pongGame.paddleHeight;
+                pongGame.ballSpeedY = (hitPos - 0.5) * 8;
+                playClickSound();
+            }
+            
+            // Ball collision with AI paddle (right)
+            if (pongGame.ballX + pongGame.ballSize >= pongGame.canvas.width - pongGame.paddleWidth &&
+                pongGame.ballY + pongGame.ballSize >= pongGame.aiY &&
+                pongGame.ballY <= pongGame.aiY + pongGame.paddleHeight) {
+                pongGame.ballSpeedX = -pongGame.ballSpeedX;
+                // Add some spin
+                const hitPos = (pongGame.ballY - pongGame.aiY) / pongGame.paddleHeight;
+                pongGame.ballSpeedY = (hitPos - 0.5) * 8;
+                playClickSound();
+            }
+            
+            // Score points
+            if (pongGame.ballX < 0) {
+                pongGame.aiScore++;
+                resetPongBall();
+                playErrorSound();
+            }
+            if (pongGame.ballX > pongGame.canvas.width) {
+                pongGame.playerScore++;
+                resetPongBall();
+                playSuccessSound();
+                
+                // Check for theme unlock
+                if (pongGame.playerScore === 10) {
+                    unlockTheme('pong');
+                }
+            }
+            
+            // Update UI
+            document.getElementById('pongPlayerScore').textContent = pongGame.playerScore;
+            document.getElementById('pongAIScore').textContent = pongGame.aiScore;
+        }
+        
+        function resetPongBall() {
+            pongGame.ballX = pongGame.canvas.width / 2;
+            pongGame.ballY = pongGame.canvas.height / 2;
+            pongGame.ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * 5;
+            pongGame.ballSpeedY = (Math.random() > 0.5 ? 1 : -1) * 3;
+        }
+        
+        function drawPong() {
+            const ctx = pongGame.ctx;
+            const canvas = pongGame.canvas;
+            
+            // Clear canvas
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw center line
+            ctx.strokeStyle = '#30363d';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw player paddle (left)
+            ctx.fillStyle = '#58a6ff';
+            ctx.fillRect(0, pongGame.playerY, pongGame.paddleWidth, pongGame.paddleHeight);
+            
+            // Draw AI paddle (right)
+            ctx.fillStyle = '#f85149';
+            ctx.fillRect(canvas.width - pongGame.paddleWidth, pongGame.aiY, pongGame.paddleWidth, pongGame.paddleHeight);
+            
+            // Draw ball
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(pongGame.ballX, pongGame.ballY, pongGame.ballSize, pongGame.ballSize);
+        }
+        
+        function resetPong() {
+            stopPongGame();
+            pongGame.playerScore = 0;
+            pongGame.aiScore = 0;
+            resetPongBall();
+            pongGame.playerY = pongGame.canvas.height / 2 - pongGame.paddleHeight / 2;
+            pongGame.aiY = pongGame.canvas.height / 2 - pongGame.paddleHeight / 2;
+            document.getElementById('pongPlayerScore').textContent = 0;
+            document.getElementById('pongAIScore').textContent = 0;
+            startPongGame();
+        }
+        
+        function savePongScore() {
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            
+            if (!usernameLower || !database || pongGame.playerScore === 0) return;
+            
+            // Save best score
+            readFromFirebase(`pongScores/${usernameLower}`).then((existing) => {
+                const bestScore = existing && existing.bestScore ? existing.bestScore : 0;
+                if (pongGame.playerScore > bestScore) {
+                    writeToFirebase(`pongScores/${usernameLower}`, {
+                        username: username,
+                        usernameLower: usernameLower,
+                        bestScore: pongGame.playerScore,
+                        timestamp: Date.now()
+                    });
+                    document.getElementById('pongBestScore').textContent = pongGame.playerScore;
+                }
+            });
+        }
+        
+        function loadPongLeaderboard() {
+            if (!database) return;
+            
+            const leaderboard = document.getElementById('pongLeaderboard');
+            leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Loading...</p>';
+            
+            readFromFirebase('pongScores').then((scores) => {
+                if (!scores || Object.keys(scores).length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No scores yet!</p>';
+                    return;
+                }
+                
+                const scoreArray = Object.values(scores)
+                    .filter(entry => entry && entry.username)
+                    .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0))
+                    .slice(0, 10);
+                
+                leaderboard.innerHTML = '';
+                if (scoreArray.length === 0) {
+                    leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">No valid scores yet!</p>';
+                    return;
+                }
+                
+                scoreArray.forEach((entry, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item';
+                    item.innerHTML = `
+                        <span class="leaderboard-rank">${index + 1}.</span>
+                        <span class="leaderboard-username">${entry.username}</span>
+                        <span class="leaderboard-score">${entry.bestScore || 0}</span>
+                    `;
+                    leaderboard.appendChild(item);
+                });
+            }).catch(err => {
+                console.error('Error loading pong leaderboard:', err);
+                leaderboard.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px;">Error loading leaderboard</p>';
+            });
+            
+            // Load best score
+            const username = localStorage.getItem('loggedInUsername');
+            const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
+            if (usernameLower) {
+                readFromFirebase(`pongScores/${usernameLower}`).then((data) => {
+                    if (data && data.bestScore) {
+                        document.getElementById('pongBestScore').textContent = data.bestScore;
+                    }
+                });
+            }
+        }
+        
         function saveTetrisScore() {
             const username = localStorage.getItem('loggedInUsername');
             const usernameLower = localStorage.getItem('loggedInUsernameLower') || (username ? username.toLowerCase() : null);
@@ -9025,6 +9662,12 @@
                 pongThemeCanvas.remove();
                 pongThemeCanvas = null;
                 pongThemeCtx = null;
+            }
+            
+            // Stop Top Clicker rainbow animation
+            if (topClickerRainbowInterval) {
+                clearInterval(topClickerRainbowInterval);
+                topClickerRainbowInterval = null;
             }
             
             // Clear cursors
@@ -10011,6 +10654,8 @@
         // TOP CLICKER THEME
         // ============================================
         
+        let topClickerRainbowInterval = null;
+        
         function applyTopClickerTheme() {
             const bg = document.getElementById('themeBackground');
             bg.classList.add('active');
@@ -10020,18 +10665,19 @@
                 : 'linear-gradient(135deg, #1a0a00 0%, #2d1a00 50%, #1a0a00 100%)';
             bg.style.opacity = '0.9';
             
-            // Make FinHub title gold and glowing
+            // Make FinHub title rainbow colors
             const titleContainer = document.getElementById('finhubTitle');
             if (titleContainer) {
                 const letters = titleContainer.querySelectorAll('.title-letter');
                 letters.forEach((letter) => {
-                    letter.style.color = '#ffd700';
-                    letter.style.textShadow = '0 0 20px #ffd700, 0 0 40px #ffaa00, 0 0 60px #ff8800';
                     letter.style.transition = 'all 0.3s ease';
                 });
                 
                 // Add floating animation
                 titleContainer.style.animation = 'floatTitle 3s ease-in-out infinite';
+                
+                // Start rainbow color animation
+                startTopClickerRainbow(letters);
             }
             
             // Add CSS animation if not already added
@@ -10046,6 +10692,31 @@
                 `;
                 document.head.appendChild(style);
             }
+        }
+        
+        function startTopClickerRainbow(letters) {
+            if (topClickerRainbowInterval) {
+                clearInterval(topClickerRainbowInterval);
+            }
+            
+            let hue = 0;
+            topClickerRainbowInterval = setInterval(() => {
+                if (currentTheme !== 'topclicker') {
+                    clearInterval(topClickerRainbowInterval);
+                    topClickerRainbowInterval = null;
+                    return;
+                }
+                
+                letters.forEach((letter, index) => {
+                    // Each letter has a slightly different hue offset for rainbow effect
+                    const letterHue = (hue + (index * 60)) % 360;
+                    const color = `hsl(${letterHue}, 100%, 60%)`;
+                    letter.style.color = color;
+                    letter.style.textShadow = `0 0 20px ${color}, 0 0 40px ${color}, 0 0 60px ${color}`;
+                });
+                
+                hue = (hue + 2) % 360; // Slowly cycle through colors
+            }, 50); // Update every 50ms for smooth rainbow effect
         }
         
         // ============================================
