@@ -9,6 +9,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -1075,6 +1076,59 @@
             border-color: #30363d;
             cursor: not-allowed;
             opacity: 0.5;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #8b949e;
+            font-size: 14px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .divider span {
+            padding: 0 10px;
+        }
+        
+        .google-signin-btn {
+            width: 100%;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #24292f;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .google-signin-btn:hover {
+            background: #f6f8fa;
+            border-color: #1f6feb;
+            box-shadow: 0 2px 8px rgba(31, 111, 235, 0.2);
+        }
+        
+        body.light-mode .google-signin-btn {
+            background: #fff;
+            border-color: #d0d7de;
+        }
+        
+        body.light-mode .google-signin-btn:hover {
+            background: #f6f8fa;
+            border-color: #1f6feb;
         }
         
         .error-message {
@@ -2655,6 +2709,18 @@
                     <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
                 </div>
                 <button class="login-btn" onclick="handleLogin()">Login</button>
+                <div class="divider">
+                    <span>or</span>
+                </div>
+                <button class="google-signin-btn" onclick="handleGoogleSignIn()">
+                    <svg width="18" height="18" viewBox="0 0 18 18" style="margin-right: 8px;">
+                        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                        <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.951H.957C.348 6.173 0 7.55 0 9s.348 2.827.957 4.049l3.007-2.342z"/>
+                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.951L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/>
+                    </svg>
+                    Sign in with Google
+                </button>
                 <div class="error-message" id="loginError"></div>
             </div>
             
@@ -2673,6 +2739,18 @@
                     <input type="password" id="signupPasswordConfirm" placeholder="Confirm your password" autocomplete="new-password">
                 </div>
                 <button class="login-btn" onclick="handleSignup()">Sign Up</button>
+                <div class="divider">
+                    <span>or</span>
+                </div>
+                <button class="google-signin-btn" onclick="handleGoogleSignIn()">
+                    <svg width="18" height="18" viewBox="0 0 18 18" style="margin-right: 8px;">
+                        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                        <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.951H.957C.348 6.173 0 7.55 0 9s.348 2.827.957 4.049l3.007-2.342z"/>
+                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.951L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/>
+                    </svg>
+                    Sign in with Google
+                </button>
                 <div class="error-message" id="signupError"></div>
                 <div class="success-message" id="signupSuccess"></div>
             </div>
@@ -3706,6 +3784,34 @@
                 if (!unlockedFeatures.has(UNLOCK_TYPES.FRIENDS)) {
                     unlockFeature(UNLOCK_TYPES.FRIENDS);
                 }
+                
+                // Unlock all games instantly
+                if (!unlockedFeatures.has(UNLOCK_TYPES.PAINT)) {
+                    unlockFeature(UNLOCK_TYPES.PAINT);
+                }
+                if (!unlockedFeatures.has(UNLOCK_TYPES.CLICKER)) {
+                    unlockFeature(UNLOCK_TYPES.CLICKER);
+                }
+                if (!unlockedFeatures.has(UNLOCK_TYPES.MINESWEEPER)) {
+                    unlockFeature(UNLOCK_TYPES.MINESWEEPER);
+                }
+                if (!unlockedFeatures.has(UNLOCK_TYPES.SNAKE)) {
+                    unlockFeature(UNLOCK_TYPES.SNAKE);
+                }
+                
+                // Unlock themes feature instantly
+                if (!unlockedFeatures.has(UNLOCK_TYPES.THEMES)) {
+                    unlockFeature(UNLOCK_TYPES.THEMES);
+                }
+                
+                // Unlock all games in Firebase instantly
+                if (database && usernameLower) {
+                    writeToFirebase(`users/${usernameLower}/unlockedGames/wordle`, true);
+                    writeToFirebase(`users/${usernameLower}/unlockedGames/tetris`, true);
+                    writeToFirebase(`users/${usernameLower}/unlockedGames/blockblast`, true);
+                    writeToFirebase(`users/${usernameLower}/unlockedGames/pong`, true);
+                }
+                
                 updateUIUnlocks();
             });
             
@@ -12515,12 +12621,137 @@
             showMainPage();
         }
         
+        // Handle Google Sign-In
+        async function handleGoogleSignIn() {
+            if (!auth) {
+                const errorEl = document.getElementById('loginError') || document.getElementById('signupError');
+                if (errorEl) {
+                    errorEl.textContent = 'Firebase Auth not available. Please wait...';
+                }
+                playErrorSound();
+                return;
+            }
+            
+            const errorEl = document.getElementById('loginError') || document.getElementById('signupError');
+            if (errorEl) {
+                errorEl.textContent = '';
+            }
+            
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                if (!user) {
+                    throw new Error('No user data received');
+                }
+                
+                // Get user info from Google
+                const displayName = user.displayName || user.email?.split('@')[0] || 'User';
+                const email = user.email || '';
+                const photoURL = user.photoURL || '';
+                const googleUid = user.uid;
+                
+                // Create a username from Google display name or email
+                let username = displayName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 20) || email.split('@')[0].substring(0, 20) || 'googleuser';
+                if (username.length < 3) {
+                    username = 'googleuser' + Math.random().toString(36).substring(2, 7);
+                }
+                const usernameLower = username.toLowerCase();
+                
+                // Check if user already exists in our system (by Google UID or username)
+                let userData = await readFromFirebase(`userAccounts/${usernameLower}`);
+                
+                // Also check if there's a mapping from Google UID to username
+                const googleUserMapping = await readFromFirebase(`googleUsers/${googleUid}`);
+                if (googleUserMapping && googleUserMapping.usernameLower) {
+                    userData = await readFromFirebase(`userAccounts/${googleUserMapping.usernameLower}`);
+                    if (userData) {
+                        username = userData.username || googleUserMapping.usernameLower;
+                    }
+                }
+                
+                // If user doesn't exist, create account
+                if (!userData) {
+                    // Make sure username is unique
+                    let finalUsername = username;
+                    let finalUsernameLower = usernameLower;
+                    let counter = 1;
+                    while (await readFromFirebase(`userAccounts/${finalUsernameLower}`)) {
+                        finalUsername = username + counter;
+                        finalUsernameLower = finalUsername.toLowerCase();
+                        counter++;
+                    }
+                    
+                    userData = {
+                        username: finalUsername,
+                        usernameLower: finalUsernameLower,
+                        googleUid: googleUid,
+                        email: email,
+                        photoURL: photoURL,
+                        createdAt: Date.now(),
+                        isGoogleUser: true
+                    };
+                    
+                    await writeToFirebase(`userAccounts/${finalUsernameLower}`, userData);
+                    await writeToFirebase(`googleUsers/${googleUid}`, {
+                        username: finalUsername,
+                        usernameLower: finalUsernameLower
+                    });
+                    
+                    username = finalUsername;
+                } else {
+                    // Update Google info if needed
+                    if (!userData.googleUid) {
+                        userData.googleUid = googleUid;
+                        userData.email = email;
+                        userData.photoURL = photoURL;
+                        userData.isGoogleUser = true;
+                        await writeToFirebase(`userAccounts/${userData.usernameLower}`, userData);
+                        await writeToFirebase(`googleUsers/${googleUid}`, {
+                            username: userData.username,
+                            usernameLower: userData.usernameLower
+                        });
+                    }
+                }
+                
+                // Login successful - store username
+                localStorage.setItem('loggedInUsername', userData.username || username);
+                localStorage.setItem('loggedInUsernameLower', userData.usernameLower || usernameLower);
+                localStorage.setItem('loginTime', Date.now().toString());
+                
+                playLoginSound();
+                
+                // Show main page
+                showMainPage();
+                
+            } catch (error) {
+                console.error('Google Sign-In error:', error);
+                if (errorEl) {
+                    if (error.code === 'auth/popup-closed-by-user') {
+                        errorEl.textContent = 'Sign-in cancelled';
+                    } else if (error.code === 'auth/popup-blocked') {
+                        errorEl.textContent = 'Popup blocked. Please allow popups and try again.';
+                    } else {
+                        errorEl.textContent = 'Google Sign-In failed: ' + error.message;
+                    }
+                }
+                playErrorSound();
+            }
+        }
+        
         // Logout
         function logout() {
             playLogoutSound();
             stopTimeTracking();
             stopTopClickerCheck();
             stopFollowedUsersCheck();
+            
+            // Sign out from Firebase Auth if signed in with Google
+            if (auth) {
+                auth.signOut().catch(err => console.error('Auth sign out error:', err));
+            }
+            
             localStorage.removeItem('loggedInUsername');
             localStorage.removeItem('loggedInUsernameLower');
             localStorage.removeItem('loginTime');
@@ -12535,6 +12766,40 @@
             if (username) {
                 showMainPage();
                 // Time tracking will start in showMainPage()
+            } else {
+                // Check if user is signed in with Google
+                if (auth) {
+                    auth.onAuthStateChanged((user) => {
+                        if (user && user.providerData && user.providerData[0] && user.providerData[0].providerId === 'google.com') {
+                            // User is signed in with Google, restore session
+                            handleGoogleAuthState(user);
+                        } else {
+                            showLoginPage();
+                        }
+                    });
+                } else {
+                    showLoginPage();
+                }
+            }
+        }
+        
+        // Handle Google Auth State (for users already signed in)
+        async function handleGoogleAuthState(user) {
+            if (!user) return;
+            
+            const googleUid = user.uid;
+            const googleUserMapping = await readFromFirebase(`googleUsers/${googleUid}`);
+            
+            if (googleUserMapping && googleUserMapping.usernameLower) {
+                const userData = await readFromFirebase(`userAccounts/${googleUserMapping.usernameLower}`);
+                if (userData) {
+                    localStorage.setItem('loggedInUsername', userData.username || googleUserMapping.username);
+                    localStorage.setItem('loggedInUsernameLower', googleUserMapping.usernameLower);
+                    localStorage.setItem('loginTime', Date.now().toString());
+                    showMainPage();
+                } else {
+                    showLoginPage();
+                }
             } else {
                 showLoginPage();
             }
@@ -14008,7 +14273,7 @@
         };
         
         // Initialize Firebase
-        let firebaseApp, database;
+        let firebaseApp, database, auth;
         
         // Function to check Firebase connection status
         function checkFirebaseConnection() {
@@ -14059,10 +14324,12 @@
                 if (!firebase.apps || firebase.apps.length === 0) {
                     firebaseApp = firebase.initializeApp(firebaseConfig);
                     database = firebase.database();
+                    auth = firebase.auth();
                     console.log('✅ Firebase connected - Online features enabled!');
                 } else {
                     firebaseApp = firebase.app();
                     database = firebase.database();
+                    auth = firebase.auth();
                 }
             } catch (e) {
                 console.warn('⚠️ Firebase initialization failed, using localStorage fallback:', e);
