@@ -3812,6 +3812,13 @@
                     totalClicks = stats.totalClicks || 0;
                 }
                 
+                if (friendCount >= 1) {
+                    checkUnlock(UNLOCK_TYPES.PAINT);
+                }
+                if (friendCount >= 5) {
+                    checkUnlock(UNLOCK_TYPES.SNAKE);
+                }
+                
                 if (totalClicks >= 100) {
                     unlockTheme('clicker100');
                 }
@@ -4190,7 +4197,7 @@
             if (e.key === ';' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
                 e.preventDefault();
                 const commandBar = document.getElementById('commandBar');
-                if (commandBar && !commandBar.classList.contains('locked')) {
+                if (commandBar) {
                     if (!commandBar.classList.contains('active')) {
                         commandBar.classList.add('active');
                         setTimeout(() => {
@@ -4637,16 +4644,6 @@
                 writeToFirebase(`users/${usernameLower}/stats/colorChangeCount`, colorChangeCount);
             }
             
-            // Unlock textures based on color changes
-            if (colorChangeCount >= 1 && !unlockedTextures.has('dots')) {
-                unlockTexture('dots');
-            }
-            if (colorChangeCount >= 3 && !unlockedTextures.has('lines')) {
-                unlockTexture('lines');
-            }
-            if (colorChangeCount >= 5 && !unlockedTextures.has('grid')) {
-                unlockTexture('grid');
-            }
         }
         
         // ============================================
@@ -4775,11 +4772,6 @@
                     writeToFirebase(`users/${usernameLower}/stats/messageCount`, messageCount);
                 }
                 
-                // Check unlocks
-                if (messageCount === 1) {
-                    checkUnlock(UNLOCK_TYPES.CHAT);
-                    checkUnlock(UNLOCK_TYPES.FRIENDS);
-                }
             });
         }
         
@@ -4986,9 +4978,11 @@
                         writeToFirebase(`users/${usernameLower}/stats/friendCount`, friendCount);
                     }
                     
-                    // Check paint unlock
                     if (friendCount >= 1) {
                         checkUnlock(UNLOCK_TYPES.PAINT);
+                    }
+                    if (friendCount >= 5) {
+                        checkUnlock(UNLOCK_TYPES.SNAKE);
                     }
                 });
             });
@@ -6258,10 +6252,8 @@
                     localStrokes.push(currentStroke);
                     currentStroke = null;
                     
-                    // Mark that user has drawn and check for command bar unlock
                     if (!hasDrawn) {
                         hasDrawn = true;
-                        checkUnlock(UNLOCK_TYPES.COMMANDBAR);
                     }
                 }
                 paintCtx.beginPath();
@@ -6542,10 +6534,6 @@
             // Create particle effects
             createClickerParticles();
             
-            // Check for theme unlocks
-            if (totalClicks === 10) {
-                checkUnlock(UNLOCK_TYPES.THEMES);
-            }
             if (totalClicks === 100) {
                 unlockTheme('clicker100');
             }
