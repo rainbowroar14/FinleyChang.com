@@ -3799,10 +3799,17 @@
                     unlockFeature(UNLOCK_TYPES.SNAKE);
                 }
                 
-                // Unlock themes feature instantly
-                if (!unlockedFeatures.has(UNLOCK_TYPES.THEMES)) {
-                    unlockFeature(UNLOCK_TYPES.THEMES);
+                // FINHUB + command bar: unlock everything except themes (themes stay progression-gated)
+                if (!unlockedFeatures.has(UNLOCK_TYPES.FINHUB)) {
+                    unlockFeature(UNLOCK_TYPES.FINHUB);
                 }
+                if (!unlockedFeatures.has(UNLOCK_TYPES.COMMANDBAR)) {
+                    unlockFeature(UNLOCK_TYPES.COMMANDBAR);
+                }
+                
+                unlockTexture('dots');
+                unlockTexture('lines');
+                unlockTexture('grid');
                 
                 // Unlock all games in Firebase instantly
                 if (database && usernameLower) {
@@ -12082,7 +12089,10 @@
                     const scoreArray = Object.values(clickerScores)
                         .filter(entry => entry && entry.username)
                         .sort((a, b) => (b.score || 0) - (a.score || 0));
-                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    const rank = scoreArray.findIndex(entry => {
+                        const entryLower = entry.usernameLower || (entry.username ? entry.username.toLowerCase() : '');
+                        return entryLower === usernameLower;
+                    }) + 1;
                     if (rank > 0 && rank <= 3) {
                         rankings.push({ type: 'Clicker', rank: rank });
                     }
@@ -12098,7 +12108,10 @@
                     const scoreArray = Object.values(minesweeperScores)
                         .filter(entry => entry && entry.username)
                         .sort((a, b) => (a.time || Infinity) - (b.time || Infinity));
-                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    const rank = scoreArray.findIndex(entry => {
+                        const entryLower = entry.usernameLower || (entry.username ? entry.username.toLowerCase() : '');
+                        return entryLower === usernameLower;
+                    }) + 1;
                     if (rank > 0 && rank <= 3) {
                         rankings.push({ type: 'Minesweeper', rank: rank });
                     }
@@ -12114,7 +12127,10 @@
                     const scoreArray = Object.values(snakeScores)
                         .filter(entry => entry && entry.username)
                         .sort((a, b) => (b.score || 0) - (a.score || 0));
-                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    const rank = scoreArray.findIndex(entry => {
+                        const entryLower = entry.usernameLower || (entry.username ? entry.username.toLowerCase() : '');
+                        return entryLower === usernameLower;
+                    }) + 1;
                     if (rank > 0 && rank <= 3) {
                         rankings.push({ type: 'Snake', rank: rank });
                     }
@@ -12130,7 +12146,10 @@
                     const scoreArray = Object.values(hexagonScores)
                         .filter(entry => entry && entry.username)
                         .sort((a, b) => (b.score || 0) - (a.score || 0));
-                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    const rank = scoreArray.findIndex(entry => {
+                        const entryLower = entry.usernameLower || (entry.username ? entry.username.toLowerCase() : '');
+                        return entryLower === usernameLower;
+                    }) + 1;
                     if (rank > 0 && rank <= 3) {
                         rankings.push({ type: 'Hexagon Hogs', rank: rank });
                     }
@@ -12146,7 +12165,10 @@
                     const scoreArray = Object.values(timeScores)
                         .filter(entry => entry && entry.username)
                         .sort((a, b) => (b.timeSpent || 0) - (a.timeSpent || 0));
-                    const rank = scoreArray.findIndex(entry => entry.usernameLower === usernameLower) + 1;
+                    const rank = scoreArray.findIndex(entry => {
+                        const entryLower = entry.usernameLower || (entry.username ? entry.username.toLowerCase() : '');
+                        return entryLower === usernameLower;
+                    }) + 1;
                     if (rank > 0 && rank <= 3) {
                         rankings.push({ type: 'Time Spent', rank: rank });
                     }
@@ -12824,6 +12846,10 @@
                 // Check if user is admin (Finley)
                 checkAdminStatus();
                 
+                // Reset game state variables to prevent data transfer between accounts
+                hexagonScore = 0;
+                hexagonHogsSlapped = 0;
+                
                 // Sync all game data from Firebase
                 syncAllGameData();
                 
@@ -13389,11 +13415,31 @@
         async function syncHexagonScore(usernameLower) {
             try {
                 const cloudData = await readFromFirebase(`hexagonScores/${usernameLower}`);
-                const localScore = hexagonScore || 0;
                 const cloudScore = cloudData?.score || 0;
+                
+                // Load the user's actual score from cloud first, then compare with local
+                // Only use local score if it's from the current session (not from previous user)
+                const currentUsername = localStorage.getItem('loggedInUsername');
+                const currentUsernameLower = localStorage.getItem('loggedInUsernameLower');
+                
+                // Reset hexagonScore if we're syncing for a different user
+                // This prevents data transfer between accounts
+                if (currentUsernameLower !== usernameLower) {
+                    hexagonScore = 0;
+                    hexagonHogsSlapped = 0;
+                    return;
+                }
+                
+                // If cloud has a score, use that as the baseline
+                if (cloudScore > 0) {
+                    hexagonScore = Math.max(hexagonScore, cloudScore);
+                }
+                
+                const localScore = hexagonScore || 0;
                 
                 if (cloudScore > localScore) {
                     // Cloud has higher score
+                    hexagonScore = cloudScore;
                     syncConflicts.push({
                         game: 'Hexagon Hogs',
                         type: 'score',
@@ -13405,7 +13451,7 @@
                 } else if (localScore > cloudScore && localScore > 0) {
                     // Local has higher score, save to cloud
                     await writeToFirebase(`hexagonScores/${usernameLower}`, {
-                        username: localStorage.getItem('loggedInUsername'),
+                        username: currentUsername,
                         usernameLower: usernameLower,
                         score: localScore,
                         timestamp: Date.now()
