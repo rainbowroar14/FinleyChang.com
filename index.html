@@ -806,6 +806,11 @@
             color: #24292f;
         }
         
+        a.game-folder-item {
+            text-decoration: none;
+            color: inherit;
+        }
+        
         .page {
             min-height: calc(100vh - 40px);
             display: flex;
@@ -2855,6 +2860,7 @@
             <div class="sidebar-btn" id="friendsBtn" onclick="toggleFriends()">👥 Friends</div>
             <div class="sidebar-btn" id="gamesBtn" onclick="toggleGamesFolder()">🎮 Games</div>
             <div class="sidebar-btn" id="themesBtn" onclick="toggleThemes()">🎨 Themes</div>
+            <div class="sidebar-btn" id="moreBtn" onclick="toggleMoreFolder()">⋯ More</div>
         </div>
         
         <!-- Theme Selector -->
@@ -3524,6 +3530,28 @@
         </div>
     </div>
     
+    <!-- More (external links) -->
+    <div class="games-folder" id="moreFolder">
+        <div class="games-folder-header">
+            <h2 class="games-folder-title">⋯ More</h2>
+            <button class="games-folder-close" onclick="toggleMoreFolder()">✕ Close</button>
+        </div>
+        <div class="games-grid">
+            <a class="game-folder-item" href="https://rainbowroar14.github.io/FinleyChang.com-Unblocked2/" target="_blank" rel="noopener noreferrer">
+                <div class="game-folder-icon">🌐</div>
+                <div class="game-folder-name">FinVerse Hub</div>
+            </a>
+            <a class="game-folder-item" href="https://rainbowroar14.github.io/FinleyChang.com-Unblocked3/" target="_blank" rel="noopener noreferrer">
+                <div class="game-folder-icon">🌊</div>
+                <div class="game-folder-name">Geometry Dash Wave</div>
+            </a>
+            <a class="game-folder-item" href="https://rainbowroar14.github.io/FinleyChang.com-Unblocked4/" target="_blank" rel="noopener noreferrer">
+                <div class="game-folder-icon">🏖️</div>
+                <div class="game-folder-name">Sand Sim</div>
+            </a>
+        </div>
+    </div>
+    
     <!-- Home page -->
     <div class="page home-page hidden" id="homePage">
         <h1>Welcome to the home</h1>
@@ -3535,7 +3563,7 @@
         // ============================================
         // VERSION INFO - UPDATE THIS ON EACH UPDATE
         // ============================================
-        const APP_VERSION = '2.0.1';
+        const APP_VERSION = '2.0.2';
         
         // ============================================
         // SOUND EFFECTS SYSTEM
@@ -14048,12 +14076,34 @@
         
         function toggleGamesFolder() {
             const folder = document.getElementById('gamesFolder');
+            const moreFolder = document.getElementById('moreFolder');
             if (!folder) {
                 console.error('Games folder element not found');
                 return;
             }
-            // Toggle the active class
             const wasActive = folder.classList.contains('active');
+            if (!wasActive && moreFolder && moreFolder.classList.contains('active')) {
+                moreFolder.classList.remove('active');
+            }
+            folder.classList.toggle('active');
+            if (wasActive) {
+                playCloseSound();
+            } else {
+                playOpenSound();
+            }
+        }
+        
+        function toggleMoreFolder() {
+            const folder = document.getElementById('moreFolder');
+            const gamesFolderEl = document.getElementById('gamesFolder');
+            if (!folder) {
+                console.error('More folder element not found');
+                return;
+            }
+            const wasActive = folder.classList.contains('active');
+            if (!wasActive && gamesFolderEl && gamesFolderEl.classList.contains('active')) {
+                gamesFolderEl.classList.remove('active');
+            }
             folder.classList.toggle('active');
             if (wasActive) {
                 playCloseSound();
@@ -14098,21 +14148,25 @@
             }, 100);
         }
         
-        // Close games folder when clicking outside
+        // Close games / more folder when clicking the backdrop
         document.addEventListener('click', (e) => {
             const folder = document.getElementById('gamesFolder');
+            const moreFolder = document.getElementById('moreFolder');
             const gamesBtn = document.getElementById('gamesBtn');
+            const moreBtn = document.getElementById('moreBtn');
             
-            // Don't do anything if clicking the games button (it has its own handler)
             if (gamesBtn && (gamesBtn.contains(e.target) || e.target === gamesBtn)) {
                 return;
             }
+            if (moreBtn && (moreBtn.contains(e.target) || e.target === moreBtn)) {
+                return;
+            }
             
-            if (folder && folder.classList.contains('active')) {
-                // Only close if clicking on the backdrop (the folder itself, not its children)
-                if (e.target === folder) {
-                    toggleGamesFolder();
-                }
+            if (folder && folder.classList.contains('active') && e.target === folder) {
+                toggleGamesFolder();
+            }
+            if (moreFolder && moreFolder.classList.contains('active') && e.target === moreFolder) {
+                toggleMoreFolder();
             }
         });
         
